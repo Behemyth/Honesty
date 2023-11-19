@@ -33,7 +33,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${file_list})
 # Make the 'tests' project the default startup
 set_property(
 	DIRECTORY
-		${CMAKE_CURRENT_SOURCE_DIR}
+		${CMAKE_SOURCE_DIR}
 	PROPERTY
 		VS_STARTUP_PROJECT tests
 )

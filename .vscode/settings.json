@@ -1,5 +1,6 @@
 {
     "files.associations": {
         "*.ixx": "cpp"
-    }
+    },
+    "asciidoc.antora.enableAntoraSupport": true
 }

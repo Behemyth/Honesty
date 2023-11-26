@@ -7,7 +7,7 @@ import :test;
 
 export namespace synodic::honesty
 {
-	class Suite
+	class [[nodiscard]] Suite
 	{
 	public:
 		consteval Suite(std::string_view name);

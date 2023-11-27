@@ -1,6 +1,7 @@
 export module synodic.honesty.test;
 
 export import :suite;
+export import :set;
 export import :entry;
 export import :test;
 export import :literals;

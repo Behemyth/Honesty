@@ -9,7 +9,7 @@ namespace synodic::honesty
 	//{
 	//}
 
-	//TestGenerator Runner::Suite::Generate() const
+	//generator Runner::Suite::Generate() const
 	//{
 	//	return generator_();
 	//}

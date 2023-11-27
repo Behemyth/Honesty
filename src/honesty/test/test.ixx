@@ -17,6 +17,8 @@ namespace synodic::honesty
 export namespace synodic::honesty
 {
 
+	using Generator = generator<BaseTest>;
+
 	template<typename T>
 	class Test final : public BaseTest
 	{
@@ -75,7 +77,7 @@ export namespace synodic::honesty
 	// Operators
 
 	template<std::invocable<int> Fn>
-	[[nodiscard]] constexpr TestGenerator operator|(const Fn&& test, const std::ranges::range auto& range)
+	[[nodiscard]] constexpr Generator operator|(const Fn&& test, const std::ranges::range auto& range)
 	{
 		for (const auto& value: range)
 		{
@@ -85,7 +87,7 @@ export namespace synodic::honesty
 
 	template<typename Fn, typename... Types>
 		requires(std::invocable<Fn, Types> && ...)
-	[[nodiscard]] constexpr TestGenerator operator|(const Fn&& test, std::tuple<Types...>&& tuple)
+	[[nodiscard]] constexpr Generator operator|(const Fn&& test, std::tuple<Types...>&& tuple)
 	{
 		co_yield Test("", test);
 	}

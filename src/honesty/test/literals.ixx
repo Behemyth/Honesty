@@ -7,7 +7,7 @@ import :set;
 
 export namespace synodic::honesty::literals
 {
-	//[[nodiscard]] consteval TestGenerator operator""_test(const char* const name, const std::size_t size)
+	//[[nodiscard]] consteval generator operator""_test(const char* const name, const std::size_t size)
 	//{
 	//	auto callable = []
 	//	{
@@ -19,6 +19,6 @@ export namespace synodic::honesty::literals
 
 	[[nodiscard]] consteval auto operator""_set(const char* const name, const std::size_t size)
 	{
-		return Set();
+		return Set(std::string_view(name, size));
 	}
 }

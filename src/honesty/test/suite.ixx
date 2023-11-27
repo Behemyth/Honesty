@@ -14,10 +14,10 @@ export namespace synodic::honesty
 		consteval Suite(std::string_view name, Fn&& generator);
 
 		Suite(const Suite& other)	  = delete;
-		Suite(Suite&& other) noexcept = default;
+		Suite(Suite&& other) noexcept = delete;
 
 		Suite& operator=(const Suite& other)	 = delete;
-		Suite& operator=(Suite&& other) noexcept = default;
+		Suite& operator=(Suite&& other) noexcept = delete;
 
 		template<std::invocable Fn>
 		consteval Suite& operator=(Fn&& generator) noexcept;

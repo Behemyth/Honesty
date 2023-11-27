@@ -7,17 +7,18 @@ import :implementation;
 export namespace synodic::honesty
 {
 
-	class [[nodiscard]] TestGenerator
+	template<typename  T>
+	class [[nodiscard]] generator
 	{
 		class promise
 		{
 		public:
-			using reference = std::add_lvalue_reference_t<BaseTest>;
+			using reference = std::add_lvalue_reference_t<T>;
 			using pointer	= std::add_pointer_t<reference>;
 
 			auto get_return_object() noexcept
 			{
-				return TestGenerator(std::coroutine_handle<promise_type>::from_promise(*this));
+				return generator(std::coroutine_handle<promise_type>::from_promise(*this));
 			}
 
 			static std::suspend_always initial_suspend() noexcept
@@ -42,7 +43,7 @@ export namespace synodic::honesty
 				return {};
 			}
 
-			std::suspend_always yield_value(TestGenerator& value) noexcept
+			std::suspend_always yield_value(generator& value) noexcept
 			{
 				// m_value = std::addressof(value);
 				return {};
@@ -53,7 +54,7 @@ export namespace synodic::honesty
 				return *m_value;
 			}
 
-			// Don't allow any use of 'co_await' inside the TestGenerator coroutine.
+			// Don't allow any use of 'co_await' inside the generator coroutine.
 			template<typename U>
 			std::suspend_never await_transform(U&& value) = delete;
 
@@ -68,7 +69,7 @@ export namespace synodic::honesty
 
 		private:
 			pointer m_value;
-			friend TestGenerator;
+			friend generator;
 		};
 
 		struct sentinel
@@ -139,14 +140,14 @@ export namespace synodic::honesty
 	public:
 		using promise_type = promise;
 
-		TestGenerator(TestGenerator&& other) noexcept :
+		generator(generator&& other) noexcept :
 			m_coroutine(exchange(other.m_coroutine, nullptr))
 		{
 		}
 
-		TestGenerator(const TestGenerator& other) = delete;
+		generator(const generator& other) = delete;
 
-		~TestGenerator()
+		~generator()
 		{
 			if (m_coroutine)
 			{
@@ -154,7 +155,7 @@ export namespace synodic::honesty
 			}
 		}
 
-		TestGenerator& operator=(TestGenerator&& other) noexcept
+		generator& operator=(generator&& other) noexcept
 		{
 			swap(other);
 			return *this;
@@ -171,13 +172,13 @@ export namespace synodic::honesty
 			return sentinel {};
 		}
 
-		void swap(TestGenerator& other) noexcept
+		void swap(generator& other) noexcept
 		{
 			std::swap(m_coroutine, other.m_coroutine);
 		}
 
 	private:
-		explicit TestGenerator(std::coroutine_handle<promise> coroutine) noexcept :
+		explicit generator(std::coroutine_handle<promise> coroutine) noexcept :
 			m_coroutine(coroutine)
 		{
 		}

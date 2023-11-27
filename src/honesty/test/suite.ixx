@@ -10,8 +10,6 @@ export namespace synodic::honesty
 	class [[nodiscard]] Suite
 	{
 	public:
-		consteval Suite(std::string_view name);
-
 		template<std::invocable Fn>
 		consteval Suite(std::string_view name, Fn&& generator);
 
@@ -27,11 +25,6 @@ export namespace synodic::honesty
 	protected:
 		std::string_view name_;
 	};
-
-	consteval Suite::Suite(std::string_view name) :
-		name_(name)
-	{
-	}
 
 	template<std::invocable Fn>
 	consteval Suite::Suite(std::string_view name, Fn&& generator) :

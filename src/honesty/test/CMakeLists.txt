@@ -13,11 +13,14 @@ target_sources(honesty
 			"generator.ixx"
 			"implementation.ixx"
 			"test.cpp"
+			"set.ixx"
+
 	PRIVATE
 		FILE_SET implementations
 		FILES
 			"runner.cpp"
 			"suite.cpp"
+			"set.cpp"
 			"implementation.cpp"
 
 )

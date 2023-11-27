@@ -3,6 +3,7 @@ export module synodic.honesty.test:literals;
 import :test;
 import :suite;
 import :generator;
+import :set;
 
 export namespace synodic::honesty::literals
 {
@@ -16,8 +17,8 @@ export namespace synodic::honesty::literals
 	//	co_yield Test(std::string_view(name, size), callable);
 	//}
 
-	[[nodiscard]] consteval auto operator""_suite(const char* const name, const std::size_t size)
+	[[nodiscard]] consteval auto operator""_set(const char* const name, const std::size_t size)
 	{
-		return Suite(std::string_view(name, size));
+		return Set();
 	}
 }

@@ -22,12 +22,9 @@ export namespace synodic::honesty
 
 		Set& operator=(std::move_only_function<Generator()>&& generator) noexcept;
 
-		explicit operator Generator();
-
 	protected:
 		std::string_view name_;
 		std::move_only_function<Generator()> callable_;
 	};
 
-	
 }

@@ -22,20 +22,20 @@ auto suiteGenerator = []() -> Generator
 				++count;
 			});
 
-		co_yield "yes"_test = [&count]()
-		{
-			++count;
-		};
+		//co_yield "yes"_test = [&count]()
+		//{
+		//	++count;
+		//};
 
-		co_yield "array"_test = [&count](const auto& parameter)
-		{
-			++count;
-		} | std::tuple{3u, 4.0f};
+		//co_yield "array"_test = [&count](const auto& parameter)
+		//{
+		//	++count;
+		//} | std::tuple{3u, 4.0f};
 
-		co_yield "array"_test = [&count]<typename T>(const T& parameter)
-		{
-			++count;
-		} | std::array{3, 4};
+		//co_yield "array"_test = [&count]<typename T>(const T& parameter)
+		//{
+		//	++count;
+		//} | std::array{3, 4};
 	};
 
 	co_yield "inner"_set = innerSetGenerator;

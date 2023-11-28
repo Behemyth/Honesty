@@ -17,7 +17,7 @@ namespace synodic::honesty
 export namespace synodic::honesty
 {
 
-	using Generator = generator<BaseTest>;
+	using Generator = std::generator<BaseTest>;
 
 	template<typename T>
 	class Test final : public BaseTest

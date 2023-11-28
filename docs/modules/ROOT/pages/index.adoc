@@ -14,13 +14,6 @@ auto suiteGenerator = [](){};
 Suite suite("Example Suite", suiteGenerator);
 ----
 
-or
-
-[,c++]
-----
-auto inlineSuite = Suite("Example Suite", [](){});
-----
-
-=== Nested Suites
+=== Sets
 
 The top-level suite callable can also host a test section that allows for parameterization of tests

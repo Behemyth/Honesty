@@ -23,4 +23,9 @@ namespace synodic::honesty
 		callable_ = std::move(generator);
 		return *this;
 	}
+
+	Set::operator std::ranges::elements_of<auto>()
+	{
+		return std::ranges::elements_of(callable_());
+	}
 }

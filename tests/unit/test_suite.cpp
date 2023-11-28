@@ -38,6 +38,8 @@ auto suiteGenerator = []() -> Generator
 		//} | std::array{3, 4};
 	};
 
+	co_yield std::ranges::elements_of(innerSetGenerator());
+
 	co_yield "inner"_set = innerSetGenerator;
 	co_yield Set("outer", outerSetGenerator);
 };

@@ -25,7 +25,7 @@ import std;
 #	define _NO_UNIQUE_ADDRESS [[no_unique_address]]
 #endif
 
-namespace std
+export namespace std
 {
 	struct alignas(__STDCPP_DEFAULT_NEW_ALIGNMENT__) _Aligned_block
 	{
@@ -436,13 +436,11 @@ namespace std
 
 		[[nodiscard]] _Ref operator*() const noexcept
 		{
-			assert(!_Coro.done() && "Can't dereference generator end iterator");
 			return static_cast<_Ref>(*_Coro.promise()._Top.promise()._Ptr);
 		}
 
 		_Generator_iterator& operator++()
 		{
-			assert(!_Coro.done() && "Can't increment generator end iterator");
 			_Coro.promise()._Top.resume();
 			return *this;
 		}
@@ -531,7 +529,6 @@ namespace std
 		[[nodiscard]] _Generator_iterator<_Value, _Ref> begin()
 		{
 			// Pre: _Coro is suspended at its initial suspend point
-			assert(_Coro && "Can't call begin on moved-from generator");
 			_Coro.resume();
 			return _Generator_iterator<_Value, _Ref> {
 				coroutine_handle<_Generator_promise_base<_Generator_yield_t<_Ref>>>::from_address(_Coro.address())};

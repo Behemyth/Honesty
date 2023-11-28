@@ -22,6 +22,8 @@ export namespace synodic::honesty
 
 		Set& operator=(std::move_only_function<Generator()>&& generator) noexcept;
 
+		operator std::ranges::elements_of<auto>();
+
 	protected:
 		std::string_view name_;
 		std::move_only_function<Generator()> callable_;

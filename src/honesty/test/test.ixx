@@ -17,8 +17,6 @@ namespace synodic::honesty
 export namespace synodic::honesty
 {
 
-	using Generator = std::generator<BaseTest>;
-
 	template<typename T>
 	class Test final : public BaseTest
 	{
@@ -75,6 +73,8 @@ export namespace synodic::honesty
 	Test(std::string_view, std::move_only_function<void(const T&)>) -> Test<T>;
 
 	// Operators
+
+	using Generator = std::generator<BaseTest>;
 
 	template<std::invocable<int> Fn>
 	[[nodiscard]] constexpr Generator operator|(const Fn&& test, const std::ranges::range auto& range)

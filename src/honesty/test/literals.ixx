@@ -7,18 +7,13 @@ import :set;
 
 export namespace synodic::honesty::literals
 {
-	[[nodiscard]] Generator operator""_test(const char* const name, const std::size_t size)
+	[[nodiscard]] consteval auto operator""_test(const char* const name, const std::size_t size)
 	{
-		auto callable = []
-		{
-			throw std::invalid_argument("The test must be assigned a function to execute");
-		};
-
-		co_yield Test(std::string_view(name, size), callable);
+		return TestName(std::string_view(name, size));
 	}
 
-	[[nodiscard]] auto operator""_set(const char* const name, const std::size_t size)
+	[[nodiscard]] consteval auto operator""_set(const char* const name, const std::size_t size)
 	{
-		return Set(std::string_view(name, size));
+		return SetName(std::string_view(name, size));
 	}
 }

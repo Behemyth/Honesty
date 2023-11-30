@@ -5,17 +5,40 @@ import std;
 import :generator;
 import :implementation;
 
-namespace synodic::honesty
-{
-
-	class TestStub
-	{
-	};
-
-}
-
 export namespace synodic::honesty
 {
+
+	//template<std::invocable Fn>
+	//auto Test(std::string_view name, Fn&& generator)
+	//{
+	//	return std::ranges::elements_of(generator());
+	//}
+
+	/**
+	 * @brief Strongly typed definition around string_view with construction
+	 */
+	class [[nodiscard]] TestName
+	{
+	public:
+		consteval TestName(std::string_view name) :
+			name_(name) {
+
+			};
+
+		TestName(const TestName& other)				   = delete;
+		TestName(TestName&& other) noexcept			   = delete;
+		TestName& operator=(const TestName& other)	   = delete;
+		TestName& operator=(TestName&& other) noexcept = delete;
+
+		template<std::invocable Fn>
+		auto operator=(Fn&& generator)
+		{
+			return Test(name_, generator);
+		}
+
+	protected:
+		std::string_view name_;
+	};
 
 	template<typename T>
 	class Test final : public BaseTest

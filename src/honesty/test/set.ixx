@@ -7,26 +7,39 @@ import :test;
 
 export namespace synodic::honesty
 {
-	class [[nodiscard]] Set
+
+	// Note, not constexpr, as a coroutine cant be constexpr
+
+	template<std::invocable Fn>
+	auto Set(std::string_view name, Fn&& generator)
+	{
+		return std::ranges::elements_of(generator());
+	}
+
+	/**
+	 * @brief Strongly typed definition around string_view with construction 
+	 */
+	class [[nodiscard]] SetName
 	{
 	public:
-		Set(std::string_view name);
+		consteval SetName(std::string_view name) :
+			name_(name) {
 
-		Set(std::string_view name, std::move_only_function<Generator()>&& generator);
+			};
 
-		Set(const Set& other)	  = delete;
-		Set(Set&& other) noexcept = default;
+		SetName(const SetName& other)				 = delete;
+		SetName(SetName&& other) noexcept			 = delete;
+		SetName& operator=(const SetName& other)	 = delete;
+		SetName& operator=(SetName&& other) noexcept = delete;
 
-		Set& operator=(const Set& other)	 = delete;
-		Set& operator=(Set&& other) noexcept = default;
-
-		Set& operator=(std::move_only_function<Generator()>&& generator) noexcept;
-
-		operator std::ranges::elements_of<auto>();
+		template<std::invocable Fn>
+		auto operator=(Fn&& generator)
+		{
+			return Set(name_, generator);
+		}
 
 	protected:
 		std::string_view name_;
-		std::move_only_function<Generator()> callable_;
 	};
 
 }

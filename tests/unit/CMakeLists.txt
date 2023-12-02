@@ -1,6 +1,6 @@
 target_sources(tests
 PRIVATE
-	test_expect.cpp
+	test_expression.cpp
 	test_generator.cpp
 	test_suite.cpp
 	test_test.cpp

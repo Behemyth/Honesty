@@ -6,28 +6,45 @@ import synodic.honesty.test;
 using namespace synodic::honesty;
 using namespace synodic::honesty::literals;
 
-//auto defaultTest = Test(
-//	"default",
-//	[]
-//	{
-//	});
-//
-//auto callable = []
-//{
-//};
-//
-//auto referenceTest = Test("reference", callable);
-//
-//auto helperScope = []
-//{
-//	"literal"_test = []
-//	{
-//	};
-//
-//	for (auto i: std::vector{1, 2, 3})
-//	{
-//		"parameterized"_test = [i]
-//		{
-//		};
-//	}
-//};
+auto outerSetGenerator = []() -> Generator
+{
+	co_return;
+};
+
+auto suiteGenerator = []() -> Generator
+{
+	// Tests that creation via literal works
+	auto innerSetGenerator = []() -> Generator
+	{
+		int count = 0;
+		// co_yield Test(
+		//	"test",
+		//	[&count]
+		//	{
+		//		++count;
+		//	});
+
+		co_return;
+
+		// co_yield "yes"_test = [&count]()
+		//{
+		//	++count;
+		// };
+
+		// co_yield "array"_test = [&count](const auto& parameter)
+		//{
+		//	++count;
+		// } | std::tuple{3u, 4.0f};
+
+		// co_yield "array"_test = [&count]<typename T>(const T& parameter)
+		//{
+		//	++count;
+		// } | std::array{3, 4};
+	};
+
+	// TODO: Remove Set, replace with recursive test
+	co_yield Test("outer", outerSetGenerator);
+};
+
+// Global creation
+Suite suite("outer", suiteGenerator);

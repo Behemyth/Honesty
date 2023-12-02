@@ -11,7 +11,7 @@ export namespace synodic::honesty
 	{
 	public:
 		template<std::invocable Fn>
-		consteval Suite(std::string_view name, Fn&& generator);
+		consteval explicit Suite(std::string_view name, Fn&& generator);
 
 		Suite(const Suite& other)	  = delete;
 		Suite(Suite&& other) noexcept = delete;

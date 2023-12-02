@@ -3,7 +3,7 @@ export module synodic.honesty.test:literals;
 import :test;
 import :suite;
 import :generator;
-import :set;
+import :tag;
 
 export namespace synodic::honesty::literals
 {
@@ -12,8 +12,8 @@ export namespace synodic::honesty::literals
 		return TestName(std::string_view(name, size));
 	}
 
-	[[nodiscard]] consteval auto operator""_set(const char* const name, const std::size_t size)
+	[[nodiscard]] consteval auto operator""_tag(const char* const name, const std::size_t size)
 	{
-		return SetName(std::string_view(name, size));
+		return tag(std::string_view(name, size));
 	}
 }

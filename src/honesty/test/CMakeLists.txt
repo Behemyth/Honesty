@@ -12,16 +12,18 @@ target_sources(honesty
 			"logger.ixx"
 			"generator.ixx"
 			"implementation.ixx"
-			"test.cpp"
-			"set.ixx"
+			"tag.ixx"
+			"exception.ixx"
 
 	PRIVATE
 		FILE_SET implementations
 		FILES
+			"test.cpp"
 			"runner.cpp"
 			"suite.cpp"
-			"set.cpp"
 			"implementation.cpp"
+			"tag.cpp"
+			"exception.cpp"
 
 )
 

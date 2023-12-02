@@ -18,6 +18,7 @@ target_sources(honesty
 		FILE_SET implementations
 		FILES
 			"test.cpp"
+			"expression.cpp"
 			"runner.cpp"
 			"suite.cpp"
 			"tag.cpp"

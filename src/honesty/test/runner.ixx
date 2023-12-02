@@ -1,8 +1,8 @@
 
-export module synodic.honesty.test:runner;
+export module synodic.honesty.test.runner;
+export import :single;
+
 import std;
-import :suite;
-import :test;
 
 export namespace synodic::honesty
 {

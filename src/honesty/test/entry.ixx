@@ -3,7 +3,7 @@ export module synodic.honesty.test:entry;
 
 import std;
 
-import :runner;
+import  synodic.honesty.test.runner;
 
 import synodic.honesty.test.logger;
 import synodic.honesty.test.reporter;

@@ -35,7 +35,7 @@ target_sources(honesty_main
 )
 
 add_subdirectory(
-	expression
+	runner
 )
 
 add_subdirectory(

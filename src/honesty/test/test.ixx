@@ -3,16 +3,15 @@ export module synodic.honesty.test:test;
 
 import std;
 import :generator;
-import :implementation;
 
 export namespace synodic::honesty
 {
 
-	//template<std::invocable Fn>
-	//auto Test(std::string_view name, Fn&& generator)
+	// template<std::invocable Fn>
+	// auto Test(std::string_view name, Fn&& generator)
 	//{
 	//	return std::ranges::elements_of(generator());
-	//}
+	// }
 
 	/**
 	 * @brief Strongly typed definition around string_view with construction
@@ -40,64 +39,70 @@ export namespace synodic::honesty
 		std::string_view name_;
 	};
 
-	template<typename T>
-	class Test final : public BaseTest
+	class Test final
 	{
 	public:
-		Test(std::string_view name, std::move_only_function<void(const T&)> runner);
+		template<std::invocable Fn>
+		Test(std::string_view name, Fn&& test);
 
-		Test& operator=(std::move_only_function<void(const T&)> runner);
-
-	protected:
-		void Run() override;
-
-		std::move_only_function<void(const T&)> runner_;
+		template<std::invocable Fn>
+		Test& operator=(Fn&& test);
 	};
 
-	template<>
-	class Test<void> final : public BaseTest
-	{
-	public:
-		Test(std::string_view name, std::move_only_function<void()> runner);
-
-		Test& operator=(std::move_only_function<void()> generator);
-
-	protected:
-		void Run() override;
-
-	private:
-		std::move_only_function<void()> runner_;
-	};
-
-	template<typename T>
-	Test<T>::Test(std::string_view name, std::move_only_function<void(const T&)> runner) :
-		BaseTest(name),
-		runner_(std::move(runner))
+	template<std::invocable Fn>
+	Test::Test(std::string_view name, Fn&& test)
 	{
 	}
 
-	template<typename T>
-	Test<T>& Test<T>::operator=(std::move_only_function<void(const T&)> runner)
+	template<std::invocable Fn>
+	Test& Test::operator=(Fn&& test)
 	{
-		runner_ = std::move(runner);
 		return *this;
 	}
 
-	template<typename T>
-	void Test<T>::Run()
-	{
-	}
+	// template<>
+	// class Test<void> final
+	//{
+	// public:
+	//	Test(std::string_view name, std::move_only_function<void()> runner);
+
+	//	Test& operator=(std::move_only_function<void()> generator);
+
+	// protected:
+	//	void Run() override;
+
+	// private:
+	//	std::move_only_function<void()> runner_;
+	// };
+
+	// template<typename T>
+	// Test<T>::Test(std::string_view name, std::move_only_function<void(const T&)> runner) :
+	//	runner_(std::move(runner))
+	//{
+	// }
+
+	// template<typename T>
+	// Test<T>& Test<T>::operator=(std::move_only_function<void(const T&)> runner)
+	//{
+	//	runner_ = std::move(runner);
+	//	return *this;
+	// }
+
+	// template<typename T>
+	// void Test<T>::Run()
+	//{
+	// }
 
 	// Template Deductions
 
-	Test(std::string_view, std::move_only_function<void()>) -> Test<void>;
+	// Test(std::string_view, std::move_only_function<void()>) -> Test<void>;
 
-	template<typename T>
-	Test(std::string_view, std::move_only_function<void(const T&)>) -> Test<T>;
+	// template<typename T>
+	// Test(std::string_view, std::move_only_function<void(const T&)>) -> Test<T>;
 
 	// Operators
 
-	using Generator = std::generator<BaseTest>;
+	using Generator = std::generator<Test>;
 
 	template<std::invocable<int> Fn>
 	[[nodiscard]] constexpr Generator operator|(const Fn&& test, const std::ranges::range auto& range)

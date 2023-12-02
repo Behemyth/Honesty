@@ -11,7 +11,6 @@ target_sources(honesty
 			"reporter.ixx"
 			"logger.ixx"
 			"generator.ixx"
-			"implementation.ixx"
 			"tag.ixx"
 			"exception.ixx"
 
@@ -21,7 +20,6 @@ target_sources(honesty
 			"test.cpp"
 			"runner.cpp"
 			"suite.cpp"
-			"implementation.cpp"
 			"tag.cpp"
 			"exception.cpp"
 

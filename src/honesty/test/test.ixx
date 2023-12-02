@@ -6,6 +6,7 @@ import :generator;
 
 export namespace synodic::honesty
 {
+	class Test;
 
 	// template<std::invocable Fn>
 	// auto Test(std::string_view name, Fn&& generator)

@@ -5,12 +5,16 @@ using namespace synodic::honesty;
 using namespace synodic::honesty::literals;
 
 // TODO: Exception/Info testing
-/*
- *"exceptions/aborts"_test = [] {
-expect(throws<std::runtime_error>([] { throw std::runtime_error{""}; }))
-<< "throws runtime_error";
-expect(throws([] { throw 0; })) << "throws any exception";
-expect(nothrow([]{})) << "doesn't throw";
-expect(aborts([] { assert(false); }));
-};
- */
+namespace
+{
+	auto suiteGenerator = []() -> Generator
+	{
+		co_yield "exception"_test = []
+		{
+			//expect_throw<std::runtime_error>(true);
+			//expect_throw();
+		};
+	};
+
+	Suite suite("outer", suiteGenerator);
+}

@@ -4,7 +4,6 @@ PRIVATE
 	test_generator.cpp
 	test_suite.cpp
 	test_test.cpp
-	test_entry.cpp
 	test_logger.cpp
 	test_runner.cpp
 	test_reporter.cpp

@@ -11,8 +11,17 @@ namespace synodic::honesty
 
 export namespace synodic::honesty
 {
+
 	template<typename T>
 	constexpr auto expect(const T& expression, const std::source_location& location = std::source_location::current())
+	{
+		return expression;
+	}
+
+	template<typename T, std::derived_from<std::exception> Exception = std::exception>
+	constexpr auto expect_throw(
+		const T& expression,
+		const std::source_location& location = std::source_location::current())
 	{
 		return expression;
 	}

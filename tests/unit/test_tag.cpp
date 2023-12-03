@@ -15,7 +15,8 @@ namespace
 	{
 		//co_yield tag("test") / "inner"_test = dummyGenerator;
 		//co_yield skip / "test"_tag / "inner"_test = dummyGenerator;
+		co_return;
 	};
 
-	Suite suite("outer", suiteGenerator);
+	suite suite("outer", suiteGenerator);
 }

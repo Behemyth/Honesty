@@ -16,5 +16,5 @@ namespace
 		};
 	};
 
-	Suite suite("outer", suiteGenerator);
+	suite suite("outer", suiteGenerator);
 }

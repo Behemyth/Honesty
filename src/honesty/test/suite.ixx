@@ -2,39 +2,25 @@ export module synodic.honesty.test:suite;
 
 import std;
 
-import :generator;
-import :test;
-
 export namespace synodic::honesty
 {
-	class [[nodiscard]] Suite
+	class [[nodiscard]] suite
 	{
 	public:
-		template<std::invocable Fn>
-		consteval explicit Suite(std::string_view name, Fn&& generator);
+		suite(std::string_view name, std::move_only_function<void()> generator);
 
-		Suite(const Suite& other)	  = delete;
-		Suite(Suite&& other) noexcept = delete;
+		suite(const suite& other)	  = delete;
+		suite(suite&& other) noexcept = default;
 
-		Suite& operator=(const Suite& other)	 = delete;
-		Suite& operator=(Suite&& other) noexcept = delete;
-
-		template<std::invocable Fn>
-		consteval Suite& operator=(Fn&& generator) noexcept;
+		suite& operator=(const suite& other)	 = delete;
+		suite& operator=(suite&& other) noexcept = default;
 
 	protected:
+
+		inline static std::vector<suite> suites_;
+
 		std::string_view name_;
+		std::move_only_function<void()> generator_;
 	};
 
-	template<std::invocable Fn>
-	consteval Suite::Suite(std::string_view name, Fn&& generator) :
-		name_(name)
-	{
-	}
-
-	template<std::invocable Fn>
-	consteval Suite& Suite::operator=(Fn&& generator) noexcept
-	{
-		return *this;
-	}
 }

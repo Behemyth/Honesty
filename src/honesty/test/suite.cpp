@@ -6,4 +6,10 @@ import :suite;
 
 namespace synodic::honesty
 {
+	suite::suite(std::string_view name, std::move_only_function<void()> generator) :
+		name_(name),
+		generator_(std::move(generator))
+	{
+		suites_.push_back(std::move(*this));
+	}
 }

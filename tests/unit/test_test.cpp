@@ -47,4 +47,4 @@ auto suiteGenerator = []() -> Generator
 };
 
 // Global creation
-Suite suite("outer", suiteGenerator);
+suite suite("outer", suiteGenerator);

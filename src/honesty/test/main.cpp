@@ -24,7 +24,8 @@ int main(int argc, char* argv[])
 			{
 				synodic::honesty::logger::StandardOut logger;
 				synodic::honesty::reporter::StandardOut reporter;
-				auto result = synodic::honesty::entry(logger, reporter);
+				synodic::honesty::runner::single_threaded runner;
+				auto result = synodic::honesty::entry(runner, logger, reporter);
 				break;
 			}
 			default:

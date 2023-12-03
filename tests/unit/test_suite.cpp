@@ -17,7 +17,7 @@ namespace
 	};
 
 	// Global creation
-	Suite suite("outer", suiteGenerator);
+	suite suite("outer", suiteGenerator);
 
 	// template<class... Ts>
 	// struct overload : Ts...

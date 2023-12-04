@@ -2,10 +2,9 @@ target_sources(honesty
 	PUBLIC
 		FILE_SET interfaces
 		FILES
-			reporter.ixx
+			entry.ixx
 	PRIVATE
 		FILE_SET implementations
 		FILES
-			stdout.ixx
-			stdout.cpp
+			entry.cpp
 )

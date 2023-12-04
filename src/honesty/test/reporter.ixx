@@ -1,6 +1,4 @@
-export module synodic.honesty.test.reporter;
-
-export import :stdout;
+export module synodic.honesty.test:reporter;
 
 export namespace synodic::honesty
 {

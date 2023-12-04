@@ -1,6 +1,6 @@
-module synodic.honesty.test.runner;
+module synodic.honesty.test:runner;
 
-import synodic.honesty.test.runner;
+import :runner;
 import std;
 
 namespace synodic::honesty

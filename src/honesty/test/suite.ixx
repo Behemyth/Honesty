@@ -2,12 +2,14 @@ export module synodic.honesty.test:suite;
 
 import std;
 
+import :test;
+
 export namespace synodic::honesty
 {
 	class [[nodiscard]] suite
 	{
 	public:
-		suite(std::string_view name, std::move_only_function<void()> generator);
+		suite(std::string_view name, std::move_only_function<Generator()> generator);
 
 		suite(const suite& other)	  = delete;
 		suite(suite&& other) noexcept = default;
@@ -20,7 +22,7 @@ export namespace synodic::honesty
 		inline static std::vector<suite> suites_;
 
 		std::string_view name_;
-		std::move_only_function<void()> generator_;
+		std::move_only_function<Generator()> generator_;
 	};
 
 }

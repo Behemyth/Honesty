@@ -4,15 +4,14 @@ import :single;
 
 namespace synodic::honesty::runner
 {
-	void single_threaded::run(std::span<std::move_only_function<void()>> suites)
+	void single_threaded::run(std::span<std::move_only_function<Generator()>> suites) const
 	{
-		for (const auto& suite: suites)
+		for (auto& suite: suites)
 		{
-			// auto generator = suite.();
-			// for (auto& test: generator)
-			//{
-			//	test.run();
-			// }
+			for (auto generator = suite(); auto& test: generator)
+			{
+				//test.run();
+			}
 		}
 	}
 }

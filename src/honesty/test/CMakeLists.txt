@@ -4,7 +4,6 @@ target_sources(honesty
 		FILES
 			"suite.ixx"
 			"test.ixx"
-			"entry.ixx"
 			"runner.ixx"
 			"expression.ixx"
 			"literals.ixx"
@@ -20,6 +19,8 @@ target_sources(honesty
 			"test.cpp"
 			"expression.cpp"
 			"runner.cpp"
+			"logger.cpp"
+			"reporter.cpp"
 			"suite.cpp"
 			"tag.cpp"
 			"exception.cpp"
@@ -31,6 +32,10 @@ target_sources(honesty_main
 		FILE_SET interfaces
 		FILES
 			"main.cpp"
+)
+
+add_subdirectory(
+	entry
 )
 
 add_subdirectory(

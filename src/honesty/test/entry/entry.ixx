@@ -19,7 +19,8 @@ export namespace synodic::honesty
 		is_runner Runner	 = runner::single_threaded,
 		is_logger Logger	 = logger::StandardOut,
 		is_reporter Reporter = reporter::StandardOut>
-	std::expected<void, TestResultCode> entry(const Runner& runner = Runner(),const  Logger& logger = Logger(), const Reporter& reporter = Reporter())
+	std::expected<void, TestResultCode>
+		entry(const Runner& runner = Runner(), const Logger& logger = Logger(), const Reporter& reporter = Reporter())
 	{
 		runner.run({});
 

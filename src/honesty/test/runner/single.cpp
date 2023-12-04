@@ -8,7 +8,7 @@ namespace synodic::honesty::runner
 	{
 		for (auto& suite: suites)
 		{
-			for (auto generator = suite(); auto& test: generator)
+			for (auto generator = suite(); const Test& test: generator)
 			{
 				//test.run();
 			}

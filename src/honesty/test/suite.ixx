@@ -6,7 +6,19 @@ import :test;
 
 export namespace synodic::honesty
 {
-	class [[nodiscard]] suite final : suite_registrar
+	class suite;
+
+	class suite_registrar
+	{
+	public:
+		static std::span<suite> suites();
+
+	protected:
+		inline static std::vector<suite> suites_;
+
+	};
+
+	class [[nodiscard]] suite final : protected suite_registrar
 	{
 	public:
 		suite(std::string_view name, std::move_only_function<Generator()> generator);
@@ -18,9 +30,6 @@ export namespace synodic::honesty
 		suite& operator=(suite&& other) noexcept = default;
 
 	private:
-
-		inline static std::vector<suite> suites_;
-
 		std::string_view name_;
 		std::move_only_function<Generator()> generator_;
 	};

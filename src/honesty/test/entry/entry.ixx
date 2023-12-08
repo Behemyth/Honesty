@@ -30,7 +30,9 @@ export namespace synodic::honesty
 	std::expected<void, TestResultCode>
 		entry(const Runner& runner = Runner(), const Logger& logger = Logger(), const Reporter& reporter = Reporter())
 	{
-		for (auto& suite: suite::)
+		suite_registrar registrar;
+
+		for (auto& suite: registrar.suites())
 		{
 			for (auto generator = suite(); const Test& test: generator)
 			{

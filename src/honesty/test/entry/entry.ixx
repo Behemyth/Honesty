@@ -8,6 +8,14 @@ import synodic.honesty.test.runner;
 import synodic.honesty.test.logger;
 import synodic.honesty.test.reporter;
 
+namespace synodic::honesty
+{
+	struct suite_runner
+	{
+		suite_runner(suite suite);
+	};
+}
+
 export namespace synodic::honesty
 {
 	enum class TestResultCode
@@ -22,6 +30,13 @@ export namespace synodic::honesty
 	std::expected<void, TestResultCode>
 		entry(const Runner& runner = Runner(), const Logger& logger = Logger(), const Reporter& reporter = Reporter())
 	{
+		for (auto& suite: suite::)
+		{
+			for (auto generator = suite(); const Test& test: generator)
+			{
+			}
+		}
+
 		runner.run({});
 
 		// return std::unexpected(TestResultCode::FAIL);

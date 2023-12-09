@@ -44,7 +44,10 @@ export namespace synodic::honesty
 
 	private:
 
+
+
 		friend suite_registrar;
+		friend Test;
 
 		std::string_view name_;
 		std::move_only_function<Generator()> generator_;

@@ -48,6 +48,9 @@ export namespace synodic::honesty
 
 		template<std::invocable Fn>
 		Test& operator=(Fn&& test);
+	private:
+
+		std::move_only_function<void()> runner_;
 	};
 
 	template<std::invocable Fn>
@@ -60,46 +63,6 @@ export namespace synodic::honesty
 	{
 		return *this;
 	}
-
-	// template<>
-	// class Test<void> final
-	//{
-	// public:
-	//	Test(std::string_view name, std::move_only_function<void()> runner);
-
-	//	Test& operator=(std::move_only_function<void()> generator);
-
-	// protected:
-	//	void Run() override;
-
-	// private:
-	//	std::move_only_function<void()> runner_;
-	// };
-
-	// template<typename T>
-	// Test<T>::Test(std::string_view name, std::move_only_function<void(const T&)> runner) :
-	//	runner_(std::move(runner))
-	//{
-	// }
-
-	// template<typename T>
-	// Test<T>& Test<T>::operator=(std::move_only_function<void(const T&)> runner)
-	//{
-	//	runner_ = std::move(runner);
-	//	return *this;
-	// }
-
-	// template<typename T>
-	// void Test<T>::Run()
-	//{
-	// }
-
-	// Template Deductions
-
-	// Test(std::string_view, std::move_only_function<void()>) -> Test<void>;
-
-	// template<typename T>
-	// Test(std::string_view, std::move_only_function<void(const T&)>) -> Test<T>;
 
 	// Operators
 

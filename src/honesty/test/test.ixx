@@ -8,6 +8,21 @@ export namespace synodic::honesty
 {
 	class Test;
 
+	class TestBase
+	{
+	public:
+		virtual ~TestBase();
+		virtual void Run() = 0;
+
+		template<class Self>
+		operator TestBase*(this Self&& self)
+		{
+			return &self;
+		}
+
+	private:
+	};
+
 	// template<std::invocable Fn>
 	// auto Test(std::string_view name, Fn&& generator)
 	//{
@@ -40,36 +55,25 @@ export namespace synodic::honesty
 		std::string_view name_;
 	};
 
-	class Test final
+	class Test final : TestBase
 	{
 	public:
-		template<std::invocable Fn>
-		Test(std::string_view name, Fn&& test);
+		Test(std::string_view name, std::move_only_function<void()> test);
 
-		template<std::invocable Fn>
-		Test& operator=(Fn&& test);
+		Test& operator=(std::move_only_function<void()> test);
+
+		void Run() override;
+
 	private:
-
 		std::move_only_function<void()> runner_;
 	};
 
-	template<std::invocable Fn>
-	Test::Test(std::string_view name, Fn&& test)
-	{
-	}
-
-	template<std::invocable Fn>
-	Test& Test::operator=(Fn&& test)
-	{
-		return *this;
-	}
-
 	// Operators
 
-	using Generator = std::generator<Test>;
+	using Generator = std::generator<TestBase>;
 
 	template<std::invocable<int> Fn>
-	[[nodiscard]] constexpr Generator operator|(const Fn&& test, const std::ranges::range auto& range)
+	[[nodiscard]] Generator operator|(const Fn&& test, const std::ranges::range auto& range)
 	{
 		for (const auto& value: range)
 		{
@@ -79,7 +83,7 @@ export namespace synodic::honesty
 
 	template<typename Fn, typename... Types>
 		requires(std::invocable<Fn, Types> && ...)
-	[[nodiscard]] constexpr Generator operator|(const Fn&& test, std::tuple<Types...>&& tuple)
+	[[nodiscard]] Generator operator|(const Fn&& test, std::tuple<Types...>&& tuple)
 	{
 		co_yield Test("", test);
 	}

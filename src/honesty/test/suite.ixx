@@ -9,7 +9,7 @@ export namespace synodic::honesty
 	class suite;
 
 	/**
-	 * \brief The mangement of all suites. Useful only if implementing your own test entrypoint
+	 * \brief The management of all suites. Useful only if implementing your own test entrypoint
 	 */
 	class suite_registrar
 	{
@@ -24,7 +24,7 @@ export namespace synodic::honesty
 		static std::span<suite> suites();
 
 	protected:
-		static constinit std::vector<new_suite> suites_;
+		static constinit std::vector<suite> suites_;
 
 	};
 

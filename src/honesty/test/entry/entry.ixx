@@ -30,11 +30,11 @@ export namespace synodic::honesty
 	std::expected<void, TestResultCode>
 		entry(const Runner& runner = Runner(), const Logger& logger = Logger(), const Reporter& reporter = Reporter())
 	{
-		suite_registrar registrar;
+		//suite_registrar registrar;
 
-		registrar.execute();
+		//registrar.execute();
 
-		runner.run({});
+		//runner.run({});
 
 		// return std::unexpected(TestResultCode::FAIL);
 

@@ -4,18 +4,16 @@ import :test;
 
 namespace synodic::honesty
 {
-	TestImp& TestImp::operator=(std::move_only_function<void()> test)
+	Test::Test(std::string_view name, std::move_only_function<void()> test)
+	{
+	}
+
+	Test& Test::operator=(std::move_only_function<void()> test)
 	{
 		return *this;
 	}
 
-	void TestImp::Run()
+	void Test::Run()
 	{
-		runner_();
-	}
-
-	TestImp Test(std::string_view name, std::move_only_function<void()> test)
-	{
-		return TestImp(name, std::move(test));
 	}
 }

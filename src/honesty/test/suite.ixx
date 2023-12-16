@@ -18,7 +18,7 @@ export namespace synodic::honesty
 		void execute();
 
 	protected:
-		static constinit std::vector<suite> suites_;
+		inline static std::vector<suite> suites_;
 
 	};
 

@@ -11,14 +11,8 @@ export namespace synodic::honesty
 	class TestBase
 	{
 	public:
-		virtual ~TestBase();
+		virtual ~TestBase() = default;
 		virtual void Run() = 0;
-
-		template<class Self>
-		operator TestBase*(this Self&& self)
-		{
-			return &self;
-		}
 
 	private:
 	};
@@ -67,10 +61,10 @@ export namespace synodic::honesty
 	private:
 		std::move_only_function<void()> runner_;
 	};
-
+	 
 	// Operators
 
-	using Generator = std::generator<TestBase>;
+	using Generator = std::generator<Test>;
 
 	template<std::invocable<int> Fn>
 	[[nodiscard]] Generator operator|(const Fn&& test, const std::ranges::range auto& range)

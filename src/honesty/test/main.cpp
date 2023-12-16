@@ -1,4 +1,3 @@
-import synodic.honesty.test;
 import synodic.honesty.test.entry;
 import std;
 

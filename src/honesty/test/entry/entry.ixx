@@ -18,7 +18,7 @@ namespace synodic::honesty
 
 export namespace synodic::honesty
 {
-	enum class TestResultCode
+	enum class TestResultCode : std::uint8_t
 	{
 		FAIL
 	};
@@ -32,12 +32,7 @@ export namespace synodic::honesty
 	{
 		suite_registrar registrar;
 
-		for (auto& suite: registrar.suites())
-		{
-			for (auto generator = suite(); const Test& test: generator)
-			{
-			}
-		}
+		registrar.execute();
 
 		runner.run({});
 

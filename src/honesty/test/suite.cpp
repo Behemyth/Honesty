@@ -6,9 +6,13 @@ import :suite;
 
 namespace synodic::honesty
 {
-	std::span<suite> suite_registrar::suites()
+
+	void suite_registrar::execute()
 	{
-		return suites_;
+		for(suite& suite: suites_)
+		{
+			suite.generator_();
+		}
 	}
 
 	suite::suite(std::string_view name, std::move_only_function<Generator()> generator) :

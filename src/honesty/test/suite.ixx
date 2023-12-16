@@ -15,13 +15,7 @@ export namespace synodic::honesty
 	{
 	public:
 
-		struct new_suite
-		{
-			std::string_view name;
-			std::move_only_function<Generator()> generator;
-		};
-
-		static std::span<suite> suites();
+		void execute();
 
 	protected:
 		static constinit std::vector<suite> suites_;
@@ -43,11 +37,7 @@ export namespace synodic::honesty
 		suite& operator=(suite&& other) noexcept = default;
 
 	private:
-
-
-
 		friend suite_registrar;
-		friend Test;
 
 		std::string_view name_;
 		std::move_only_function<Generator()> generator_;

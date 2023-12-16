@@ -49,7 +49,7 @@ export namespace synodic::honesty
 		std::string_view name_;
 	};
 
-	class Test final : TestBase
+	class Test final : public TestBase
 	{
 	public:
 		Test(std::string_view name, std::move_only_function<void()> test);
@@ -64,7 +64,7 @@ export namespace synodic::honesty
 	 
 	// Operators
 
-	using Generator = std::generator<Test>;
+	using Generator = std::generator<TestBase>;
 
 	template<std::invocable<int> Fn>
 	[[nodiscard]] Generator operator|(const Fn&& test, const std::ranges::range auto& range)

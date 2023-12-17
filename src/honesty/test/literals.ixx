@@ -1,7 +1,6 @@
 export module synodic.honesty.test:literals;
 
 import :test;
-import :suite;
 import :generator;
 import :tag;
 

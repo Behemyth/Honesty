@@ -1,8 +1,8 @@
 target_sources(honesty
 	PUBLIC
 		FILE_SET interfaces
+		TYPE CXX_MODULES
 		FILES
-			"suite.ixx"
 			"test.ixx"
 			"runner.ixx"
 			"expression.ixx"
@@ -12,26 +12,26 @@ target_sources(honesty
 			"generator.ixx"
 			"tag.ixx"
 			"exception.ixx"
-
 	PRIVATE
 		FILE_SET implementations
+		TYPE CXX_MODULES
 		FILES
-			"test.cpp"
-			"expression.cpp"
-			"runner.cpp"
-			"logger.cpp"
-			"reporter.cpp"
-			"suite.cpp"
-			"tag.cpp"
-			"exception.cpp"
+			"backend.ixx"
+	PRIVATE
+		"test.cpp"
+		"expression.cpp"
+		"runner.cpp"
+		"logger.cpp"
+		"reporter.cpp"
+		"backend.cpp"
+		"tag.cpp"
+		"exception.cpp"
 
 )
 
 target_sources(honesty_main
 	PUBLIC
-		FILE_SET interfaces
-		FILES
-			"main.cpp"
+		"main.cpp"
 )
 
 add_subdirectory(

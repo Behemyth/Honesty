@@ -2,6 +2,7 @@ module synodic.honesty.test:test;
 
 import :test;
 
+
 namespace synodic::honesty
 {
 	Test::Test(std::string_view name, std::move_only_function<void()> test)
@@ -15,5 +16,10 @@ namespace synodic::honesty
 
 	void Test::Run()
 	{
+	}
+
+	suite::suite(std::string_view name, std::move_only_function<Generator()> generator)
+	{
+		suites.emplace_back(name, std::move(generator));
 	}
 }

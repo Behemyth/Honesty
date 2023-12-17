@@ -36,8 +36,6 @@ export namespace synodic::honesty
 
 		//runner.run({});
 
-		// return std::unexpected(TestResultCode::FAIL);
-
 		return {};
 	}
 }

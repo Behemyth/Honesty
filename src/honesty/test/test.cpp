@@ -20,6 +20,6 @@ namespace synodic::honesty
 
 	suite::suite(std::string_view name, std::move_only_function<Generator()> generator)
 	{
-		suites.emplace_back(name, std::move(generator));
+		AddSuite(name, std::move(generator));
 	}
 }

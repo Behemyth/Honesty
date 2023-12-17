@@ -12,6 +12,8 @@ export namespace synodic::honesty
 	//	return std::ranges::elements_of(generator());
 	// }
 
+	class Test;
+
 	/**
 	 * @brief Strongly typed definition around string_view with construction
 	 */
@@ -52,6 +54,8 @@ export namespace synodic::honesty
 	};
 
 	// Operators
+	using Generator = std::generator<TestBase>;
+
 
 	template<std::invocable<int> Fn>
 	[[nodiscard]] Generator operator|(const Fn&& test, const std::ranges::range auto& range)
@@ -83,7 +87,5 @@ export namespace synodic::honesty
 		suite& operator=(const suite& other)	 = delete;
 		suite& operator=(suite&& other) noexcept = default;
 	};
-
-	using honesty::Generator;
 
 }

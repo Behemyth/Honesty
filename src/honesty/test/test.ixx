@@ -99,6 +99,25 @@ export namespace synodic::honesty
 
 	tag skip("skip");
 
+		constexpr auto expect(const bool expression, const std::source_location& location = std::source_location::current())
+	{
+		return expression;
+	}
+
+	template<std::convertible_to<bool> T>
+	constexpr auto expect(const T& expression, const std::source_location& location = std::source_location::current())
+	{
+		return static_cast<bool>(expression);
+	}
+
+	template<typename T, std::derived_from<std::exception> Exception = std::exception>
+	constexpr auto expect_throw(
+		const T& expression,
+		const std::source_location& location = std::source_location::current())
+	{
+		return expression;
+	}
+
 	namespace literals
 	{
 		[[nodiscard]] consteval auto operator""_test(const char* const name, const std::size_t size)

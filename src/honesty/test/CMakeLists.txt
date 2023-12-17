@@ -5,7 +5,6 @@ target_sources(honesty
 		FILES
 			"test.ixx"
 			"runner.ixx"
-			"expression.ixx"
 			"reporter.ixx"
 			"logger.ixx"
 			"generator.ixx"
@@ -16,7 +15,6 @@ target_sources(honesty
 			"backend.ixx"
 	PRIVATE
 		"test.cpp"
-		"expression.cpp"
 		"runner.cpp"
 		"logger.cpp"
 		"reporter.cpp"

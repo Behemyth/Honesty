@@ -6,12 +6,9 @@ target_sources(honesty
 			"test.ixx"
 			"runner.ixx"
 			"expression.ixx"
-			"literals.ixx"
 			"reporter.ixx"
 			"logger.ixx"
 			"generator.ixx"
-			"tag.ixx"
-			"exception.ixx"
 	PRIVATE
 		FILE_SET implementations
 		TYPE CXX_MODULES
@@ -24,8 +21,6 @@ target_sources(honesty
 		"logger.cpp"
 		"reporter.cpp"
 		"backend.cpp"
-		"tag.cpp"
-		"exception.cpp"
 
 )
 

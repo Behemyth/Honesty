@@ -56,7 +56,6 @@ export namespace synodic::honesty
 	// Operators
 	using Generator = std::generator<TestBase>;
 
-
 	template<std::invocable<int> Fn>
 	[[nodiscard]] Generator operator|(const Fn&& test, const std::ranges::range auto& range)
 	{
@@ -88,4 +87,28 @@ export namespace synodic::honesty
 		suite& operator=(suite&& other) noexcept = default;
 	};
 
+	class tag
+	{
+	public:
+		explicit consteval tag(std::string_view)
+		{
+		}
+
+	private:
+	};
+
+	tag skip("skip");
+
+	namespace literals
+	{
+		[[nodiscard]] consteval auto operator""_test(const char* const name, const std::size_t size)
+		{
+			return TestName(std::string_view(name, size));
+		}
+
+		[[nodiscard]] consteval auto operator""_tag(const char* const name, const std::size_t size)
+		{
+			return tag(std::string_view(name, size));
+		}
+	}
 }

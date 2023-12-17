@@ -15,7 +15,7 @@ export namespace synodic::honesty
 	private:
 	};
 
-		class suite_data
+	class suite_data
 	{
 	public:
 		suite_data(std::string_view name, std::move_only_function<std::generator<TestBase>()> generator);
@@ -24,7 +24,6 @@ export namespace synodic::honesty
 		std::string_view name_;
 		std::move_only_function<std::generator<TestBase>()> generator_;
 	};
-
 
 	std::span<suite_data> Suites();
 	void AddSuite(std::string_view name, std::move_only_function<std::generator<TestBase>()> generator);

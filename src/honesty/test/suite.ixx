@@ -6,7 +6,15 @@ import :test;
 
 export namespace synodic::honesty
 {
-	class suite;
+	class suite_data
+	{
+	public:
+		suite_data(std::string_view name, std::move_only_function<Generator()> generator);
+
+	private:
+		std::string_view name_;
+		std::move_only_function<Generator()> generator_;
+	};
 
 	/**
 	 * \brief The management of all suites. Useful only if implementing your own test entrypoint
@@ -18,7 +26,7 @@ export namespace synodic::honesty
 		void execute();
 
 	protected:
-		inline static std::vector<suite> suites_;
+		static std::vector<suite_data> suites_;
 
 	};
 
@@ -35,12 +43,6 @@ export namespace synodic::honesty
 
 		suite& operator=(const suite& other)	 = delete;
 		suite& operator=(suite&& other) noexcept = default;
-
-	private:
-		friend suite_registrar;
-
-		std::string_view name_;
-		std::move_only_function<Generator()> generator_;
 	};
 
 }

@@ -1,5 +1,5 @@
 
-export module synodic.honesty.test:generator;
+export module generator;
 
 import std;
 

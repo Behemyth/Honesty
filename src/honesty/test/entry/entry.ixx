@@ -4,6 +4,7 @@ export module synodic.honesty.test.entry;
 import std;
 
 import synodic.honesty.test;
+import synodic.honesty.test.backend;
 import synodic.honesty.test.runner;
 import synodic.honesty.test.logger;
 import synodic.honesty.test.reporter;
@@ -30,7 +31,7 @@ export namespace synodic::honesty
 	std::expected<void, TestResultCode>
 		entry(const Runner& runner = Runner(), const Logger& logger = Logger(), const Reporter& reporter = Reporter())
 	{
-		//suite_registrar registrar;
+		auto suites = Suites();
 
 		//registrar.execute();
 

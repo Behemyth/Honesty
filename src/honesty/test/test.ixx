@@ -2,7 +2,8 @@
 export module synodic.honesty.test:test;
 
 import std;
-import :backend;
+import generator;
+import synodic.honesty.test.backend;
 
 export namespace synodic::honesty
 {
@@ -99,7 +100,7 @@ export namespace synodic::honesty
 
 	tag skip("skip");
 
-		constexpr auto expect(const bool expression, const std::source_location& location = std::source_location::current())
+	constexpr auto expect(const bool expression, const std::source_location& location = std::source_location::current())
 	{
 		return expression;
 	}
@@ -111,9 +112,8 @@ export namespace synodic::honesty
 	}
 
 	template<typename T, std::derived_from<std::exception> Exception = std::exception>
-	constexpr auto expect_throw(
-		const T& expression,
-		const std::source_location& location = std::source_location::current())
+	constexpr auto
+		expect_throw(const T& expression, const std::source_location& location = std::source_location::current())
 	{
 		return expression;
 	}

@@ -1,8 +1,8 @@
-export module synodic.honesty.test:backend;
+export module synodic.honesty.test.backend;
 
 import std;
 
-import :generator;
+import generator;
 
 export namespace synodic::honesty
 {

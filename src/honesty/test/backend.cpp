@@ -1,6 +1,4 @@
-module synodic.honesty.test:backend;
-
-import :backend;
+module synodic.honesty.test.backend;
 
 namespace
 {

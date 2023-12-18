@@ -43,8 +43,8 @@ auto suiteGenerator = []() -> Generator
 	};
 
 	// TODO: Remove Set, replace with recursive test
-	co_yield Test("outer", outerSetGenerator);
+	co_yield Test("top level test", outerSetGenerator);
 };
 
 // Global creation
-suite suite("outer", suiteGenerator);
+suite suite("test suite", suiteGenerator);

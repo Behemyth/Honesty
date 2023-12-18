@@ -8,7 +8,7 @@ namespace
 	auto suiteGenerator = []() -> Generator
 	{
 		co_yield Test(
-			"outer",
+			"top level test",
 			[]() -> Generator
 			{
 				co_return;
@@ -16,5 +16,5 @@ namespace
 	};
 
 	// Global creation
-	suite suite("outer", suiteGenerator);
+	suite suite("suite suite", suiteGenerator);
 }

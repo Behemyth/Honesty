@@ -12,7 +12,7 @@ namespace
 		co_return;
 	};
 
-	suite suite("outer", suiteGenerator);
+	suite suite("runner suite", suiteGenerator);
 }
 
 static_assert(is_runner<runner::single_threaded>, "The single threaded runner must satisfy the runner concept");

@@ -18,5 +18,5 @@ namespace
 		co_return;
 	};
 
-	suite suite("outer", suiteGenerator);
+	suite suite("tag suite", suiteGenerator);
 }

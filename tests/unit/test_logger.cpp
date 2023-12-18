@@ -14,7 +14,7 @@ namespace
 		co_return;
 	};
 
-	suite suite("outer", suiteGenerator);
+	suite suite("logger suite", suiteGenerator);
 }
 
 static_assert(is_logger<logger::StandardOut>, "The stdout logger must satisfy the logger concept");

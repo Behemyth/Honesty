@@ -16,5 +16,5 @@ namespace
 		};
 	};
 
-	suite suite("outer", suiteGenerator);
+	suite suite("exception suite", suiteGenerator);
 }

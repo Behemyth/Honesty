@@ -1,5 +1,9 @@
-// Anonymous namespace to avoid ODR violation
-namespace
+
+export module counter;
+
+import std;
+
+export namespace
 {
 
 	template<typename Context, int Start = 0, int Step = 1>

@@ -45,5 +45,5 @@ auto suiteGenerator = []() -> Generator
 	co_yield Test("top level test", outerSetGenerator);
 };
 
-// Global creation
+// Registration
 constexpr suite suite("test suite", suiteGenerator);

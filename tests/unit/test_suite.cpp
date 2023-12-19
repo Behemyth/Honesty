@@ -15,6 +15,6 @@ namespace
 			});
 	};
 
-	// Global creation
+	// Registration
 	constexpr suite suite("suite suite", suiteGenerator);
 }

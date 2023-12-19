@@ -79,14 +79,20 @@ export namespace synodic::honesty
 	class [[nodiscard]] suite final
 	{
 	public:
-		suite(std::string_view name, std::move_only_function<Generator()> generator);
+		consteval suite(std::string_view name, std::generator<TestBase>(*generator)());
 
 		suite(const suite& other)	  = delete;
-		suite(suite&& other) noexcept = default;
+		consteval suite(suite&& other) noexcept = default;
 
 		suite& operator=(const suite& other)	 = delete;
-		suite& operator=(suite&& other) noexcept = default;
+		consteval suite& operator=(suite&& other) noexcept = default;
 	};
+
+	consteval suite::suite(std::string_view name, std::generator<TestBase>(*generator)())
+	{
+		RegisterSuite(name);
+		AddSuite(name, generator);
+	}
 
 	class tag
 	{

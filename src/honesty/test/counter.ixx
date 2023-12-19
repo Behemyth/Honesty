@@ -1,9 +1,8 @@
-
 export module counter;
 
 import std;
 
-export namespace
+export namespace std
 {
 
 	template<typename Context, int Start = 0, int Step = 1>

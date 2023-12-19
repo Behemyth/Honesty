@@ -17,9 +17,4 @@ namespace synodic::honesty
 	void Test::Run()
 	{
 	}
-
-	suite::suite(std::string_view name, std::move_only_function<Generator()> generator)
-	{
-		AddSuite(name, std::move(generator));
-	}
 }

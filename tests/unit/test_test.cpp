@@ -47,4 +47,4 @@ auto suiteGenerator = []() -> Generator
 };
 
 // Global creation
-suite suite("test suite", suiteGenerator);
+constexpr suite suite("test suite", suiteGenerator);

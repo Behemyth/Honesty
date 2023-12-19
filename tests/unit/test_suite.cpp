@@ -16,5 +16,5 @@ namespace
 	};
 
 	// Global creation
-	suite suite("suite suite", suiteGenerator);
+	constexpr suite suite("suite suite", suiteGenerator);
 }

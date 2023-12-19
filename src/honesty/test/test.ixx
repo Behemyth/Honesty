@@ -90,8 +90,7 @@ export namespace synodic::honesty
 
 	consteval suite::suite(std::string_view name, std::generator<TestBase>(*generator)())
 	{
-		RegisterSuite(name);
-		AddSuite(name, generator);
+		RegisterSuite(name, generator);
 	}
 
 	class tag

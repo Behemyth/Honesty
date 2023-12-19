@@ -33,13 +33,22 @@ export namespace synodic::honesty
 
 	std::span<suite_data> Suites();
 
-	consteval void RegisterSuite(std::string_view name)
+	/**		
+	 * \brief Counts the suites at compile time via type reflection. Using the resulting value needs to happen after this function
+	 * \param name 
+	 */
+	consteval void RegisterSuite(std::string_view name, std::generator<TestBase> (*generator)())
 	{
 		counter.next<__COUNTER__>();
 	}
 
 	consteval void AddSuite(std::string_view name, std::generator<TestBase> (*generator)())
 	{
+		constexpr int size = counter.current<__COUNTER__>();
+
+		//static std::array<suite_data, size> suites;
+
+
 		// GetSuiteStorage().emplace_back(name, std::move(generator));
 	}
 

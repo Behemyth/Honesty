@@ -42,7 +42,6 @@ auto suiteGenerator = []() -> Generator
 		// } | std::array{3, 4};
 	};
 
-	// TODO: Remove Set, replace with recursive test
 	co_yield Test("top level test", outerSetGenerator);
 };
 

@@ -18,7 +18,7 @@ export namespace synodic::honesty
 	class suite_data
 	{
 	public:
-		suite_data(std::string_view name, std::move_only_function<std::generator<TestBase>()> generator);
+		suite_data(std::string_view name, std::move_only_function<std::generator<TestBase>()> generator) noexcept;
 
 	private:
 		std::string_view name_;

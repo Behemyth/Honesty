@@ -4,6 +4,7 @@ export module synodic.honesty.test:test;
 import std;
 import generator;
 import synodic.honesty.test.backend;
+import counter;
 
 export namespace synodic::honesty
 {
@@ -76,7 +77,7 @@ export namespace synodic::honesty
 	/**
 	 * \brief Allows the static registration of tests in the global scope
 	 */
-	class [[nodiscard]] suite final
+	class [[nodiscard]] suite final :  std::counter<suite_data, 1>
 	{
 	public:
 		consteval suite(std::string_view name, std::generator<TestBase>(*generator)());

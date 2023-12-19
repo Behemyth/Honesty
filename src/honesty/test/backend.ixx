@@ -5,11 +5,6 @@ import std;
 import generator;
 import counter;
 
-template<int I>
-struct U;
-
-constexpr std::counter<U<1>, 1> counter;
-
 export namespace synodic::honesty
 {
 	class TestBase
@@ -31,7 +26,7 @@ export namespace synodic::honesty
 		std::generator<TestBase> (*generator_)();
 	};
 
-	std::span<suite_data> Suites();
+	// std::span<suite_data> Suites();
 
 	/**		
 	 * \brief Counts the suites at compile time via type reflection. Using the resulting value needs to happen after this function
@@ -39,7 +34,7 @@ export namespace synodic::honesty
 	 */
 	consteval void RegisterSuite(std::string_view name, std::generator<TestBase> (*generator)())
 	{
-		counter.next<__COUNTER__>();
+		suite_data::next<__COUNTER__>();
 	}
 
 	consteval void AddSuite(std::string_view name, std::generator<TestBase> (*generator)())

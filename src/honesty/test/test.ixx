@@ -4,7 +4,6 @@ export module synodic.honesty.test:test;
 import std;
 import generator;
 import synodic.honesty.test.backend;
-import counter;
 
 export namespace synodic::honesty
 {
@@ -77,7 +76,7 @@ export namespace synodic::honesty
 	/**
 	 * \brief Allows the static registration of tests in the global scope
 	 */
-	class suite final :  std::counter<suite, 1>
+	class suite final
 	{
 	public:
 		consteval suite(std::string_view name, std::generator<TestBase>(*generator)());
@@ -91,10 +90,7 @@ export namespace synodic::honesty
 
 	consteval suite::suite(std::string_view name, std::generator<TestBase>(*generator)())
 	{
-		constexpr int nextIndex = next<__COUNTER__>();
-
-		using SuiteSingleton = suite_data<nextIndex>;
-		SuiteSingleton::Initialize(name, generator);
+		AddSuite(suite_data(name, generator));
 	}
 
 	class tag

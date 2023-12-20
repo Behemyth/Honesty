@@ -4,17 +4,13 @@ import counter;
 
 namespace
 {
-	//std::vector<synodic::honesty::suite_data>& GetSuiteStorage()
+	//std::vector<synodic::honesty::suite_builder>& GetSuiteStorage()
 	//{
-	//	static std::vector<synodic::honesty::suite_data> suites;
+	//	static std::vector<synodic::honesty::suite_builder> suites;
 	//	return suites;
 	//}
 }
 
 namespace synodic::honesty
 {
-	//std::span<suite_data> Suites()
-	//{
-	//	return GetSuiteStorage();
-	//}
 }

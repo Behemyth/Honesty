@@ -5,6 +5,11 @@ import std;
 import generator;
 import counter;
 
+template<int I>
+struct U;
+
+constexpr std::counter<U<1>> Counter;
+
 export namespace synodic::honesty
 {
 	class TestBase
@@ -16,72 +21,84 @@ export namespace synodic::honesty
 	private:
 	};
 
-	template<int T>
-	class suite_data
+	struct suite_data
 	{
-	public:
-		static consteval void Initialize(std::string_view name, std::generator<TestBase> (*generator)());
-		static consteval const suite_data Get();
-
-	private:
 		consteval suite_data(std::string_view name, std::generator<TestBase> (*generator)()) noexcept;
-
-		static consteval suite_data SetData(std::string_view name, std::generator<TestBase> (*generator)());
 
 		std::string_view name_;
 		std::generator<TestBase> (*generator_)();
 	};
 
-	template<int T>
-	consteval suite_data<T>::suite_data(std::string_view name, std::generator<TestBase> (*generator)()) noexcept :
+	consteval suite_data::suite_data(std::string_view name, std::generator<TestBase> (*generator)()) noexcept :
 		name_(name),
-		generator_(std::move(generator))
+		generator_(generator)
 	{
 	}
 
-	template<int T>
-	consteval void suite_data<T>::Initialize(std::string_view name, std::generator<TestBase> (*generator)())
+	template<std::size_t>
+	class suite_builder
 	{
-		SetData(name, generator);
+	public:
+		static consteval void Initialize(suite_data data);
+		static consteval suite_data Get();
+
+	private:
+		consteval suite_builder(suite_data data) noexcept;
+
+		static consteval suite_data SetData(suite_data data);
+
+		suite_data data_;
+	};
+
+	template<std::size_t T>
+	consteval suite_builder<T>::suite_builder(suite_data data) noexcept :
+		data_(data)
+	{
 	}
 
-	template<int T>
-	consteval const suite_data<T> suite_data<T>::Get()
+	template<std::size_t T>
+	consteval void suite_builder<T>::Initialize(suite_data data)
 	{
-		return SetData(suite_data(
-			"Uninitialized Suite",
-			[]
-			{
-			}));
+		SetData(data);
 	}
 
-	template<int T>
-	consteval suite_data<T> suite_data<T>::SetData(std::string_view name, std::generator<TestBase> (*generator)())
+	template<std::size_t T>
+	consteval suite_data suite_builder<T>::Get()
 	{
+		return SetData(suite_data("Uninitialized Suite", nullptr));
+	}
+
+	template<std::size_t T>
+	consteval suite_data suite_builder<T>::SetData(suite_data data)
+	{
+		// Alternative to static constexpr variable
 		auto builder = [&]() consteval
 		{
-			return suite_data(name, generator);
+			return suite_data(data);
 		};
 		return builder();
 
-		// TODO: Replace with C++23
-		// static constexpr suite_data data(name, generator);
+		// TODO: Replace with this come C++23
+		// static constexpr suite_builder data(name, generator);
 		// return data;
 	}
 
-	// std::span<suite_data> Suites();
-
-	/**
-	 * \brief Counts the suites at compile time via type reflection. Using the resulting value needs to happen after
-	 * this function \param name
-	 */
-	consteval void AddSuite(std::string_view name, std::generator<TestBase> (*generator)())
+	consteval void AddSuite(suite_data data)
 	{
-		// constexpr int size = counter.current<__COUNTER__>();
+		constexpr int nextIndex = Counter.next<__COUNTER__>();
 
-		// static std::array<suite_data, size> suites;
-
-		// GetSuiteStorage().emplace_back(name, std::move(generator));
+		suite_builder<nextIndex>::Initialize(data);
 	}
 
+	consteval auto GenerateSuites()
+	{
+		constexpr int count = Counter.current<__COUNTER__>();
+
+		auto sequenceGenerator = []<std::size_t... Indices>(std::index_sequence<Indices...>) -> auto
+		{
+			return std::array<suite_data, sizeof...(Indices)>{suite_builder<Indices>::Get()...};
+		};
+
+		return sequenceGenerator(std::make_index_sequence<count>());
+	}
 }

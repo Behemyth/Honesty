@@ -7,11 +7,13 @@ import synodic.honesty.test.backend;
 
 export namespace synodic::honesty
 {
-	// template<std::invocable Fn>
-	// auto Test(std::string_view name, Fn&& generator)
-	//{
-	//	return std::ranges::elements_of(generator());
-	// }
+
+	using honesty::Generator;
+
+	auto Test(std::string_view name, Generator (*generator)())
+	{
+		return std::ranges::elements_of(generator());
+	}
 
 	class Test;
 
@@ -31,11 +33,7 @@ export namespace synodic::honesty
 		TestName& operator=(const TestName& other)	   = delete;
 		TestName& operator=(TestName&& other) noexcept = delete;
 
-		template<std::invocable Fn>
-		auto operator=(Fn&& generator)
-		{
-			return Test(name_, generator);
-		}
+		auto operator=(Generator (*generator)()) const;
 
 	protected:
 		std::string_view name_;
@@ -44,18 +42,17 @@ export namespace synodic::honesty
 	class Test final : public TestBase
 	{
 	public:
-		Test(std::string_view name, std::move_only_function<void()> test);
+		Test(std::string_view name, void (*test)());
 
-		Test& operator=(std::move_only_function<void()> test);
+		Test& operator=(void (*test)());
 
 		void Run() const override;
 
 	private:
-		std::move_only_function<void()> runner_;
+		void (*runner_)();
 	};
 
 	// Operators
-	using Generator = std::generator<TestBase>;
 
 	template<std::invocable<int> Fn>
 	[[nodiscard]] Generator operator|(const Fn&& test, const std::ranges::range auto& range)

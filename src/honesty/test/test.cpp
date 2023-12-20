@@ -2,19 +2,25 @@ module synodic.honesty.test:test;
 
 import :test;
 
-
 namespace synodic::honesty
 {
-	Test::Test(std::string_view name, std::move_only_function<void()> test)
+	auto TestName::operator=(Generator (*generator)()) const
+	{
+		return Test(name_, generator);
+	}
+
+	Test::Test(std::string_view name, void (*test)()):
+		runner_(test)
 	{
 	}
 
-	Test& Test::operator=(std::move_only_function<void()> test)
+	class Test& Test::operator=(void (*test)())
 	{
 		return *this;
 	}
 
 	void Test::Run() const
 	{
+		runner_();
 	}
 }

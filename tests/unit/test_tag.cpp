@@ -18,5 +18,5 @@ namespace
 		co_return;
 	};
 
-	constexpr suite suite("tag suite", suiteGenerator);
+	suite suite("tag suite", suiteGenerator);
 }

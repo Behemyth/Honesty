@@ -46,4 +46,4 @@ auto suiteGenerator = []() -> Generator
 };
 
 // Registration
-constexpr suite suite("test suite", suiteGenerator);
+suite suite("test suite", suiteGenerator);

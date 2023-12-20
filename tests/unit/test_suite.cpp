@@ -16,5 +16,5 @@ namespace
 	};
 
 	// Registration
-	constexpr suite suite("suite suite", suiteGenerator);
+	suite suite("suite suite", suiteGenerator);
 }

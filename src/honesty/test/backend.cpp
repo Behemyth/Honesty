@@ -13,4 +13,5 @@ namespace
 
 namespace synodic::honesty
 {
+	constinit Registry tests;
 }

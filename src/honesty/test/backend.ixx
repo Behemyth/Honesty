@@ -79,8 +79,11 @@ export namespace synodic::honesty
 		return builder();
 
 		// TODO: Replace with this come C++23
-		// static constexpr suite_builder data(name, generator);
+		// static constexpr suite_data data(name, generator);
 		// return data;
+
+		// constinit suite_data staticData = data;
+		// return staticData;
 	}
 
 	consteval void AddSuite(suite_data data)
@@ -90,15 +93,24 @@ export namespace synodic::honesty
 		suite_builder<nextIndex>::Initialize(data);
 	}
 
-	consteval auto GenerateSuites()
+	auto GenerateSuites()
 	{
 		constexpr int count = Counter.current<__COUNTER__>();
 
 		auto sequenceGenerator = []<std::size_t... Indices>(std::index_sequence<Indices...>) -> auto
 		{
-			return std::array<suite_data, sizeof...(Indices)>{suite_builder<Indices>::Get()...};
+			return std::array<suite_data, sizeof...(Indices)> {suite_builder<Indices>::Get()...};
 		};
 
 		return sequenceGenerator(std::make_index_sequence<count>());
 	}
+
+	class Registry
+	{
+	public:
+
+	private:
+	};
+
+	extern constinit Registry tests;
 }

@@ -15,5 +15,5 @@ namespace
 		};
 	};
 
-	constexpr suite suite("exception suite", suiteGenerator);
+	suite suite("exception suite", suiteGenerator);
 }

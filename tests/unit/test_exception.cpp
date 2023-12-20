@@ -4,13 +4,16 @@ import synodic.honesty.test;
 using namespace synodic::honesty;
 using namespace synodic::honesty::literals;
 
-auto suiteGenerator = []() -> Generator
+namespace
 {
-	co_yield "exception"_test = []
+	auto suiteGenerator = []() -> Generator
 	{
-		// expect_throw<std::runtime_error>(true);
-		// expect_throw();
+		co_yield "exception"_test = []
+		{
+			// expect_throw<std::runtime_error>(true);
+			// expect_throw();
+		};
 	};
-};
 
-constexpr suite suite("exception suite", suiteGenerator);
+	constexpr suite suite("exception suite", suiteGenerator);
+}

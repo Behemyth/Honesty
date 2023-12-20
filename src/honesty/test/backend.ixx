@@ -20,14 +20,13 @@ export namespace synodic::honesty
 	class suite_data
 	{
 	public:
-
 		static consteval void Initialize(std::string_view name, std::generator<TestBase> (*generator)());
-		static consteval const suite_data& Get();
+		static consteval const suite_data Get();
 
 	private:
 		consteval suite_data(std::string_view name, std::generator<TestBase> (*generator)()) noexcept;
 
-		static consteval suite_data& SetData(std::string_view name, std::generator<TestBase> (*generator)());
+		static consteval suite_data SetData(std::string_view name, std::generator<TestBase> (*generator)());
 
 		std::string_view name_;
 		std::generator<TestBase> (*generator_)();
@@ -47,18 +46,28 @@ export namespace synodic::honesty
 	}
 
 	template<int T>
-	consteval const suite_data<T>& suite_data<T>::Get()
+	consteval const suite_data<T> suite_data<T>::Get()
 	{
-		return SetData(suite_data("Uninitialized Suite", []{}));
+		return SetData(suite_data(
+			"Uninitialized Suite",
+			[]
+			{
+			}));
 	}
 
 	template<int T>
-	consteval suite_data<T>& suite_data<T>::SetData(std::string_view name, std::generator<TestBase> (*generator)())
+	consteval suite_data<T> suite_data<T>::SetData(std::string_view name, std::generator<TestBase> (*generator)())
 	{
-		static constexpr suite_data data(name, generator);
-		return data;
-	}
+		auto builder = [&]() consteval
+		{
+			return suite_data(name, generator);
+		};
+		return builder();
 
+		// TODO: Replace with C++23
+		// static constexpr suite_data data(name, generator);
+		// return data;
+	}
 
 	// std::span<suite_data> Suites();
 

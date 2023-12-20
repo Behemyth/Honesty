@@ -34,6 +34,7 @@ export namespace synodic::honesty
 		TestName& operator=(TestName&& other) noexcept = delete;
 
 		auto operator=(Generator (*generator)()) const;
+		class Test operator=(void (*generator)()) const;
 
 	protected:
 		std::string_view name_;

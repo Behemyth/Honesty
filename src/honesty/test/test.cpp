@@ -9,6 +9,11 @@ namespace synodic::honesty
 		return Test(name_, generator);
 	}
 
+	class Test TestName::operator=(void (*generator)()) const
+	{
+		return {name_, generator};
+	}
+
 	Test::Test(std::string_view name, void (*test)()):
 		runner_(test)
 	{

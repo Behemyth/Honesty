@@ -1,14 +1,15 @@
 export module synodic.honesty.test.runner:single;
 
 import std;
-import synodic.honesty.test;
+import synodic.honesty.test.backend;
+import generator;
 
 export namespace synodic::honesty::runner
 {
 	class single_threaded
 	{
 	public:
-		void run(std::span<std::move_only_function<Generator()>> suites) const;
+		void run(std::span<suite_data> suites) const;
 
 	private:
 	};

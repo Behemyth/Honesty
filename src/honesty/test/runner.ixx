@@ -8,9 +8,9 @@ export namespace synodic::honesty
 {
 
 	template<typename T>
-	concept is_runner = requires(T const type, std::span<std::move_only_function<Generator()>> generator) {
+	concept is_runner = requires(T const type, std::span<suite_data> suites) {
 		{
-			type.run(generator)
+			type.run(suites)
 		} -> std::same_as<void>;
 	};
 

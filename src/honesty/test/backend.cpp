@@ -1,7 +1,5 @@
 module synodic.honesty.test.backend;
 
-import counter;
-
 namespace
 {
 	//std::vector<synodic::honesty::suite_builder>& GetSuiteStorage()
@@ -13,5 +11,4 @@ namespace
 
 namespace synodic::honesty
 {
-	constinit Registry tests;
 }

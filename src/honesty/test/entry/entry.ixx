@@ -11,10 +11,6 @@ import synodic.honesty.test.reporter;
 
 namespace synodic::honesty
 {
-	struct suite_runner
-	{
-		suite_runner(suite suite);
-	};
 }
 
 export namespace synodic::honesty
@@ -31,7 +27,7 @@ export namespace synodic::honesty
 	std::expected<void, TestResultCode>
 		entry(const Runner& runner = Runner(), const Logger& logger = Logger(), const Reporter& reporter = Reporter())
 	{
-		auto suites = GenerateSuites();
+		auto suites = Registry::GenerateSuites();
 
 		//registrar.execute();
 

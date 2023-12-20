@@ -79,18 +79,18 @@ export namespace synodic::honesty
 	class suite final
 	{
 	public:
-		consteval suite(std::string_view name, std::generator<TestBase>(*generator)());
+		suite(std::string_view name, std::generator<TestBase> (*generator)());
 
 		suite(const suite& other)	  = delete;
-		consteval suite(suite&& other) noexcept = default;
+		suite(suite&& other) noexcept = default;
 
 		suite& operator=(const suite& other)	 = delete;
-		consteval suite& operator=(suite&& other) noexcept = default;
+		suite& operator=(suite&& other) noexcept = default;
 	};
 
-	consteval suite::suite(std::string_view name, std::generator<TestBase>(*generator)())
+	suite::suite(std::string_view name, std::generator<TestBase> (*generator)())
 	{
-		AddSuite(suite_data(name, generator));
+		Registry::Add(suite_data(name, generator));
 	}
 
 	class tag

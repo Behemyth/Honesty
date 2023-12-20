@@ -8,7 +8,6 @@ target_sources(honesty
 			"reporter.ixx"
 			"logger.ixx"
 			"generator.ixx"
-			"counter.ixx"
 	PRIVATE
 		FILE_SET implementations
 		TYPE CXX_MODULES

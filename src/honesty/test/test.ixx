@@ -48,7 +48,7 @@ export namespace synodic::honesty
 
 		Test& operator=(std::move_only_function<void()> test);
 
-		void Run() override;
+		void Run() const override;
 
 	private:
 		std::move_only_function<void()> runner_;

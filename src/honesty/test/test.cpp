@@ -14,7 +14,7 @@ namespace synodic::honesty
 		return *this;
 	}
 
-	void Test::Run()
+	void Test::Run() const
 	{
 	}
 }

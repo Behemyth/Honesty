@@ -9,7 +9,7 @@ export namespace synodic::honesty::runner
 	class single_threaded
 	{
 	public:
-		void run(std::span<suite_data> suites) const;
+		void run(std::span<const suite_data> suites) const;
 
 	private:
 	};

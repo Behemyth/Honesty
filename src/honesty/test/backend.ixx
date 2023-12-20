@@ -9,8 +9,8 @@ export namespace synodic::honesty
 	class TestBase
 	{
 	public:
-		virtual ~TestBase() = default;
-		virtual void Run()	= 0;
+		virtual ~TestBase()		 = default;
+		virtual void Run() const = 0;
 
 	private:
 	};

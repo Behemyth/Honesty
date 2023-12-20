@@ -4,7 +4,14 @@ import :single;
 
 namespace synodic::honesty::runner
 {
-	void single_threaded::run(std::span<suite_data> suites) const
+	void single_threaded::run(std::span<const suite_data> suites) const
 	{
+		for (const auto& suite: suites)
+		{
+			for (const TestBase& test: suite.generator_())
+			{
+				test.Run();
+			}
+		}
 	}
 }

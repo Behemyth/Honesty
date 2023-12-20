@@ -31,7 +31,7 @@ export namespace synodic::honesty
 	std::expected<void, TestResultCode>
 		entry(const Runner& runner = Runner(), const Logger& logger = Logger(), const Reporter& reporter = Reporter())
 	{
-		auto suites = Suites();
+		//auto suites = Suites();
 
 		//registrar.execute();
 

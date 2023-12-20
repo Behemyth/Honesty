@@ -77,7 +77,7 @@ export namespace synodic::honesty
 	/**
 	 * \brief Allows the static registration of tests in the global scope
 	 */
-	class [[nodiscard]] suite final :  std::counter<suite_data, 1>
+	class suite final :  std::counter<suite, 1>
 	{
 	public:
 		consteval suite(std::string_view name, std::generator<TestBase>(*generator)());
@@ -91,7 +91,10 @@ export namespace synodic::honesty
 
 	consteval suite::suite(std::string_view name, std::generator<TestBase>(*generator)())
 	{
-		RegisterSuite(name, generator);
+		constexpr int nextIndex = next<__COUNTER__>();
+
+		using SuiteSingleton = suite_data<nextIndex>;
+		SuiteSingleton::Initialize(name, generator);
 	}
 
 	class tag

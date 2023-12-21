@@ -7,12 +7,12 @@ using namespace synodic::honesty::literals;
 
 namespace
 {
-	auto dummyGenerator = []() -> std::generator<TestBase>
+	auto dummyGenerator = []() -> TestGenerator
 	{
 		co_return;
 	};
 
-	auto suiteGenerator = []() -> std::generator<TestBase>
+	auto suiteGenerator = []() -> TestGenerator
 	{
 		//co_yield tag("test") / "inner"_test = dummyGenerator;
 		//co_yield skip / "test"_tag / "inner"_test = dummyGenerator;

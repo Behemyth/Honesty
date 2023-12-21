@@ -6,13 +6,12 @@ using namespace synodic::honesty;
 
 namespace
 {
-	auto suiteGenerator = []() -> std::generator<TestBase>
+	auto suiteGenerator = []() -> TestGenerator
 	{
 		co_yield Test(
 			"top level test",
-			[]() -> std::generator<TestBase>
+			[]()
 			{
-				co_return;
 			});
 	};
 

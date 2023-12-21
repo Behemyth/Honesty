@@ -8,15 +8,14 @@ import generator;
 using namespace synodic::honesty;
 using namespace synodic::honesty::literals;
 
-auto outerSetGenerator = []() -> std::generator<TestBase>
+auto outerSetGenerator = []()
 {
-	co_return;
 };
 
-auto suiteGenerator = []() -> std::generator<TestBase>
+auto suiteGenerator = []() -> TestGenerator
 {
 	// Tests that creation via literal works
-	auto innerSetGenerator = []() -> std::generator<TestBase>
+	auto innerSetGenerator = []() -> TestGenerator
 	{
 		int count = 0;
 		co_yield Test(
@@ -41,12 +40,8 @@ auto suiteGenerator = []() -> std::generator<TestBase>
 		// } | std::array{3, 4};
 	};
 
-	// Pts fall out of scope?
-
 	co_yield Test("top level test", outerSetGenerator);
 	co_yield Test("inner level test", innerSetGenerator);
-
-	co_return;
 };
 
 // Registration

@@ -9,6 +9,8 @@ export namespace synodic::honesty
 {
 	class VoidTest;
 
+	using TestGenerator = std::generator<TestBase>;
+
 	/**
 	 * @brief Strongly typed definition around string_view with construction
 	 */
@@ -25,7 +27,7 @@ export namespace synodic::honesty
 		TestName& operator=(const TestName& other)	   = delete;
 		TestName& operator=(TestName&& other) noexcept = delete;
 
-		std::ranges::elements_of<std::generator<TestBase>> operator=(std::generator<TestBase> (*generator)()) const;
+		std::ranges::elements_of<TestGenerator> operator=(TestGenerator (*generator)()) const;
 		VoidTest operator=(void (*generator)()) const;
 
 	protected:
@@ -45,15 +47,15 @@ export namespace synodic::honesty
 		void (*runner_)();
 	};
 
-	std::ranges::elements_of<std::generator<TestBase>>
-		Test(std::string_view name, std::generator<TestBase> (*generator)());
+	std::ranges::elements_of<TestGenerator>
+		Test(std::string_view name, TestGenerator (*generator)());
 
 	VoidTest Test(std::string_view name, void (*generator)());
 
 	// Operators
 
 	template<std::invocable<int> Fn>
-	[[nodiscard]] std::generator<TestBase> operator|(const Fn&& test, const std::ranges::range auto& range)
+	[[nodiscard]] TestGenerator operator|(const Fn&& test, const std::ranges::range auto& range)
 	{
 		for (const auto& value: range)
 		{
@@ -63,7 +65,7 @@ export namespace synodic::honesty
 
 	template<typename Fn, typename... Types>
 		requires(std::invocable<Fn, Types> && ...)
-	[[nodiscard]] std::generator<TestBase> operator|(const Fn&& test, std::tuple<Types...>&& tuple)
+	[[nodiscard]] TestGenerator operator|(const Fn&& test, std::tuple<Types...>&& tuple)
 	{
 		co_yield Test("", test);
 	}
@@ -74,7 +76,7 @@ export namespace synodic::honesty
 	class suite final
 	{
 	public:
-		suite(std::string_view name, std::generator<TestBase> (*generator)());
+		suite(std::string_view name, TestGenerator (*generator)());
 
 		suite(const suite& other)	  = delete;
 		suite(suite&& other) noexcept = default;
@@ -83,7 +85,7 @@ export namespace synodic::honesty
 		suite& operator=(suite&& other) noexcept = default;
 	};
 
-	suite::suite(std::string_view name, std::generator<TestBase> (*generator)())
+	suite::suite(std::string_view name, TestGenerator (*generator)())
 	{
 		Registry::Add(suite_data(name, generator));
 	}

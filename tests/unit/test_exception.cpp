@@ -7,7 +7,7 @@ using namespace synodic::honesty::literals;
 
 namespace
 {
-	auto suiteGenerator = []() -> std::generator<TestBase>
+	auto suiteGenerator = []() -> TestGenerator
 	{
 		co_yield "exception"_test = []
 		{

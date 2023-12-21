@@ -18,15 +18,17 @@ export namespace synodic::honesty
 	private:
 	};
 
+	using TestGenerator = std::generator<TestBase>;
+
 	struct suite_data
 	{
-		suite_data(std::string_view name, std::generator<TestBase> (*generator)()) noexcept;
+		suite_data(std::string_view name, TestGenerator (*generator)()) noexcept;
 
 		std::string_view name_;
-		std::generator<TestBase> (*generator_)();
+		TestGenerator (*generator_)();
 	};
 
-	suite_data::suite_data(std::string_view name, std::generator<TestBase> (*generator)()) noexcept :
+	suite_data::suite_data(std::string_view name, TestGenerator (*generator)()) noexcept :
 		name_(name),
 		generator_(generator)
 	{

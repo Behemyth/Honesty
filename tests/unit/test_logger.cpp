@@ -8,7 +8,7 @@ using namespace synodic::honesty::literals;
 
 namespace
 {
-	auto suiteGenerator = []() -> std::generator<TestBase>
+	auto suiteGenerator = []() -> TestGenerator
 	{
 		log("message");
 

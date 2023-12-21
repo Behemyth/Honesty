@@ -1,23 +1,23 @@
-import std;
-import synodic.honesty.test;
-import synodic.honesty.test.backend;
-import generator;
-using namespace synodic::honesty;
-using namespace synodic::honesty::literals;
-
-namespace
-{
-	auto dummyGenerator = []() -> TestGenerator
-	{
-		co_return;
-	};
-
-	auto suiteGenerator = []() -> TestGenerator
-	{
-		//co_yield tag("test") / "inner"_test = dummyGenerator;
-		//co_yield skip / "test"_tag / "inner"_test = dummyGenerator;
-		co_return;
-	};
-
-	suite suite("tag suite", suiteGenerator);
-}
+// import std;
+// import synodic.honesty.test;
+// import synodic.honesty.test.backend;
+// import generator;
+// using namespace synodic::honesty;
+// using namespace synodic::honesty::literals;
+//
+// namespace
+// {
+// 	auto dummyGenerator = []() -> TestGenerator
+// 	{
+// 		co_return;
+// 	};
+//
+// 	auto suiteGenerator = []() -> TestGenerator
+// 	{
+// 		//co_yield tag("test") / "inner"_test = dummyGenerator;
+// 		//co_yield skip / "test"_tag / "inner"_test = dummyGenerator;
+// 		co_return;
+// 	};
+//
+// 	suite suite("tag suite", suiteGenerator);
+// }

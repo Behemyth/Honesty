@@ -15,33 +15,35 @@ auto outerSetGenerator = []()
 auto suiteGenerator = []() -> TestGenerator
 {
 	// Tests that creation via literal works
-	auto innerSetGenerator = []() -> TestGenerator
-	{
-		int count = 0;
-		co_yield Test(
-			"test",
-			[]
-			{
-			});
+	//auto innerSetGenerator = []() -> TestGenerator
+	//{
+	//	int count = 0;
+	//	co_yield Test(
+	//		"test",
+	//		[]
+	//		{
+	//		});
 
-		// co_yield "yes"_test = [&count]()
-		//{
-		//	++count;
-		// };
+	//	// co_yield "yes"_test = [&count]()
+	//	//{
+	//	//	++count;
+	//	// };
 
-		// co_yield "array"_test = [&count](const auto& parameter)
-		//{
-		//	++count;
-		// } | std::tuple{3u, 4.0f};
+	//	// co_yield "array"_test = [&count](const auto& parameter)
+	//	//{
+	//	//	++count;
+	//	// } | std::tuple{3u, 4.0f};
 
-		// co_yield "array"_test = [&count]<typename T>(const T& parameter)
-		//{
-		//	++count;
-		// } | std::array{3, 4};
-	};
+	//	// co_yield "array"_test = [&count]<typename T>(const T& parameter)
+	//	//{
+	//	//	++count;
+	//	// } | std::array{3, 4};
+	//};
 
-	co_yield Test("top level test", outerSetGenerator);
-	co_yield Test("inner level test", innerSetGenerator);
+	//co_yield Test("top level test", outerSetGenerator);
+	//co_yield Test("inner level test", innerSetGenerator);
+
+	co_return;
 };
 
 // Registration

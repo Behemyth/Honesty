@@ -4,27 +4,37 @@ import :test;
 
 namespace synodic::honesty
 {
-	auto TestName::operator=(Generator (*generator)()) const
+	std::ranges::elements_of<Generator> TestName::operator=(Generator (*generator)()) const
 	{
 		return Test(name_, generator);
 	}
 
-	class Test TestName::operator=(void (*generator)()) const
+	VoidTest TestName::operator=(void (*generator)()) const
 	{
 		return {name_, generator};
 	}
 
-	Test::Test(std::string_view name, void (*test)()):
+	VoidTest::VoidTest(std::string_view name, void (*test)()):
 		runner_(test)
 	{
 	}
 
-	class Test& Test::operator=(void (*test)())
+	std::ranges::elements_of<Generator> Test(std::string_view name, Generator (*generator)())
+	{
+		return std::ranges::elements_of(generator());
+	}
+
+	VoidTest Test(std::string_view name, void (*generator)())
+	{
+		return {name, generator};
+	}
+
+	VoidTest& VoidTest::operator=(void (*test)())
 	{
 		return *this;
 	}
 
-	void Test::Run() const
+	void VoidTest::Run() const
 	{
 		runner_();
 	}

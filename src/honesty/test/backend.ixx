@@ -10,7 +10,10 @@ export namespace synodic::honesty
 	{
 	public:
 		virtual ~TestBase()		 = default;
-		virtual void Run() const = 0;
+		virtual void Run() const = 0
+		{
+			
+		}
 
 	private:
 	};
@@ -19,13 +22,13 @@ export namespace synodic::honesty
 
 	struct suite_data
 	{
-		suite_data(std::string_view name, std::generator<TestBase> (*generator)()) noexcept;
+		suite_data(std::string_view name, Generator (*generator)()) noexcept;
 
 		std::string_view name_;
-		std::generator<TestBase> (*generator_)();
+		Generator (*generator_)();
 	};
 
-	suite_data::suite_data(std::string_view name, std::generator<TestBase> (*generator)()) noexcept :
+	suite_data::suite_data(std::string_view name, Generator (*generator)()) noexcept :
 		name_(name),
 		generator_(generator)
 	{

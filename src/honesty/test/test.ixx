@@ -10,12 +10,7 @@ export namespace synodic::honesty
 
 	using honesty::Generator;
 
-	auto Test(std::string_view name, Generator (*generator)())
-	{
-		return std::ranges::elements_of(generator());
-	}
-
-	class Test;
+	class VoidTest;
 
 	/**
 	 * @brief Strongly typed definition around string_view with construction
@@ -24,34 +19,38 @@ export namespace synodic::honesty
 	{
 	public:
 		consteval TestName(std::string_view name) :
-			name_(name) {
-
-			};
+			name_(name)
+		{
+		}
 
 		TestName(const TestName& other)				   = delete;
 		TestName(TestName&& other) noexcept			   = delete;
 		TestName& operator=(const TestName& other)	   = delete;
 		TestName& operator=(TestName&& other) noexcept = delete;
 
-		auto operator=(Generator (*generator)()) const;
-		class Test operator=(void (*generator)()) const;
+		std::ranges::elements_of<Generator> operator=(Generator (*generator)()) const;
+		VoidTest operator=(void (*generator)()) const;
 
 	protected:
 		std::string_view name_;
 	};
 
-	class Test final : public TestBase
+	class VoidTest final : public TestBase
 	{
 	public:
-		Test(std::string_view name, void (*test)());
+		VoidTest(std::string_view name, void (*test)());
 
-		Test& operator=(void (*test)());
+		VoidTest& operator=(void (*test)());
 
 		void Run() const override;
 
 	private:
 		void (*runner_)();
 	};
+
+	std::ranges::elements_of<Generator> Test(std::string_view name, Generator (*generator)());
+
+	VoidTest Test(std::string_view name, void (*generator)());
 
 	// Operators
 
@@ -77,7 +76,7 @@ export namespace synodic::honesty
 	class suite final
 	{
 	public:
-		suite(std::string_view name, std::generator<TestBase> (*generator)());
+		suite(std::string_view name, Generator (*generator)());
 
 		suite(const suite& other)	  = delete;
 		suite(suite&& other) noexcept = default;
@@ -86,7 +85,7 @@ export namespace synodic::honesty
 		suite& operator=(suite&& other) noexcept = default;
 	};
 
-	suite::suite(std::string_view name, std::generator<TestBase> (*generator)())
+	suite::suite(std::string_view name, Generator (*generator)())
 	{
 		Registry::Add(suite_data(name, generator));
 	}

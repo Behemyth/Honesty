@@ -17,14 +17,11 @@ auto suiteGenerator = []() -> Generator
 	auto innerSetGenerator = []() -> Generator
 	{
 		int count = 0;
-		// co_yield Test(
-		//	"test",
-		//	[&count]
-		//	{
-		//		++count;
-		//	});
-
-		co_return;
+		co_yield Test(
+			"test",
+			[]
+			{
+			});
 
 		// co_yield "yes"_test = [&count]()
 		//{
@@ -42,7 +39,12 @@ auto suiteGenerator = []() -> Generator
 		// } | std::array{3, 4};
 	};
 
+	// Pts fall out of scope?
+
 	co_yield Test("top level test", outerSetGenerator);
+	co_yield Test("inner level test", innerSetGenerator);
+
+	co_return;
 };
 
 // Registration

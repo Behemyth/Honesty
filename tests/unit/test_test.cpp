@@ -1,4 +1,3 @@
-#include <cassert>
 #include <cstdio>
 
 import std;
@@ -10,22 +9,16 @@ using namespace synodic::honesty::literals;
 template<class... Args>
 void expect(bool value, const std::source_location location, std::format_string<Args...> fmt, Args&&... args)
 {
-	std::println(
-		stderr,
-		"Test Failed: File({}), Line({})",
-		location.file_name(),
-		location.line());
-	std::print(stderr, "    ");
-	std::println(stderr, fmt, std::forward<Args>(args)...);
+	if (!value)
+	{
+		std::println(stderr, "Test Failed: File({}), Line({})", location.file_name(), location.line());
+		std::print(stderr, "    ");
+		std::println(stderr, fmt, std::forward<Args>(args)...);
+	}
 }
 
 namespace
 {
-	auto basicGenerator = []() -> TestGenerator
-	{
-		co_return;
-	};
-
 	using Function = std::move_only_function<TestGenerator()>;
 
 	struct Runner
@@ -33,8 +26,7 @@ namespace
 		explicit Runner(
 			Function function,
 			const int expected,
-			const std::source_location& location =
-				std::source_location::current())
+			const std::source_location& location = std::source_location::current())
 		{
 			int count = 0;
 			for (const auto& test: function())
@@ -47,21 +39,45 @@ namespace
 	};
 
 	/**
-	 * \brief Verifies that an empty generator can be executed
+	 * \brief Verifies that an empty generator is created
 	 */
-	Runner runner(basicGenerator, 0);
+	auto basicGenerator = []() -> TestGenerator
+	{
+		co_return;
+	};
+
+	/**
+	 * \brief Verifies that a generator with no capture is created
+	 */
+	auto emptyGenerator = []() -> TestGenerator
+	{
+		co_yield Test(
+			"emptyGenerator",
+			[]
+			{
+			});
+	};
+
+	/**
+	 * \brief Verifies that the literal shorthand generates an empty test
+	 */
+	auto emptyLiteral = []() -> TestGenerator
+	{
+		co_yield "emptyLiteral"_test = []
+		{
+		};
+	};
+
+	Runner a(basicGenerator, 0);
+	Runner b(emptyGenerator, 1);
+	Runner c(emptyLiteral, 1);
 }
+
+// TODO: Create tests
 
 // Tests that creation via literal works
 // auto innerSetGenerator = []() -> TestGenerator
 //{
-//	int count = 0;
-//	co_yield Test(
-//		"test",
-//		[]
-//		{
-//		});
-
 //	// co_yield "yes"_test = [&count]()
 //	//{
 //	//	++count;
@@ -77,6 +93,3 @@ namespace
 //	//	++count;
 //	// } | std::array{3, 4};
 //};
-
-// co_yield Test("top level test", outerSetGenerator);
-// co_yield Test("inner level test", innerSetGenerator);

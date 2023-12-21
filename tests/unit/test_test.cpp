@@ -41,7 +41,7 @@ namespace
 	/**
 	 * \brief Verifies that an empty generator is created
 	 */
-	auto basicGenerator = []() -> TestGenerator
+	auto emptyGenerator = []() -> TestGenerator
 	{
 		co_return;
 	};
@@ -49,10 +49,10 @@ namespace
 	/**
 	 * \brief Verifies that a generator with no capture is created
 	 */
-	auto emptyGenerator = []() -> TestGenerator
+	auto basicGenerator = []() -> TestGenerator
 	{
 		co_yield Test(
-			"emptyGenerator",
+			"basicGenerator",
 			[]
 			{
 			});
@@ -68,9 +68,18 @@ namespace
 		};
 	};
 
-	Runner a(basicGenerator, 0);
-	Runner b(emptyGenerator, 1);
+	/**
+	 * \brief Verifies that the literal shorthand generates an empty test
+	 */
+	auto emptyRecursive = []() -> TestGenerator
+	{
+		co_yield Test("emptyRecursive", emptyGenerator);
+	};
+
+	Runner b(emptyGenerator, 0);
+	Runner a(basicGenerator, 1);
 	Runner c(emptyLiteral, 1);
+	Runner d(emptyRecursive, 0);
 }
 
 // TODO: Create tests

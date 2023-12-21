@@ -1,13 +1,14 @@
 import std;
 import synodic.honesty.test;
 import synodic.honesty.test.runner;
-
+import synodic.honesty.test.backend;
+import generator;
 using namespace synodic::honesty;
 using namespace synodic::honesty::literals;
 
 namespace
 {
-	auto suiteGenerator = []() -> Generator
+	auto suiteGenerator = []() -> std::generator<TestBase>
 	{
 		co_return;
 	};

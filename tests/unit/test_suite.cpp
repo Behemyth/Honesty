@@ -1,15 +1,16 @@
 import std;
 import synodic.honesty.test;
-
+import synodic.honesty.test.backend;
+import generator;
 using namespace synodic::honesty;
 
 namespace
 {
-	auto suiteGenerator = []() -> Generator
+	auto suiteGenerator = []() -> std::generator<TestBase>
 	{
 		co_yield Test(
 			"top level test",
-			[]() -> Generator
+			[]() -> std::generator<TestBase>
 			{
 				co_return;
 			});

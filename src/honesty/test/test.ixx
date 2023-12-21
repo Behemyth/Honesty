@@ -7,9 +7,6 @@ import synodic.honesty.test.backend;
 
 export namespace synodic::honesty
 {
-
-	using honesty::Generator;
-
 	class VoidTest;
 
 	/**
@@ -28,7 +25,7 @@ export namespace synodic::honesty
 		TestName& operator=(const TestName& other)	   = delete;
 		TestName& operator=(TestName&& other) noexcept = delete;
 
-		std::ranges::elements_of<Generator> operator=(Generator (*generator)()) const;
+		std::ranges::elements_of<std::generator<TestBase>> operator=(std::generator<TestBase> (*generator)()) const;
 		VoidTest operator=(void (*generator)()) const;
 
 	protected:
@@ -48,14 +45,15 @@ export namespace synodic::honesty
 		void (*runner_)();
 	};
 
-	std::ranges::elements_of<Generator> Test(std::string_view name, Generator (*generator)());
+	std::ranges::elements_of<std::generator<TestBase>>
+		Test(std::string_view name, std::generator<TestBase> (*generator)());
 
 	VoidTest Test(std::string_view name, void (*generator)());
 
 	// Operators
 
 	template<std::invocable<int> Fn>
-	[[nodiscard]] Generator operator|(const Fn&& test, const std::ranges::range auto& range)
+	[[nodiscard]] std::generator<TestBase> operator|(const Fn&& test, const std::ranges::range auto& range)
 	{
 		for (const auto& value: range)
 		{
@@ -65,7 +63,7 @@ export namespace synodic::honesty
 
 	template<typename Fn, typename... Types>
 		requires(std::invocable<Fn, Types> && ...)
-	[[nodiscard]] Generator operator|(const Fn&& test, std::tuple<Types...>&& tuple)
+	[[nodiscard]] std::generator<TestBase> operator|(const Fn&& test, std::tuple<Types...>&& tuple)
 	{
 		co_yield Test("", test);
 	}
@@ -76,7 +74,7 @@ export namespace synodic::honesty
 	class suite final
 	{
 	public:
-		suite(std::string_view name, Generator (*generator)());
+		suite(std::string_view name, std::generator<TestBase> (*generator)());
 
 		suite(const suite& other)	  = delete;
 		suite(suite&& other) noexcept = default;
@@ -85,7 +83,7 @@ export namespace synodic::honesty
 		suite& operator=(suite&& other) noexcept = default;
 	};
 
-	suite::suite(std::string_view name, Generator (*generator)())
+	suite::suite(std::string_view name, std::generator<TestBase> (*generator)())
 	{
 		Registry::Add(suite_data(name, generator));
 	}

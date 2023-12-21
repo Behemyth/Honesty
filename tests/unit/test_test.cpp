@@ -2,19 +2,21 @@
 
 import std;
 import synodic.honesty.test;
+import synodic.honesty.test.backend;
+import generator;
 
 using namespace synodic::honesty;
 using namespace synodic::honesty::literals;
 
-auto outerSetGenerator = []() -> Generator
+auto outerSetGenerator = []() -> std::generator<TestBase>
 {
 	co_return;
 };
 
-auto suiteGenerator = []() -> Generator
+auto suiteGenerator = []() -> std::generator<TestBase>
 {
 	// Tests that creation via literal works
-	auto innerSetGenerator = []() -> Generator
+	auto innerSetGenerator = []() -> std::generator<TestBase>
 	{
 		int count = 0;
 		co_yield Test(

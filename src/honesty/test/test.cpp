@@ -4,7 +4,8 @@ import :test;
 
 namespace synodic::honesty
 {
-	std::ranges::elements_of<Generator> TestName::operator=(Generator (*generator)()) const
+	std::ranges::elements_of<std::generator<TestBase>> TestName::operator=(
+		std::generator<TestBase> (*generator)()) const
 	{
 		return Test(name_, generator);
 	}
@@ -19,9 +20,11 @@ namespace synodic::honesty
 	{
 	}
 
-	std::ranges::elements_of<Generator> Test(std::string_view name, Generator (*generator)())
+	std::ranges::elements_of<std::generator<TestBase>> Test(
+		std::string_view name,
+		std::generator<TestBase> (*generator)())
 	{
-		return std::ranges::elements_of(generator());
+		return {generator()};
 	}
 
 	VoidTest Test(std::string_view name, void (*generator)())

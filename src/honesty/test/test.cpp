@@ -34,6 +34,7 @@ namespace synodic::honesty
 
 	VoidTest& VoidTest::operator=(void (*test)())
 	{
+		runner_ = test;
 		return *this;
 	}
 

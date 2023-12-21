@@ -10,10 +10,7 @@ export namespace synodic::honesty
 	{
 	public:
 		virtual ~TestBase()		 = default;
-		virtual void Run() const = 0
-		{
-			
-		}
+		virtual void Run() const = 0;
 
 	private:
 	};

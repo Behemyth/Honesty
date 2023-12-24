@@ -2,6 +2,7 @@
 
 import std;
 import synodic.honesty.test;
+import generator;
 
 using namespace synodic::honesty;
 using namespace synodic::honesty::literals;
@@ -73,7 +74,7 @@ namespace
 	 */
 	auto emptyRecursive = []() -> TestGenerator
 	{
-		co_yield Test("emptyRecursive", emptyGenerator);
+		co_yield std::ranges::elements_of(Test("emptyRecursive", emptyGenerator));
 	};
 
 	Runner b(emptyGenerator, 0);

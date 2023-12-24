@@ -27,21 +27,11 @@ export namespace synodic::honesty
 		TestName& operator=(const TestName& other)	   = delete;
 		TestName& operator=(TestName&& other) noexcept = delete;
 
-		// std::ranges::elements_of<TestGenerator> operator=(TestGenerator (*generator)()) const;
+		TestGenerator operator=(TestGenerator (*generator)()) const;
 		VoidTest operator=(void (*generator)()) const;
 
 	protected:
 		std::string_view name_;
-	};
-
-	class RecursiveTest
-	{
-	public:
-		RecursiveTest(std::string_view name, TestGenerator (*generator)());
-
-		operator std::ranges::elements_of<TestGenerator&&>() { return {std::forward<TestGenerator>(generator_)}; }
-	private:
-		TestGenerator generator_;
 	};
 
 	class VoidTest final : public TestBase
@@ -57,15 +47,7 @@ export namespace synodic::honesty
 		void (*runner_)();
 	};
 
-	//std::ranges::elements_of<TestGenerator&&> Test(std::string_view name, TestGenerator&& generator)
-	//{
-	//	return {std::forward<TestGenerator>(generator)};
-	//}
-
-		RecursiveTest Test(std::string_view name, TestGenerator (*generator)())
-	{
-		return {name, generator};
-	}
+	TestGenerator Test(std::string_view name, TestGenerator (*generator)());
 
 	VoidTest Test(std::string_view name, void (*generator)());
 

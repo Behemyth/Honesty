@@ -2,6 +2,8 @@ module synodic.honesty.test:test;
 
 import :test;
 
+using namespace synodic::honesty::literals;
+
 namespace synodic::honesty
 {
 	TestGenerator TestName::operator=(
@@ -22,7 +24,11 @@ namespace synodic::honesty
 
 	TestGenerator Test(std::string_view name, TestGenerator(* generator)())
 	{
-		return generator();
+		for(TestBase&& test : generator())
+		{
+			// TODO: inject changes
+			co_yield Test("", [](){});
+		}
 	}
 
 	VoidTest Test(std::string_view name, void (*generator)())

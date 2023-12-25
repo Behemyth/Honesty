@@ -74,7 +74,7 @@ namespace
 	 */
 	auto emptyRecursive = []() -> TestGenerator
 	{
-		co_yield std::ranges::elements_of(Test("emptyRecursive", emptyGenerator));
+		co_yield std::ranges::elements_of( Test("emptyRecursive", emptyGenerator));
 	};
 
 	Runner b(emptyGenerator, 0);

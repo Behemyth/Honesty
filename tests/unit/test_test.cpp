@@ -74,13 +74,23 @@ namespace
 	 */
 	auto emptyRecursive = []() -> TestGenerator
 	{
-		co_yield std::ranges::elements_of( Test("emptyRecursive", emptyGenerator));
+		co_yield std::ranges::elements_of(Test("emptyRecursive", emptyGenerator));
 	};
 
+	auto variableCapture = []() -> TestGenerator
+	{
+		int counter = 0;
+
+		co_yield "variableCapture"_test = [&counter]()
+		{
+			++counter;
+		};
+	};
 	Runner b(emptyGenerator, 0);
 	Runner a(basicGenerator, 1);
 	Runner c(emptyLiteral, 1);
 	Runner d(emptyRecursive, 0);
+	Runner e(variableCapture, 1);
 }
 
 // TODO: Create tests

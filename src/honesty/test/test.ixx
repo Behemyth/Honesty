@@ -27,8 +27,8 @@ export namespace synodic::honesty
 		TestName& operator=(const TestName& other)	   = delete;
 		TestName& operator=(TestName&& other) noexcept = delete;
 
-		TestGenerator operator=(TestGenerator (*generator)()) const;
-		VoidTest operator=(void (*generator)()) const;
+		TestGenerator operator=(std::move_only_function<TestGenerator() const> generator) const;
+		VoidTest operator=(std::move_only_function<void() const> generator) const;
 
 	protected:
 		std::string_view name_;
@@ -37,19 +37,19 @@ export namespace synodic::honesty
 	class VoidTest final : public TestBase
 	{
 	public:
-		VoidTest(std::string_view name, void (*test)());
+		VoidTest(std::string_view name, std::move_only_function<void() const> test);
 
-		VoidTest& operator=(void (*test)());
+		VoidTest& operator=(std::move_only_function<void() const> test);
 
 		void Run() const override;
 
 	private:
-		void (*runner_)();
+		std::move_only_function<void() const> runner_;
 	};
 
-	TestGenerator Test(std::string_view name, TestGenerator (*generator)());
+	TestGenerator Test(std::string_view name, std::move_only_function<TestGenerator() const> generator);
 
-	VoidTest Test(std::string_view name, void (*generator)());
+	VoidTest Test(std::string_view name, std::move_only_function<void() const> generator);
 
 	// Operators
 

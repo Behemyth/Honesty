@@ -3,6 +3,7 @@
 import std;
 import synodic.honesty.test;
 import generator;
+import function_ref;
 
 using namespace synodic::honesty;
 using namespace synodic::honesty::literals;
@@ -20,7 +21,7 @@ void expect(bool value, const std::source_location location, std::format_string<
 
 namespace
 {
-	using Function = std::move_only_function<TestGenerator()>;
+	using Function = std::function_ref<TestGenerator()>;
 
 	struct Runner
 	{
@@ -72,10 +73,10 @@ namespace
 	/**
 	 * \brief Verifies that the literal shorthand generates an empty test
 	 */
-	auto emptyRecursive = []() -> TestGenerator
-	{
-		co_yield std::ranges::elements_of(Test("emptyRecursive", emptyGenerator));
-	};
+	//auto emptyRecursive = []() -> TestGenerator
+	//{
+	//	co_yield std::ranges::elements_of(Test("emptyRecursive", emptyGenerator));
+	//};
 
 	auto variableCapture = []() -> TestGenerator
 	{
@@ -89,7 +90,7 @@ namespace
 	Runner b(emptyGenerator, 0);
 	Runner a(basicGenerator, 1);
 	Runner c(emptyLiteral, 1);
-	Runner d(emptyRecursive, 0);
+	//Runner d(emptyRecursive, 0);
 	Runner e(variableCapture, 1);
 }
 

@@ -200,7 +200,7 @@ namespace std
 	{
 		template<range _Rng, class _Alloc = allocator<byte>>
 		struct elements_of
-		{
+		{ 
 			NO_UNIQUE_ADDRESS _Rng range;
 			NO_UNIQUE_ADDRESS _Alloc allocator {};
 		};

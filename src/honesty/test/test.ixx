@@ -3,6 +3,7 @@ export module synodic.honesty.test:test;
 
 import std;
 import generator;
+import function_ref;
 import synodic.honesty.test.backend;
 
 export namespace synodic::honesty
@@ -27,8 +28,8 @@ export namespace synodic::honesty
 		TestName& operator=(const TestName& other)	   = delete;
 		TestName& operator=(TestName&& other) noexcept = delete;
 
-		TestGenerator operator=(std::move_only_function<TestGenerator() const> generator) const;
-		VoidTest operator=(std::move_only_function<void() const> generator) const;
+		TestGenerator operator=(std::function_ref<TestGenerator()> generator) const;
+		VoidTest operator=(std::function_ref<void()> generator) const;
 
 	protected:
 		std::string_view name_;
@@ -37,19 +38,19 @@ export namespace synodic::honesty
 	class VoidTest final : public TestBase
 	{
 	public:
-		VoidTest(std::string_view name, std::move_only_function<void() const> test);
+		VoidTest(std::string_view name, std::function_ref<void()> test);
 
-		VoidTest& operator=(std::move_only_function<void() const> test);
+		VoidTest& operator=(std::function_ref<void()> test);
 
 		void Run() const override;
 
 	private:
-		std::move_only_function<void() const> runner_;
+		std::function_ref<void()> runner_;
 	};
 
-	TestGenerator Test(std::string_view name, std::move_only_function<TestGenerator() const> generator);
+	TestGenerator Test(std::string_view name, std::function_ref<TestGenerator()> generator);
 
-	VoidTest Test(std::string_view name, std::move_only_function<void() const> generator);
+	VoidTest Test(std::string_view name, std::function_ref<void()> generator);
 
 	// Operators
 

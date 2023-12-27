@@ -6,22 +6,22 @@ using namespace synodic::honesty::literals;
 
 namespace synodic::honesty
 {
-	TestGenerator TestName::operator=(std::move_only_function<TestGenerator() const> generator) const
+	TestGenerator TestName::operator=(std::function_ref<TestGenerator()> generator) const
 	{
 		return Test(name_, std::move(generator));
 	}
 
-	VoidTest TestName::operator=(std::move_only_function<void() const> generator) const
+	VoidTest TestName::operator=(std::function_ref<void()> generator) const
 	{
 		return {name_, std::move(generator)};
 	}
 
-	VoidTest::VoidTest(std::string_view name, std::move_only_function<void() const> test) :
+	VoidTest::VoidTest(std::string_view name, std::function_ref<void()> test) :
 		runner_(std::move(test))
 	{
 	}
 
-	TestGenerator Test(std::string_view name, std::move_only_function<TestGenerator() const> generator)
+	TestGenerator Test(std::string_view name, std::function_ref<TestGenerator()> generator)
 	{
 		for (TestBase&& test: generator())
 		{
@@ -34,12 +34,12 @@ namespace synodic::honesty
 		}
 	}
 
-	VoidTest Test(std::string_view name, std::move_only_function<void() const> generator)
+	VoidTest Test(std::string_view name, std::function_ref<void()> generator)
 	{
 		return {name, std::move(generator)};
 	}
 
-	VoidTest& VoidTest::operator=(std::move_only_function<void() const> test)
+	VoidTest& VoidTest::operator=(std::function_ref<void()> test)
 	{
 		runner_ = std::move(test);
 		return *this;

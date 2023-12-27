@@ -73,10 +73,10 @@ namespace
 	/**
 	 * \brief Verifies that the literal shorthand generates an empty test
 	 */
-	//auto emptyRecursive = []() -> TestGenerator
-	//{
-	//	co_yield std::ranges::elements_of(Test("emptyRecursive", emptyGenerator));
-	//};
+	auto emptyRecursive = []() -> TestGenerator
+	{
+		co_yield Test("emptyRecursive", emptyGenerator);
+	};
 
 	auto variableCapture = []() -> TestGenerator
 	{
@@ -87,10 +87,11 @@ namespace
 			++counter;
 		};
 	};
+
 	Runner b(emptyGenerator, 0);
 	Runner a(basicGenerator, 1);
 	Runner c(emptyLiteral, 1);
-	//Runner d(emptyRecursive, 0);
+	Runner d(emptyRecursive, 0);
 	Runner e(variableCapture, 1);
 }
 

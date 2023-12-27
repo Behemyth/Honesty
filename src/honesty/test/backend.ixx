@@ -3,6 +3,7 @@ export module synodic.honesty.test.backend;
 import std;
 
 import generator;
+import function_ref;
 
 export namespace synodic::honesty
 {
@@ -19,13 +20,13 @@ export namespace synodic::honesty
 
 	struct suite_data
 	{
-		suite_data(std::string_view name, TestGenerator (*generator)()) noexcept;
+		suite_data(std::string_view name,std::function_ref<TestGenerator()> generator) noexcept;
 
 		std::string_view name_;
-		TestGenerator (*generator_)();
+		std::function_ref<TestGenerator()> generator_;
 	};
 
-	suite_data::suite_data(std::string_view name, TestGenerator (*generator)()) noexcept :
+	suite_data::suite_data(std::string_view name, std::function_ref<TestGenerator()> generator) noexcept :
 		name_(name),
 		generator_(generator)
 	{

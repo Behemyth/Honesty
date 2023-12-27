@@ -78,6 +78,15 @@ namespace
 		co_yield Test("emptyRecursive", emptyGenerator);
 	};
 
+	/**
+	 * \brief Verifies that the literal shorthand generates an empty test
+	 */
+	auto basicRecursive = []() -> TestGenerator
+	{
+		co_yield "emptyRecursive"_test = emptyGenerator;
+	};
+
+
 	auto variableCapture = []() -> TestGenerator
 	{
 		int counter = 0;

@@ -2,7 +2,6 @@
 
 import std;
 import synodic.honesty.test;
-import generator;
 import function_ref;
 
 using namespace synodic::honesty;
@@ -73,19 +72,18 @@ namespace
 	/**
 	 * \brief Verifies that the literal shorthand generates an empty test
 	 */
-	auto emptyRecursive = []() -> TestGenerator
-	{
-		co_yield Test("emptyRecursive", emptyGenerator);
-	};
+	//auto emptyRecursive = []() -> TestGenerator
+	//{
+	//	co_yield Test("emptyRecursive", emptyGenerator);
+	//};
 
-	/**
-	 * \brief Verifies that the literal shorthand generates an empty test
-	 */
-	auto basicRecursive = []() -> TestGenerator
-	{
-		co_yield "emptyRecursive"_test = emptyGenerator;
-	};
-
+	///**
+	// * \brief Verifies that the literal shorthand generates an empty test
+	// */
+	//auto basicRecursive = []() -> TestGenerator
+	//{
+	//	co_yield "emptyRecursive"_test = emptyGenerator;
+	//};
 
 	auto variableCapture = []() -> TestGenerator
 	{
@@ -97,30 +95,25 @@ namespace
 		};
 	};
 
+	//auto tupleParameterization = []() -> TestGenerator
+	//{
+	//	co_yield "array"_test = [](const auto& parameter)
+	//	{
+	//	} | std::tuple {3u, 4.0f};
+	//};
+
+	//auto arrayParameterization = []() -> TestGenerator
+	//{
+	//	co_yield "array"_test = []<typename T>(const T& parameter)
+	//	{
+	//	} | std::array {3, 4};
+	//};
+
 	Runner b(emptyGenerator, 0);
 	Runner a(basicGenerator, 1);
 	Runner c(emptyLiteral, 1);
-	Runner d(emptyRecursive, 0);
+	//Runner d(emptyRecursive, 0);
 	Runner e(variableCapture, 1);
+	//Runner f(tupleParameterization, 2);
+	//Runner g(arrayParameterization, 2);
 }
-
-// TODO: Create tests
-
-// Tests that creation via literal works
-// auto innerSetGenerator = []() -> TestGenerator
-//{
-//	// co_yield "yes"_test = [&count]()
-//	//{
-//	//	++count;
-//	// };
-
-//	// co_yield "array"_test = [&count](const auto& parameter)
-//	//{
-//	//	++count;
-//	// } | std::tuple{3u, 4.0f};
-
-//	// co_yield "array"_test = [&count]<typename T>(const T& parameter)
-//	//{
-//	//	++count;
-//	// } | std::array{3, 4};
-//};

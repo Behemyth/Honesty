@@ -7,20 +7,12 @@ target_sources(honesty
 			"runner.ixx"
 			"reporter.ixx"
 			"logger.ixx"
-			"generator.ixx"
 			"function_ref.ixx"
-	PRIVATE
-		FILE_SET implementations
-		TYPE CXX_MODULES
-		FILES
-			"backend.ixx"
 	PRIVATE
 		"test.cpp"
 		"runner.cpp"
 		"logger.cpp"
 		"reporter.cpp"
-		"backend.cpp"
-
 )
 
 target_sources(honesty_main
@@ -30,6 +22,10 @@ target_sources(honesty_main
 
 add_subdirectory(
 	entry
+)
+
+add_subdirectory(
+	backend
 )
 
 add_subdirectory(

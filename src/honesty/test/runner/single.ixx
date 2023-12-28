@@ -2,7 +2,6 @@ export module synodic.honesty.test.runner:single;
 
 import std;
 import synodic.honesty.test.backend;
-import generator;
 
 export namespace synodic::honesty::runner
 {

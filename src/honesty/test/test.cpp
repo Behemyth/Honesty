@@ -11,6 +11,11 @@ namespace synodic::honesty
 		return Test(name_, std::move(generator));
 	}
 
+	TestGenerator TestName::operator=(TestGenerator generator) const
+	{
+		return generator;
+	}
+
 	VoidTest TestName::operator=(std::function_ref<void()> generator) const
 	{
 		return {name_, std::move(generator)};

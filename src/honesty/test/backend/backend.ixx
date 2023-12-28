@@ -1,20 +1,12 @@
 export module synodic.honesty.test.backend;
 
 import std;
-
-import generator;
+export import :generator;
+export import :test;
 import function_ref;
 
 export namespace synodic::honesty
 {
-	class TestBase
-	{
-	public:
-		virtual ~TestBase()		 = default;
-		virtual void Run() const = 0;
-
-	private:
-	};
 
 	using TestGenerator = std::generator<TestBase>;
 

@@ -2,7 +2,6 @@
 export module synodic.honesty.test:test;
 
 import std;
-import generator;
 import function_ref;
 import synodic.honesty.test.backend;
 
@@ -29,6 +28,7 @@ export namespace synodic::honesty
 		TestName& operator=(TestName&& other) noexcept = delete;
 
 		TestGenerator operator=(std::function_ref<TestGenerator()> generator) const;
+		TestGenerator operator=(TestGenerator generator) const;
 		VoidTest operator=(std::function_ref<void()> generator) const;
 
 	protected:
@@ -48,8 +48,10 @@ export namespace synodic::honesty
 		std::function_ref<void()> runner_;
 	};
 
-	TestGenerator Test(std::string_view name, std::function_ref<TestGenerator()> generator);
+	// TODO: Distinguish type overloads
 
+	TestGenerator Test(std::string_view name, std::function_ref<TestGenerator()> generator);
+	TestGenerator Test(std::string_view name, std::function_ref<TestGenerator()> generator);
 	VoidTest Test(std::string_view name, std::function_ref<void()> generator);
 
 	// Operators

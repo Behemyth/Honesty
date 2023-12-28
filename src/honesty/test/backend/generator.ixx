@@ -215,7 +215,7 @@ namespace synodic::honesty
 	public:
 		static_assert(std::is_reference_v<_Yielded>);
 
-		/* [[nodiscard]] */ std::suspend_always initial_suspend() noexcept
+		[[nodiscard]] std::suspend_always initial_suspend() noexcept
 		{
 			return {};
 		}
@@ -231,14 +231,11 @@ namespace synodic::honesty
 			return {};
 		}
 
-		//// clang-format off
-		//      template <class _Rty, class _Vty, class _Alloc, class _Unused>
-		//          requires std::same_as<_Gen_yield_t<_Gen_reference_t<_Rty, _Vty>>, _Yielded>
-		//      [[nodiscard]] auto yield_value(
-		//          ::std::ranges::elements_of<generator<_Rty, _Vty, _Alloc>&&, _Unused> _Elem) noexcept {
-		//	// clang-format on
-		//	return _Nested_awaitable<_Rty, _Vty, _Alloc> {std::move(_Elem.range)};
-		//}
+		template<class _Rty, class _Vty, class _Alloc>
+		[[nodiscard]] auto yield_value(generator<_Rty, _Vty, _Alloc>&& _Gen) noexcept
+		{
+			return _Nested_awaitable<_Rty, _Vty, _Alloc> {std::move(_Gen)};
+		}
 
 		//// clang-format off
 		//      template <::std::ranges::input_range _Rng, class _Alloc>
@@ -368,8 +365,8 @@ namespace synodic::honesty
 
 		// _Top and _Info are mutually exclusive, and could potentially be merged.
 		std::coroutine_handle<_Gen_promise_base> _Top = std::coroutine_handle<_Gen_promise_base>::from_promise(*this);
-		std::add_pointer_t<_Yielded> _Ptr			 = nullptr;
-		_Nest_info* _Info						 = nullptr;
+		std::add_pointer_t<_Yielded> _Ptr			  = nullptr;
+		_Nest_info* _Info							  = nullptr;
 	};
 
 	struct _Gen_secret_tag
@@ -421,7 +418,9 @@ namespace synodic::honesty
 		template<class, class, class>
 		friend class generator;
 
-		explicit _Gen_iter(_Gen_secret_tag, std::coroutine_handle<_Gen_promise_base<_Gen_yield_t<_Ref>>> _Coro_) noexcept :
+		explicit _Gen_iter(
+			_Gen_secret_tag,
+			std::coroutine_handle<_Gen_promise_base<_Gen_yield_t<_Ref>>> _Coro_) noexcept :
 			_Coro {_Coro_}
 		{
 		}

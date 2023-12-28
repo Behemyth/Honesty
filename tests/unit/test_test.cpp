@@ -72,10 +72,10 @@ namespace
 	/**
 	 * \brief Verifies that the literal shorthand generates an empty test
 	 */
-	//auto emptyRecursive = []() -> TestGenerator
-	//{
-	//	co_yield TestRecurse("emptyRecursive", emptyGenerator);
-	//};
+	auto emptyRecursive = []() -> TestGenerator
+	{
+		co_yield TestRecurse("emptyRecursive", emptyGenerator);
+	};
 
 	/**
 	 * \brief Verifies that the literal shorthand generates an empty test

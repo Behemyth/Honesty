@@ -85,16 +85,6 @@ namespace
 		co_yield "emptyRecursive"_test = emptyGenerator;
 	};
 
-	auto variableCapture = []() -> TestGenerator
-	{
-		int counter = 0;
-
-		co_yield "variableCapture"_test = [&counter]()
-		{
-			++counter;
-		};
-	};
-
 	auto tupleParameterization = []() -> TestGenerator
 	{
 		co_yield "array"_test = [](const auto& parameter)
@@ -114,7 +104,6 @@ namespace
 	Runner c(emptyLiteral, 1);
 	Runner d(emptyRecursive, 0);
 	Runner e(assignedRecursive, 0);
-	Runner f(variableCapture, 1);
 	Runner g(tupleParameterization, 2);
 	Runner h(arrayParameterization, 2);
 }

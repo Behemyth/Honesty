@@ -74,12 +74,12 @@ namespace
 	 */
 	//auto emptyRecursive = []() -> TestGenerator
 	//{
-	//	co_yield Test("emptyRecursive", emptyGenerator);
+	//	co_yield TestRecurse("emptyRecursive", emptyGenerator);
 	//};
 
-	///**
-	// * \brief Verifies that the literal shorthand generates an empty test
-	// */
+	/**
+	 * \brief Verifies that the literal shorthand generates an empty test
+	 */
 	//auto basicRecursive = []() -> TestGenerator
 	//{
 	//	co_yield "emptyRecursive"_test = emptyGenerator;

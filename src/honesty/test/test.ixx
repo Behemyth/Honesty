@@ -9,7 +9,7 @@ export namespace synodic::honesty
 {
 	class VoidTest;
 
-	using TestGenerator = std::generator<TestBase>;
+	using TestGenerator = TestGenerator;
 
 	/**
 	 * @brief Strongly typed definition around string_view with construction
@@ -50,8 +50,8 @@ export namespace synodic::honesty
 
 	// TODO: Distinguish type overloads
 
-	TestGenerator Test(std::string_view name, std::function_ref<TestGenerator()> generator);
-	TestGenerator Test(std::string_view name, std::function_ref<TestGenerator()> generator);
+	//TestGenerator Test(std::string_view name, std::function_ref<TestGenerator()> generator);
+	TestGenerator TestRecurse(std::string_view name, std::function_ref<TestGenerator()> generator);
 	VoidTest Test(std::string_view name, std::function_ref<void()> generator);
 
 	// Operators

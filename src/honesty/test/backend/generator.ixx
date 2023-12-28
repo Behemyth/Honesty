@@ -242,15 +242,6 @@ namespace std
 		}
 
 		// clang-format off
-        [[nodiscard]] auto yield_value(const remove_reference_t<_Yielded>& _Val)
-            noexcept(is_nothrow_constructible_v<remove_cvref_t<_Yielded>, const remove_reference_t<_Yielded>&>)
-            requires (is_rvalue_reference_v<_Yielded> &&
-                constructible_from<remove_cvref_t<_Yielded>, const remove_reference_t<_Yielded>&>) {
-			// clang-format on
-			return _Element_awaiter {_Val};
-		}
-
-		// clang-format off
         template <class _Rty, class _Vty, class _Alloc, class _Unused>
             requires same_as<_Gen_yield_t<_Gen_reference_t<_Rty, _Vty>>, _Yielded>
         [[nodiscard]] auto yield_value(
@@ -297,31 +288,6 @@ namespace std
 		}
 
 	private:
-		struct _Element_awaiter
-		{
-			remove_cvref_t<_Yielded> _Val;
-
-			[[nodiscard]] constexpr bool await_ready() const noexcept
-			{
-				return false;
-			}
-
-			template<class _Promise>
-			constexpr void await_suspend(coroutine_handle<_Promise> _Handle) noexcept
-			{
-#ifdef __cpp_lib_is_pointer_interconvertible
-				static_assert(is_pointer_interconvertible_base_of_v<_Gen_promise_base, _Promise>);
-#endif	// __cpp_lib_is_pointer_interconvertible
-
-				_Gen_promise_base& _Current = _Handle.promise();
-				_Current._Ptr				= ::std::addressof(_Val);
-			}
-
-			constexpr void await_resume() const noexcept
-			{
-			}
-		};
-
 		struct _Nest_info
 		{
 			exception_ptr _Except;

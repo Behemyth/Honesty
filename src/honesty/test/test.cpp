@@ -8,7 +8,7 @@ namespace synodic::honesty
 {
 	TestGenerator TestName::operator=(std::function_ref<TestGenerator()> generator) const
 	{
-		return Test(name_, std::move(generator));
+		return TestRecurse(name_, std::move(generator));
 	}
 
 	TestGenerator TestName::operator=(TestGenerator generator) const
@@ -26,9 +26,9 @@ namespace synodic::honesty
 	{
 	}
 
-	TestGenerator Test(std::string_view name, std::function_ref<TestGenerator()> generator)
+	TestGenerator TestRecurse(std::string_view name, std::function_ref<TestGenerator()> generator)
 	{
-		for (TestBase&& test: generator())
+		for (const TestBase& test: generator())
 		{
 			// TODO: inject changes
 			co_yield Test(

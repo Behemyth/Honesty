@@ -95,16 +95,17 @@ export namespace synodic::honesty
 
 		template<typename Fn>
 			requires std::invocable<Fn> && SameReturn<Fn, TestGenerator>
-		TestGenerator operator=(Fn&& generator){
-		return Test(name_, std::forward<Fn>(generator));
-	}
+		TestGenerator operator=(Fn&& generator)
+		{
+			return Test(name_, std::forward<Fn>(generator));
+		}
 
 		template<typename Fn>
 			requires std::invocable<Fn> && SameReturn<Fn, void>
-		VoidTest operator=(Fn&& generator){
-		return Test(name_, std::forward<Fn>(generator));
-	}
-
+		VoidTest operator=(Fn&& generator)
+		{
+			return Test(name_, std::forward<Fn>(generator));
+		}
 
 	protected:
 		std::string_view name_;
@@ -126,7 +127,7 @@ export namespace synodic::honesty
 	// Operators
 
 	template<std::invocable<int> Fn>
-	[[nodiscard]] TestGenerator operator|(const Fn&& test, const std::ranges::range auto& range)
+	[[nodiscard]] TestGenerator operator|(Fn&& test, const std::ranges::range auto& range)
 	{
 		for (const auto& value: range)
 		{
@@ -134,16 +135,31 @@ export namespace synodic::honesty
 		}
 	}
 
+	// recursion base case
+	template <typename Fn, typename T>
+	TestGenerator ApplyNested(Fn&& test, T arg)
+	{
+	    co_yield TinyTest<T>("", std::forward<Fn>(test), arg);
+	}
+
+	// recursive function
+	template <typename Fn, typename T, typename... Ts>
+	TestGenerator ApplyNested(Fn&& test, T arg, Ts... rest)
+	{
+	    co_yield TinyTest<T>("", std::forward<Fn>(test), arg);
+	    co_yield ApplyNested(std::forward<Fn>(test), rest...);
+	}
+
 	template<typename Fn, typename... Types>
 		requires(std::invocable<Fn, Types> && ...)
-	[[nodiscard]] TestGenerator operator|(const Fn&& test, std::tuple<Types...>&& tuple)
+	[[nodiscard]] TestGenerator operator|(Fn&& test, std::tuple<Types...>&& tuple)
 	{
+		auto applicator = [&]<typename... T>(T&&... args) -> TestGenerator
+		{
+			co_yield ApplyNested(std::forward<Fn>(test), args...);
+		};
 
-		//std::apply([](auto &&... args) { my_func(args...); }, tuple);
-
-		//(co_yield TinyTest<Types>("", test, tuple), ...);
-
-		co_return;
+		co_yield std::apply(applicator, tuple);
 	}
 
 	/**

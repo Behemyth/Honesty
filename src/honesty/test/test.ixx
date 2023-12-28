@@ -10,29 +10,13 @@ export namespace synodic::honesty
 	class VoidTest;
 
 	using TestGenerator = TestGenerator;
+	using TestContext	= TestContext;
 
-	/**
-	 * @brief Strongly typed definition around string_view with construction
-	 */
-	class [[nodiscard]] TestName
-	{
-	public:
-		consteval TestName(std::string_view name) :
-			name_(name)
+	template<typename FuncType, typename RetType>
+	concept SameReturn = requires(FuncType func) {
 		{
-		}
-
-		TestName(const TestName& other)				   = delete;
-		TestName(TestName&& other) noexcept			   = delete;
-		TestName& operator=(const TestName& other)	   = delete;
-		TestName& operator=(TestName&& other) noexcept = delete;
-
-		TestGenerator operator=(std::function_ref<TestGenerator()> generator) const;
-		TestGenerator operator=(TestGenerator generator) const;
-		VoidTest operator=(std::function_ref<void()> generator) const;
-
-	protected:
-		std::string_view name_;
+			func()
+		} -> std::same_as<RetType>;
 	};
 
 	class VoidTest final : public TestBase
@@ -49,10 +33,56 @@ export namespace synodic::honesty
 	};
 
 	// TODO: Distinguish type overloads
+	template<typename Fn>
+		requires std::invocable<Fn> && SameReturn<Fn, TestGenerator>
+	TestGenerator Test(std::string_view name, Fn&& generator)
+	{
+		for (const TestBase& test: generator())
+		{
+			// TODO: inject changes
+			co_yield Test(
+				"TODO",
+				[]()
+				{
+				});
+		}
+	}
 
-	//TestGenerator Test(std::string_view name, std::function_ref<TestGenerator()> generator);
-	TestGenerator TestRecurse(std::string_view name, std::function_ref<TestGenerator()> generator);
-	VoidTest Test(std::string_view name, std::function_ref<void()> generator);
+	template<typename Fn>
+		requires std::invocable<Fn> && SameReturn<Fn, void>
+	VoidTest Test(std::string_view name, Fn&& generator)
+	{
+		return VoidTest(name, std::move(generator));
+	}
+
+	/**
+	 * @brief Strongly typed definition around string_view with construction
+	 */
+	class [[nodiscard]] TestStub
+	{
+	public:
+		consteval TestStub(std::string_view name) :
+			name_(name)
+		{
+		}
+
+		TestStub(const TestStub& other)				   = delete;
+		TestStub(TestStub&& other) noexcept			   = delete;
+		TestStub& operator=(const TestStub& other)	   = delete;
+		TestStub& operator=(TestStub&& other) noexcept = delete;
+
+		template<typename Fn>
+		auto operator=(Fn&& generator) const;
+
+	protected:
+		std::string_view name_;
+	};
+
+	template<typename Fn>
+	auto TestStub::operator=(Fn&& generator) const
+	{
+		return Test(name_, std::forward<Fn>(generator));
+	}
 
 	// Operators
 
@@ -126,7 +156,7 @@ export namespace synodic::honesty
 	{
 		[[nodiscard]] consteval auto operator""_test(const char* const name, const std::size_t size)
 		{
-			return TestName(std::string_view(name, size));
+			return TestStub(std::string_view(name, size));
 		}
 
 		[[nodiscard]] consteval auto operator""_tag(const char* const name, const std::size_t size)

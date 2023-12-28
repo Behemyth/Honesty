@@ -74,16 +74,16 @@ namespace
 	 */
 	auto emptyRecursive = []() -> TestGenerator
 	{
-		co_yield TestRecurse("emptyRecursive", emptyGenerator);
+		co_yield Test("emptyRecursive", emptyGenerator);
 	};
 
 	/**
 	 * \brief Verifies that the literal shorthand generates an empty test
 	 */
-	//auto basicRecursive = []() -> TestGenerator
-	//{
-	//	co_yield "emptyRecursive"_test = emptyGenerator;
-	//};
+	auto assignedRecursive = []() -> TestGenerator
+	{
+		co_yield "emptyRecursive"_test = emptyGenerator;
+	};
 
 	auto variableCapture = []() -> TestGenerator
 	{
@@ -112,8 +112,9 @@ namespace
 	Runner b(emptyGenerator, 0);
 	Runner a(basicGenerator, 1);
 	Runner c(emptyLiteral, 1);
-	//Runner d(emptyRecursive, 0);
-	Runner e(variableCapture, 1);
-	//Runner f(tupleParameterization, 2);
-	//Runner g(arrayParameterization, 2);
+	Runner d(emptyRecursive, 0);
+	Runner e(assignedRecursive, 0);
+	Runner f(variableCapture, 1);
+	//Runner g(tupleParameterization, 2);
+	//Runner h(arrayParameterization, 2);
 }

@@ -19,6 +19,19 @@ export namespace synodic::honesty
 		} -> std::same_as<RetType>;
 	};
 
+	template<typename T>
+	class TinyTest final : public TestBase
+	{
+	public:
+		TinyTest(std::string_view name, std::function_ref<void(const T&)> test, T value);
+
+		void Run() const override;
+
+	private:
+		std::function_ref<void(const T&)> runner_;
+		T value_;
+	};
+
 	class VoidTest final : public TestBase
 	{
 	public:
@@ -55,6 +68,13 @@ export namespace synodic::honesty
 		return VoidTest(name, std::move(generator));
 	}
 
+	template<typename Fn, typename T>
+		requires std::invocable<Fn, T> && SameReturn<Fn, void>
+	TinyTest<T> Test(std::string_view name, Fn&& generator)
+	{
+		return TinyTest(name, std::move(generator));
+	}
+
 	/**
 	 * @brief Strongly typed definition around string_view with construction
 	 */
@@ -71,17 +91,36 @@ export namespace synodic::honesty
 		TestStub& operator=(const TestStub& other)	   = delete;
 		TestStub& operator=(TestStub&& other) noexcept = delete;
 
+		TestGenerator operator=(TestGenerator&& generator) const;
+
 		template<typename Fn>
-		auto operator=(Fn&& generator) const;
+			requires std::invocable<Fn> && SameReturn<Fn, TestGenerator>
+		TestGenerator operator=(Fn&& generator){
+		return Test(name_, std::forward<Fn>(generator));
+	}
+
+		template<typename Fn>
+			requires std::invocable<Fn> && SameReturn<Fn, void>
+		VoidTest operator=(Fn&& generator){
+		return Test(name_, std::forward<Fn>(generator));
+	}
+
 
 	protected:
 		std::string_view name_;
 	};
 
-	template<typename Fn>
-	auto TestStub::operator=(Fn&& generator) const
+	template<typename T>
+	TinyTest<T>::TinyTest(std::string_view name, std::function_ref<void(const T&)> test, T value) :
+		runner_(test),
+		value_(value)
 	{
-		return Test(name_, std::forward<Fn>(generator));
+	}
+
+	template<typename T>
+	void TinyTest<T>::Run() const
+	{
+		runner_(value_);
 	}
 
 	// Operators
@@ -91,7 +130,7 @@ export namespace synodic::honesty
 	{
 		for (const auto& value: range)
 		{
-			co_yield Test("", test);
+			co_yield TinyTest<decltype(value)>("", test, value);
 		}
 	}
 
@@ -99,7 +138,12 @@ export namespace synodic::honesty
 		requires(std::invocable<Fn, Types> && ...)
 	[[nodiscard]] TestGenerator operator|(const Fn&& test, std::tuple<Types...>&& tuple)
 	{
-		co_yield Test("", test);
+
+		//std::apply([](auto &&... args) { my_func(args...); }, tuple);
+
+		//(co_yield TinyTest<Types>("", test, tuple), ...);
+
+		co_return;
 	}
 
 	/**

@@ -215,12 +215,12 @@ namespace synodic::honesty
 	public:
 		static_assert(std::is_reference_v<_Yielded>);
 
-		[[nodiscard]] std::suspend_always initial_suspend() noexcept
+		[[nodiscard]] static std::suspend_always initial_suspend() noexcept
 		{
 			return {};
 		}
 
-		[[nodiscard]] auto final_suspend() noexcept
+		[[nodiscard]] auto final_suspend() const noexcept
 		{
 			return _Final_awaiter {};
 		}
@@ -237,28 +237,9 @@ namespace synodic::honesty
 			return _Nested_awaitable<_Rty, _Vty, _Alloc> {std::move(_Gen)};
 		}
 
-		//// clang-format off
-		//      template <::std::ranges::input_range _Rng, class _Alloc>
-		//          requires convertible_to<::std::ranges::range_reference_t<_Rng>, _Yielded>
-		//      [[nodiscard]] auto yield_value(::std::ranges::elements_of<_Rng, _Alloc> _Elem) noexcept {
-		//	// clang-format on
-		//	using _Vty = ::std::ranges::range_value_t<_Rng>;
-		//	return _Nested_awaitable<_Yielded, _Vty, _Alloc> {
-		//		[](allocator_arg_t,
-		//		   _Alloc,
-		//		   ::std::ranges::iterator_t<_Rng> _It,
-		//		   const ::std::ranges::sentinel_t<_Rng> _Se) -> generator<_Yielded, _Vty, _Alloc>
-		//		{
-		//			for (; _It != _Se; ++_It)
-		//			{
-		//				co_yield static_cast<_Yielded>(*_It);
-		//			}
-		//		}(allocator_arg, _Elem.allocator, ::std::ranges::begin(_Elem.range), ::std::ranges::end(_Elem.range))};
-		//}
-
 		void await_transform() = delete;
 
-		void return_void() noexcept
+		static void return_void() noexcept
 		{
 		}
 

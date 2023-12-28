@@ -12,28 +12,15 @@ namespace synodic::honesty
 	{
 	}
 
-	TestGenerator Test(std::string_view name, std::function_ref<TestGenerator()> generator)
-	{
-		for (const TestBase& test: generator())
-		{
-			// TODO: inject changes
-			co_yield Test(
-				"",
-				[]()
-				{
-				});
-		}
-	}
-
-	VoidTest Test(std::string_view name, std::function_ref<void()> generator)
-	{
-		return {name, std::move(generator)};
-	}
-
 	VoidTest& VoidTest::operator=(std::function_ref<void()> test)
 	{
 		runner_ = std::move(test);
 		return *this;
+	}
+
+	TestGenerator TestStub::operator=(TestGenerator&& generator) const
+	{
+		return generator;
 	}
 
 	void VoidTest::Run() const

@@ -95,19 +95,19 @@ namespace
 		};
 	};
 
-	//auto tupleParameterization = []() -> TestGenerator
-	//{
-	//	co_yield "array"_test = [](const auto& parameter)
-	//	{
-	//	} | std::tuple {3u, 4.0f};
-	//};
+	auto tupleParameterization = []() -> TestGenerator
+	{
+		co_yield "array"_test = [](const auto& parameter)
+		{
+		} | std::tuple {3u, 4.0f};
+	};
 
-	//auto arrayParameterization = []() -> TestGenerator
-	//{
-	//	co_yield "array"_test = []<typename T>(const T& parameter)
-	//	{
-	//	} | std::array {3, 4};
-	//};
+	auto arrayParameterization = []() -> TestGenerator
+	{
+		co_yield "array"_test = []<typename T>(const T& parameter)
+		{
+		} | std::array {3, 4};
+	};
 
 	Runner b(emptyGenerator, 0);
 	Runner a(basicGenerator, 1);
@@ -115,6 +115,6 @@ namespace
 	Runner d(emptyRecursive, 0);
 	Runner e(assignedRecursive, 0);
 	Runner f(variableCapture, 1);
-	//Runner g(tupleParameterization, 2);
-	//Runner h(arrayParameterization, 2);
+	Runner g(tupleParameterization, 2);
+	Runner h(arrayParameterization, 2);
 }

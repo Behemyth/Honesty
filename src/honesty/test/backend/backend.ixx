@@ -8,7 +8,7 @@ import function_ref;
 export namespace synodic::honesty
 {
 
-	using TestGenerator = std::generator<TestBase>;
+	using TestGenerator = generator<TestBase>;
 
 	struct suite_data
 	{

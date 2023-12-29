@@ -7,16 +7,28 @@ using namespace synodic::honesty::literals;
 
 namespace
 {
-	auto dummyGenerator = []() -> TestGenerator
+	auto emptyGenerator = []() -> TestGenerator
 	{
 		co_return;
 	};
 
-	auto suiteGenerator = []() -> TestGenerator
+	auto dummyGenerator = []() -> TestGenerator
 	{
-		co_yield Tag("test") / "inner"_test = dummyGenerator;
-		co_yield skip / "test"_tag / "inner"_test = dummyGenerator;
+		co_yield Tag("test", "skip") / "inner"_test = emptyGenerator;
+		co_yield skip / "test"_tag / "inner"_test	= emptyGenerator;
 	};
 
-	suite suite("tag suite", suiteGenerator);
+	auto tagSuite = []() -> TestGenerator
+	{
+		// Verify the count of tags for each test. The two tests each have two tags
+		co_yield "tag"_test = []()
+		{
+			for (auto&& test: dummyGenerator())
+			{
+				expect(test.Tags().size() == 2);
+			}
+		};
+	};
+
+	suite suite("tag suite", tagSuite);
 }

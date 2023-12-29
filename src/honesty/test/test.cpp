@@ -22,4 +22,9 @@ namespace synodic::honesty
 	{
 		runner_();
 	}
+
+	std::span<std::string_view> VoidTest::Tags() const
+	{
+		return {};
+	}
 }

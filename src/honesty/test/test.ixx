@@ -19,9 +19,6 @@ export namespace synodic::honesty
 		} -> std::same_as<RetType>;
 	};
 
-	template<typename T, typename U>
-	concept TypeIs = std::same_as<std::remove_cvref_t<T>, U>;
-
 	template<typename T>
 	class TinyTest final : public TestBase
 	{
@@ -29,6 +26,7 @@ export namespace synodic::honesty
 		TinyTest(std::string_view name, std::function_ref<void(const T&)> test, T value);
 
 		void Run() const override;
+		std::span<std::string_view> Tags() const override;
 
 	private:
 		std::function_ref<void(const T&)> runner_;
@@ -43,6 +41,7 @@ export namespace synodic::honesty
 		VoidTest& operator=(std::function_ref<void()> test);
 
 		void Run() const override;
+		std::span<std::string_view> Tags() const override;
 
 	private:
 		std::function_ref<void()> runner_;
@@ -131,6 +130,12 @@ export namespace synodic::honesty
 		runner_(value_);
 	}
 
+	template<typename T>
+	std::span<std::string_view> TinyTest<T>::Tags() const
+	{
+		return {};
+	}
+
 	template<std::size_t Size>
 	TestGenerator TestStub<Size>::operator=(TestGenerator&& generator) const
 	{
@@ -199,7 +204,9 @@ export namespace synodic::honesty
 	class Tag
 	{
 	public:
-		explicit consteval Tag(std::string_view t, TypeIs<std::string_view> auto... tags) :
+		explicit consteval Tag(
+			std::convertible_to<std::string_view> auto t,
+			std::convertible_to<std::string_view> auto... tags) :
 			tags_ {t, tags...}
 		{
 		}
@@ -207,45 +214,61 @@ export namespace synodic::honesty
 		template<std::size_t RSize>
 		consteval Tag<Size + RSize> operator/(Tag<RSize> tag) const;
 
-		TestStub<Size> operator/(const TestStub<>& test) const;
+		consteval TestStub<Size> operator/(const TestStub<>& test) const;
 
 	private:
 		template<std::size_t>
 		friend class Tag;
 
-		template<std::size_t A, std::size_t B>
-		explicit consteval Tag(Tag<A> a, Tag<B> b) :
-			tags_ {}
-		{
-			std::size_t index = 0;
+		// template<std::size_t A, std::size_t B>
+		// explicit consteval Tag(Tag<A> a, Tag<B> b) :
+		//	tags_ {}
+		//{
+		//	std::size_t index = 0;
 
-			for (auto& el: a.tags_)
-			{
-				tags_[index] = std::move(el);
-				++index;
-			}
-			for (auto& el: b.tags_)
-			{
-				tags_[index] = std::move(el);
-				++index;
-			}
-		}
+		//	for (auto& el: a.tags_)
+		//	{
+		//		tags_[index] = std::move(el);
+		//		++index;
+		//	}
+		//	for (auto& el: b.tags_)
+		//	{
+		//		tags_[index] = std::move(el);
+		//		++index;
+		//	}
+		//}
 
 		std::array<std::string_view, Size> tags_;
 	};
 
 	template<std::size_t Size>
-	TestStub<Size> Tag<Size>::operator/(const TestStub<>& test) const
+	consteval TestStub<Size> Tag<Size>::operator/(const TestStub<>& test) const
 	{
 		// TODO
-		return TestStub<Size>("yes");
+		return TestStub<Size>("TODO: Tag operator /");
 	}
 
 	template<std::size_t Size>
 	template<std::size_t RSize>
 	consteval Tag<Size + RSize> Tag<Size>::operator/(Tag<RSize> tag) const
 	{
-		return Tag<Size + RSize>(*this, tag);
+		Tag<Size + RSize> result(tags_[0]);
+
+		// Concat
+		std::size_t index = 0;
+
+		for (auto& el: tag.tags_)
+		{
+			result.tags_[index] = std::move(el);
+			++index;
+		}
+		for (auto& el: tags_)
+		{
+			result.tags_[index] = std::move(el);
+			++index;
+		}
+
+		return result;
 	}
 
 	Tag(std::string_view) -> Tag<1>;

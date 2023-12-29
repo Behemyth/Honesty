@@ -182,6 +182,7 @@ export namespace synodic::honesty
 		Registry::Add(suite_data(name, generator));
 	}
 
+	template<std::size_t Tags>
 	class tag
 	{
 	public:
@@ -190,7 +191,10 @@ export namespace synodic::honesty
 		}
 
 	private:
+		std::array<std::string_view, Tags> tags_;
 	};
+
+	tag(std::string_view) -> tag<1>;
 
 	tag skip("skip");
 

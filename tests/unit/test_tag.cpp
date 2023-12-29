@@ -14,7 +14,7 @@ namespace
 
 	auto suiteGenerator = []() -> TestGenerator
 	{
-		co_yield tag("test") / "inner"_test = dummyGenerator;
+		co_yield Tag("test") / "inner"_test = dummyGenerator;
 		co_yield skip / "test"_tag / "inner"_test = dummyGenerator;
 	};
 

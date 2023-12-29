@@ -19,6 +19,9 @@ export namespace synodic::honesty
 		} -> std::same_as<RetType>;
 	};
 
+	template<typename T, typename U>
+	concept TypeIs = std::same_as<std::remove_cvref_t<T>, U>;
+
 	template<typename T>
 	class TinyTest final : public TestBase
 	{
@@ -78,6 +81,7 @@ export namespace synodic::honesty
 	/**
 	 * @brief Strongly typed definition around string_view with construction
 	 */
+	template<std::size_t Size = 0>
 	class [[nodiscard]] TestStub
 	{
 	public:
@@ -107,7 +111,10 @@ export namespace synodic::honesty
 			return Test(name_, std::forward<Fn>(generator));
 		}
 
-	protected:
+	private:
+		template<std::size_t>
+		friend class TestStub;
+
 		std::string_view name_;
 	};
 
@@ -124,6 +131,12 @@ export namespace synodic::honesty
 		runner_(value_);
 	}
 
+	template<std::size_t Size>
+	TestGenerator TestStub<Size>::operator=(TestGenerator&& generator) const
+	{
+		return generator;
+	}
+
 	// Operators
 
 	template<std::invocable<int> Fn>
@@ -136,18 +149,18 @@ export namespace synodic::honesty
 	}
 
 	// recursion base case
-	template <typename Fn, typename T>
+	template<typename Fn, typename T>
 	TestGenerator ApplyNested(Fn&& test, T arg)
 	{
-	    co_yield TinyTest<T>("", std::forward<Fn>(test), arg);
+		co_yield TinyTest<T>("", std::forward<Fn>(test), arg);
 	}
 
 	// recursive function
-	template <typename Fn, typename T, typename... Ts>
+	template<typename Fn, typename T, typename... Ts>
 	TestGenerator ApplyNested(Fn&& test, T arg, Ts... rest)
 	{
-	    co_yield TinyTest<T>("", std::forward<Fn>(test), arg);
-	    co_yield ApplyNested(std::forward<Fn>(test), rest...);
+		co_yield TinyTest<T>("", std::forward<Fn>(test), arg);
+		co_yield ApplyNested(std::forward<Fn>(test), rest...);
 	}
 
 	template<typename Fn, typename... Types>
@@ -182,21 +195,65 @@ export namespace synodic::honesty
 		Registry::Add(suite_data(name, generator));
 	}
 
-	template<std::size_t Tags>
-	class tag
+	template<std::size_t Size>
+	class Tag
 	{
 	public:
-		explicit consteval tag(std::string_view)
+		explicit consteval Tag(std::string_view t, TypeIs<std::string_view> auto... tags) :
+			tags_ {t, tags...}
 		{
 		}
 
+		template<std::size_t RSize>
+		consteval Tag<Size + RSize> operator/(Tag<RSize> tag) const;
+
+		TestStub<Size> operator/(const TestStub<>& test) const;
+
 	private:
-		std::array<std::string_view, Tags> tags_;
+		template<std::size_t>
+		friend class Tag;
+
+		template<std::size_t A, std::size_t B>
+		explicit consteval Tag(Tag<A> a, Tag<B> b) :
+			tags_ {}
+		{
+			std::size_t index = 0;
+
+			for (auto& el: a.tags_)
+			{
+				tags_[index] = std::move(el);
+				++index;
+			}
+			for (auto& el: b.tags_)
+			{
+				tags_[index] = std::move(el);
+				++index;
+			}
+		}
+
+		std::array<std::string_view, Size> tags_;
 	};
 
-	tag(std::string_view) -> tag<1>;
+	template<std::size_t Size>
+	TestStub<Size> Tag<Size>::operator/(const TestStub<>& test) const
+	{
+		// TODO
+		return TestStub<Size>("yes");
+	}
 
-	tag skip("skip");
+	template<std::size_t Size>
+	template<std::size_t RSize>
+	consteval Tag<Size + RSize> Tag<Size>::operator/(Tag<RSize> tag) const
+	{
+		return Tag<Size + RSize>(*this, tag);
+	}
+
+	Tag(std::string_view) -> Tag<1>;
+
+	template<typename... T>
+	Tag(std::string_view, T...) -> Tag<1 + sizeof...(T)>;
+
+	constexpr Tag skip("skip");
 
 	constexpr auto expect(const bool expression, const std::source_location& location = std::source_location::current())
 	{
@@ -225,7 +282,7 @@ export namespace synodic::honesty
 
 		[[nodiscard]] consteval auto operator""_tag(const char* const name, const std::size_t size)
 		{
-			return tag(std::string_view(name, size));
+			return Tag(std::string_view(name, size));
 		}
 	}
 }

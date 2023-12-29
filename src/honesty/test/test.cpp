@@ -18,11 +18,6 @@ namespace synodic::honesty
 		return *this;
 	}
 
-	TestGenerator TestStub::operator=(TestGenerator&& generator) const
-	{
-		return generator;
-	}
-
 	void VoidTest::Run() const
 	{
 		runner_();

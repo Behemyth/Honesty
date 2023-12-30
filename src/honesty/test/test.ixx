@@ -186,7 +186,8 @@ export namespace synodic::honesty
 	class suite final
 	{
 	public:
-		suite(std::string_view name, TestGenerator (*generator)());
+
+		suite(std::string_view name, std::function_ref<TestGenerator()> generator);
 
 		suite(const suite& other)	  = delete;
 		suite(suite&& other) noexcept = default;
@@ -195,7 +196,7 @@ export namespace synodic::honesty
 		suite& operator=(suite&& other) noexcept = default;
 	};
 
-	suite::suite(std::string_view name, TestGenerator (*generator)())
+	suite::suite(std::string_view name, std::function_ref<TestGenerator()> generator)
 	{
 		Registry::Add(suite_data(name, generator));
 	}
@@ -219,24 +220,6 @@ export namespace synodic::honesty
 	private:
 		template<std::size_t>
 		friend class Tag;
-
-		// template<std::size_t A, std::size_t B>
-		// explicit consteval Tag(Tag<A> a, Tag<B> b) :
-		//	tags_ {}
-		//{
-		//	std::size_t index = 0;
-
-		//	for (auto& el: a.tags_)
-		//	{
-		//		tags_[index] = std::move(el);
-		//		++index;
-		//	}
-		//	for (auto& el: b.tags_)
-		//	{
-		//		tags_[index] = std::move(el);
-		//		++index;
-		//	}
-		//}
 
 		std::array<std::string_view, Size> tags_;
 	};
@@ -294,6 +277,14 @@ export namespace synodic::honesty
 		expect_throw(const T& expression, const std::source_location& location = std::source_location::current())
 	{
 		return expression;
+	}
+
+	template< class T, class U >
+		requires std::equality_comparable_with<T, U>
+	constexpr auto
+		expect_equals(const T& a, const U& b, const std::source_location& location = std::source_location::current())
+	{
+		return a == b;
 	}
 
 	namespace literals

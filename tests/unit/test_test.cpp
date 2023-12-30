@@ -99,11 +99,29 @@ namespace
 		} | std::array {3, 4};
 	};
 
-	Runner b(emptyGenerator, 0);
-	Runner a(basicGenerator, 1);
-	Runner c(emptyLiteral, 1);
-	Runner d(emptyRecursive, 0);
-	Runner e(assignedRecursive, 0);
-	Runner g(tupleParameterization, 2);
-	Runner h(arrayParameterization, 2);
+	auto tagSuite = []() -> TestGenerator
+	{
+		auto counter = [](std::function_ref<TestGenerator()> function) -> int
+		{
+			int count = 0;
+			for (const auto& test: function())
+			{
+				++count;
+			}
+
+			return count;
+		};
+
+		expect_equals(counter(emptyGenerator), 0);
+		expect_equals(counter(basicGenerator), 1);
+		expect_equals(counter(emptyLiteral), 1);
+		expect_equals(counter(emptyRecursive), 0);
+		expect_equals(counter(assignedRecursive), 0);
+		expect_equals(counter(tupleParameterization), 2);
+		expect_equals(counter(arrayParameterization), 2);
+
+		co_return;
+	};
+
+	suite suite("test suite", tagSuite);
 }

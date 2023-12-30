@@ -1,5 +1,3 @@
-#include <cstdio>
-
 import std;
 import synodic.honesty.test;
 import function_ref;
@@ -7,38 +5,8 @@ import function_ref;
 using namespace synodic::honesty;
 using namespace synodic::honesty::literals;
 
-template<class... Args>
-void expect(bool value, const std::source_location location, std::format_string<Args...> fmt, Args&&... args)
-{
-	if (!value)
-	{
-		std::println(stderr, "Test Failed: File({}), Line({})", location.file_name(), location.line());
-		std::print(stderr, "    ");
-		std::println(stderr, fmt, std::forward<Args>(args)...);
-	}
-}
-
 namespace
 {
-	using Function = std::function_ref<TestGenerator()>;
-
-	struct Runner
-	{
-		explicit Runner(
-			Function function,
-			const int expected,
-			const std::source_location& location = std::source_location::current())
-		{
-			int count = 0;
-			for (const auto& test: function())
-			{
-				++count;
-			}
-
-			expect(count == expected, location, "{} values were generated. {} was expected", count, expected);
-		}
-	};
-
 	/**
 	 * \brief Verifies that an empty generator is created
 	 */
@@ -99,29 +67,30 @@ namespace
 		} | std::array {3, 4};
 	};
 
-	auto tagSuite = []() -> TestGenerator
+	auto testSuite = []() -> TestGenerator
 	{
-		auto counter = [](std::function_ref<TestGenerator()> function) -> int
+		co_yield "run"_test = []()
 		{
-			int count = 0;
-			for (const auto& test: function())
+			auto counter = [](std::function_ref<TestGenerator()> function) -> int
 			{
-				++count;
-			}
+				int count = 0;
+				for (const auto& test: function())
+				{
+					++count;
+				}
 
-			return count;
+				return count;
+			};
+
+			expect_equals(counter(emptyGenerator), 0);
+			expect_equals(counter(basicGenerator), 1);
+			expect_equals(counter(emptyLiteral), 1);
+			expect_equals(counter(emptyRecursive), 0);
+			expect_equals(counter(assignedRecursive), 0);
+			expect_equals(counter(tupleParameterization), 2);
+			expect_equals(counter(arrayParameterization), 2);
 		};
-
-		expect_equals(counter(emptyGenerator), 0);
-		expect_equals(counter(basicGenerator), 1);
-		expect_equals(counter(emptyLiteral), 1);
-		expect_equals(counter(emptyRecursive), 0);
-		expect_equals(counter(assignedRecursive), 0);
-		expect_equals(counter(tupleParameterization), 2);
-		expect_equals(counter(arrayParameterization), 2);
-
-		co_return;
 	};
 
-	suite suite("test suite", tagSuite);
+	suite suite("test suite", testSuite);
 }

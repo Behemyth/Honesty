@@ -71,6 +71,7 @@ namespace
 	{
 		co_yield "run"_test = []()
 		{
+			// Runs through each generator and counts the number of test instances recorded
 			auto counter = [](std::function_ref<TestGenerator()> function) -> int
 			{
 				int count = 0;
@@ -92,5 +93,6 @@ namespace
 		};
 	};
 
-	suite suite("test suite", testSuite);
+	constinit Suite suite("test Suite", testSuite);
+	bool registered = suite.Register();
 }

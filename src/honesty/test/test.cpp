@@ -27,4 +27,11 @@ namespace synodic::honesty
 	{
 		return {};
 	}
+
+	bool Suite::Register() const
+	{
+		Registry::Add(suite_data(name_, generator_));
+
+		return true;
+	}
 }

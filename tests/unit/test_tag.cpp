@@ -30,5 +30,6 @@ namespace
 		};
 	};
 
-	suite suite("tag suite", tagSuite);
+	constinit Suite suite("tag Suite", tagSuite);
+	bool registered = suite.Register();
 }

@@ -8,9 +8,13 @@ export namespace synodic::honesty
 {
 
 	template<typename T>
-	concept is_runner = requires(T const type, std::span<const suite_data> suites) {
+	concept is_runner = requires(T type, const T constType, suite_data data) {
 		{
-			type.run(suites)
+			constType.run()
+		} -> std::same_as<void>;
+
+		{
+			type.submit(data)
 		} -> std::same_as<void>;
 	};
 

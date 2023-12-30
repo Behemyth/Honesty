@@ -490,4 +490,4 @@ namespace synodic::honesty
 		{
 		}
 	};
-}  // namespace std
+}

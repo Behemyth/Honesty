@@ -183,22 +183,28 @@ export namespace synodic::honesty
 	/**
 	 * \brief Allows the static registration of tests in the global scope
 	 */
-	class suite final
+	class Suite final
 	{
 	public:
+		consteval Suite(std::string_view name, std::function_ref<TestGenerator()> generator);
 
-		suite(std::string_view name, std::function_ref<TestGenerator()> generator);
+		Suite(const Suite& other)	  = delete;
+		Suite(Suite&& other) noexcept = default;
 
-		suite(const suite& other)	  = delete;
-		suite(suite&& other) noexcept = default;
+		Suite& operator=(const Suite& other)	 = delete;
+		Suite& operator=(Suite&& other) noexcept = default;
 
-		suite& operator=(const suite& other)	 = delete;
-		suite& operator=(suite&& other) noexcept = default;
+		bool Register() const;
+
+	private:
+		std::string_view name_;
+		std::function_ref<TestGenerator()> generator_;
 	};
 
-	suite::suite(std::string_view name, std::function_ref<TestGenerator()> generator)
+	consteval Suite::Suite(std::string_view name, std::function_ref<TestGenerator()> generator) :
+		name_(name),
+		generator_(generator)
 	{
-		Registry::Add(suite_data(name, generator));
 	}
 
 	template<std::size_t Size>
@@ -279,7 +285,7 @@ export namespace synodic::honesty
 		return expression;
 	}
 
-	template< class T, class U >
+	template<class T, class U>
 		requires std::equality_comparable_with<T, U>
 	constexpr auto
 		expect_equals(const T& a, const U& b, const std::source_location& location = std::source_location::current())

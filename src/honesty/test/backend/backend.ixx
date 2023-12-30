@@ -12,7 +12,7 @@ export namespace synodic::honesty
 
 	struct suite_data
 	{
-		suite_data(std::string_view name,std::function_ref<TestGenerator()> generator) noexcept;
+		suite_data(std::string_view name, std::function_ref<TestGenerator()> generator) noexcept;
 
 		std::string_view name_;
 		std::function_ref<TestGenerator()> generator_;

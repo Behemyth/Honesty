@@ -29,7 +29,7 @@ export namespace synodic::honesty
 	{
 		auto suites = Registry::GenerateSuites();
 
-		runner.run(suites);
+		runner.run();
 
 		return {};
 	}

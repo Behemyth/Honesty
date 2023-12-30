@@ -10,6 +10,6 @@ namespace
 		co_return;
 	};
 
-	// Verify that the suite is compiling
-	suite suite("suite suite", suiteGenerator);
+	// Verify that the Suite is compiling
+	Suite suite("Suite Suite", suiteGenerator);
 }

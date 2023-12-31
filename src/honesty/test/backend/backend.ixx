@@ -26,13 +26,24 @@ export namespace synodic::honesty
 
 	class Registry
 	{
+		template<is_runner Runner>
+		consteval Registry();
+
+		class Instance()
+		{
+		public:
+
+		private:
+			std::set<std::function_ref<void()>> runners_;
+		}
+
 	public:
 		static void Add(suite_data data)
 		{
 			Instance().data_.push_back(std::move(data));
 		}
 
-		static std::span<suite_data> GenerateSuites()
+		static std::span<suite_data> DefaultedData()
 		{
 			return Instance().data_;
 		}
@@ -40,13 +51,23 @@ export namespace synodic::honesty
 	private:
 		Registry() = default;
 
-		static Registry& Instance()
+		static Registry& Instance(=)
 		{
-			static Registry instance;
-			return instance;
+			if (registry_)
+			{
+				static Registry instance();
+				registry_ = &instance;
+				return instance;
+			}
+
+			return *registry_;
 		}
 
-		std::vector<suite_data> data_;
+		static Registry* registry_ = nullptr;
 	};
 
+	template<is_runner Runner>
+	consteval Registry::Registry()
+	{
+	}
 }

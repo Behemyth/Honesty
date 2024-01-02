@@ -15,7 +15,7 @@ export namespace synodic::honesty
 {
 	enum class TestResultCode : std::uint8_t
 	{
-		FAIL
+		FAILURE
 	};
 
 	std::expected<void, TestResultCode> entry()
@@ -25,8 +25,10 @@ export namespace synodic::honesty
 
 		const std::vector<suite_data> data = registry.ExtractDefaultData();
 
-		// Copy the direct registry data into the default runner
+		// Move the direct registry data into the default runner
 		runner.Submit(data);
+
+		runner.Run();
 
 		return {};
 	}

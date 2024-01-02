@@ -9,6 +9,7 @@ target_sources(honesty
 			"suite.ixx"
 			"runner.ixx"
 			"reporter.ixx"
+			"logger.ixx"
 
 	PRIVATE
 		"backend.cpp"
@@ -16,4 +17,5 @@ target_sources(honesty
 		"suite.cpp"
 		"test.cpp"
 		"reporter.cpp"
+		"logger.cpp"
 )

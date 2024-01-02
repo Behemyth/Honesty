@@ -3,6 +3,7 @@ export module synodic.honesty.test.backend;
 export import :generator;
 export import :test;
 export import :runner;
+export import :logger;
 export import :reporter;
 export import :suite;
 

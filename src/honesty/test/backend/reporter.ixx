@@ -56,7 +56,7 @@ export namespace synodic::honesty
 		std::string_view name;
 	};
 
-	template<is_logger Logger>
+	template<logger_type Logger>
 	class Reporter
 	{
    

@@ -6,6 +6,6 @@ target_sources(honesty
 	PRIVATE
 		FILE_SET implementations
 		FILES
-			stdout.ixx
-			stdout.cpp
+			console.ixx
+			console.cpp
 )

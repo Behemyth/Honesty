@@ -1,10 +1,10 @@
-module synodic.honesty.test.runner:single;
+module synodic.honesty.test.runner:local;
 
-import :single;
+import :local;
 
 namespace synodic::honesty::runner
 {
-	void single_threaded::Run()
+	void Local::Run()
 	{
 		for (const suite_data& suite: suites_)
 		{
@@ -15,12 +15,12 @@ namespace synodic::honesty::runner
 		}
 	}
 
-	void single_threaded::Submit(suite_data data)
+	void Local::Submit(suite_data data)
 	{
 		suites_.push_back(std::move(data));
 	}
 
-	void single_threaded::Submit(std::vector<suite_data> data)
+	void Local::Submit(std::vector<suite_data> data)
 	{
 		suites_.insert(suites_.end(), std::make_move_iterator(data.begin()), std::make_move_iterator(data.end()));
 	}

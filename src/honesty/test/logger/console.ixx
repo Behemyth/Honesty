@@ -4,7 +4,7 @@ import std;
 
 export namespace synodic::honesty::logger
 {
-	class StandardOut
+	class Local
 	{
 	public:
 		template<class... Args>

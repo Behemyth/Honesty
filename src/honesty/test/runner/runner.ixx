@@ -1,6 +1,6 @@
 export module synodic.honesty.test.runner;
 
-export import :single;
+export import :local;
 
 namespace synodic::honesty::test::runner
 {

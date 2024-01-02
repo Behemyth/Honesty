@@ -1,14 +1,14 @@
-export module synodic.honesty.test.runner:single;
+export module synodic.honesty.test.runner:local;
 
 import std;
 import synodic.honesty.test.backend;
 
 export namespace synodic::honesty::runner
 {
-	class single_threaded  : public Runner
+	class Local  : public Runner
 	{
 	public:
-		single_threaded() :
+		Local() :
 			Runner("default")
 		{
 		}

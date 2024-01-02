@@ -21,7 +21,7 @@ export namespace synodic::honesty
 	std::expected<void, TestResultCode> entry()
 	{
 		Registry registry;
-		runner::single_threaded runner;
+		runner::Local runner;
 
 		const std::vector<suite_data> data = registry.ExtractDefaultData();
 

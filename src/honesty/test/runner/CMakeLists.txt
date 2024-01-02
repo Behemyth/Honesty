@@ -6,6 +6,6 @@ target_sources(honesty
 	PRIVATE
 		FILE_SET implementations
 		FILES
-			single.ixx
-			single.cpp
+			local.ixx
+			local.cpp
 )

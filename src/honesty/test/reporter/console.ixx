@@ -6,7 +6,7 @@ import std;
 
 export namespace synodic::honesty::reporter
 {
-	class StandardOut
+	class Console
 	{
 	public:
 		template<class... Args>

@@ -10,6 +10,8 @@ namespace
 		co_return;
 	};
 
-	// Verify that the Suite is compiling
-	Suite suite("Suite Suite", suiteGenerator);
+	// Verify that the Suite is compiling. 'constinit' is not required because Suite is an immediate function
+	/* constinit */ Suite suite("Suite Suite", suiteGenerator);
+	bool registered = suite.Register();
+
 }

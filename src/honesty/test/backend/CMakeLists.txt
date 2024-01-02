@@ -6,8 +6,15 @@ target_sources(honesty
 			"backend.ixx"
 			"generator.ixx"
 			"test.ixx"
+			"suite.ixx"
+			"runner.ixx"
+
 
 	PRIVATE
 		"backend.cpp"
+		"runner.cpp"
+		"suite.cpp"
+		"test.cpp"
+
 
 )

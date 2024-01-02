@@ -1,73 +1,56 @@
 export module synodic.honesty.test.backend;
 
-import std;
 export import :generator;
 export import :test;
+export import :runner;
+export import :suite;
+
+import std;
 import function_ref;
 
 export namespace synodic::honesty
 {
-
 	using TestGenerator = generator<TestBase>;
-
-	struct suite_data
-	{
-		suite_data(std::string_view name, std::function_ref<TestGenerator()> generator) noexcept;
-
-		std::string_view name_;
-		std::function_ref<TestGenerator()> generator_;
-	};
-
-	suite_data::suite_data(std::string_view name, std::function_ref<TestGenerator()> generator) noexcept :
-		name_(name),
-		generator_(generator)
-	{
-	}
 
 	class Registry
 	{
-		template<is_runner Runner>
-		consteval Registry();
-
-		class Instance()
+		class Instance
 		{
 		public:
 
 		private:
-			std::set<std::function_ref<void()>> runners_;
-		}
+			friend class Registry;
+
+			std::unordered_set<const Runner*> runners_;
+			std::vector<suite_data> defaultSuites_;
+		};
 
 	public:
-		static void Add(suite_data data)
+		static Instance& GetInstance()
 		{
-			Instance().data_.push_back(std::move(data));
+			static Instance instance;
+			return instance;
 		}
 
-		static std::span<suite_data> DefaultedData()
+		static void Add(suite_data&& data)
 		{
-			return Instance().data_;
+			GetInstance().defaultSuites_.push_back(std::move(data));
 		}
 
-	private:
-		Registry() = default;
-
-		static Registry& Instance(=)
+		static void Add(suite_data data, const Runner& runner)
 		{
-			if (registry_)
-			{
-				static Registry instance();
-				registry_ = &instance;
-				return instance;
-			}
-
-			return *registry_;
+			GetInstance().runners_.insert(&runner);
 		}
 
-		static Registry* registry_ = nullptr;
+		std::span<const suite_data> GetDefaultData() const
+		{
+			return GetInstance().defaultSuites_;
+		}
+
+		Registry()							 = default;
+		Registry(const Registry&)			 = delete;
+		Registry(Registry&&)				 = delete;
+		Registry& operator=(const Registry&) = delete;
+		Registry& operator=(Registry&&)		 = delete;
 	};
-
-	template<is_runner Runner>
-	consteval Registry::Registry()
-	{
-	}
 }

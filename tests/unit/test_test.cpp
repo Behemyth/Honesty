@@ -93,7 +93,7 @@ namespace
 		};
 	};
 
-	constinit Suite suite("test Suite", testSuite);
+	Suite suite("test Suite", testSuite);
 	bool registered = suite.Register();
 
 }

@@ -20,7 +20,7 @@ namespace synodic::honesty::runner
 		suites_.push_back(std::move(data));
 	}
 
-	void single_threaded::Default(std::span<suite_data> data)
+	void single_threaded::Default(std::span<const suite_data> data)
 	{
 		suites_.assign(data.begin(), data.end());
 	}

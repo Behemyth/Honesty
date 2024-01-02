@@ -15,7 +15,7 @@ export namespace synodic::honesty::runner
 		 * \brief Called when a suite is submitted with no backend
 		 * \param data 
 		 */
-		void Default(std::span<suite_data> data);
+		void Default(std::span<const suite_data> data);
 
 	private:
 		std::vector<suite_data> suites_;

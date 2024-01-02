@@ -5,17 +5,17 @@ import synodic.honesty.test.backend;
 
 export namespace synodic::honesty::runner
 {
-	class single_threaded
+	class single_threaded  : public Runner
 	{
 	public:
-		void run() const;
-		void submit(suite_data data);
+		single_threaded() :
+			Runner("default")
+		{
+		}
 
-		/**
-		 * \brief Called when a suite is submitted with no backend
-		 * \param data 
-		 */
-		void Default(std::span<const suite_data> data);
+		void Run() override;
+		void Submit(suite_data data) override;
+		void Submit(std::vector<suite_data> data) override;
 
 	private:
 		std::vector<suite_data> suites_;

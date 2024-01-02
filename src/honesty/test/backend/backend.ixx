@@ -42,9 +42,9 @@ export namespace synodic::honesty
 			GetInstance().runners_.insert(&runner);
 		}
 
-		std::span<const suite_data> GetDefaultData() const
+		std::vector<suite_data> ExtractDefaultData() const
 		{
-			return GetInstance().defaultSuites_;
+			return std::move(GetInstance().defaultSuites_);
 		}
 
 		Registry()							 = default;

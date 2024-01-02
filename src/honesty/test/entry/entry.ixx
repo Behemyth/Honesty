@@ -23,10 +23,10 @@ export namespace synodic::honesty
 		Registry registry;
 		runner::single_threaded runner;
 
-		auto data = registry.GetDefaultData();
+		const std::vector<suite_data> data = registry.ExtractDefaultData();
 
 		// Copy the direct registry data into the default runner
-		runner.Default(data);
+		runner.Submit(data);
 
 		return {};
 	}

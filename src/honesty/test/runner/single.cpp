@@ -4,7 +4,7 @@ import :single;
 
 namespace synodic::honesty::runner
 {
-	void single_threaded::run() const
+	void single_threaded::Run()
 	{
 		for (const suite_data& suite: suites_)
 		{
@@ -15,13 +15,13 @@ namespace synodic::honesty::runner
 		}
 	}
 
-	void single_threaded::submit(suite_data data)
+	void single_threaded::Submit(suite_data data)
 	{
 		suites_.push_back(std::move(data));
 	}
 
-	void single_threaded::Default(std::span<const suite_data> data)
+	void single_threaded::Submit(std::vector<suite_data> data)
 	{
-		suites_.assign(data.begin(), data.end());
+		suites_.insert(suites_.end(), std::make_move_iterator(data.begin()), std::make_move_iterator(data.end()));
 	}
 }

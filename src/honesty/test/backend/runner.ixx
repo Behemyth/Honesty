@@ -17,21 +17,23 @@ export namespace synodic::honesty
 	{
 	public:
 		/**
-		 * \brief 
+		 * \brief
 		 * \param name The name of the runner. This is used to identify the runner when invoking tests
 		 */
-		consteval Runner(std::string_view name);
+		constexpr Runner(std::string_view name);
 
 		virtual ~Runner() = default;
 
-		virtual void Run()					 = 0;
-		virtual void Submit(suite_data data) = 0;
+		virtual void Run() = 0;
 
-	private:
-		std::string_view name_;
+		virtual void Submit(suite_data data)			  = 0;
+		virtual void Submit(std::vector<suite_data> data) = 0;
+
+	protected:
+		const std::string_view name_;
 	};
 
-	consteval Runner::Runner(std::string_view name) :
+	constexpr Runner::Runner(std::string_view name) :
 		name_(name)
 	{
 	}

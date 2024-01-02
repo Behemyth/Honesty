@@ -4,13 +4,11 @@ target_sources(honesty
 		TYPE CXX_MODULES
 		FILES
 			"test.ixx"
-			"reporter.ixx"
 			"logger.ixx"
 			"function_ref.ixx"
 	PRIVATE
 		"test.cpp"
 		"logger.cpp"
-		"reporter.cpp"
 )
 
 target_sources(honesty_main

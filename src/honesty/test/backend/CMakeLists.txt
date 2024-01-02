@@ -8,13 +8,12 @@ target_sources(honesty
 			"test.ixx"
 			"suite.ixx"
 			"runner.ixx"
-
+			"reporter.ixx"
 
 	PRIVATE
 		"backend.cpp"
 		"runner.cpp"
 		"suite.cpp"
 		"test.cpp"
-
-
+		"reporter.cpp"
 )

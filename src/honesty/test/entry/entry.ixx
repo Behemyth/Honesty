@@ -3,6 +3,7 @@ export module synodic.honesty.test.entry;
 
 import synodic.honesty.test;
 import synodic.honesty.test.runner;
+import synodic.honesty.test.reporter;
 import synodic.honesty.test.backend;
 
 import std;
@@ -21,6 +22,8 @@ export namespace synodic::honesty
 	std::expected<void, TestResultCode> entry()
 	{
 		Registry registry;
+
+		reporter::Console reporter;
 		runner::Local runner;
 
 		const std::vector<suite_data> data = registry.ExtractDefaultData();

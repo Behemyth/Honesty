@@ -2,10 +2,10 @@ export module synodic.honesty.test.backend:reporter;
 
 import :logger;
 import std;
+import function_ref;
 
 export namespace synodic::honesty
 {
-
 	struct TestBeginEvent
 	{
 		std::string_view name;
@@ -56,9 +56,60 @@ export namespace synodic::honesty
 		std::string_view name;
 	};
 
-	template<logger_type Logger>
-	class Reporter
+	template<typename Event>
+	class EventBroadcaster
 	{
-   
+	public:
+		void connect(std::move_only_function<void(const Event&)> connection)
+		{
+			connections_.push_back(std::move(connection));
+		}
+
+		void signal(const Event& event)
+		{
+			for (const auto& connection: connections_)
+			{
+				connection(event);
+			}
+		}
+
+	private:
+		std::vector<std::move_only_function<void(const Event&)>> connections_;
+	};
+
+	template<typename... Events>
+	class EventSystem : EventBroadcaster<Events>...
+	{
+	public:
+		template<typename Event>
+			requires std::disjunction_v<Event, Events...>
+		void connect(std::move_only_function<void(const Event&)> connection)
+		{
+			EventBroadcaster<Event>& backend = *this;
+			backend.connect(std::move(connection));
+		}
+
+		template<typename Event>
+			requires std::disjunction_v<Event, Events...>
+		void signal(const Event& event)
+		{
+			EventBroadcaster<Event>& backend = *this;
+			backend.signal(event);
+		}
+	};
+
+	class Reporter :
+		public EventSystem<
+			TestBeginEvent,
+			TestEndEvent,
+			TestSkipEvent,
+			TestRunEvent,
+			TestFailEvent,
+			TestPassEvent,
+			AssertionFailEvent,
+			AssertionPassEvent,
+			AssertionSkipEvent,
+			SummaryEvent>
+	{
 	};
 }

@@ -24,6 +24,7 @@ export namespace synodic::honesty
 			friend class Registry;
 
 			std::unordered_set<const Runner*> runners_;
+			std::unordered_set<const Reporter*> reporters_;
 			std::vector<suite_data> defaultSuites_;
 		};
 
@@ -44,7 +45,17 @@ export namespace synodic::honesty
 			GetInstance().runners_.insert(&runner);
 		}
 
-		std::vector<suite_data> ExtractDefaultData() const
+		static void AddReporter(const Reporter&)
+		{
+			GetInstance();
+		}
+
+		static void AddRunner(const Runner&)
+		{
+			GetInstance();
+		}
+
+		static std::vector<suite_data> ExtractDefaultData()
 		{
 			return std::move(GetInstance().defaultSuites_);
 		}

@@ -23,6 +23,7 @@ export namespace synodic::honesty
 	{
 		Registry registry;
 
+		// TODO: Dynamic reporter and runner
 		reporter::Console reporter;
 		runner::Local runner;
 

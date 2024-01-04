@@ -98,6 +98,18 @@ export namespace synodic::honesty
 		}
 	};
 
+	template<typename>
+	struct on;
+
+	template<>
+	struct on<TestBeginEvent>
+	{
+		static void call(const TestBeginEvent& event)
+		{
+			//logger::info("Test begin: {}", event.name);
+		}
+	};
+
 	class Reporter :
 		public EventSystem<
 			TestBeginEvent,
@@ -111,5 +123,10 @@ export namespace synodic::honesty
 			AssertionSkipEvent,
 			SummaryEvent>
 	{
+	public:
+		Reporter()			= default;
+		virtual ~Reporter() = default;
+
+	private:
 	};
 }

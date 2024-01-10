@@ -27,10 +27,10 @@ export namespace synodic::honesty
 		reporter::Console reporter;
 		runner::Local runner;
 
-		const std::vector<suite_data> data = registry.ExtractDefaultData();
+		//const std::vector<suite_data> data = registry.ExtractDefaultData();
 
-		// Move the direct registry data into the default runner
-		runner.Submit(data);
+		//// Move the direct registry data into the default runner
+		//runner.Submit(data);
 
 		runner.Run();
 

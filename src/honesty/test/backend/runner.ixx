@@ -5,15 +5,15 @@ import :test;
 import :suite;
 import std;
 
-export namespace synodic::honesty
+namespace synodic::honesty
 {
 	/**
 	 * \brief The type of runner can be selected by the user when invoking tests, for example, via the command line
 	 * interface. Additionally, the user can specify a specific runner for a specific test suite. Test suites must be
-	 * registered with static runtime registration to overcome the limitations of the C++ compile time process. With
+	 * registered with runtime registration to avoid having every translation unit recompile when mo. With
 	 * these two constraints its clear that the Runner interface must be runtime polymorphic.
 	 */
-	class Runner
+	export class Runner
 	{
 	public:
 		/**

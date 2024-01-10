@@ -9,6 +9,7 @@ export import :suite;
 
 import std;
 import function_ref;
+import counter;
 
 export namespace synodic::honesty
 {
@@ -16,16 +17,23 @@ export namespace synodic::honesty
 
 	class Registry
 	{
-		class Instance
+
+		class Instance : std::counter<Instance>
 		{
 		public:
+			Instance()//:
+				//defaultSuites_()
+			{
+			}
 
 		private:
 			friend class Registry;
 
 			std::unordered_set<const Runner*> runners_;
 			std::unordered_set<const Reporter*> reporters_;
-			std::vector<suite_data> defaultSuites_;
+
+			// TODO: Count with reflection using C++26
+			//suite_data defaultSuites_[20];
 		};
 
 	public:
@@ -37,7 +45,10 @@ export namespace synodic::honesty
 
 		static void Add(suite_data&& data)
 		{
-			GetInstance().defaultSuites_.push_back(std::move(data));
+			Instance& instance = GetInstance();
+
+			constexpr int index = instance.next<__COUNTER__>();
+			//GetInstance().defaultSuites_[index] = std::move(data);
 		}
 
 		static void Add(suite_data data, const Runner& runner)
@@ -55,15 +66,16 @@ export namespace synodic::honesty
 			GetInstance();
 		}
 
-		static std::vector<suite_data> ExtractDefaultData()
-		{
-			return std::move(GetInstance().defaultSuites_);
-		}
+		//static std::vector<suite_data> ExtractDefaultData()
+		//{
+		//	return std::move(GetInstance().defaultSuites_);
+		//}
 
 		Registry()							 = default;
 		Registry(const Registry&)			 = delete;
 		Registry(Registry&&)				 = delete;
 		Registry& operator=(const Registry&) = delete;
 		Registry& operator=(Registry&&)		 = delete;
+
 	};
 }

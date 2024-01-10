@@ -20,4 +20,8 @@ export namespace synodic::honesty::runner
 	private:
 		std::vector<suite_data> suites_;
 	};
+
+	//Suite suite("test Suite", testSuite);
+	//bool registered = suite.Register();
 }
+

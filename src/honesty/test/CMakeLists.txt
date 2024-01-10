@@ -5,6 +5,7 @@ target_sources(honesty
 		FILES
 			"test.ixx"
 			"function_ref.ixx"
+			"counter.ixx"
 	PRIVATE
 		"test.cpp"
 )

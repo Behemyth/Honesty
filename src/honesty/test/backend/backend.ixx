@@ -30,6 +30,11 @@ export namespace synodic::honesty
 				runners_.insert(&runner);
 			}
 
+			std::span<const SuiteData* const> GetDefaultSuites() const
+			{
+				return std::span(defaultSuites_.data(), size_);
+			}
+
 		private:
 			std::unordered_set<const Runner*> runners_;
 			std::unordered_set<const Reporter*> reporters_;
@@ -72,10 +77,10 @@ export namespace synodic::honesty
 			GetInstance();
 		}
 
-		// static std::vector<SuiteData> ExtractDefaultData()
-		//{
-		//	return std::move(GetInstance().defaultSuites_);
-		// }
+		std::span<const SuiteData* const> GetDefaultSuites() const
+		{
+			return GetInstance().GetDefaultSuites();
+		}
 
 		Registry()							 = default;
 		Registry(const Registry&)			 = delete;

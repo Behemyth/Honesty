@@ -27,7 +27,7 @@ export namespace synodic::honesty
 		reporter::Console reporter;
 		runner::Local runner;
 
-		//const std::vector<SuiteData> data = registry.ExtractDefaultData();
+		auto suites = registry.GetDefaultSuites();
 
 		//// Move the direct registry data into the default runner
 		//runner.Submit(data);

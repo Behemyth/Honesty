@@ -17,24 +17,18 @@ export namespace synodic::honesty
 
 	class Registry
 	{
-
 		class Instance : std::counter<Instance>
 		{
-		public:
-			Instance()//:
-				//defaultSuites_()
-			{
-			}
-
-		private:
 			friend class Registry;
 
 			std::unordered_set<const Runner*> runners_;
 			std::unordered_set<const Reporter*> reporters_;
 
 			// TODO: Count with reflection using C++26
-			SuiteData* defaultSuites_[20];
+			const SuiteData* defaultSuites_[20]{};
 		};
+
+		static inline int size_ = 0;
 
 	public:
 		static Instance& GetInstance()
@@ -47,8 +41,7 @@ export namespace synodic::honesty
 		{
 			Instance& instance = GetInstance();
 
-			constexpr int index = instance.next<__COUNTER__>();
-			//GetInstance().defaultSuites_[index] = std::move(data);
+			GetInstance().defaultSuites_[size_++] = data;
 		}
 
 		static void Add(SuiteData data, const Runner& runner)
@@ -66,10 +59,10 @@ export namespace synodic::honesty
 			GetInstance();
 		}
 
-		//static std::vector<SuiteData> ExtractDefaultData()
+		// static std::vector<SuiteData> ExtractDefaultData()
 		//{
 		//	return std::move(GetInstance().defaultSuites_);
-		//}
+		// }
 
 		Registry()							 = default;
 		Registry(const Registry&)			 = delete;

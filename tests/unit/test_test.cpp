@@ -57,14 +57,14 @@ namespace
 	{
 		co_yield "array"_test = [](const auto& parameter)
 		{
-		} | std::tuple {3u, 4.0f};
+		} | std::tuple{3u, 4.0f};
 	};
 
 	auto arrayParameterization = []() -> TestGenerator
 	{
 		co_yield "array"_test = []<typename T>(const T& parameter)
 		{
-		} | std::array {3, 4};
+		} | std::array{3, 4};
 	};
 
 	auto testSuite = []() -> TestGenerator
@@ -95,5 +95,4 @@ namespace
 
 	Suite suite("test Suite", testSuite);
 	bool registered = suite.Register();
-
 }

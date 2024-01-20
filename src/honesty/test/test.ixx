@@ -197,13 +197,11 @@ export namespace synodic::honesty
 		bool Register() const;
 
 	private:
-		std::string_view name_;
-		std::function_ref<TestGenerator()> generator_;
+		SuiteData data_;
 	};
 
 	consteval Suite::Suite(std::string_view name, std::function_ref<TestGenerator()> generator) :
-		name_(name),
-		generator_(generator)
+		data_(name, generator)
 	{
 	}
 

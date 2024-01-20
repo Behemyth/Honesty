@@ -14,11 +14,11 @@ export namespace synodic::honesty::runner
 		}
 
 		void Run() override;
-		void Submit(suite_data data) override;
-		void Submit(std::vector<suite_data> data) override;
+		void Submit(SuiteData data) override;
+		void Submit(std::vector<SuiteData> data) override;
 
 	private:
-		std::vector<suite_data> suites_;
+		std::vector<SuiteData> suites_;
 	};
 
 	//Suite suite("test Suite", testSuite);

@@ -33,7 +33,7 @@ export namespace synodic::honesty
 			std::unordered_set<const Reporter*> reporters_;
 
 			// TODO: Count with reflection using C++26
-			//suite_data defaultSuites_[20];
+			SuiteData* defaultSuites_[20];
 		};
 
 	public:
@@ -43,7 +43,7 @@ export namespace synodic::honesty
 			return instance;
 		}
 
-		static void Add(suite_data&& data)
+		static void Add(const SuiteData* data)
 		{
 			Instance& instance = GetInstance();
 
@@ -51,7 +51,7 @@ export namespace synodic::honesty
 			//GetInstance().defaultSuites_[index] = std::move(data);
 		}
 
-		static void Add(suite_data data, const Runner& runner)
+		static void Add(SuiteData data, const Runner& runner)
 		{
 			GetInstance().runners_.insert(&runner);
 		}
@@ -66,7 +66,7 @@ export namespace synodic::honesty
 			GetInstance();
 		}
 
-		//static std::vector<suite_data> ExtractDefaultData()
+		//static std::vector<SuiteData> ExtractDefaultData()
 		//{
 		//	return std::move(GetInstance().defaultSuites_);
 		//}
@@ -76,6 +76,5 @@ export namespace synodic::honesty
 		Registry(Registry&&)				 = delete;
 		Registry& operator=(const Registry&) = delete;
 		Registry& operator=(Registry&&)		 = delete;
-
 	};
 }

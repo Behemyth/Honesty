@@ -6,7 +6,6 @@ using namespace synodic::honesty::literals;
 
 namespace synodic::honesty
 {
-
 	VoidTest::VoidTest(std::string_view name, std::function_ref<void()> test) :
 		runner_(std::move(test))
 	{
@@ -30,7 +29,7 @@ namespace synodic::honesty
 
 	bool Suite::Register() const
 	{
-		Registry::Add(suite_data(name_, generator_));
+		Registry::Add(&data_);
 
 		return true;
 	}

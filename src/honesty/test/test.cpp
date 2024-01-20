@@ -29,7 +29,7 @@ namespace synodic::honesty
 
 	bool Suite::Register() const
 	{
-		Registry::Add(&data_);
+		Registry::Add(data_);
 
 		return true;
 	}

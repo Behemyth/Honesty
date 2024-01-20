@@ -19,16 +19,26 @@ export namespace synodic::honesty
 	{
 		class Instance : std::counter<Instance>
 		{
-			friend class Registry;
+		public:
+			void AddSuite(const SuiteData& data)
+			{
+				defaultSuites_[size_++] = &data;
+			}
 
+			void AddRunner(const Runner& runner)
+			{
+				runners_.insert(&runner);
+			}
+
+		private:
 			std::unordered_set<const Runner*> runners_;
 			std::unordered_set<const Reporter*> reporters_;
 
 			// TODO: Count with reflection using C++26
-			const SuiteData* defaultSuites_[20]{};
-		};
+			std::array<const SuiteData*, 20> defaultSuites_ {};
 
-		static inline int size_ = 0;
+			static inline int size_ = 0;
+		};
 
 	public:
 		static Instance& GetInstance()
@@ -37,16 +47,19 @@ export namespace synodic::honesty
 			return instance;
 		}
 
-		static void Add(const SuiteData* data)
+		static void Add(const SuiteData& data)
 		{
 			Instance& instance = GetInstance();
 
-			GetInstance().defaultSuites_[size_++] = data;
+			GetInstance().AddSuite(data);
 		}
 
-		static void Add(SuiteData data, const Runner& runner)
+		static void Add(const SuiteData& data, const Runner& runner)
 		{
-			GetInstance().runners_.insert(&runner);
+			auto& instance = GetInstance();
+
+			instance.AddRunner(runner);
+			instance.AddSuite(data);
 		}
 
 		static void AddReporter(const Reporter&)

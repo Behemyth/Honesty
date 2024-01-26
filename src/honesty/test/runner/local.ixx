@@ -5,7 +5,7 @@ import synodic.honesty.test.backend;
 
 export namespace synodic::honesty::runner
 {
-	class Local  : public Runner
+	class Local : public Runner
 	{
 	public:
 		Local() :
@@ -14,14 +14,13 @@ export namespace synodic::honesty::runner
 		}
 
 		void Run() override;
-		void Submit(SuiteData data) override;
-		void Submit(std::vector<SuiteData> data) override;
+		void Submit(const SuiteData* data) override;
+		void Submit(std::span<const SuiteData* const> data) override;
 
 	private:
-		std::vector<SuiteData> suites_;
+		std::vector<const SuiteData*> suites_;
 	};
 
-	//Suite suite("test Suite", testSuite);
-	//bool registered = suite.Register();
+	// Suite suite("test Suite", testSuite);
+	// bool registered = suite.Register();
 }
-

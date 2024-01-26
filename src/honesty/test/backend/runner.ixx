@@ -26,8 +26,8 @@ namespace synodic::honesty
 
 		virtual void Run() = 0;
 
-		virtual void Submit(SuiteData data)			  = 0;
-		virtual void Submit(std::vector<SuiteData> data) = 0;
+		virtual void Submit(const SuiteData* data)			 = 0;
+		virtual void Submit(std::span<const SuiteData* const> data) = 0;
 
 	protected:
 		const std::string_view name_;

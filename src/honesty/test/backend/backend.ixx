@@ -20,9 +20,9 @@ export namespace synodic::honesty
 		class Instance : std::counter<Instance>
 		{
 		public:
-			void AddSuite(const SuiteData& data)
+			void AddSuite(const SuiteData* const data)
 			{
-				defaultSuites_[size_++] = &data;
+				defaultSuites_[size_++] = data;
 			}
 
 			void AddRunner(const Runner& runner)
@@ -56,15 +56,13 @@ export namespace synodic::honesty
 		{
 			Instance& instance = GetInstance();
 
-			GetInstance().AddSuite(data);
+			GetInstance().AddSuite(&data);
 		}
 
 		static void Add(const SuiteData& data, const Runner& runner)
 		{
 			auto& instance = GetInstance();
 
-			instance.AddRunner(runner);
-			instance.AddSuite(data);
 		}
 
 		static void AddReporter(const Reporter&)
@@ -77,7 +75,7 @@ export namespace synodic::honesty
 			GetInstance();
 		}
 
-		std::span<const SuiteData* const> GetDefaultSuites() const
+		static std::span<const SuiteData* const> GetDefaultSuites()
 		{
 			return GetInstance().GetDefaultSuites();
 		}

@@ -21,16 +21,14 @@ export namespace synodic::honesty
 
 	std::expected<void, TestResultCode> entry()
 	{
-		Registry registry;
-
 		// TODO: Dynamic reporter and runner
 		reporter::Console reporter;
 		runner::Local runner;
 
-		auto suites = registry.GetDefaultSuites();
+		auto suites = Registry::GetDefaultSuites();
 
-		//// Move the direct registry data into the default runner
-		//runner.Submit(data);
+		// Move the direct registry data into the default runner
+		runner.Submit(suites);
 
 		runner.Run();
 

@@ -3,10 +3,12 @@ export module synodic.honesty.test.backend:runner;
 
 import :test;
 import :suite;
+import :reporter;
 import std;
 
 namespace synodic::honesty
 {
+
 	/**
 	 * \brief The type of runner can be selected by the user when invoking tests, for example, via the command line
 	 * interface. Additionally, the user can specify a specific runner for a specific test suite. Test suites must be
@@ -17,24 +19,22 @@ namespace synodic::honesty
 	{
 	public:
 		/**
-		 * \brief
-		 * \param name The name of the runner. This is used to identify the runner when invoking tests
+		 * @brief
+		 * @param reporter The reporter to use when running tests. If the user does not use the reporter given for the
+		 *	runner, nothing will be reported
+		 *	when invoking tests
 		 */
-		constexpr Runner(std::string_view name);
+		explicit constexpr Runner(const Reporter& reporter);
 
 		virtual ~Runner() = default;
 
-		virtual void Run() = 0;
+		virtual void Run() const = 0;
 
-		virtual void Submit(const SuiteData* data)			 = 0;
+		virtual void Submit(const SuiteData* data)					= 0;
 		virtual void Submit(std::span<const SuiteData* const> data) = 0;
-
-	protected:
-		const std::string_view name_;
 	};
 
-	constexpr Runner::Runner(std::string_view name) :
-		name_(name)
+	constexpr Runner::Runner(const Reporter& reporter)
 	{
 	}
 }

@@ -3,10 +3,11 @@ export module synodic.honesty.test.reporter:stdout;
 #include <cstdio>
 
 import std;
+import synodic.honesty.test.backend;
 
 export namespace synodic::honesty::reporter
 {
-	class Console
+	class Console : public Reporter
 	{
 	public:
 		template<class... Args>

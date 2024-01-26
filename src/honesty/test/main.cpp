@@ -1,5 +1,8 @@
 import synodic.honesty.test.entry;
 import std;
+import synodic.honesty.test;
+import synodic.honesty.test.reporter;
+import synodic.honesty.test.runner;
 
 namespace synodic::honesty
 {
@@ -19,12 +22,15 @@ int main(int argc, char* argv[])
 	{
 		switch (mode)
 		{
-			case synodic::honesty::Mode::EXECUTE:
+			case synodic::honesty::Mode::EXECUTE :
 			{
-				auto result = synodic::honesty::entry();
+				synodic::honesty::reporter::Console reporter;
+				synodic::honesty::runner::Local runner(reporter);
+
+				auto result = entry(reporter, runner);
 				break;
 			}
-			default:
+			default :
 			{
 				std::terminate();
 			}

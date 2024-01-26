@@ -19,18 +19,24 @@ export namespace synodic::honesty
 		FAILURE
 	};
 
-	std::expected<void, TestResultCode> entry()
+	/**
+	 * @brief The entry point for the test runner. If the user does not specify a runner, the default runner will be
+	 *	used to run the tests
+	 * @param reporter
+	 * @param defaultRunner The default runner to use when running tests
+	 * @return The result of the test run
+	 */
+	std::expected<void, TestResultCode>
+		entry(const reporter::Console& defaultReporter, Runner& defaultRunner)
 	{
-		// TODO: Dynamic reporter and runner
-		reporter::Console reporter;
-		runner::Local runner;
+		const auto suites = Registry::GetDefaultSuites();
 
-		auto suites = Registry::GetDefaultSuites();
+		const auto reporters = Registry::GetReporters();
+		const auto runners = Registry::GetRunners();
 
-		// Move the direct registry data into the default runner
-		runner.Submit(suites);
-
-		runner.Run();
+		// Move the direct registry data into the default defaultRunner
+		defaultRunner.Submit(suites);
+		defaultRunner.Run();
 
 		return {};
 	}

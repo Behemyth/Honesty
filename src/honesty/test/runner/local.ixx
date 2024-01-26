@@ -8,12 +8,12 @@ export namespace synodic::honesty::runner
 	class Local : public Runner
 	{
 	public:
-		Local() :
-			Runner("default")
+		explicit Local(const Reporter& reporter) :
+			Runner(reporter)
 		{
 		}
 
-		void Run() override;
+		void Run() const override;
 		void Submit(const SuiteData* data) override;
 		void Submit(std::span<const SuiteData* const> data) override;
 

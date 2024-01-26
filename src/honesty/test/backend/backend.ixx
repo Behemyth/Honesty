@@ -25,19 +25,29 @@ export namespace synodic::honesty
 				defaultSuites_[size_++] = data;
 			}
 
-			void AddRunner(const Runner& runner)
-			{
-				runners_.insert(&runner);
-			}
+			//void AddRunner(const Runner& runner)
+			//{
+			//	runners_.insert(&runner);
+			//}
 
 			std::span<const SuiteData* const> GetDefaultSuites() const
 			{
 				return std::span(defaultSuites_.data(), size_);
 			}
 
+			std::span<const Reporter* const> GetReporters() const
+			{
+				return reporters_;
+			}
+
+			std::span<const Runner* const> GetRunners() const
+			{
+				return runners_;
+			}
+
 		private:
-			std::unordered_set<const Runner*> runners_;
-			std::unordered_set<const Reporter*> reporters_;
+			std::vector<const Runner*> runners_;
+			std::vector<const Reporter*> reporters_;
 
 			// TODO: Count with reflection using C++26
 			std::array<const SuiteData*, 20> defaultSuites_ {};
@@ -78,6 +88,16 @@ export namespace synodic::honesty
 		static std::span<const SuiteData* const> GetDefaultSuites()
 		{
 			return GetInstance().GetDefaultSuites();
+		}
+
+		static std::span<const Reporter* const> GetReporters()
+		{
+			return GetInstance().GetReporters();
+		}
+
+		static std::span<const Runner* const> GetRunners()
+		{
+			return GetInstance().GetRunners();
 		}
 
 		Registry()							 = default;

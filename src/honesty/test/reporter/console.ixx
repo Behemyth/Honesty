@@ -1,6 +1,7 @@
-export module synodic.honesty.test.reporter:stdout;
-
+module;
 #include <cstdio>
+
+export module synodic.honesty.test.reporter:console;
 
 import std;
 import synodic.honesty.test.backend;

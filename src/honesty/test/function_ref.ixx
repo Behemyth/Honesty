@@ -1,6 +1,7 @@
-export module function_ref;
-
+module;
 #include <cassert>
+
+export module function_ref;
 
 import std;
 

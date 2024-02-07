@@ -20,39 +20,51 @@ export namespace synodic::honesty
 		class Instance : std::counter<Instance>
 		{
 		public:
+
+			static constexpr int RUNNER_COUNT = 1;
+			static constexpr int REPORTER_COUNT = 1;
+			static constexpr int SUITE_COUNT = 20;
+
 			void AddSuite(const SuiteData* const data)
 			{
-				defaultSuites_[size_++] = data;
+				suites_[suiteSize_++] = data;
 			}
 
-			//void AddRunner(const Runner& runner)
-			//{
-			//	runners_.insert(&runner);
-			//}
-
-			std::span<const SuiteData* const> GetDefaultSuites() const
+			void AddReporter(const Reporter* const reporter)
 			{
-				return std::span(defaultSuites_.data(), size_);
+				reporters_[reporterSize_++] = reporter;
+			}
+
+			void AddRunner(const Runner* const runner)
+			{
+				runners_[runnerSize_++] = runner;
+			}
+
+			std::span<const SuiteData* const> GetSuites() const
+			{
+				return std::span(suites_.data(), suiteSize_);
 			}
 
 			std::span<const Reporter* const> GetReporters() const
 			{
-				return reporters_;
+				return std::span(reporters_.data(), reporterSize_);
 			}
 
 			std::span<const Runner* const> GetRunners() const
 			{
-				return runners_;
+				return std::span(runners_.data(), runnerSize_);
 			}
 
 		private:
-			std::vector<const Runner*> runners_;
-			std::vector<const Reporter*> reporters_;
-
 			// TODO: Count with reflection using C++26
-			std::array<const SuiteData*, 20> defaultSuites_ {};
 
-			static inline int size_ = 0;
+			std::array<const Runner*, RUNNER_COUNT> runners_{};
+			std::array<const Reporter*, REPORTER_COUNT> reporters_{};
+			std::array<const SuiteData*, SUITE_COUNT> suites_ {};
+
+			static inline int suiteSize_ = 0;
+			static inline int runnerSize_ = 0;
+			static inline int reporterSize_ = 0;
 		};
 
 	public:
@@ -87,7 +99,7 @@ export namespace synodic::honesty
 
 		static std::span<const SuiteData* const> GetDefaultSuites()
 		{
-			return GetInstance().GetDefaultSuites();
+			return GetInstance().GetSuites();
 		}
 
 		static std::span<const Reporter* const> GetReporters()

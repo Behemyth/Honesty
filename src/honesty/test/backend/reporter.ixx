@@ -98,17 +98,9 @@ export namespace synodic::honesty
 		}
 	};
 
-	template<typename>
-	struct on;
+	// TODO: Wait until deducing this is supported with modules. Using CRTP dispatch for events based on the type of the event
 
-	template<>
-	struct on<TestBeginEvent>
-	{
-		static void call(const TestBeginEvent& event)
-		{
-			//logger::info("Test begin: {}", event.name);
-		}
-	};
+	class
 
 	class Reporter :
 		public EventSystem<

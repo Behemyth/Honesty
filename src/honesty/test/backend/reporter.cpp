@@ -5,4 +5,7 @@ import std;
 
 namespace synodic::honesty
 {
+	Events::Events(std::span<const Reporter* const>)
+	{
+	}
 }

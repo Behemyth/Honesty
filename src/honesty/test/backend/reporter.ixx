@@ -56,69 +56,56 @@ export namespace synodic::honesty
 		std::string_view name;
 	};
 
-	template<typename Event>
-	class EventBroadcaster
-	{
-	public:
-		void connect(std::move_only_function<void(const Event&)> connection)
-		{
-			connections_.push_back(std::move(connection));
-		}
-
-		void signal(const Event& event)
-		{
-			for (const auto& connection: connections_)
-			{
-				connection(event);
-			}
-		}
-
-	private:
-		std::vector<std::move_only_function<void(const Event&)>> connections_;
-	};
-
-	template<typename... Events>
-	class EventSystem : EventBroadcaster<Events>...
-	{
-	public:
-		template<typename Event>
-			requires std::disjunction_v<Event, Events...>
-		void connect(std::move_only_function<void(const Event&)> connection)
-		{
-			EventBroadcaster<Event>& backend = *this;
-			backend.connect(std::move(connection));
-		}
-
-		template<typename Event>
-			requires std::disjunction_v<Event, Events...>
-		void signal(const Event& event)
-		{
-			EventBroadcaster<Event>& backend = *this;
-			backend.signal(event);
-		}
-	};
-
-	// TODO: Wait until deducing this is supported with modules. Using CRTP dispatch for events based on the type of the event
-
-	class
-
-	class Reporter :
-		public EventSystem<
-			TestBeginEvent,
-			TestEndEvent,
-			TestSkipEvent,
-			TestRunEvent,
-			TestFailEvent,
-			TestPassEvent,
-			AssertionFailEvent,
-			AssertionPassEvent,
-			AssertionSkipEvent,
-			SummaryEvent>
+	class Reporter
 	{
 	public:
 		Reporter()			= default;
 		virtual ~Reporter() = default;
 
+		virtual void signal(const TestBeginEvent& event) {};
+		virtual void signal(const TestEndEvent& event) {};
+		virtual void signal(const TestSkipEvent& event) {};
+
+		virtual void signal(const TestRunEvent& event) {};
+		virtual void signal(const TestFailEvent& event) {};
+		virtual void signal(const TestPassEvent& event) {};
+
+		virtual void signal(const AssertionFailEvent& event) {};
+		virtual void signal(const AssertionPassEvent& event) {};
+		virtual void signal(const AssertionSkipEvent& event) {};
+
+		virtual void signal(const SummaryEvent& event) {};
+
 	private:
+	};
+
+	class Events
+	{
+	public:
+		Events(std::span<const Reporter* const>);
+
+		template<typename Event>
+			requires std::disjunction_v<
+				Event,
+				TestBeginEvent,
+				TestEndEvent,
+				TestSkipEvent,
+				TestRunEvent,
+				TestFailEvent,
+				TestPassEvent,
+				AssertionFailEvent,
+				AssertionPassEvent,
+				AssertionSkipEvent,
+				SummaryEvent>
+		void signal(const Event& event)
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->signal(event);
+			}
+		}
+
+	private:
+		std::span<const Reporter* const> reporters_;
 	};
 }

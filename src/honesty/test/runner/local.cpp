@@ -4,7 +4,7 @@ import :local;
 
 namespace synodic::honesty::runner
 {
-	void Local::Run() const
+	void Local::Run(const Events& events) const
 	{
 		for (const SuiteData* const suite: suites_)
 		{

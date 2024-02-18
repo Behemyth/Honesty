@@ -31,12 +31,14 @@ export namespace synodic::honesty
 	{
 		const auto suites = Registry::GetDefaultSuites();
 
-		const auto reporters = Registry::GetReporters();
+		const std::span<const Reporter* const> reporters = Registry::GetReporters();
 		const auto runners = Registry::GetRunners();
+
+		Events events(reporters);
 
 		// Move the direct registry data into the default defaultRunner
 		defaultRunner.Submit(suites);
-		defaultRunner.Run();
+		defaultRunner.Run(events);
 
 		return {};
 	}

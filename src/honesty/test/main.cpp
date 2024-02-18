@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 			case synodic::honesty::Mode::EXECUTE :
 			{
 				synodic::honesty::reporter::Console reporter;
-				synodic::honesty::runner::Local runner(reporter);
+				synodic::honesty::runner::Local runner;
 
 				auto result = entry(reporter, runner);
 				break;

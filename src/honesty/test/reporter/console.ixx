@@ -12,6 +12,11 @@ export namespace synodic::honesty::reporter
 	{
 	public:
 
+		void signal(const event::SuiteBegin& event) override
+		{
+			std::println("Suite Begin: {}", event.name);
+		}
+
 		void signal(const event::TestBegin& event) override
 		{
 			std::println("Test Begin: {}", event.name);

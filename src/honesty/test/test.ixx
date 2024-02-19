@@ -28,9 +28,12 @@ export namespace synodic::honesty
 		void Run() const override;
 		std::span<std::string_view> Tags() const override;
 
+		std::string_view Name() const override;
+
 	private:
 		std::function_ref<void(const T&)> runner_;
 		T value_;
+		std::string_view name_;
 	};
 
 	class VoidTest final : public TestBase
@@ -43,8 +46,11 @@ export namespace synodic::honesty
 		void Run() const override;
 		std::span<std::string_view> Tags() const override;
 
+		std::string_view Name() const override;
+
 	private:
 		std::function_ref<void()> runner_;
+		std::string_view name_;
 	};
 
 	// TODO: Distinguish type overloads
@@ -120,7 +126,8 @@ export namespace synodic::honesty
 	template<typename T>
 	TinyTest<T>::TinyTest(std::string_view name, std::function_ref<void(const T&)> test, T value) :
 		runner_(test),
-		value_(value)
+		value_(value),
+		name_(name)
 	{
 	}
 
@@ -134,6 +141,12 @@ export namespace synodic::honesty
 	std::span<std::string_view> TinyTest<T>::Tags() const
 	{
 		return {};
+	}
+
+	template<typename T>
+	std::string_view TinyTest<T>::Name() const
+	{
+		return name_;
 	}
 
 	template<std::size_t Size>

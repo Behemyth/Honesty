@@ -18,6 +18,8 @@ export namespace synodic::honesty
 
 		virtual std::span<std::string_view> Tags() const = 0;
 
+		virtual std::string_view Name() const = 0;
+
 	private:
 	};
 

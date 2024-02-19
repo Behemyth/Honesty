@@ -7,7 +7,8 @@ using namespace synodic::honesty::literals;
 namespace synodic::honesty
 {
 	VoidTest::VoidTest(std::string_view name, std::function_ref<void()> test) :
-		runner_(std::move(test))
+		runner_(std::move(test)),
+		name_(name)
 	{
 	}
 
@@ -25,6 +26,11 @@ namespace synodic::honesty
 	std::span<std::string_view> VoidTest::Tags() const
 	{
 		return {};
+	}
+
+	std::string_view VoidTest::Name() const
+	{
+		return name_;
 	}
 
 	bool Suite::Register() const

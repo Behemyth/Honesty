@@ -8,9 +8,13 @@ namespace synodic::honesty::runner
 	{
 		for (const SuiteData* const suite: suites_)
 		{
-			for (const TestBase& test: suite->generator_())
+			synodic::honesty::event::SuiteBegin event(suite->name);
+
+			events.signal(event);
+
+			for (const TestBase& test: suite->generatorWrapper())
 			{
-				synodic::honesty::event::TestBegin event("TODO");
+				synodic::honesty::event::TestBegin event(test.Name());
 
 				events.signal(event);
 

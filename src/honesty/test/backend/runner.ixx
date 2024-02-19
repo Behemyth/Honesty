@@ -25,7 +25,7 @@ namespace synodic::honesty
 
 		virtual ~Runner() = default;
 
-		virtual void Run(const Events& events) const = 0;
+		virtual void Run(const Events& events) = 0;
 
 		virtual void Submit(const SuiteData* data)					= 0;
 		virtual void Submit(std::span<const SuiteData* const> data) = 0;

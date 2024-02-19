@@ -11,6 +11,13 @@ export namespace synodic::honesty::reporter
 	class Console : public Reporter
 	{
 	public:
+
+		void signal(const event::TestBegin& event) override
+		{
+			std::println("Test Begin: {}", event.name);
+		}
+
+
 		template<class... Args>
 		void expect(bool value, const std::source_location location, std::format_string<Args...> fmt, Args&&... args)
 		{

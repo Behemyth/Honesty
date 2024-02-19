@@ -5,7 +5,9 @@ import std;
 
 namespace synodic::honesty
 {
-	Events::Events(std::span<const Reporter* const>)
+	Events::Events(std::span<Reporter* const> reporters) :
+		reporters_(reporters)
+
 	{
 	}
 }

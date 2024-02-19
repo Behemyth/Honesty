@@ -4,12 +4,16 @@ import :local;
 
 namespace synodic::honesty::runner
 {
-	void Local::Run(const Events& events) const
+	void Local::Run(const Events& events)
 	{
 		for (const SuiteData* const suite: suites_)
 		{
 			for (const TestBase& test: suite->generator_())
 			{
+				synodic::honesty::event::TestBegin event("TODO");
+
+				events.signal(event);
+
 				test.Run();
 			}
 		}

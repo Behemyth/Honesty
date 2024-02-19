@@ -26,19 +26,20 @@ export namespace synodic::honesty
 	 * @param defaultRunner The default runner to use when running tests
 	 * @return The result of the test run
 	 */
-	std::expected<void, TestResultCode>
-		entry(const reporter::Console& defaultReporter, Runner& defaultRunner)
+	template<typename ReporterT = reporter::Console, typename RunnerT = runner::Local>
+	std::expected<void, TestResultCode> entry(ReporterT& defaultReporter, RunnerT& defaultRunner)
 	{
-		const auto suites = Registry::GetDefaultSuites();
+		Registry registry(defaultReporter, defaultRunner);
 
-		const std::span<const Reporter* const> reporters = Registry::GetReporters();
-		const auto runners = Registry::GetRunners();
+		std::span<Reporter*> reporters = registry.GetReporters();
+		std::span<Runner*> runners	   = registry.GetRunners();
 
 		Events events(reporters);
 
-		// Move the direct registry data into the default defaultRunner
-		defaultRunner.Submit(suites);
-		defaultRunner.Run(events);
+		for (Runner* runner: runners)
+		{
+			runner->Run(events);
+		}
 
 		return {};
 	}

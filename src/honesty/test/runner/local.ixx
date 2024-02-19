@@ -12,14 +12,11 @@ export namespace synodic::honesty::runner
 		{
 		}
 
-		void Run(const Events& events) const override;
+		void Run(const Events& events) override;
 		void Submit(const SuiteData* data) override;
 		void Submit(std::span<const SuiteData* const> data) override;
 
 	private:
 		std::vector<const SuiteData*> suites_;
 	};
-
-	// Suite suite("test Suite", testSuite);
-	// bool registered = suite.Register();
 }

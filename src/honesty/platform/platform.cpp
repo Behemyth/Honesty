@@ -1,1 +1,1 @@
-module synodic.honesty.terminal:terminal;
+module synodic.honesty.platform:platform;

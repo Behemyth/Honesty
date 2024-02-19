@@ -3,7 +3,9 @@ target_sources(honesty
 		FILE_SET interfaces
 		FILES
 			"benchmark.ixx"
+			"platform.ixx"
 			"profile.ixx"
+			"terminal.ixx"
 			"test.ixx"
 )
 
@@ -12,7 +14,15 @@ add_subdirectory(
 )
 
 add_subdirectory(
+	platform
+)
+
+add_subdirectory(
 	profile
+)
+
+add_subdirectory(
+	terminal
 )
 
 add_subdirectory(

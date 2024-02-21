@@ -1,4 +1,4 @@
-// Wrapper around std::format for terminal output
+// Wrapper around std::format for styled terminal output
 
 module;
 
@@ -56,13 +56,6 @@ export namespace synodic::honesty::terminal
 	}
 
 	/**
-	 * @brief Overload (2) - https://en.cppreference.com/w/cpp/utility/format/vformat
-	 */
-	export inline std::wstring vformat(const text_style& style, std::wstring_view fmt, std::wformat_args args)
-	{
-	}
-
-	/**
 	 * @brief Overload (1) - https://en.cppreference.com/w/cpp/utility/format/vformat_to
 	 */
 	export template<std::output_iterator<const char&> OutputIt>
@@ -70,13 +63,6 @@ export namespace synodic::honesty::terminal
 	{
 	}
 
-	/**
-	 * @brief Overload (2) - https://en.cppreference.com/w/cpp/utility/format/vformat_to
-	 */
-	export template<std::output_iterator<const wchar_t&> OutputIt>
-	OutputIt vformat_to(OutputIt out, const text_style& ts, std::wstring_view fmt, std::wformat_args args)
-	{
-	}
 
 	/**
 	 * @brief  Overload (1) - https://en.cppreference.com/w/cpp/utility/format/format
@@ -88,15 +74,6 @@ export namespace synodic::honesty::terminal
 	}
 
 	/**
-	 * @brief Overload (2) - https://en.cppreference.com/w/cpp/utility/format/format
-	 */
-	export template<typename... Args>
-	std::wstring format(const text_style& style, std::wformat_string<Args...> fmt, Args&&... args)
-	{
-		return vformat(fmt.get(), std::make_wformat_args(args...));
-	}
-
-	/**
 	 * @brief Overload (1) - https://en.cppreference.com/w/cpp/utility/format/format_to
 	 */
 	export template<std::output_iterator<const char&> OutputIt, typename... Args>
@@ -104,16 +81,6 @@ export namespace synodic::honesty::terminal
 	{
 		return vformat_to(out, style, fmt.get(), std::make_format_args(args...));
 	}
-
-	/**
-	 * @brief Overload (2) - https://en.cppreference.com/w/cpp/utility/format/format_to
-	 */
-	export template<std::output_iterator<const wchar_t&> OutputIt, typename... Args>
-	OutputIt format_to(OutputIt out, const text_style& style, std::wformat_string<Args...> fmt, Args&&... args)
-	{
-		return vformat_to(std::move(out), style, fmt.get(), std::make_wformat_args(args...));
-	}
-
 	/**
 	 * @brief Overload (1) - https://en.cppreference.com/w/cpp/io/vprint_unicode
 	 */

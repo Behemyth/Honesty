@@ -39,7 +39,8 @@ export namespace synodic::honesty::terminal
 	class text_style
 	{
 	public:
-		text_style(terminal::color24_t);
+		explicit text_style(terminal::color8_t color);
+		explicit text_style(terminal::color24_t color);
 
 	private:
 		std::optional<color_type> fg_color;
@@ -48,79 +49,139 @@ export namespace synodic::honesty::terminal
 	};
 
 	/**
-	 * @brief  Type erased version of `vformat` that mirrors std::vformat_to with styling
+	 * @brief Overload (1) - https://en.cppreference.com/w/cpp/utility/format/vformat
 	 */
-	template<typename CharT, std::output_iterator<const CharT&> OutputIt>
-		requires std::output_iterator<OutputIt, const CharT&>
-	OutputIt vformat_to(
-		OutputIt out,
-		const text_style& style,
-		std::basic_string_view<CharT> fmt,
-		std::basic_format_args<std::basic_format_args<std::basic_format_context<OutputIt, CharT>>> args)
+	export inline std::string vformat(const text_style& style, std::string_view fmt, std::format_args args)
 	{
 	}
 
 	/**
-	 * @brief  Mirrors `std::vformat` overload(1) with styling
+	 * @brief Overload (2) - https://en.cppreference.com/w/cpp/utility/format/vformat
 	 */
-	inline std::string vformat(const text_style& style, std::string_view fmt, std::format_args args)
+	export inline std::wstring vformat(const text_style& style, std::wstring_view fmt, std::wformat_args args)
 	{
-		std::string buffer;
-		// vformat_to(buffer.begin(), style, fmt, args);
-		return buffer;
 	}
 
 	/**
-	 * @brief  Mirrors `std::vformat` overload(2) with styling
+	 * @brief Overload (1) - https://en.cppreference.com/w/cpp/utility/format/vformat_to
 	 */
-	inline std::wstring vformat(const text_style& style, std::wstring_view fmt, std::wformat_args args)
+	export template<std::output_iterator<const char&> OutputIt>
+	OutputIt vformat_to(OutputIt out, const text_style& ts, std::string_view fmt, std::format_args args)
 	{
-		std::wstring buffer;
-		// vformat_to(buffer.begin(), style, fmt, args);
-		return buffer;
 	}
 
-	export inline void vprint(std::FILE* f, const text_style& style, std::string_view fmt, std::format_args args)
+	/**
+	 * @brief Overload (2) - https://en.cppreference.com/w/cpp/utility/format/vformat_to
+	 */
+	export template<std::output_iterator<const wchar_t&> OutputIt>
+	OutputIt vformat_to(OutputIt out, const text_style& ts, std::wstring_view fmt, std::wformat_args args)
 	{
-		// auto buf = memory_buffer();
-		// vformat_to(buf, style, fmt, args);
-		// print(f, FMT_STRING("{}"), std::string_view(buf.begin(), buf.size()));
 	}
 
+	/**
+	 * @brief  Overload (1) - https://en.cppreference.com/w/cpp/utility/format/format
+	 */
 	export template<typename... Args>
-	void print(std::FILE* fileStream, const text_style& style, std::format_string<Args...> fmt, Args&&... args)
+	std::string format(const text_style& style, std::format_string<Args...> fmt, Args&&... args)
 	{
-		vprint(fileStream, style, fmt, std::make_format_args(args...));
+		return vformat(fmt.get(), std::make_format_args(args...));
 	}
 
+	/**
+	 * @brief Overload (2) - https://en.cppreference.com/w/cpp/utility/format/format
+	 */
+	export template<typename... Args>
+	std::wstring format(const text_style& style, std::wformat_string<Args...> fmt, Args&&... args)
+	{
+		return vformat(fmt.get(), std::make_wformat_args(args...));
+	}
+
+	/**
+	 * @brief Overload (1) - https://en.cppreference.com/w/cpp/utility/format/format_to
+	 */
+	export template<std::output_iterator<const char&> OutputIt, typename... Args>
+	OutputIt format_to(OutputIt out, const text_style& style, std::format_string<Args...> fmt, Args&&... args)
+	{
+		return vformat_to(out, style, fmt.get(), std::make_format_args(args...));
+	}
+
+	/**
+	 * @brief Overload (2) - https://en.cppreference.com/w/cpp/utility/format/format_to
+	 */
+	export template<std::output_iterator<const wchar_t&> OutputIt, typename... Args>
+	OutputIt format_to(OutputIt out, const text_style& style, std::wformat_string<Args...> fmt, Args&&... args)
+	{
+		return vformat_to(std::move(out), style, fmt.get(), std::make_wformat_args(args...));
+	}
+
+	/**
+	 * @brief Overload (1) - https://en.cppreference.com/w/cpp/io/vprint_unicode
+	 */
+	export inline void vprint_unicode(std::FILE* stream, std::string_view fmt, std::format_args args)
+	{
+	}
+
+	/**
+	 * @brief Overload (2) - https://en.cppreference.com/w/cpp/io/vprint_unicode
+	 */
+	export void vprint_unicode(std::string_view fmt, std::format_args args)
+	{
+		vprint_unicode(stdout, fmt, args);
+	}
+
+	/**
+	 * @brief Overload (1) - https://en.cppreference.com/w/cpp/io/vprint_nonunicode
+	 */
+	export void vprint_nonunicode(std::FILE* stream, std::string_view fmt, std::format_args args)
+	{
+	}
+
+	/**
+	 * @brief Overload (2) - https://en.cppreference.com/w/cpp/io/vprint_nonunicode
+	 */
+	export void vprint_nonunicode(std::string_view fmt, std::format_args args)
+	{
+		vprint_nonunicode(stdout, fmt, args);
+	}
+
+	/**
+	 * @brief Overload (1) - https://en.cppreference.com/w/cpp/io/print
+	 */
+	export template<typename... Args>
+	void print(std::FILE* stream, const text_style& style, std::format_string<Args...> fmt, Args&&... args)
+	{
+		std::vprint_unicode(stream, fmt.get(), std::make_format_args(args...));
+
+		or
+
+		std::vprint_nonunicode(stream, fmt.get(), std::make_format_args(args...));
+	}
+
+	/**
+	 * @brief Overload (2) - https://en.cppreference.com/w/cpp/io/print
+	 */
 	export template<typename... Args>
 	void print(const text_style& style, std::format_string<Args...> fmt, Args&&... args)
 	{
 		return print(stdout, style, fmt, std::forward<Args>(args)...);
 	}
 
-	export template<typename... Args>
-	inline auto format(const text_style& style, std::format_string<Args...> fmt, Args&&... args) -> std::string
+	/**
+	 * @brief Overload (1) - https://en.cppreference.com/w/cpp/io/println
+	 */
+	export template<class... Args>
+	void println(std::FILE* stream, std::format_string<Args...> fmt, Args&&... args)
 	{
-		return vformat(style, fmt, std::make_format_args(args...));
-	}
-
-	export template<typename OutputIt, typename CharT>
-		requires std::output_iterator<OutputIt, const CharT&>
-	OutputIt vformat_to(OutputIt out, const text_style& ts, std::string_view fmt, std::basic_format_args<CharT> args)
-	{
-		auto&& buf = get_buffer<char>(out);
-		vformat_to(buf, ts, fmt, args);
-		return get_iterator(buf, out);
+		print(stream, "{}\n", std::format(fmt, args...));
 	}
 
 	/**
-	 * @brief
+	 * @brief Overload (2) - https://en.cppreference.com/w/cpp/io/println
 	 */
-	export template<typename OutputIt, typename CharT, typename... Args>
-		requires std::output_iterator<OutputIt, const CharT&>
-	OutputIt format_to(OutputIt out, const text_style& style, std::basic_format_string<CharT> fmt, Args&&... args)
+	export template<class... Args>
+	void println(std::format_string<Args...> fmt, Args&&... args)
 	{
-		return vformat_to(out, style, fmt, std::make_format_args(args...));
+		println(stdout, fmt, args...);
 	}
+
 }

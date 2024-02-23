@@ -58,14 +58,15 @@ export namespace synodic::honesty::terminal
 		 * @param fmt
 		 * @param args
 		 */
-		template<typename OutputIt, typename CharT>
+		template<typename OutputIt, typename BackendBuffer, typename CharT>
 			requires std::output_iterator<OutputIt, const CharT&>
 		void vformat_to(
-			OutputIt& out,
+			OutputIt out,
 			const text_style& style,
 			std::basic_string_view<CharT> fmt,
-			std::basic_format_args<std::basic_format_context<OutputIt, std::type_identity_t<CharT>>> args)
+			std::basic_format_args<std::basic_format_context<BackendBuffer, std::type_identity_t<CharT>>> args)
 		{
+			std::vformat_to(out, fmt, args);
 		}
 	}
 
@@ -80,8 +81,7 @@ export namespace synodic::honesty::terminal
 	export template<std::output_iterator<const char&> OutputIt>
 	OutputIt vformat_to(OutputIt out, const text_style& style, std::string_view fmt, std::format_args args)
 	{
-		//auto data = out.out();
-		//detail::vformat_to(out, style, fmt, args);
+		detail::vformat_to(out, style, fmt, args);
 		return out;
 	}
 
@@ -110,7 +110,7 @@ export namespace synodic::honesty::terminal
 	void print(std::FILE* stream, const text_style& style, std::format_string<Args...> fmt, Args&&... args)
 	{
 		std::string data;
-		//detail::vformat_to(std::back_inserter(data), style, fmt, args);
+		detail::vformat_to(std::back_inserter(data), style, fmt, args);
 		std::print(stream, "{}", data);
 	}
 

@@ -80,7 +80,8 @@ export namespace synodic::honesty::terminal
 	export template<std::output_iterator<const char&> OutputIt>
 	OutputIt vformat_to(OutputIt out, const text_style& style, std::string_view fmt, std::format_args args)
 	{
-		detail::vformat_to(out, style, fmt, args);
+		//auto data = out.out();
+		//detail::vformat_to(out, style, fmt, args);
 		return out;
 	}
 
@@ -109,7 +110,7 @@ export namespace synodic::honesty::terminal
 	void print(std::FILE* stream, const text_style& style, std::format_string<Args...> fmt, Args&&... args)
 	{
 		std::string data;
-		detail::vformat_to(std::back_inserter(data), style, fmt, args);
+		//detail::vformat_to(std::back_inserter(data), style, fmt, args);
 		std::print(stream, "{}", data);
 	}
 

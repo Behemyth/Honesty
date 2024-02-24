@@ -22,7 +22,7 @@ export namespace synodic::honesty::terminal
 		std::uint8_t blue;
 	};
 
-	enum class emphasis : std::uint8_t
+	export enum class emphasis : std::uint8_t
 	{
 		bold		  = 1,
 		faint		  = 1 << 1,
@@ -34,9 +34,9 @@ export namespace synodic::honesty::terminal
 		strikethrough = 1 << 7,
 	};
 
-	using color_type = std::variant<color8_t, color24_t>;
+	export using color_type = std::variant<color8_t, color24_t>;
 
-	class text_style
+	export class text_style
 	{
 	public:
 		explicit text_style(terminal::color8_t color);

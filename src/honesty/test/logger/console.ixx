@@ -1,16 +1,23 @@
-export module synodic.honesty.test.logger:stdout;
+export module synodic.honesty.test.logger:console;
 
 import std;
+import synodic.honesty.terminal;
 
 export namespace synodic::honesty::logger
 {
-	class Local
+	class Console
 	{
 	public:
 		template<class... Args>
 		void log(std::format_string<Args...> fmt, Args&&... args)
 		{
-			std::print(fmt, std::forward<Args>(args)...);
+			std::println(fmt, std::forward<Args>(args)...);
+		}
+
+		template<class... Args>
+		void log(const synodic::honesty::terminal::text_style& style, std::format_string<Args...> fmt, Args&&... args)
+		{
+			synodic::honesty::terminal::println(style, fmt, std::forward<Args>(args)...);
 		}
 
 	private:

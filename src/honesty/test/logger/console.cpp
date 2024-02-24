@@ -1,1 +1,1 @@
-module synodic.honesty.test.logger:stdout;
+module synodic.honesty.test.logger:console;

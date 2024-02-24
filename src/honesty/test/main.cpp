@@ -3,6 +3,7 @@ import std;
 import synodic.honesty.test;
 import synodic.honesty.test.reporter;
 import synodic.honesty.test.runner;
+import synodic.honesty.test.logger;
 
 namespace synodic::honesty
 {
@@ -24,7 +25,8 @@ int main(int argc, char* argv[])
 		{
 			case synodic::honesty::Mode::EXECUTE :
 			{
-				synodic::honesty::reporter::Console reporter;
+				synodic::honesty::logger::Console logger;
+				synodic::honesty::reporter::Console<synodic::honesty::logger::Console> reporter(logger);
 				synodic::honesty::runner::Local runner;
 
 				auto result = entry(reporter, runner);

@@ -55,6 +55,8 @@ export namespace synodic::honesty
 			}
 
 		private:
+
+			// Compile-time storage of run-time objects
 			// TODO: Count with reflection using C++26
 
 			std::array<Runner*, RUNNER_COUNT> runners_ {};

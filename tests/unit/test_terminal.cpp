@@ -9,7 +9,7 @@ namespace
 {
 	auto colorGenerator = []() -> TestGenerator
 	{
-		co_yield "format_to"_test = []()
+		co_yield "construction"_test = []()
 		{
 			terminal::color24_t(255, 20, 30);
 		};
@@ -38,7 +38,7 @@ namespace
 				1,
 				2,
 				3);
-			//expect_equals(std::to_string(output), "\x1b[38;2;255;020;030mrgb(255,20,30)123\x1b[0m");
+			expect_equals(output, "\x1b[38;2;255;020;030mrgb(255,20,30)123\x1b[0m");
 		};
 
 		co_yield "print"_test = []()

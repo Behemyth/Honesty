@@ -3,14 +3,42 @@ export module synodic.honesty.test:test;
 
 import std;
 import function_ref;
-import synodic.honesty.test.backend;
+import synodic.honesty.generator;
 
-export namespace synodic::honesty
+namespace synodic::honesty
 {
+	class TestBase
+	{
+	public:
+		virtual ~TestBase()		 = default;
+		virtual void Run() const = 0;
+
+		virtual std::span<std::string_view> Tags() const = 0;
+
+		virtual std::string_view Name() const = 0;
+
+	private:
+	};
+
+	class SuiteData
+	{
+	public:
+		consteval SuiteData(std::string_view name, std::function_ref<std::generator<TestBase>()> generator) noexcept;
+
+		std::string_view name;
+		std::function_ref<std::generator<TestBase>()> generatorWrapper;
+	};
+
+	consteval SuiteData::SuiteData(
+		std::string_view name,
+		std::function_ref<std::generator<TestBase>()> generator) noexcept :
+		name(name),
+		generatorWrapper(generator)
+	{
+	}
 	class VoidTest;
 
-	using TestGenerator = TestGenerator;
-	using TestContext	= TestContext;
+	using TestGenerator = std::generator<TestBase>;
 
 	template<typename FuncType, typename RetType>
 	concept SameReturn = requires(FuncType func) {

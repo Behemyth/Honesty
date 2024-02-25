@@ -1,4 +1,4 @@
-module synodic.honesty.test.backend:runner;
+module synodic.honesty.test.runner:runner;
 
 import :runner;
 import std;

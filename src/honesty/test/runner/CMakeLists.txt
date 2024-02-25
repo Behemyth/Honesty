@@ -3,9 +3,10 @@ target_sources(honesty
 		FILE_SET interfaces
 		FILES
 			runner.ixx
+			local.ixx
 	PRIVATE
 		FILE_SET implementations
 		FILES
-			local.ixx
 			local.cpp
+			runner.cpp
 )

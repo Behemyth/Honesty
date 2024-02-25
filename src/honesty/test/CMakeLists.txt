@@ -3,7 +3,11 @@ target_sources(honesty
 		FILE_SET interfaces
 		TYPE CXX_MODULES
 		FILES
+			"backend.ixx"
 			"test.ixx"
+			"logger.ixx"
+			"reporter.ixx"
+			"runner.ixx"
 			"function_ref.ixx"
 			"counter.ixx"
 	PRIVATE

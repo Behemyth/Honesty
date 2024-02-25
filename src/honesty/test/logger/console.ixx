@@ -1,3 +1,6 @@
+module;
+#include <cstdio>
+
 export module synodic.honesty.test.logger:console;
 
 import std;

@@ -7,6 +7,7 @@ target_sources(honesty
 			"profile.ixx"
 			"terminal.ixx"
 			"test.ixx"
+			"generator.ixx"
 )
 
 add_subdirectory(

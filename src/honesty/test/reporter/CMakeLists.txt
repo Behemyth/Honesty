@@ -3,9 +3,10 @@ target_sources(honesty
 		FILE_SET interfaces
 		FILES
 			reporter.ixx
+			console.ixx
 	PRIVATE
 		FILE_SET implementations
 		FILES
-			console.ixx
 			console.cpp
+			reporter.cpp
 )

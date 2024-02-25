@@ -2,9 +2,8 @@ export module synodic.honesty.test.backend;
 
 export import :generator;
 export import :test;
-export import :runner;
-export import :logger;
-export import :reporter;
+export import synodic.honesty.test.runner;
+export import synodic.honesty.test.reporter;
 export import :suite;
 
 import std;
@@ -55,7 +54,6 @@ export namespace synodic::honesty
 			}
 
 		private:
-
 			// Compile-time storage of run-time objects
 			// TODO: Count with reflection using C++26
 

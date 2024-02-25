@@ -53,6 +53,9 @@ namespace
 		co_yield "emptyRecursive"_test = emptyGenerator;
 	};
 
+	/**
+	 * \brief Applies a tuple to a test such that the test is run for each element in the tuple
+	 */
 	auto tupleParameterization = []() -> TestGenerator
 	{
 		co_yield "array"_test = [](const auto& parameter)
@@ -60,6 +63,9 @@ namespace
 		} | std::tuple{3u, 4.0f};
 	};
 
+	/**
+	 * \brief Applies an array to a test such that the test is run for each element in the array
+	 */
 	auto arrayParameterization = []() -> TestGenerator
 	{
 		co_yield "array"_test = []<typename T>(const T& parameter)

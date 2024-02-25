@@ -4,18 +4,7 @@ target_sources(honesty
 		TYPE CXX_MODULES
 		FILES
 			"backend.ixx"
-			"generator.ixx"
-			"test.ixx"
-			"suite.ixx"
-			"runner.ixx"
-			"reporter.ixx"
-			"logger.ixx"
 
 	PRIVATE
 		"backend.cpp"
-		"runner.cpp"
-		"suite.cpp"
-		"test.cpp"
-		"reporter.cpp"
-		"logger.cpp"
 )

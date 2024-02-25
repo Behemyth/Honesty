@@ -1,10 +1,11 @@
 
-export module synodic.honesty.test.backend:generator;
+module;
 
 import <cassert>;
 
+export module synodic.honesty.generator;
+
 import std;
-import :test;
 
 #ifdef _MSC_VER
 #	define EMPTY_BASES __declspec(empty_bases)
@@ -18,7 +19,7 @@ import :test;
 #	define NO_UNIQUE_ADDRESS [[no_unique_address]]
 #endif
 
-namespace synodic::honesty
+namespace std
 {
 	struct alignas(__STDCPP_DEFAULT_NEW_ALIGNMENT__) _Aligned_block
 	{

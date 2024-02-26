@@ -1,9 +1,9 @@
-export module synodic.honesty.test.reporter:console;
+export module synodic.honesty.test:reporter.console;
 
 import :reporter;
+import :logger;
 
 import std;
-import synodic.honesty.test.logger;
 
 export namespace synodic::honesty::test::reporter
 {

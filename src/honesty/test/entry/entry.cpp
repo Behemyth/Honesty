@@ -1,7 +1,7 @@
-module synodic.honesty.test.entry;
+module synodic.honesty.test:entry;
 
 import std;
 
-namespace synodic::honesty
+namespace synodic::honesty::test
 {
 }

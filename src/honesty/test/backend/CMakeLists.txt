@@ -3,8 +3,6 @@ target_sources(honesty
 		FILE_SET implementations
 		TYPE CXX_MODULES
 		FILES
-			"backend.ixx"
 
 	PRIVATE
-		"backend.cpp"
 )

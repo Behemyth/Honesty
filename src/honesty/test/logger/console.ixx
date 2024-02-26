@@ -1,12 +1,12 @@
 module;
 #include <cstdio>
 
-export module synodic.honesty.test.logger:console;
+export module synodic.honesty.test:logger.console;
 
 import std;
 import synodic.honesty.terminal;
 
-export namespace synodic::honesty::logger
+export namespace synodic::honesty::test::logger
 {
 	class Console
 	{

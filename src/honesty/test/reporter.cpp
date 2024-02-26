@@ -1,4 +1,4 @@
-module synodic.honesty.test.reporter:reporter;
+module synodic.honesty.test:reporter;
 
 import :reporter;
 import std;

@@ -1,20 +1,20 @@
-module synodic.honesty.test.runner:local;
+module synodic.honesty.test:runner.local;
 
-import :local;
+import :runner.local;
 
-namespace synodic::honesty::runner
+namespace synodic::honesty::test::runner
 {
 	void Local::Run(const Events& events)
 	{
 		for (const SuiteData* const suite: suites_)
 		{
-			synodic::honesty::event::SuiteBegin event(suite->name);
+			synodic::honesty::test::event::SuiteBegin event(suite->name);
 
 			events.signal(event);
 
 			for (const TestBase& test: suite->generatorWrapper())
 			{
-				synodic::honesty::event::TestBegin event(test.Name());
+				synodic::honesty::test::event::TestBegin event(test.Name());
 
 				events.signal(event);
 

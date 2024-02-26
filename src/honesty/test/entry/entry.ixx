@@ -1,18 +1,18 @@
 
-export module synodic.honesty.test.entry;
-
-import synodic.honesty.test;
-import synodic.honesty.test.runner;
-import synodic.honesty.test.reporter;
-import synodic.honesty.test.backend;
+export module synodic.honesty.test:entry;
 
 import std;
+import :backend;
+import :reporter;
+import :reporter.console;
+import :runner;
+import :runner.local;
 
 namespace synodic::honesty
 {
 }
 
-export namespace synodic::honesty
+export namespace synodic::honesty::test
 {
 	enum class TestResultCode : std::uint8_t
 	{

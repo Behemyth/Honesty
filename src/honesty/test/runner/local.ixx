@@ -1,9 +1,9 @@
-export module synodic.honesty.test.runner:local;
+export module synodic.honesty.test:runner.local;
 
 import std;
-import synodic.honesty.test.backend;
+import :runner;
 
-export namespace synodic::honesty::runner
+export namespace synodic::honesty::test::runner
 {
 	class Local : public Runner
 	{

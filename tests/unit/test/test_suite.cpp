@@ -1,11 +1,11 @@
 import std;
 import synodic.honesty.test;
 
-using namespace synodic::honesty;
+using namespace synodic::honesty::test;
 
 namespace
 {
-	auto suiteGenerator = []() -> TestGenerator
+	auto suiteGenerator = []() -> generator<TestBase>
 	{
 		co_return;
 	};

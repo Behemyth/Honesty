@@ -1,10 +1,11 @@
 module synodic.honesty.test:test;
 
 import :test;
+import :backend;
 
-using namespace synodic::honesty::literals;
+using namespace synodic::honesty::test::literals;
 
-namespace synodic::honesty
+namespace synodic::honesty::test
 {
 	VoidTest::VoidTest(std::string_view name, std::function_ref<void()> test) :
 		runner_(std::move(test)),

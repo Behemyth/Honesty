@@ -1,4 +1,22 @@
-export module synodic.honesty.test.logger;
+export module synodic.honesty.test:logger;
 
-export import :logger;
-export import :console;
+import synodic.honesty.terminal;
+import std;
+
+namespace synodic::honesty::test
+{
+	export template<typename T, typename... Args>
+	concept logger_type = requires(
+		T type,
+		const synodic::honesty::terminal::text_style& style,
+		std::format_string<Args...> fmt,
+		Args... args) {
+		{
+			type.log(fmt, args...)
+		} -> std::same_as<void>;
+
+		{
+			type.log(style, fmt, args...)
+		} -> std::same_as<void>;
+	};
+}

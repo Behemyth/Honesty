@@ -3,42 +3,12 @@ export module synodic.honesty.test:test;
 
 import std;
 import function_ref;
-import synodic.honesty.generator;
+import :generator;
+import :types;
 
-namespace synodic::honesty
+namespace synodic::honesty::test
 {
-	class TestBase
-	{
-	public:
-		virtual ~TestBase()		 = default;
-		virtual void Run() const = 0;
-
-		virtual std::span<std::string_view> Tags() const = 0;
-
-		virtual std::string_view Name() const = 0;
-
-	private:
-	};
-
-	class SuiteData
-	{
-	public:
-		consteval SuiteData(std::string_view name, std::function_ref<std::generator<TestBase>()> generator) noexcept;
-
-		std::string_view name;
-		std::function_ref<std::generator<TestBase>()> generatorWrapper;
-	};
-
-	consteval SuiteData::SuiteData(
-		std::string_view name,
-		std::function_ref<std::generator<TestBase>()> generator) noexcept :
-		name(name),
-		generatorWrapper(generator)
-	{
-	}
 	class VoidTest;
-
-	using TestGenerator = std::generator<TestBase>;
 
 	template<typename FuncType, typename RetType>
 	concept SameReturn = requires(FuncType func) {
@@ -82,9 +52,9 @@ namespace synodic::honesty
 	};
 
 	// TODO: Distinguish type overloads
-	template<typename Fn>
-		requires std::invocable<Fn> && SameReturn<Fn, TestGenerator>
-	TestGenerator Test(std::string_view name, Fn&& generator)
+	export template<typename Fn>
+		requires std::invocable<Fn> && SameReturn<Fn, generator<TestBase>>
+	generator<TestBase> Test(std::string_view name, Fn&& generator)
 	{
 		for (const TestBase& test: generator())
 		{
@@ -97,14 +67,14 @@ namespace synodic::honesty
 		}
 	}
 
-	template<typename Fn>
+	export template<typename Fn>
 		requires std::invocable<Fn> && SameReturn<Fn, void>
 	VoidTest Test(std::string_view name, Fn&& generator)
 	{
 		return VoidTest(name, std::move(generator));
 	}
 
-	template<typename Fn, typename T>
+	export template<typename Fn, typename T>
 		requires std::invocable<Fn, T> && SameReturn<Fn, void>
 	TinyTest<T> Test(std::string_view name, Fn&& generator)
 	{
@@ -128,11 +98,11 @@ namespace synodic::honesty
 		TestStub& operator=(const TestStub& other)	   = delete;
 		TestStub& operator=(TestStub&& other) noexcept = delete;
 
-		TestGenerator operator=(TestGenerator&& generator) const;
+		generator<TestBase> operator=(generator<TestBase>&& generator) const;
 
 		template<typename Fn>
-			requires std::invocable<Fn> && SameReturn<Fn, TestGenerator>
-		TestGenerator operator=(Fn&& generator)
+			requires std::invocable<Fn> && SameReturn<Fn, generator<TestBase>>
+		generator<TestBase> operator=(Fn&& generator)
 		{
 			return Test(name_, std::forward<Fn>(generator));
 		}
@@ -177,16 +147,16 @@ namespace synodic::honesty
 		return name_;
 	}
 
-	template<std::size_t Size>
-	TestGenerator TestStub<Size>::operator=(TestGenerator&& generator) const
+	export template<std::size_t Size>
+	generator<TestBase> TestStub<Size>::operator=(generator<TestBase>&& generator) const
 	{
 		return generator;
 	}
 
 	// Operators
 
-	template<std::invocable<int> Fn>
-	[[nodiscard]] TestGenerator operator|(Fn&& test, const std::ranges::range auto& range)
+	export template<std::invocable<int> Fn>
+	[[nodiscard]] generator<TestBase> operator|(Fn&& test, const std::ranges::range auto& range)
 	{
 		for (const auto& value: range)
 		{
@@ -196,24 +166,24 @@ namespace synodic::honesty
 
 	// recursion base case
 	template<typename Fn, typename T>
-	TestGenerator ApplyNested(Fn&& test, T arg)
+	generator<TestBase> ApplyNested(Fn&& test, T arg)
 	{
 		co_yield TinyTest<T>("", std::forward<Fn>(test), arg);
 	}
 
 	// recursive function
 	template<typename Fn, typename T, typename... Ts>
-	TestGenerator ApplyNested(Fn&& test, T arg, Ts... rest)
+	generator<TestBase> ApplyNested(Fn&& test, T arg, Ts... rest)
 	{
 		co_yield TinyTest<T>("", std::forward<Fn>(test), arg);
 		co_yield ApplyNested(std::forward<Fn>(test), rest...);
 	}
 
-	template<typename Fn, typename... Types>
+	export template<typename Fn, typename... Types>
 		requires(std::invocable<Fn, Types> && ...)
-	[[nodiscard]] TestGenerator operator|(Fn&& test, std::tuple<Types...>&& tuple)
+	[[nodiscard]] generator<TestBase> operator|(Fn&& test, std::tuple<Types...>&& tuple)
 	{
-		auto applicator = [&]<typename... T>(T&&... args) -> TestGenerator
+		auto applicator = [&]<typename... T>(T&&... args) -> generator<TestBase>
 		{
 			co_yield ApplyNested(std::forward<Fn>(test), args...);
 		};
@@ -224,10 +194,10 @@ namespace synodic::honesty
 	/**
 	 * \brief Allows the static registration of tests in the global scope
 	 */
-	class Suite final
+	export class Suite final
 	{
 	public:
-		consteval Suite(std::string_view name, std::function_ref<TestGenerator()> generator);
+		consteval Suite(std::string_view name, std::function_ref<generator<TestBase>()> generator);
 
 		Suite(const Suite& other)	  = delete;
 		Suite(Suite&& other) noexcept = default;
@@ -241,12 +211,12 @@ namespace synodic::honesty
 		SuiteData data_;
 	};
 
-	consteval Suite::Suite(std::string_view name, std::function_ref<TestGenerator()> generator) :
+	consteval Suite::Suite(std::string_view name, std::function_ref<generator<TestBase>()> generator) :
 		data_(name, generator)
 	{
 	}
 
-	template<std::size_t Size>
+	export template<std::size_t Size>
 	class Tag
 	{
 	public:
@@ -299,12 +269,12 @@ namespace synodic::honesty
 		return result;
 	}
 
-	Tag(std::string_view) -> Tag<1>;
+	export Tag(std::string_view) -> Tag<1>;
 
-	template<typename... T>
+	export template<typename... T>
 	Tag(std::string_view, T...) -> Tag<1 + sizeof...(T)>;
 
-	constexpr Tag skip("skip");
+	export constexpr Tag skip("skip");
 
 	constexpr auto expect(const bool expression, const std::source_location& location = std::source_location::current())
 	{
@@ -332,7 +302,7 @@ namespace synodic::honesty
 		return a == b;
 	}
 
-	namespace literals
+	export namespace literals
 	{
 		[[nodiscard]] consteval auto operator""_test(const char* const name, const std::size_t size)
 		{

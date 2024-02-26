@@ -1,9 +1,8 @@
 import std;
 import synodic.honesty.test;
-import synodic.honesty.test.reporter;
 
-using namespace synodic::honesty;
-using namespace synodic::honesty::literals;
+using namespace synodic::honesty::test;
+using namespace synodic::honesty::test::literals;
 
 namespace
 {

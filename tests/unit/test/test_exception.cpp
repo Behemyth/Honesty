@@ -7,7 +7,7 @@
 //
 // namespace
 // {
-// 	auto suiteGenerator = []() -> TestGenerator
+// 	auto suiteGenerator = []() -> generator<TestBase>
 // 	{
 // 		co_yield "exception"_test = []
 // 		{

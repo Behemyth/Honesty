@@ -5,13 +5,19 @@ target_sources(honesty
 		FILES
 			"backend.ixx"
 			"test.ixx"
+			"types.ixx"
 			"logger.ixx"
 			"reporter.ixx"
 			"runner.ixx"
 			"function_ref.ixx"
 			"counter.ixx"
+			"generator.ixx"
 	PRIVATE
+		"backend.cpp"
 		"test.cpp"
+		"reporter.cpp"
+		"runner.cpp"
+		"logger.cpp"
 )
 
 target_sources(honesty_main

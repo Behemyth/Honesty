@@ -3,7 +3,7 @@ module;
 
 import <cassert>;
 
-export module synodic.honesty.generator;
+export module synodic.honesty.test:generator;
 
 import std;
 
@@ -19,7 +19,7 @@ import std;
 #	define NO_UNIQUE_ADDRESS [[no_unique_address]]
 #endif
 
-namespace std
+namespace synodic::honesty::test
 {
 	struct alignas(__STDCPP_DEFAULT_NEW_ALIGNMENT__) _Aligned_block
 	{

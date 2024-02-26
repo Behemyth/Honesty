@@ -5,9 +5,9 @@ import :logger;
 
 import std;
 
-export namespace synodic::honesty::test::reporter
+namespace synodic::honesty::test::reporter
 {
-	template<synodic::honesty::test::logger_type LoggerType>
+	export template<synodic::honesty::test::logger_type LoggerType>
 	class Console : public synodic::honesty::test::Reporter
 	{
 	public:

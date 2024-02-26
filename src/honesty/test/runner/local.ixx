@@ -3,9 +3,9 @@ export module synodic.honesty.test:runner.local;
 import std;
 import :runner;
 
-export namespace synodic::honesty::test::runner
+namespace synodic::honesty::test::runner
 {
-	class Local : public Runner
+	export class Local : public Runner
 	{
 	public:
 		explicit Local()

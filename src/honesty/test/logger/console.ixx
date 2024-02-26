@@ -6,9 +6,9 @@ export module synodic.honesty.test:logger.console;
 import std;
 import synodic.honesty.terminal;
 
-export namespace synodic::honesty::test::logger
+namespace synodic::honesty::test::logger
 {
-	class Console
+	export class Console
 	{
 	public:
 		template<class... Args>

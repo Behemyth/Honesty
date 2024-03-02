@@ -207,7 +207,7 @@ namespace synodic::honesty::test
 		Suite& operator=(const Suite& other)	 = delete;
 		Suite& operator=(Suite&& other) noexcept = delete;
 
-		bool Register()
+		bool Register() &
 		{
 			SuiteData& data = *this;
 			Registry::Add(data);

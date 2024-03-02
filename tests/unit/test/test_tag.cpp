@@ -24,11 +24,10 @@ namespace
 		{
 			for (auto&& test: dummyGenerator())
 			{
-				//expect_equals(test.Tags().size(), 2);
+				// expect_equals(test.Tags().size(), 2);
 			}
 		};
 	};
 
-	Suite suite("tag Suite", tagSuite);
-	bool registered = suite.Register();
+	Suite suite("tag", tagSuite);
 }

@@ -15,11 +15,14 @@ namespace synodic::honesty::test
 		class Instance : std::counter<Instance>
 		{
 		public:
+
+			consteval Instance() = default;
+
 			static constexpr int RUNNER_COUNT	= 1;
 			static constexpr int REPORTER_COUNT = 1;
 			static constexpr int SUITE_COUNT	= 20;
 
-			void AddSuite(const SuiteData* const data)
+			void AddSuite(SuiteData* data)
 			{
 				suites_[suiteSize_++] = data;
 			}
@@ -34,7 +37,7 @@ namespace synodic::honesty::test
 				runners_[runnerSize_++] = &runner;
 			}
 
-			std::span<const SuiteData* const> GetSuites() const
+			std::span<SuiteData*> GetSuites()
 			{
 				return std::span(suites_.data(), suiteSize_);
 			}
@@ -55,53 +58,48 @@ namespace synodic::honesty::test
 
 			std::array<Runner*, RUNNER_COUNT> runners_ {};
 			std::array<Reporter*, REPORTER_COUNT> reporters_ {};
-			std::array<const SuiteData*, SUITE_COUNT> suites_ {};
+			std::array<SuiteData*, SUITE_COUNT> suites_ {};
 
-			static inline int suiteSize_	= 0;
-			static inline int runnerSize_	= 0;
-			static inline int reporterSize_ = 0;
+			constinit static inline int suiteSize_	= 0;
+			constinit static inline int runnerSize_	= 0;
+			constinit static inline int reporterSize_ = 0;
 		};
+
+		// Our singleton instance
+		constinit static inline Instance instance;
 
 	public:
 		template<typename ReporterT, typename RunnerT>
 		Registry(ReporterT& reporter, RunnerT& runner);
 
-		static Instance& GetInstance()
+
+		static void Add(SuiteData& data)
 		{
-			static Instance instance;
-			return instance;
+			instance.AddSuite(&data);
 		}
 
-		static void Add(const SuiteData& data)
+		static void Add(SuiteData& data, const Runner& runner)
 		{
-			Instance& instance = GetInstance();
-
-			GetInstance().AddSuite(&data);
-		}
-
-		static void Add(const SuiteData& data, const Runner& runner)
-		{
-			auto& instance = GetInstance();
 		}
 
 		static void AddReporter(Reporter& reporter)
 		{
-			GetInstance().AddReporter(reporter);
+			instance.AddReporter(reporter);
 		}
 
 		static void AddRunner(Runner& runner)
 		{
-			GetInstance().AddRunner(runner);
+			instance.AddRunner(runner);
 		}
 
 		std::span<Reporter*> GetReporters()
 		{
-			return GetInstance().GetReporters();
+			return instance.GetReporters();
 		}
 
 		std::span<Runner*> GetRunners()
 		{
-			return GetInstance().GetRunners();
+			return instance.GetRunners();
 		}
 
 		Registry(const Registry&)			 = delete;
@@ -116,7 +114,7 @@ namespace synodic::honesty::test
 		AddReporter(reporter);
 
 		// Add the default collected suites to the default runner if it's provided
-		runner.Submit(GetInstance().GetSuites());
+		runner.Submit(instance.GetSuites());
 
 		AddRunner(runner);
 	}

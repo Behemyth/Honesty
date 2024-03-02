@@ -8,11 +8,13 @@ namespace synodic::honesty::test::runner
 	{
 		for (const SuiteData* const suite: suites_)
 		{
-			synodic::honesty::test::event::SuiteBegin event(suite->name);
+			synodic::honesty::test::event::SuiteBegin event(suite->Name());
 
 			events.signal(event);
 
-			for (const TestBase& test: suite->generatorWrapper())
+
+			auto generator = suite->Generator();
+			for (const TestBase& test: generator())
 			{
 				synodic::honesty::test::event::TestBegin event(test.Name());
 

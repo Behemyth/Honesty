@@ -33,11 +33,4 @@ namespace synodic::honesty::test
 	{
 		return name_;
 	}
-
-	bool Suite::Register() const
-	{
-		Registry::Add(data_);
-
-		return true;
-	}
 }

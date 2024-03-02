@@ -22,17 +22,30 @@ namespace synodic::honesty::test
 	class SuiteData
 	{
 	public:
-		consteval SuiteData(std::string_view name, std::function_ref<synodic::honesty::test::generator<TestBase>()> generator) noexcept;
+		consteval SuiteData(
+			std::string_view name,
+			std::function_ref<synodic::honesty::test::generator<TestBase>()> generator) noexcept;
 
-		std::string_view name;
-		std::function_ref<synodic::honesty::test::generator<TestBase>()> generatorWrapper;
+		std::string_view Name() const noexcept
+		{
+			return name_;
+		}
+
+		std::function_ref<synodic::honesty::test::generator<TestBase>()> Generator() const noexcept
+		{
+			return generator_;
+		}
+
+	private:
+		std::string_view name_;
+		std::function_ref<synodic::honesty::test::generator<TestBase>()> generator_;
 	};
 
 	consteval SuiteData::SuiteData(
 		std::string_view name,
 		std::function_ref<synodic::honesty::test::generator<TestBase>()> generator) noexcept :
-		name(name),
-		generatorWrapper(generator)
+		name_(name),
+		generator_(std::move(generator))
 	{
 	}
 }

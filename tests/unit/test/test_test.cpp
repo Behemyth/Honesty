@@ -99,6 +99,5 @@ namespace
 		};
 	};
 
-	Suite suite("test Suite", testSuite);
-	bool registered = suite.Register();
+	Suite suite("test", testSuite);
 }

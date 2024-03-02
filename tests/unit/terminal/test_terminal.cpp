@@ -8,46 +8,40 @@ using namespace synodic::honesty::test::literals;
 
 namespace
 {
-	auto colorGenerator = []() -> generator<TestBase>
-	{
-		co_yield "construction"_test = []()
+	Suite colorSuite(
+		"color",
+		[]() -> generator<TestBase>
 		{
-			terminal::color24_t(255, 20, 30);
-		};
-	};
+			co_yield "construction"_test = []()
+			{
+				terminal::color24_t(255, 20, 30);
+			};
+		});
 
-	Suite colorSuite("Color", colorGenerator);
-	bool registeredColorSuite = colorSuite.Register();
-
-	auto terminalGenerator = []() -> generator<TestBase>
-	{
-		co_yield "format"_test = []()
+	Suite terminalSuite(
+		"terminal",
+		[]() -> generator<TestBase>
 		{
+			co_yield "format"_test = []()
+			{
 
-		};
+			};
 
-		co_yield "format_to"_test = []()
-		{
-			std::string output;
+			co_yield "format_to"_test = []()
+			{
+				std::string output;
 
-			terminal::text_style style(terminal::color24_t(255, 20, 30));
+				terminal::text_style style(terminal::color24_t(255, 20, 30));
 
-			terminal::format_to(
-				std::back_inserter(output),
-				style,
-				"rgb(255,20,30){}{}{}",
-				1,
-				2,
-				3);
-			//expect_equals(output, "\x1b[38;2;255;020;030mrgb(255,20,30)123\x1b[0m");
-		};
+				terminal::format_to(std::back_inserter(output), style, "rgb(255,20,30){}{}{}", 1, 2, 3);
+				// expect_equals(output, "\x1b[38;2;255;020;030mrgb(255,20,30)123\x1b[0m");
+			};
 
-		co_yield "print"_test = []()
-		{
+			co_yield "print"_test = []()
+			{
 
-		};
-	};
+			};
+		});
 
-	Suite terminalSuite("Terminal", terminalGenerator);
-	bool registeredTerminalSuite = terminalSuite.Register();
+	bool registered = Register(colorSuite, terminalSuite);
 }

@@ -11,5 +11,5 @@ namespace
 	};
 
 	Suite suite("suite", suiteGenerator);
-
+	bool result = suite.Register();
 }

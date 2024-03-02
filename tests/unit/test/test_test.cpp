@@ -100,4 +100,5 @@ namespace
 	};
 
 	Suite suite("test", testSuite);
+	bool result = suite.Register();
 }

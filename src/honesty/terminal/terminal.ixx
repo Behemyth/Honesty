@@ -27,11 +27,10 @@ namespace synodic::honesty::terminal
 	};
 
 	/**
-	 * @brief Supported SGR parameters
+	 * @brief Supported SGR parameter mask
 	 */
 	export enum class attribute : std::uint8_t
 	{
-		none		  = 0,
 		bold		  = 1,
 		faint		  = 1 << 1,
 		italic		  = 1 << 2,
@@ -47,12 +46,12 @@ namespace synodic::honesty::terminal
 	export class text_style
 	{
 	public:
-		explicit text_style(terminal::color8_t color);
-		explicit text_style(terminal::color24_t color);
+		constexpr explicit text_style(terminal::color8_t color);
+		constexpr explicit text_style(terminal::color24_t color);
 
-		std::optional<color_type> Foreground() const;
-		std::optional<color_type> Background() const;
-		std::optional<attribute> Attribute() const;
+		constexpr std::optional<color_type> Foreground() const;
+		constexpr std::optional<color_type> Background() const;
+		constexpr std::optional<attribute> Attribute() const;
 
 		friend bool operator<=>(const text_style&, const text_style&) = default;
 
@@ -61,6 +60,31 @@ namespace synodic::honesty::terminal
 		std::optional<color_type> background_;
 		std::optional<attribute> attribute_;
 	};
+
+	constexpr text_style::text_style(terminal::color8_t color) :
+		foreground_(color)
+	{
+	}
+
+	constexpr text_style::text_style(terminal::color24_t color) :
+		foreground_(color)
+	{
+	}
+
+	constexpr std::optional<color_type> text_style::Foreground() const
+	{
+		return foreground_;
+	}
+
+	constexpr std::optional<color_type> text_style::Background() const
+	{
+		return background_;
+	}
+
+	constexpr std::optional<attribute> text_style::Attribute() const
+	{
+		return attribute_;
+	}
 
 	// Implementation details that should not be exported
 	namespace detail

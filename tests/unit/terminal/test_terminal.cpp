@@ -50,9 +50,15 @@ namespace
 			{
 				std::string output;
 				terminal::text_style style(terminal::color24_t(58, 90, 64));
-
 				terminal::format_to(std::back_inserter(output), style, "{} = (58,90,64)", "Hunter Green");
-				expect_equals(output, "\x1b[38;2;058;090;064mHunter Green = (58,90,64)\x1b[0m");
+
+				std::string expected;
+				std::format_to(
+					std::back_inserter(expected),
+					"\x1b[38;2;058;090;064m{}\x1b[0m",
+					"Hunter Green = (58,90,64)");
+
+				expect_equals(output, expected);
 			};
 
 			co_yield "print"_test = []()

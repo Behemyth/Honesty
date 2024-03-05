@@ -8,10 +8,11 @@ import std;
 namespace synodic::honesty::test::reporter
 {
 	export template<synodic::honesty::test::logger_type LoggerType>
-	class Console : public synodic::honesty::test::Reporter
+	class Console : public synodic::honesty::test::StreamingAdapter
 	{
 	public:
 		Console(LoggerType logger);
+		~Console() override = default;
 
 		void signal(const event::SuiteBegin& event) override
 		{
@@ -23,22 +24,15 @@ namespace synodic::honesty::test::reporter
 			logger_.log("Test Begin: {}", event.name);
 		}
 
-		//template<class... Args>
-		//void expect(bool value, const std::source_location location, std::format_string<Args...> fmt, Args&&... args)
-		//{
-		//	if (!value)
-		//	{
-		//		logger_.log(stderr, "Test Failed: File({}), Line({})", location.file_name(), location.line());
-		//		logger_.log(stderr, fmt, std::forward<Args>(args)...);
-		//	}
-		//}
+		void signal(const event::AssertionPass& event) override
+		{
+			logger_.log("Assertion Passed: File({}), Line({})", event.location.file_name(), event.location.line());
+		}
 
-		//template<class T, class U>
-		//	requires std::equality_comparable_with<T, U>
-		//void expect_equals(const T& a, const U& b, const std::source_location& location)
-		//{
-		//	expect(a == b, location, "{} was expected to equal {}. It did not", a, b);
-		//}
+		void signal(const event::AssertionFail& event) override
+		{
+			logger_.log("Test Failed: File({}), Line({})", event.location.file_name(), event.location.line());
+		}
 
 	private:
 		LoggerType logger_;

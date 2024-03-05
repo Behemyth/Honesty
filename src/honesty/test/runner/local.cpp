@@ -4,13 +4,13 @@ import :runner.local;
 
 namespace synodic::honesty::test::runner
 {
-	void Local::Run(const Events& events)
+	void Local::Run(Broadcast& broadcaster)
 	{
 		for (const SuiteData* const suite: suites_)
 		{
 			synodic::honesty::test::event::SuiteBegin event(suite->Name());
 
-			events.signal(event);
+			broadcaster.signal(event);
 
 
 			auto generator = suite->Generator();
@@ -18,7 +18,7 @@ namespace synodic::honesty::test::runner
 			{
 				synodic::honesty::test::event::TestBegin event(test.Name());
 
-				events.signal(event);
+				broadcaster.signal(event);
 
 				test.Run();
 			}

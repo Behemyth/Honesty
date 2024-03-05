@@ -34,11 +34,11 @@ export namespace synodic::honesty::test
 		std::span<Reporter*> reporters = registry.GetReporters();
 		std::span<Runner*> runners	   = registry.GetRunners();
 
-		Events events(reporters);
+		Broadcast broadcaster;
 
 		for (Runner* runner: runners)
 		{
-			runner->Run(events);
+			runner->Run(broadcaster);
 		}
 
 		return {};

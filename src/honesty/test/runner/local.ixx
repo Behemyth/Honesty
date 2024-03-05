@@ -12,7 +12,7 @@ namespace synodic::honesty::test::runner
 		{
 		}
 
-		void Run(const Events& events) override;
+		void Run(Broadcast& broadcaster) override;
 		void Submit(const SuiteData* data) override;
 		void Submit(std::span<const SuiteData* const> data) override;
 

@@ -15,7 +15,6 @@ namespace synodic::honesty::test
 		class Instance : std::counter<Instance>
 		{
 		public:
-
 			consteval Instance() = default;
 
 			static constexpr int RUNNER_COUNT	= 1;
@@ -60,18 +59,24 @@ namespace synodic::honesty::test
 			std::array<Reporter*, REPORTER_COUNT> reporters_ {};
 			std::array<SuiteData*, SUITE_COUNT> suites_ {};
 
-			constinit static inline int suiteSize_	= 0;
-			constinit static inline int runnerSize_	= 0;
+			constinit static inline int suiteSize_	  = 0;
+			constinit static inline int runnerSize_	  = 0;
 			constinit static inline int reporterSize_ = 0;
 		};
 
 		// Our singleton instance
 		constinit static inline Instance instance;
 
+		// The fallback context for tests
+		constinit static inline RunnerContext defaultContext;
+
+		// Each thread has its own context, such that tests can reference global functions without an object
+		constinit static inline thread_local RunnerContext& context = defaultContext;
+
+
 	public:
 		template<typename ReporterT, typename RunnerT>
 		Registry(ReporterT& reporter, RunnerT& runner);
-
 
 		static void Add(SuiteData& data)
 		{
@@ -92,14 +97,19 @@ namespace synodic::honesty::test
 			instance.AddRunner(runner);
 		}
 
-		std::span<Reporter*> GetReporters()
+		static std::span<Reporter*> GetReporters()
 		{
 			return instance.GetReporters();
 		}
 
-		std::span<Runner*> GetRunners()
+		static std::span<Runner*> GetRunners()
 		{
 			return instance.GetRunners();
+		}
+
+		static RunnerContext& Context()
+		{
+			return context;
 		}
 
 		Registry(const Registry&)			 = delete;

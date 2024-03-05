@@ -222,7 +222,7 @@ namespace synodic::honesty::test
 	template<size_t Size>
 	consteval Suite<Size>::Suite(const char (&name)[Size], std::function_ref<generator<TestBase>()> generator) :
 		name_ {0},
-		SuiteData(std::string_view(name_.data(), Size),generator)
+		SuiteData(std::string_view(name_.data(), Size), generator)
 	{
 		std::copy_n(name, Size, name_.begin());
 	}
@@ -299,30 +299,47 @@ namespace synodic::honesty::test
 
 	export constexpr Tag skip("skip");
 
-	constexpr auto expect(const bool expression, const std::source_location& location = std::source_location::current())
+	export bool
+		expect(const bool expression, const std::source_location& location = std::source_location::current())
 	{
+		if (expression)
+		{
+			event::AssertionPass passed;
+			passed.location = location;
+
+			Registry::Context().broadcaster.signal(passed);
+		}
+		else
+		{
+			event::AssertionFail failed;
+			failed.location = location;
+
+			Registry::Context().broadcaster.signal(failed);
+		}
+
 		return expression;
 	}
 
-	template<std::convertible_to<bool> T>
-	constexpr auto expect(const T& expression, const std::source_location& location = std::source_location::current())
+	export template<std::convertible_to<bool> T>
+	bool expect(const T& expression, const std::source_location& location = std::source_location::current())
 	{
-		return static_cast<bool>(expression);
+		return expect(static_cast<bool>(expression), location);
 	}
 
-	template<typename T, std::derived_from<std::exception> Exception = std::exception>
-	constexpr auto
+	export template<typename T, std::derived_from<std::exception> Exception = std::exception>
+	constexpr bool
 		expect_throw(const T& expression, const std::source_location& location = std::source_location::current())
 	{
 		return expression;
 	}
 
-	template<class T, class U>
+	export template<class T, class U>
 		requires std::equality_comparable_with<T, U>
-	constexpr auto
+	constexpr bool
 		expect_equals(const T& a, const U& b, const std::source_location& location = std::source_location::current())
 	{
-		return a == b;
+		// TODO: Pass message context
+		return expect(a == b, location);
 	}
 
 	export namespace literals

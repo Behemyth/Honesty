@@ -14,7 +14,24 @@ namespace
 		{
 			co_yield "construction"_test = []()
 			{
-				terminal::color24_t(58,90,64); // #3A5A40 Hunter Green
+				terminal::color24_t(58, 90, 64);  // #3A5A40 Hunter Green
+			};
+		});
+
+	Suite styleSuite(
+		"style",
+		[]() -> generator<TestBase>
+		{
+			co_yield "construction"_test = []()
+			{
+				terminal::color24_t hunterGreen(58, 90, 64);
+				terminal::text_style style(hunterGreen);
+
+				auto foreground = style.Foreground();
+				assert(foreground.has_value());
+
+				auto value = std::get<terminal::color24_t>(foreground.value());
+				expect_equals(value, hunterGreen);
 			};
 		});
 
@@ -30,8 +47,7 @@ namespace
 			co_yield "format_to"_test = []()
 			{
 				std::string output;
-
-				terminal::text_style style(terminal::color24_t(58,90,64));
+				terminal::text_style style(terminal::color24_t(58, 90, 64));
 
 				terminal::format_to(std::back_inserter(output), style, "{} = (58,90,64)", "Hunter Green");
 				expect_equals(output, "\x1b[38;2;058;090;064mHunter Green = (58,90,64)\x1b[0m");
@@ -43,5 +59,5 @@ namespace
 			};
 		});
 
-	bool registered = Register(colorSuite, terminalSuite);
+	bool registered = Register(styleSuite, colorSuite, terminalSuite);
 }

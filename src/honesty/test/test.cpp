@@ -34,7 +34,25 @@ namespace synodic::honesty::test
 		return name_;
 	}
 
-	bool expect(const bool expression, const std::source_location& location)
+	void assert(bool expression, const std::source_location& location)
+	{
+		if (expression)
+		{
+			event::AssertionPass passed;
+			passed.location = location;
+
+			Registry::Context().broadcaster.signal(passed);
+		}
+		else
+		{
+			event::AssertionFail failed;
+			failed.location = location;
+
+			Registry::Context().broadcaster.signal(failed);
+		}
+	}
+
+	bool expect(bool expression, const std::source_location& location)
 	{
 		if (expression)
 		{

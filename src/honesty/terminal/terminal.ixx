@@ -13,6 +13,8 @@ namespace synodic::honesty::terminal
 	export struct color8_t
 	{
 		std::uint8_t code;
+
+		friend bool operator<=>(const color8_t&, const color8_t&) = default;
 	};
 
 	export struct color24_t
@@ -20,6 +22,8 @@ namespace synodic::honesty::terminal
 		std::uint8_t red;
 		std::uint8_t green;
 		std::uint8_t blue;
+
+		friend bool operator<=>(const color24_t&, const color24_t&) = default;
 	};
 
 	/**
@@ -45,6 +49,12 @@ namespace synodic::honesty::terminal
 	public:
 		explicit text_style(terminal::color8_t color);
 		explicit text_style(terminal::color24_t color);
+
+		std::optional<color_type> Foreground() const;
+		std::optional<color_type> Background() const;
+		std::optional<attribute> Attribute() const;
+
+		friend bool operator<=>(const text_style&, const text_style&) = default;
 
 	private:
 		std::optional<color_type> foreground_;

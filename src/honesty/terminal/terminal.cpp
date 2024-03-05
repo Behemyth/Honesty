@@ -15,6 +15,21 @@ namespace synodic::honesty::terminal
 	{
 	}
 
+	std::optional<color_type> text_style::Foreground() const
+	{
+		return foreground_;
+	}
+
+	std::optional<color_type> text_style::Background() const
+	{
+		return background_;
+	}
+
+	std::optional<attribute> text_style::Attribute() const
+	{
+		return attribute_;
+	}
+
 	std::string vformat(const text_style& style, std::string_view fmt, std::format_args args)
 	{
 		std::string data;

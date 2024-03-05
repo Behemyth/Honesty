@@ -299,7 +299,10 @@ namespace synodic::honesty::test
 
 	export constexpr Tag skip("skip");
 
-	export bool expect(const bool expression, const std::source_location& location = std::source_location::current());
+
+	export void assert(bool expression, const std::source_location& location = std::source_location::current());
+
+	export bool expect(bool expression, const std::source_location& location = std::source_location::current());
 
 	export template<std::convertible_to<bool> T>
 	bool expect(const T& expression, const std::source_location& location = std::source_location::current())

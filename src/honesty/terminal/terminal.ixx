@@ -22,8 +22,12 @@ namespace synodic::honesty::terminal
 		std::uint8_t blue;
 	};
 
-	export enum class emphasis : std::uint8_t
+	/**
+	 * @brief Supported SGR parameters
+	 */
+	export enum class attribute : std::uint8_t
 	{
+		none		  = 0,
 		bold		  = 1,
 		faint		  = 1 << 1,
 		italic		  = 1 << 2,
@@ -43,9 +47,9 @@ namespace synodic::honesty::terminal
 		explicit text_style(terminal::color24_t color);
 
 	private:
-		std::optional<color_type> fg_color;
-		std::optional<color_type> bg_color;
-		std::optional<emphasis> ems;
+		std::optional<color_type> foreground_;
+		std::optional<color_type> background_;
+		std::optional<attribute> attribute_;
 	};
 
 	// Implementation details that should not be exported

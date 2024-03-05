@@ -24,7 +24,7 @@ namespace
 		{
 			for (auto&& test: dummyGenerator())
 			{
-				// expect_equals(test.Tags().size(), 2);
+				expect_equals(test.Tags().size(), 2);
 			}
 		};
 	};

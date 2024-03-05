@@ -14,7 +14,7 @@ namespace
 		{
 			co_yield "construction"_test = []()
 			{
-				terminal::color24_t(255, 20, 30);
+				terminal::color24_t(58,90,64); // #3A5A40 Hunter Green
 			};
 		});
 
@@ -31,10 +31,10 @@ namespace
 			{
 				std::string output;
 
-				terminal::text_style style(terminal::color24_t(255, 20, 30));
+				terminal::text_style style(terminal::color24_t(58,90,64));
 
-				terminal::format_to(std::back_inserter(output), style, "rgb(255,20,30){}{}{}", 1, 2, 3);
-				expect_equals(output, "\x1b[38;2;255;020;030mrgb(255,20,30)123\x1b[0m");
+				terminal::format_to(std::back_inserter(output), style, "{} = (58,90,64)", "Hunter Green");
+				expect_equals(output, "\x1b[38;2;058;090;064mHunter Green = (58,90,64)\x1b[0m");
 			};
 
 			co_yield "print"_test = []()

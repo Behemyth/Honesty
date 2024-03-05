@@ -299,26 +299,7 @@ namespace synodic::honesty::test
 
 	export constexpr Tag skip("skip");
 
-	export bool
-		expect(const bool expression, const std::source_location& location = std::source_location::current())
-	{
-		if (expression)
-		{
-			event::AssertionPass passed;
-			passed.location = location;
-
-			Registry::Context().broadcaster.signal(passed);
-		}
-		else
-		{
-			event::AssertionFail failed;
-			failed.location = location;
-
-			Registry::Context().broadcaster.signal(failed);
-		}
-
-		return expression;
-	}
+	export bool expect(const bool expression, const std::source_location& location = std::source_location::current());
 
 	export template<std::convertible_to<bool> T>
 	bool expect(const T& expression, const std::source_location& location = std::source_location::current())

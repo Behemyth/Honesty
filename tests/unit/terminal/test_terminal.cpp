@@ -29,6 +29,8 @@ namespace
 
 				auto foreground = style.Foreground();
 				assert(foreground.has_value());
+				expect(not style.Background().has_value());
+				expect(not style.Attribute().has_value());
 
 				auto value = std::get<terminal::color24_t>(foreground.value());
 				expect_equals(value, hunterGreen);

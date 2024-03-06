@@ -19,6 +19,19 @@ namespace synodic::honesty::terminal
 
 	export struct color24_t
 	{
+		constexpr color24_t(std::uint32_t hexCode) :
+			red((hexCode >> 16) & 0xFF),
+			green((hexCode >> 8) & 0xFF),
+			blue(hexCode & 0xFF)
+		{
+		}
+		constexpr color24_t(std::uint8_t red, std::uint8_t green, std::uint8_t blue) :
+			red(red),
+			green(green),
+			blue(blue)
+		{
+		}
+
 		std::uint8_t red;
 		std::uint8_t green;
 		std::uint8_t blue;

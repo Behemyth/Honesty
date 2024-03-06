@@ -14,7 +14,9 @@ namespace
 		{
 			co_yield "construction"_test = []()
 			{
-				terminal::color24_t(58, 90, 64);  // #3A5A40 Hunter Green
+				expect_equals(
+					terminal::color24_t(58, 90, 64),
+					terminal::color24_t(0x3A'5A'40));  // #3A5A40 Hunter Green
 			};
 		});
 

@@ -163,11 +163,15 @@ namespace synodic::honesty::terminal
 					colorType);
 			}
 
-			if (style.Attribute())
+			std::optional<attribute> attribute = style.Attribute();
+			if (attribute)
 			{
+				attribute& attributeMask = attribute.value();
+
 			}
+
 			next = std::vformat_to(next, fmt, args);
-			return std::vformat_to(next, "\x1b[0m", {});
+			return std::format_to(next, "\x1b[0m");
 		}
 	}
 

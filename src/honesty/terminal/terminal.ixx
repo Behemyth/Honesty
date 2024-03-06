@@ -25,6 +25,7 @@ namespace synodic::honesty::terminal
 			blue(hexCode & 0xFF)
 		{
 		}
+
 		constexpr color24_t(std::uint8_t red, std::uint8_t green, std::uint8_t blue) :
 			red(red),
 			green(green),
@@ -44,11 +45,11 @@ namespace synodic::honesty::terminal
 	 */
 	export enum class attribute : std::uint8_t
 	{
-		bold	   = 1,
-		faint	   = 1 << 1,
-		italic	   = 1 << 2,
-		underline  = 1 << 3,
-		blink_slow = 1 << 4,
+		bold	  = 1,
+		faint	  = 1 << 1,
+		italic	  = 1 << 2,
+		underline = 1 << 3,
+		blink	  = 1 << 4,	 // slow blink
 		// blink_fast = 1 << 5, // Omitted for uint8_t sizing
 		reverse = 1 << 5,
 		conceal = 1 << 6,
@@ -167,7 +168,6 @@ namespace synodic::honesty::terminal
 			if (attribute)
 			{
 				attribute& attributeMask = attribute.value();
-
 			}
 
 			next = std::vformat_to(next, fmt, args);

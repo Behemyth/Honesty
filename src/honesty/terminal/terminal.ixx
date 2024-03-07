@@ -54,7 +54,7 @@ namespace synodic::honesty::terminal
 		faint	  = 1 << 1,
 		italic	  = 1 << 2,
 		underline = 1 << 3,
-		blink	  = 1 << 4,	 // slow blink
+		blink	  = 1 << 4,
 		reverse	  = 1 << 5,
 		conceal	  = 1 << 6,
 		strike	  = 1 << 7,

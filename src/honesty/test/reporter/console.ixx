@@ -26,12 +26,14 @@ namespace synodic::honesty::test::reporter
 
 		void signal(const event::AssertionPass& event) override
 		{
-			logger_.log("Assertion Passed: File({}), Line({})", event.location.file_name(), event.location.line());
+			std::string styledResult = terminal::format(terminal::text_style(terminal::color24_t(0, 255, 0)), "Passed");
+			logger_.log("Assertion {}: File({}), Line({})", styledResult, event.location.file_name(), event.location.line());
 		}
 
 		void signal(const event::AssertionFail& event) override
 		{
-			logger_.log("Test Failed: File({}), Line({})", event.location.file_name(), event.location.line());
+			std::string styledResult = terminal::format(terminal::text_style(terminal::color24_t(255, 0, 0)), "Failed");
+			logger_.log("Test {}: File({}), Line({})", styledResult, event.location.file_name(), event.location.line());
 		}
 
 	private:

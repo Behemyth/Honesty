@@ -43,11 +43,6 @@ namespace
 		"terminal",
 		[]() -> generator<TestBase>
 		{
-			co_yield "format"_test = []()
-			{
-
-			};
-
 			co_yield "format_to"_test = []()
 			{
 				std::string output;
@@ -63,9 +58,20 @@ namespace
 				expect_equals(output, expected);
 			};
 
+			co_yield "format"_test = []()
+			{
+				std::string output = terminal::format(
+					terminal::text_style(terminal::color24_t(58, 90, 64)),
+					"Hunter Green = (58,90,64)");
+
+				std::string expected = std::format("\x1b[38;2;058;090;064m{}\x1b[0m", "Hunter Green = (58,90,64)");
+
+				expect_equals(output, expected);
+			};
+
 			co_yield "print"_test = []()
 			{
-
+				// TODO: How do we capture the output?
 			};
 		});
 

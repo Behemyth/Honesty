@@ -12,6 +12,11 @@ namespace synodic::honesty::terminal
 {
 	export struct color8_t
 	{
+		constexpr color8_t(std::uint8_t code) :
+			code(code)
+		{
+		}
+
 		std::uint8_t code;
 
 		friend bool operator<=>(const color8_t&, const color8_t&) = default;
@@ -50,14 +55,33 @@ namespace synodic::honesty::terminal
 		italic	  = 1 << 2,
 		underline = 1 << 3,
 		blink	  = 1 << 4,	 // slow blink
-		// blink_fast = 1 << 5, // Omitted for uint8_t sizing
-		reverse = 1 << 5,
-		conceal = 1 << 6,
-		strike	= 1 << 7,
+		reverse	  = 1 << 5,
+		conceal	  = 1 << 6,
+		strike	  = 1 << 7,
 	};
 
-	// TODO: Replace with reflection
-	static constexpr size_t ATTRIBUTE_COUNT = 8;
+	/**
+	 * @brief ANSI color escape codes
+	 */
+	enum class terminal_color : std::uint8_t
+	{
+		black = 30,
+		red,
+		green,
+		yellow,
+		blue,
+		magenta,
+		cyan,
+		white,
+		bright_black = 90,
+		bright_red,
+		bright_green,
+		bright_yellow,
+		bright_blue,
+		bright_magenta,
+		bright_cyan,
+		bright_white
+	};
 
 	export using color_type = std::variant<color8_t, color24_t>;
 
@@ -69,23 +93,25 @@ namespace synodic::honesty::terminal
 
 		constexpr std::optional<color_type> Foreground() const;
 		constexpr std::optional<color_type> Background() const;
-		constexpr std::optional<attribute> Attribute() const;
+		constexpr std::uint8_t AttributeMask() const;
 
 		friend bool operator<=>(const text_style&, const text_style&) = default;
 
 	private:
 		std::optional<color_type> foreground_;
 		std::optional<color_type> background_;
-		std::optional<attribute> attribute_;
+		std::uint8_t attributeMask_;
 	};
 
 	constexpr text_style::text_style(terminal::color8_t color) :
-		foreground_(color)
+		foreground_(color),
+		attributeMask_(0)
 	{
 	}
 
 	constexpr text_style::text_style(terminal::color24_t color) :
-		foreground_(color)
+		foreground_(color),
+		attributeMask_(0)
 	{
 	}
 
@@ -99,9 +125,9 @@ namespace synodic::honesty::terminal
 		return background_;
 	}
 
-	constexpr std::optional<attribute> text_style::Attribute() const
+	constexpr std::uint8_t text_style::AttributeMask() const
 	{
-		return attribute_;
+		return attributeMask_;
 	}
 
 	// Implementation details that should not be exported
@@ -112,6 +138,9 @@ namespace synodic::honesty::terminal
 		{
 			using Ts::operator()...;
 		};
+
+
+		std::uint8_t ConvertIndexToAnsiCode(std::uint8_t maskIndex);
 
 		/**
 		 * @brief Application of a text style to a string
@@ -130,6 +159,21 @@ namespace synodic::honesty::terminal
 		{
 			OutputIt next = out;
 
+			std::uint8_t attributeMask = style.AttributeMask();
+			if (attributeMask)
+			{
+				constexpr size_t ATTRIBUTE_COUNT = std::numeric_limits<std::underlying_type_t<attribute>>::digits;
+
+				for (int index = 0; index < ATTRIBUTE_COUNT; ++index)
+				{
+					std::uint8_t mask = static_cast<std::uint8_t>(1 << index);
+					if (attributeMask & mask)
+					{
+						next = std::format_to(next, "\x1b[{}m", ConvertIndexToAnsiCode(index));
+					}
+				}
+			}
+
 			std::optional<color_type> foreground = style.Foreground();
 			if (foreground)
 			{
@@ -139,6 +183,7 @@ namespace synodic::honesty::terminal
 					overloaded {
 						[&](color8_t arg)
 						{
+							next = std::format_to(next, "\x1b[{}m", arg.code);
 						},
 						[&](color24_t arg)
 						{
@@ -156,18 +201,13 @@ namespace synodic::honesty::terminal
 					overloaded {
 						[&](color8_t arg)
 						{
+							next = std::format_to(next, "\x1b[{}m", arg.code + 10);
 						},
 						[&](color24_t arg)
 						{
 							next = std::format_to(next, "\x1b[48;2;{:03};{:03};{:03}m", arg.red, arg.green, arg.blue);
 						}},
 					colorType);
-			}
-
-			std::optional<attribute> attribute = style.Attribute();
-			if (attribute)
-			{
-				attribute& attributeMask = attribute.value();
 			}
 
 			next = std::vformat_to(next, fmt, args);

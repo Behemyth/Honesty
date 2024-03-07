@@ -1,20 +1,30 @@
-// import std;
-// import synodic.honesty.test;
-// import synodic.honesty.test.backend;
-// import generator;
-// using namespace synodic::honesty;
-// using namespace synodic::honesty::literals;
-//
-// namespace
-// {
-// 	auto suiteGenerator = []() -> generator<TestBase>
-// 	{
-// 		co_yield "exception"_test = []
-// 		{
-// 			// expect_throw<std::runtime_error>(true);
-// 			// expect_throw();
-// 		};
-// 	};
-//
-// 	suite suite("exception suite", suiteGenerator);
-// }
+import std;
+import synodic.honesty.test;
+
+using namespace synodic::honesty::test;
+using namespace synodic::honesty::test::literals;
+
+namespace
+{
+	Suite exceptionSuite(
+		"exception",
+		[]() -> generator<TestBase>
+		{
+			co_yield "exception"_test = []
+			{
+				expect_throw<std::runtime_error>(
+					[]()
+					{
+						throw std::runtime_error {"Test exception"};
+					});
+
+				expect_not_throw(
+					[]()
+					{
+
+					});
+			};
+		});
+
+	bool registered = Register(exceptionSuite);
+}

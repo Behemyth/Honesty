@@ -299,7 +299,6 @@ namespace synodic::honesty::test
 
 	export constexpr Tag skip("skip");
 
-
 	export void assert(bool expression, const std::source_location& location = std::source_location::current());
 
 	export bool expect(bool expression, const std::source_location& location = std::source_location::current());
@@ -310,11 +309,52 @@ namespace synodic::honesty::test
 		return expect(static_cast<bool>(expression), location);
 	}
 
-	export template<typename T, std::derived_from<std::exception> Exception = std::exception>
-	constexpr bool
-		expect_throw(const T& expression, const std::source_location& location = std::source_location::current())
+	export template<std::derived_from<std::exception> Exception = std::exception, std::invocable Fn>
+	constexpr void expect_throw(Fn&& function, const std::source_location& location = std::source_location::current())
 	{
-		return expression;
+		try
+		{
+			std::invoke(std::forward<Fn>(function));
+			event::AssertionFail failed;
+			failed.location = location;
+
+			Registry::Context().broadcaster.signal(failed);
+		}
+		catch (const Exception&)
+		{
+			event::AssertionPass passed;
+			passed.location = location;
+
+			Registry::Context().broadcaster.signal(passed);
+		}
+		catch (...)
+		{
+			event::AssertionFail failed;
+			failed.location = location;
+
+			Registry::Context().broadcaster.signal(failed);
+		}
+	}
+
+	export template<std::invocable Fn>
+	constexpr void
+		expect_not_throw(Fn&& function, const std::source_location& location = std::source_location::current())
+	{
+		try
+		{
+			std::invoke(std::forward<Fn>(function));
+			event::AssertionPass passed;
+			passed.location = location;
+
+			Registry::Context().broadcaster.signal(passed);
+		}
+		catch (...)
+		{
+			event::AssertionFail failed;
+			failed.location = location;
+
+			Registry::Context().broadcaster.signal(failed);
+		}
 	}
 
 	export template<class T, class U>

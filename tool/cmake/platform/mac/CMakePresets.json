@@ -1,7 +1,7 @@
 {
 	"version": 6,
 	"include": [
-		"platform.json"
+		"../common/CMakePresets.json"
 	],
 	"configurePresets": [
 

@@ -1,7 +1,7 @@
 {
 	"version": 6,
 	"include": [
-		"platform.json"
+		"../common/CMakePresets.json"
 	],
 	"configurePresets": [
 		{
@@ -60,17 +60,20 @@
 		{
 			"name": "windows-msbuild-msvc-release",
 			"displayName": "Release",
-			"configurePreset": "windows-msbuild-msvc"
+			"configurePreset": "windows-msbuild-msvc",
+			"configuration": "Release"
 		},
 		{
 			"name": "windows-msbuild-msvc-development",
 			"displayName": "Development",
-			"configurePreset": "windows-msbuild-msvc"
+			"configurePreset": "windows-msbuild-msvc",
+			"configuration": "Development"
 		},
 		{
 			"name": "windows-msbuild-msvc-debug",
 			"displayName": "Debug",
-			"configurePreset": "windows-msbuild-msvc"
+			"configurePreset": "windows-msbuild-msvc",
+			"configuration": "Debug"
 		}
 	],
 	"testPresets": [

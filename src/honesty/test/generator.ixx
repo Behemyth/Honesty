@@ -1,7 +1,7 @@
 
 module;
 
-import <cassert>;
+#include <cassert>
 
 export module synodic.honesty.test:generator;
 

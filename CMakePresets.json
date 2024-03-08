@@ -5,9 +5,9 @@
         "minor": 28,
         "patch": 0
     },
-    "include": [
-        "tool/cmake/presets/linux.json",
-        "tool/cmake/presets/macos.json",
-        "tool/cmake/presets/windows.json"
-    ]
+	"include": [
+		"tool/cmake/platform/linux/CMakePresets.json",
+		"tool/cmake/platform/mac/CMakePresets.json",
+		"tool/cmake/platform/windows/CMakePresets.json"
+	]
 }

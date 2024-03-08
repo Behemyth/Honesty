@@ -6,7 +6,17 @@
 			"hidden": true,
 			"description": "Base preset for configurations",
 			"generator": "Ninja Multi-Config",
-			"binaryDir": "${sourceDir}/build/${presetName}"
+			"binaryDir": "${sourceDir}/build/${presetName}",
+			"cacheVariables": {
+				"CMAKE_PROJECT_TOP_LEVEL_INCLUDES": {
+					"type": "FILEPATH",
+					"value": "${sourceDir}/tool/conan/conan_provider.cmake"
+				},
+				"CMAKE_CONFIGURATION_TYPES": {
+					"type": "STRING",
+					"value": "Debug;Development;Release"
+				}
+			}
 		},
 		{
 			"name": "windows-default",

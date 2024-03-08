@@ -19,8 +19,8 @@ requires-python = ">=3.12"
 paths = ["LICENSE.md"]
 
 [project.urls]
-homepage = "https://github.com/Synodic-Software/Synodic-Template-Library"
-repository = "https://github.com/Synodic-Software/Synodic-Template-Library"
+homepage = "https://github.com/Synodic-Software/Honesty"
+repository = "https://github.com/Synodic-Software/Honesty"
 
 [tool.pdm.dev-dependencies]
 dev = [

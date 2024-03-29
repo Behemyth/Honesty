@@ -5,6 +5,23 @@
 	],
 	"configurePresets": [
 		{
+			"name": "windows-default",
+			"inherits": [
+				"default"
+			],
+			"hidden": true,
+			"description": "Base preset for Windows configurations",
+			"architecture": {
+				"value": "x64",
+				"strategy": "external"
+			},
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
 			"name": "windows-ninja-msvc",
 			"displayName": "Ninja - MSVC",
 			"description": "Default configuration using Ninja Multi-Config generator and the Microsoft Visual C++ compiler",
@@ -58,25 +75,55 @@
 	],
 	"buildPresets": [
 		{
+			"name": "windows-default",
+			"hidden": true,
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
 			"name": "windows-msbuild-msvc-release",
 			"displayName": "Release",
 			"configurePreset": "windows-msbuild-msvc",
-			"configuration": "Release"
+			"configuration": "Release",
+			"inherits": [
+				"windows-default"
+			]
 		},
 		{
 			"name": "windows-msbuild-msvc-development",
 			"displayName": "Development",
 			"configurePreset": "windows-msbuild-msvc",
-			"configuration": "Development"
+			"configuration": "Development",
+			"inherits": [
+				"windows-default"
+			]
 		},
 		{
 			"name": "windows-msbuild-msvc-debug",
 			"displayName": "Debug",
 			"configurePreset": "windows-msbuild-msvc",
-			"configuration": "Debug"
+			"configuration": "Debug",
+			"inherits": [
+				"windows-default"
+			]
 		}
 	],
 	"testPresets": [
+		{
+			"name": "windows-default",
+			"hidden": true,
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			},
+			"inherits": [
+				"default"
+			]
+		},
 		{
 			"name": "windows-msbuild-msvc-test",
 			"displayName": "Test",

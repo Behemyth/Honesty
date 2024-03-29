@@ -17,78 +17,12 @@
 					"value": "Debug;Development;Release"
 				}
 			}
-		},
-		{
-			"name": "windows-default",
-			"inherits": [
-				"default"
-			],
-			"hidden": true,
-			"description": "Base preset for Windows configurations",
-			"architecture": {
-				"value": "x64",
-				"strategy": "external"
-			},
-			"condition": {
-				"type": "equals",
-				"lhs": "${hostSystemName}",
-				"rhs": "Windows"
-			}
-		},
-		{
-			"name": "macos-default",
-			"inherits": [
-				"default"
-			],
-			"hidden": true,
-			"description": "Base preset for MacOS configurations",
-			"condition": {
-				"type": "equals",
-				"lhs": "${hostSystemName}",
-				"rhs": "Darwin"
-			}
-		},
-		{
-			"name": "linux-default",
-			"inherits": [
-				"default"
-			],
-			"hidden": true,
-			"description": "Base preset for Linux configurations",
-			"condition": {
-				"type": "equals",
-				"lhs": "${hostSystemName}",
-				"rhs": "Linux"
-			}
 		}
 	],
 	"buildPresets": [
 		{
-			"name": "windows-default",
-			"hidden": true,
-			"condition": {
-				"type": "equals",
-				"lhs": "${hostSystemName}",
-				"rhs": "Windows"
-			}
-		},
-		{
-			"name": "macos-default",
-			"hidden": true,
-			"condition": {
-				"type": "equals",
-				"lhs": "${hostSystemName}",
-				"rhs": "Darwin"
-			}
-		},
-		{
-			"name": "linux-default",
-			"hidden": true,
-			"condition": {
-				"type": "equals",
-				"lhs": "${hostSystemName}",
-				"rhs": "Linux"
-			}
+			"name": "default",
+			"hidden": true
 		}
 	],
 	"testPresets": [
@@ -103,40 +37,6 @@
 				"noTestsAction": "error",
 				"stopOnFailure": true
 			}
-		},
-		{
-			"name": "windows-default",
-			"hidden": true,
-			"condition": {
-				"type": "equals",
-				"lhs": "${hostSystemName}",
-				"rhs": "Windows"
-			},
-			"inherits": [
-				"default"
-			]
-		},
-		{
-			"name": "macos-default",
-			"hidden": true,
-			"output": {
-				"outputOnFailure": true,
-				"shortProgress": true
-			},
-			"inherits": [
-				"default"
-			]
-		},
-		{
-			"name": "linux-default",
-			"hidden": true,
-			"output": {
-				"outputOnFailure": true,
-				"shortProgress": true
-			},
-			"inherits": [
-				"default"
-			]
 		}
 	]
 }

@@ -5,6 +5,19 @@
 	],
 	"configurePresets": [
 		{
+			"name": "linux-default",
+			"inherits": [
+				"default"
+			],
+			"hidden": true,
+			"description": "Base preset for Linux configurations",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
+		},
+		{
 			"name": "linux-ninja-gcc",
 			"displayName": "Ninja - GCC",
 			"description": "Default configuration using Ninja and GCC",
@@ -17,6 +30,15 @@
 		}
 	],
 	"buildPresets": [
+		{
+			"name": "linux-default",
+			"hidden": true,
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
+		},
 		{
 			"name": "linux-msbuild-clang-debug",
 			"displayName": "Debug",
@@ -49,6 +71,17 @@
 		}
 	],
 	"testPresets": [
+		{
+			"name": "linux-default",
+			"hidden": true,
+			"output": {
+				"outputOnFailure": true,
+				"shortProgress": true
+			},
+			"inherits": [
+				"default"
+			]
+		},
 		{
 			"name": "linux-msbuild-clang-debug",
 			"displayName": "Debug",

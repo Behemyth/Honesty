@@ -8,6 +8,9 @@ project(honesty
 
 option(BUILD_TESTING "Build the tests verifying Honesty functionality" ON)
 
+# Register our custom module location with CMake
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/tool/cmake/modules")
+
 # Provide the library definition
 add_library(honesty STATIC)
 add_library(synodic::honesty ALIAS honesty)

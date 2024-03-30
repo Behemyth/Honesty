@@ -11,9 +11,19 @@ namespace synodic::honesty
 
 int main(int argc, char* argv[])
 {
-	// TODO: Parse inputs
+	auto arguments = std::span(argv, argc) | std::views::transform(
+								[](const char* v)
+								{
+									// strlen linear search under the hood
+									return std::string_view(v);
+								});
 
 	constexpr synodic::honesty::Mode mode = synodic::honesty::Mode::EXECUTE;
+
+	if (std::ranges::contains(arguments, "list-tests"))
+	{
+		
+	}
 
 	try
 	{
@@ -22,7 +32,7 @@ int main(int argc, char* argv[])
 			case synodic::honesty::Mode::EXECUTE :
 			{
 				synodic::honesty::test::logger::Console logger;
-				synodic::honesty::test::reporter::Console<synodic::honesty::test::logger::Console> reporter(logger);
+				synodic::honesty::test::reporter::Console reporter(logger);
 				synodic::honesty::test::runner::Local runner;
 
 				auto result = entry(reporter, runner);

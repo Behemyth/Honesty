@@ -5,6 +5,8 @@ project(tests
 	LANGUAGES CXX
 )
 
+include(honesty)
+
 add_executable(tests)
 
 set_target_properties(tests
@@ -37,3 +39,6 @@ set_property(
 	PROPERTY
 		VS_STARTUP_PROJECT tests
 )
+
+# Register the tests
+honesty_discover_tests(tests)

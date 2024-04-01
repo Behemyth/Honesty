@@ -125,12 +125,13 @@
 			]
 		},
 		{
-			"name": "windows-msbuild-msvc-test",
-			"displayName": "Test",
+			"name": "windows-msbuild-msvc-test-debug",
+			"displayName": "Test Debug Configuration",
 			"configurePreset": "windows-msbuild-msvc",
 			"inherits": [
 				"windows-default"
-			]
+			],
+			"configuration": "Debug"
 		}
 	]
 }

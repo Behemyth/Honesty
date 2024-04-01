@@ -47,7 +47,7 @@ function(honesty_discover_tests TARGET)
     )
 
     # The files used to store test listings
-    set(ctest_file_base "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}[${counter}]")
+    set(ctest_file_base "${CMAKE_CURRENT_BINARY_DIR}/${TARGET}_${counter}")
     set(ctest_include_file "${ctest_file_base}_include.cmake")
 
     get_property(GENERATOR_IS_MULTI_CONFIG GLOBAL
@@ -61,6 +61,8 @@ function(honesty_discover_tests TARGET)
         set(ctest_tests_file "${ctest_file_base}_tests.cmake")
     endif()
 
+	set(ctest_tests_helper "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../test/honesty_add_tests.cmake")
+
     # CMake functionality that will be injected prior to target execution.
     #   As a result, test discovery will happen in the same configured context as the executable
     string(CONCAT ctest_include_content
@@ -68,10 +70,10 @@ function(honesty_discover_tests TARGET)
         "   if(NOT EXISTS \"${ctest_tests_file}\" OR"                                 "\n"
         "     NOT \"${ctest_tests_file}\" IS_NEWER_THAN \"$<TARGET_FILE:${TARGET}>\" OR\n"
         "     NOT \"${ctest_tests_file}\" IS_NEWER_THAN \"\${CMAKE_CURRENT_LIST_FILE}\")\n"
-        "       include(\"honestyAddTests\")"                                           "\n"
+        "       include(\"${ctest_tests_helper}\")"                                           "\n"
         "       honesty_extract_tests("                                                 "\n"
-        "           TEST_EXECUTABLE"        " [==[" "$<TARGET_FILE:${TARGET}>"   "]==]"   "\n"
-        "           CTEST_FILE"             " [==[" "${ctest_tests_file}"        "]==]"   "\n"
+        "           TEST_EXECUTABLE"         "$<TARGET_FILE:${TARGET}>"      "\n"
+        "           CTEST_FILE"              "${ctest_tests_file}"           "\n"
         "       )"                                                                      "\n"
         "   endif()"                                                                  "\n"
         "   include(\"${ctest_tests_file}\")"                                         "\n"

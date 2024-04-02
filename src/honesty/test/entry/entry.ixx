@@ -12,9 +12,9 @@ namespace synodic::honesty
 {
 }
 
-export namespace synodic::honesty::test
+namespace synodic::honesty::test
 {
-	enum class TestResultCode : std::uint8_t
+	export enum class TestResultCode : std::uint8_t
 	{
 		FAILURE
 	};
@@ -26,7 +26,7 @@ export namespace synodic::honesty::test
 	 * @param defaultRunner The default runner to use when running tests
 	 * @return The result of the test run
 	 */
-	template<typename ReporterT = reporter::Console, typename RunnerT = runner::Local>
+	export template<typename ReporterT = reporter::Console, typename RunnerT = runner::Local>
 	std::expected<void, TestResultCode> entry(ReporterT& defaultReporter, RunnerT& defaultRunner)
 	{
 		Registry registry(defaultReporter, defaultRunner);

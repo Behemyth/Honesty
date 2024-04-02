@@ -11,6 +11,19 @@ option(BUILD_TESTING "Build the tests verifying Honesty functionality" ON)
 # Register our custom module location with CMake
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/tool/cmake/modules")
 
+# Find our dependencies for tools and functionality
+
+# Python
+set(Python_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/.venv/Scripts")
+find_package(Python MODULE REQUIRED COMPONENTS Interpreter Development.Module REQUIRED)
+
+# nanobind
+execute_process(
+  COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
+  OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE NB_DIR)
+list(APPEND CMAKE_PREFIX_PATH "${NB_DIR}")
+find_package(nanobind CONFIG REQUIRED)
+
 # Provide the library definition
 add_library(honesty STATIC)
 add_library(synodic::honesty ALIAS honesty)

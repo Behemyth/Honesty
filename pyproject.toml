@@ -24,15 +24,16 @@ repository = "https://github.com/Synodic-Software/Honesty"
 
 [tool.pdm.dev-dependencies]
 dev = [
-  "cmake>=3.28.3",
+  "cmake>=3.29.0",
   "cppython-conan>=0.0.0.dev1",
   "cppython-pdm>=0.2.8.dev2",
+  "nanobind>=1.9.0",
 ]
 lint = [
-  "black>=24.2.0",
+  "black>=24.3.0",
   "pylint>=3.1.0",
   "isort>=5.13.2",
-  "mypy>=1.8.0",
+  "mypy>=1.9.0",
 ]
 test = [
   "pytest>=8.0.2",
@@ -51,4 +52,4 @@ test = {shell = "cppython test"}
 
 [build-system]
 build-backend = "pdm.backend"
-requires = ["pdm.backend"]
+requires = ["pdm.backend", "nanobind"]

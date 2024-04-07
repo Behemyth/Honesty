@@ -13,6 +13,6 @@ export import :logger.console;
 export import :runner;
 export import :runner.local;
 
-export import :entry;
+export import :interface;
 
 export import :generator;

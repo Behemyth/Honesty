@@ -7,6 +7,6 @@ PRIVATE
 	test_runner.cpp
 	test_reporter.cpp
 	test_tag.cpp
-	test_entry.cpp
+	test_interface.cpp
 	test_exception.cpp
 )

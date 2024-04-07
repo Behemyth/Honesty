@@ -7,11 +7,11 @@ using namespace synodic::honesty::test::literals;
 
 namespace
 {
-	auto entryGenerator = []() -> generator<TestBase>
+	auto interfaceGenerator = []() -> generator<TestBase>
 	{
 		co_return;
 	};
 
-	Suite suite("suite", entryGenerator);
+	Suite suite("suite", interfaceGenerator);
 	bool result = suite.Register();
 }

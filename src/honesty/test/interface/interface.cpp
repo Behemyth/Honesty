@@ -1,7 +1,7 @@
-module synodic.honesty.test:entry;
+module synodic.honesty.test:interface;
 
 import std;
-import :entry;
+import :interface;
 namespace synodic::honesty::test
 {
 	void API::Execute(const parameters::Execute& parameters)

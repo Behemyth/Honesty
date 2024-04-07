@@ -1,5 +1,5 @@
 
-export module synodic.honesty.test:entry;
+export module synodic.honesty.test:interface;
 
 import std;
 import :backend;

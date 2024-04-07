@@ -9,16 +9,16 @@ namespace synodic::honesty::test::runner
 	{
 		for (const SuiteData* const suite: suites_)
 		{
-			synodic::honesty::test::event::SuiteBegin event(suite->Name());
+			event::SuiteBegin event(suite->Name());
 
 			broadcaster.signal(event);
 
 			auto generator = suite->Generator();
 			for (const TestBase& test: generator())
 			{
-				synodic::honesty::test::event::TestBegin event(test.Name());
+				event::TestBegin beginEvent(test.Name());
 
-				broadcaster.signal(event);
+				broadcaster.signal(beginEvent);
 
 				test.Run();
 			}

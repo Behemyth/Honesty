@@ -1,6 +1,3 @@
-module;
-#include <cstdio>
-
 export module synodic.honesty.test:logger.console;
 
 import std;
@@ -18,9 +15,9 @@ namespace synodic::honesty::test::logger
 		}
 
 		template<class... Args>
-		void log(const synodic::honesty::terminal::text_style& style, std::format_string<Args...> fmt, Args&&... args)
+		void log(const terminal::text_style& style, std::format_string<Args...> fmt, Args&&... args)
 		{
-			synodic::honesty::terminal::println(style, fmt, std::forward<Args>(args)...);
+			terminal::println(style, fmt, std::forward<Args>(args)...);
 		}
 
 	private:

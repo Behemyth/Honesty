@@ -50,6 +50,5 @@ build = {shell = "cppython build"}
 test = {shell = "cppython test"}
 
 [build-system]
-run-setuptools = true # Required for C extensions
 build-backend = "pdm.backend"
 requires = ["pdm.backend"]

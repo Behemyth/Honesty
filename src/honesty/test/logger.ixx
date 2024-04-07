@@ -8,7 +8,7 @@ namespace synodic::honesty::test
 	export template<typename T, typename... Args>
 	concept logger_type = requires(
 		T type,
-		const synodic::honesty::terminal::text_style& style,
+		const terminal::text_style& style,
 		std::format_string<Args...> fmt,
 		Args... args) {
 		{

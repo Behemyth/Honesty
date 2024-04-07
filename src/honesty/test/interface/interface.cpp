@@ -4,7 +4,7 @@ import std;
 import :interface;
 namespace synodic::honesty::test
 {
-	void API::Execute(const parameters::Execute& parameters)
+	result::Execute Interface::Execute(const parameter::Execute& parameters)
 	{
 		Broadcast broadcaster;
 
@@ -12,9 +12,12 @@ namespace synodic::honesty::test
 		{
 			runner->Run(broadcaster);
 		}
+
+		return {};
 	}
 
-	void API::List(const parameters::List& parameters)
+	result::List Interface::List(const parameter::List& parameters)
 	{
+		return {};
 	}
 }

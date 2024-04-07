@@ -17,8 +17,8 @@ namespace synodic::honesty::test
 		FAILURE
 	};
 
-	// Parameters inputs for the API
-	export namespace parameters
+	// Parameters inputs for the Interface
+	export namespace parameter
 	{
 		struct Execute
 		{
@@ -31,15 +31,28 @@ namespace synodic::honesty::test
 		};
 	}
 
-	export class API
+	export namespace result
+	{
+		struct Execute
+		{
+			Execute() = default;
+		};
+
+		struct List
+		{
+			List() = default;
+		};
+	}
+
+	export class Interface
 	{
 	public:
 		template<typename ReporterT, typename RunnerT>
-		API(ReporterT& defaultReporter, RunnerT& defaultRunner);
+		Interface(ReporterT& defaultReporter, RunnerT& defaultRunner);
 
-		void Execute(const parameters::Execute& parameters);
+		result::Execute Execute(const parameter::Execute& parameters);
 
-		void List(const parameters::List& parameters);
+		result::List List(const parameter::List& parameters);
 
 	private:
 		Registry registry;
@@ -48,7 +61,7 @@ namespace synodic::honesty::test
 	};
 
 	template<typename ReporterT, typename RunnerT>
-	API::API(ReporterT& defaultReporter, RunnerT& defaultRunner) :
+	Interface::Interface(ReporterT& defaultReporter, RunnerT& defaultRunner) :
 		registry(defaultReporter, defaultRunner),
 		reporters_(registry.GetReporters()),
 		runners_(registry.GetRunners())

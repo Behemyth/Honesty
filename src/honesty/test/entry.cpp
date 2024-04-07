@@ -18,18 +18,18 @@ int main(int argc, char* argv[])
 		synodic::honesty::test::reporter::Console reporter(logger);
 		synodic::honesty::test::runner::Local runner;
 
-		synodic::honesty::test::API api(reporter, runner);
+		synodic::honesty::test::Interface interface(reporter, runner);
 
 		if (std::ranges::contains(arguments, "list-tests"))
 		{
-			synodic::honesty::test::parameters::List parameters;
+			synodic::honesty::test::parameter::List parameters;
 
-			api.List(parameters);
+			interface.List(parameters);
 		}
 		else
 		{
-			synodic::honesty::test::parameters::Execute parameters;
-			api.Execute(parameters);
+			synodic::honesty::test::parameter::Execute parameters;
+			interface.Execute(parameters);
 		}
 		return 0;
 	}

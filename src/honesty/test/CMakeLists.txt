@@ -22,7 +22,7 @@ target_sources(honesty
 
 target_sources(honesty_main
 	PUBLIC
-		"interface.cpp"
+		"entry.cpp"
 )
 
 add_subdirectory(

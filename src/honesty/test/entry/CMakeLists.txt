@@ -8,8 +8,3 @@ target_sources(honesty
 	FILES
 	entry.cpp
 )
-
-nanobind_add_module(honesty_ext
-	python.cpp)
-
-target_link_libraries(honesty_ext PRIVATE honesty)

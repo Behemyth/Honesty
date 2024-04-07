@@ -11,14 +11,14 @@ add_executable(tests)
 
 set_target_properties(tests
 	PROPERTIES
-		LINKER_LANGUAGE CXX
-		CXX_STANDARD 23
-		CXX_STANDARD_REQUIRED ON
-		CXX_EXTENSIONS NO
+	LINKER_LANGUAGE CXX
+	CXX_STANDARD 23
+	CXX_STANDARD_REQUIRED ON
+	CXX_EXTENSIONS NO
 )
 
 target_link_libraries(tests
-PRIVATE
+	PRIVATE
 	synodic::honesty::main
 )
 
@@ -35,9 +35,9 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${file_list})
 # Make the 'tests' project the default startup
 set_property(
 	DIRECTORY
-		${CMAKE_SOURCE_DIR}
+	${CMAKE_SOURCE_DIR}
 	PROPERTY
-		VS_STARTUP_PROJECT tests
+	VS_STARTUP_PROJECT tests
 )
 
 # Register the tests

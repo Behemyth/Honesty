@@ -1,5 +1,6 @@
 module synodic.honesty.test:runner.local;
 
+import std;
 import :runner.local;
 
 namespace synodic::honesty::test::runner
@@ -11,7 +12,6 @@ namespace synodic::honesty::test::runner
 			synodic::honesty::test::event::SuiteBegin event(suite->Name());
 
 			broadcaster.signal(event);
-
 
 			auto generator = suite->Generator();
 			for (const TestBase& test: generator())

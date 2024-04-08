@@ -6,13 +6,12 @@ import :types;
 
 import std;
 import function_ref;
-import counter;
 
 namespace synodic::honesty::test
 {
 	class Registry
 	{
-		class Instance : std::counter<Instance>
+		class Instance
 		{
 		public:
 			consteval Instance() = default;
@@ -59,9 +58,9 @@ namespace synodic::honesty::test
 			std::array<Reporter*, REPORTER_COUNT> reporters_ {};
 			std::array<SuiteData*, SUITE_COUNT> suites_ {};
 
-			constinit static inline int suiteSize_	  = 0;
-			constinit static inline int runnerSize_	  = 0;
-			constinit static inline int reporterSize_ = 0;
+			int suiteSize_	  = 0;
+			int runnerSize_	  = 0;
+			int reporterSize_ = 0;
 		};
 
 		// Our singleton instance

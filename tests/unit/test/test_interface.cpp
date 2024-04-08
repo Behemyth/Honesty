@@ -4,7 +4,6 @@ import synodic.honesty.test;
 using namespace synodic::honesty::test;
 using namespace synodic::honesty::test::literals;
 
-
 namespace
 {
 	class MockReporter final : public Reporter
@@ -28,18 +27,6 @@ namespace
 		void signal(const event::AssertionSkip& event) override;
 		void signal(const event::Summary& event) override;
 	};
-
-	void MockReporter::signal(const event::SuitePass& event)
-	{
-	}
-
-	void MockReporter::signal(const event::SuiteRun& event)
-	{
-	}
-
-	void MockReporter::signal(const event::TestRun& event)
-	{
-	}
 
 	class MockRunner final : public Runner
 	{
@@ -70,6 +57,18 @@ namespace
 
 	Suite suite("suite", interfaceGenerator);
 	bool result = suite.Register();
+
+	void MockReporter::signal(const event::SuitePass& event)
+	{
+	}
+
+	void MockReporter::signal(const event::SuiteRun& event)
+	{
+	}
+
+	void MockReporter::signal(const event::TestRun& event)
+	{
+	}
 
 	void MockReporter::signal(const event::SuiteBegin& event)
 	{

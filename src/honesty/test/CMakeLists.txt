@@ -10,7 +10,7 @@ target_sources(honesty
 			"reporter.ixx"
 			"runner.ixx"
 			"function_ref.ixx"
-			"counter.ixx"
+			
 			"generator.ixx"
 	PRIVATE
 		"backend.cpp"

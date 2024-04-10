@@ -7,6 +7,7 @@ import :generator;
 import :types;
 import :registry;
 
+
 namespace synodic::honesty::test
 {
 	class VoidTest;
@@ -192,8 +193,11 @@ namespace synodic::honesty::test
 		co_yield std::apply(applicator, tuple);
 	}
 
+	Registry& GetRegistry();
+	RunnerContext& GetContext();
+
 	/**
-	 * \brief Allows the static registration of tests in the global scope
+	 * @brief Allows the static registration of tests in the global scope
 	 */
 	export template<size_t Size>
 	class Suite final : SuiteData
@@ -210,7 +214,7 @@ namespace synodic::honesty::test
 		bool Register() &
 		{
 			SuiteData& data = *this;
-			Registry::Add(data);
+			GetRegistry().AddSuite(data);
 
 			return true;
 		}
@@ -318,21 +322,21 @@ namespace synodic::honesty::test
 			event::AssertionFail failed;
 			failed.location = location;
 
-			Registry::Context().broadcaster.signal(failed);
+			GetContext().broadcaster.signal(failed);
 		}
 		catch (const Exception&)
 		{
 			event::AssertionPass passed;
 			passed.location = location;
 
-			Registry::Context().broadcaster.signal(passed);
+			GetContext().broadcaster.signal(passed);
 		}
 		catch (...)
 		{
 			event::AssertionFail failed;
 			failed.location = location;
 
-			Registry::Context().broadcaster.signal(failed);
+			GetContext().broadcaster.signal(failed);
 		}
 	}
 
@@ -346,14 +350,14 @@ namespace synodic::honesty::test
 			event::AssertionPass passed;
 			passed.location = location;
 
-			Registry::Context().broadcaster.signal(passed);
+			GetContext().broadcaster.signal(passed);
 		}
 		catch (...)
 		{
 			event::AssertionFail failed;
 			failed.location = location;
 
-			Registry::Context().broadcaster.signal(failed);
+			GetContext().broadcaster.signal(failed);
 		}
 	}
 

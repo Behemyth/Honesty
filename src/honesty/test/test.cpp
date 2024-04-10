@@ -1,4 +1,3 @@
-
 module synodic.honesty.test;
 
 import std;
@@ -6,8 +5,20 @@ import function_ref;
 import :generator;
 import :types;
 import :registry;
+import :runner;
 
 using namespace synodic::honesty::test::literals;
+
+namespace
+{
+	// The fallback context for tests
+	inline synodic::honesty::test::RunnerContext emptyContext({});
+
+	// Each thread has its own context, such that tests can reference global functions without an object
+	inline thread_local synodic::honesty::test::RunnerContext& context = emptyContext;
+
+	constinit synodic::honesty::test::Registry registry;
+}
 
 namespace synodic::honesty::test
 {
@@ -38,6 +49,16 @@ namespace synodic::honesty::test
 		return name_;
 	}
 
+	Registry& GetRegistry()
+	{
+		return registry;
+	}
+
+	RunnerContext& GetContext()
+	{
+		return context;
+	}
+
 	void assert(bool expression, const std::source_location& location)
 	{
 		if (expression)
@@ -45,14 +66,14 @@ namespace synodic::honesty::test
 			event::AssertionPass passed;
 			passed.location = location;
 
-			Registry::Context().broadcaster.signal(passed);
+			context.broadcaster.signal(passed);
 		}
 		else
 		{
 			event::AssertionFail failed;
 			failed.location = location;
 
-			Registry::Context().broadcaster.signal(failed);
+			context.broadcaster.signal(failed);
 		}
 	}
 
@@ -63,14 +84,14 @@ namespace synodic::honesty::test
 			event::AssertionPass passed;
 			passed.location = location;
 
-			Registry::Context().broadcaster.signal(passed);
+			context.broadcaster.signal(passed);
 		}
 		else
 		{
 			event::AssertionFail failed;
 			failed.location = location;
 
-			Registry::Context().broadcaster.signal(failed);
+			context.broadcaster.signal(failed);
 		}
 
 		return expression;

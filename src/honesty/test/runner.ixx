@@ -11,7 +11,7 @@ namespace synodic::honesty::test
 	export class Broadcast final : public Reporter
 	{
 	public:
-		Broadcast()			  = default;
+		Broadcast(std::span<Reporter*> reporters);
 		~Broadcast() override = default;
 
 		void signal(const event::SuiteBegin& event) override;
@@ -37,12 +37,15 @@ namespace synodic::honesty::test
 		void signal(const event::AssertionSkip& event) override;
 
 		void signal(const event::Summary& event) override;
+
+	private:
+		std::span<Reporter*> reporters_;
 	};
 
 	/**
-	 * \brief The type of runner can be selected by the user when invoking tests, for example, via the command line
+	 * @brief The type of runner can be selected by the user when invoking tests, for example, via the command line
 	 * interface. Additionally, the user can specify a specific runner for a specific test suite. Test suites must be
-	 * registered with runtime registration to avoid having every translation unit recompile when mo. With
+	 * registered with runtime registration to avoid having every translation unit recompile. With
 	 * these two constraints its clear that the Runner interface must be runtime polymorphic.
 	 *	Handles the interface to the test std::execution context.
 	 */
@@ -70,7 +73,7 @@ namespace synodic::honesty::test
 	export class RunnerContext
 	{
 	public:
-		RunnerContext() = default;
+		RunnerContext(std::span<Reporter*> reporters);
 
 		Broadcast broadcaster;
 

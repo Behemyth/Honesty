@@ -5,6 +5,7 @@ import std;
 import :registry;
 import :reporter;
 import :runner;
+import :test;
 
 namespace synodic::honesty::test
 {
@@ -40,6 +41,10 @@ namespace synodic::honesty::test
 		};
 	}
 
+	/**
+	 * @brief The interface to interacting with the test framework. Multiple interfaces are allowed to exist for the
+	 *	same instance
+	 */
 	export class Interface
 	{
 	public:
@@ -51,16 +56,22 @@ namespace synodic::honesty::test
 		result::List List(const parameter::List& parameters);
 
 	private:
-		Registry registry;
 		std::span<Reporter*> reporters_;
 		std::span<Runner*> runners_;
 	};
 
 	template<typename ReporterT, typename RunnerT>
-	Interface::Interface(ReporterT& defaultReporter, RunnerT& defaultRunner) :
-		registry(defaultReporter, defaultRunner),
-		reporters_(registry.GetReporters()),
-		runners_(registry.GetRunners())
+	Interface::Interface(ReporterT& defaultReporter, RunnerT& defaultRunner)
 	{
+		// TODO: Change once multiple reporters/runners are supported correctly
+		defaultRunner.Submit(GetRegistry().GetSuites());
+
+		Registry& registry = GetRegistry();
+
+		registry.AddReporter(defaultReporter);
+		registry.AddRunner(defaultRunner);
+
+		reporters_ = registry.GetReporters();
+		runners_   = registry.GetRunners();
 	}
 }

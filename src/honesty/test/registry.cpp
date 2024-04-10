@@ -11,120 +11,59 @@ namespace synodic::honesty::test
 {
 	class Registry
 	{
-		class Instance
-		{
-		public:
-			consteval Instance() = default;
-
-			static constexpr int RUNNER_COUNT	= 1;
-			static constexpr int REPORTER_COUNT = 1;
-			static constexpr int SUITE_COUNT	= 20;
-
-			void AddSuite(SuiteData* data)
-			{
-				suites_[suiteSize_++] = data;
-			}
-
-			void AddReporter(Reporter& reporter)
-			{
-				reporters_[reporterSize_++] = &reporter;
-			}
-
-			void AddRunner(Runner& runner)
-			{
-				runners_[runnerSize_++] = &runner;
-			}
-
-			std::span<SuiteData*> GetSuites()
-			{
-				return std::span(suites_.data(), suiteSize_);
-			}
-
-			std::span<Reporter*> GetReporters()
-			{
-				return std::span(reporters_.data(), reporterSize_);
-			}
-
-			std::span<Runner*> GetRunners()
-			{
-				return std::span(runners_.data(), runnerSize_);
-			}
-
-		private:
-			// Compile-time storage of run-time objects
-			// TODO: Count with reflection using C++26
-
-			std::array<Runner*, RUNNER_COUNT> runners_ {};
-			std::array<Reporter*, REPORTER_COUNT> reporters_ {};
-			std::array<SuiteData*, SUITE_COUNT> suites_ {};
-
-			int suiteSize_	  = 0;
-			int runnerSize_	  = 0;
-			int reporterSize_ = 0;
-		};
-
-		// Our singleton instance
-		constinit static inline Instance instance;
-
-		// The fallback context for tests
-		constinit static inline RunnerContext defaultContext;
-
-		// Each thread has its own context, such that tests can reference global functions without an object
-		constinit static inline thread_local RunnerContext& context = defaultContext;
-
+		static constexpr int RUNNER_COUNT = 2;
+		static constexpr int REPORTER_COUNT = 2;
+		static constexpr int SUITE_COUNT = 20;
 
 	public:
-		template<typename ReporterT, typename RunnerT>
-		Registry(ReporterT& reporter, RunnerT& runner);
+		constexpr Registry() = default;
+		~Registry() = default;
 
-		static void Add(SuiteData& data)
+		void AddSuite(SuiteData& data)
 		{
-			instance.AddSuite(&data);
+			suites_[suiteSize_++] = &data;
 		}
 
-		static void Add(SuiteData& data, const Runner& runner)
+		void AddReporter(Reporter& reporter)
 		{
+			reporters_[reporterSize_++] = &reporter;
 		}
 
-		static void AddReporter(Reporter& reporter)
+		void AddRunner(Runner& runner)
 		{
-			instance.AddReporter(reporter);
+			runners_[runnerSize_++] = &runner;
 		}
 
-		static void AddRunner(Runner& runner)
+		std::span<SuiteData*> GetSuites()
 		{
-			instance.AddRunner(runner);
+			return std::span(suites_.data(), suiteSize_);
 		}
 
-		static std::span<Reporter*> GetReporters()
+		std::span<Reporter*> GetReporters()
 		{
-			return instance.GetReporters();
+			return std::span(reporters_.data(), reporterSize_);
 		}
 
-		static std::span<Runner*> GetRunners()
+		std::span<Runner*> GetRunners()
 		{
-			return instance.GetRunners();
+			return std::span(runners_.data(), runnerSize_);
 		}
 
-		static RunnerContext& Context()
-		{
-			return context;
-		}
-
-		Registry(const Registry&)			 = delete;
-		Registry(Registry&&)				 = delete;
+		Registry(const Registry&) = delete;
+		Registry(Registry&&) = delete;
 		Registry& operator=(const Registry&) = delete;
-		Registry& operator=(Registry&&)		 = delete;
+		Registry& operator=(Registry&&) = delete;
+
+	private:
+		// Compile-time storage of run-time objects
+		// TODO: Count with reflection using C++26
+
+		std::array<Runner*, RUNNER_COUNT> runners_{};
+		std::array<Reporter*, REPORTER_COUNT> reporters_{};
+		std::array<SuiteData*, SUITE_COUNT> suites_{};
+
+		int suiteSize_ = 0;
+		int runnerSize_ = 0;
+		int reporterSize_ = 0;
 	};
-
-	template<typename ReporterT, typename RunnerT>
-	Registry::Registry(ReporterT& reporter, RunnerT& runner)
-	{
-		AddReporter(reporter);
-
-		// Add the default collected suites to the default runner if it's provided
-		runner.Submit(instance.GetSuites());
-
-		AddRunner(runner);
-	}
 }

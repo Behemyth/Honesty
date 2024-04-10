@@ -8,7 +8,7 @@ using namespace synodic::honesty::test::literals;
 namespace
 {
 	/**
-	 * \brief Verifies that an empty generator is created
+	 * @brief Verifies that an empty generator is created
 	 */
 	auto emptyGenerator = []() -> generator<TestBase>
 	{
@@ -16,7 +16,7 @@ namespace
 	};
 
 	/**
-	 * \brief Verifies that a generator with no capture is created
+	 * @brief Verifies that a generator with no capture is created
 	 */
 	auto basicGenerator = []() -> generator<TestBase>
 	{
@@ -28,7 +28,7 @@ namespace
 	};
 
 	/**
-	 * \brief Verifies that the literal shorthand generates an empty test
+	 * @brief Verifies that the literal shorthand generates an empty test
 	 */
 	auto emptyLiteral = []() -> generator<TestBase>
 	{
@@ -38,7 +38,7 @@ namespace
 	};
 
 	/**
-	 * \brief Verifies that the literal shorthand generates an empty test
+	 * @brief Verifies that the literal shorthand generates an empty test
 	 */
 	auto emptyRecursive = []() -> generator<TestBase>
 	{
@@ -46,7 +46,7 @@ namespace
 	};
 
 	/**
-	 * \brief Verifies that the literal shorthand generates an empty test
+	 * @brief Verifies that the literal shorthand generates an empty test
 	 */
 	auto assignedRecursive = []() -> generator<TestBase>
 	{
@@ -54,7 +54,7 @@ namespace
 	};
 
 	/**
-	 * \brief Applies a tuple to a test such that the test is run for each element in the tuple
+	 * @brief Applies a tuple to a test such that the test is run for each element in the tuple
 	 */
 	auto tupleParameterization = []() -> generator<TestBase>
 	{
@@ -64,7 +64,7 @@ namespace
 	};
 
 	/**
-	 * \brief Applies an array to a test such that the test is run for each element in the array
+	 * @brief Applies an array to a test such that the test is run for each element in the array
 	 */
 	auto arrayParameterization = []() -> generator<TestBase>
 	{

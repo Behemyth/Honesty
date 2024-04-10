@@ -3,105 +3,153 @@ module synodic.honesty.test:runner;
 import :types;
 import :reporter;
 import :registry;
-
-/**
- * @brief The type is already constrained via the reporter interface. No need to pollute the definition here with
- * duplicate constraints.
- * @param event
- */
-template<typename Event>
-void delegate(const Event& event)
-{
-	for (synodic::honesty::test::Reporter* reporter: synodic::honesty::test::Registry::GetReporters())
-	{
-		reporter->signal(event);
-	}
-}
+import std;
 
 namespace synodic::honesty::test
 {
+	Broadcast::Broadcast(std::span<Reporter*> reporters) :
+		reporters_(reporters)
+	{
+	}
+
 	void Broadcast::signal(const event::SuiteBegin& event)
 	{
-		delegate(event);
+		for (Reporter* reporter: reporters_)
+		{
+			reporter->signal(event);
+		}
 	}
 
 	void Broadcast::signal(const event::SuiteEnd& event)
 	{
-		delegate(event);
+		for (Reporter* reporter: reporters_)
+		{
+			reporter->signal(event);
+		}
 	}
 
 	void Broadcast::signal(const event::SuiteSkip& event)
 	{
-		delegate(event);
+		for (Reporter* reporter: reporters_)
+		{
+			reporter->signal(event);
+		}
 	}
 
 	void Broadcast::signal(const event::SuiteRun& event)
 	{
-		delegate(event);
+		for (Reporter* reporter: reporters_)
+		{
+			reporter->signal(event);
+		}
 	}
 
 	void Broadcast::signal(const event::SuiteFail& event)
 	{
-		delegate(event);
+		for (Reporter* reporter: reporters_)
+		{
+			reporter->signal(event);
+		}
 	}
 
 	void Broadcast::signal(const event::SuitePass& event)
 	{
-		delegate(event);
+		for (Reporter* reporter: reporters_)
+		{
+			reporter->signal(event);
+		}
 	}
 
 	void Broadcast::signal(const event::SuiteSummary& event)
 	{
-		delegate(event);
+		for (Reporter* reporter: reporters_)
+		{
+			reporter->signal(event);
+		}
 	}
 
 	void Broadcast::signal(const event::TestBegin& event)
 	{
-		delegate(event);
+		for (Reporter* reporter: reporters_)
+		{
+			reporter->signal(event);
+		}
 	}
 
 	void Broadcast::signal(const event::TestEnd& event)
 	{
-		delegate(event);
+		for (Reporter* reporter: reporters_)
+		{
+			reporter->signal(event);
+		}
 	}
 
 	void Broadcast::signal(const event::TestSkip& event)
 	{
-		delegate(event);
+		for (Reporter* reporter: reporters_)
+		{
+			reporter->signal(event);
+		}
 	}
 
 	void Broadcast::signal(const event::TestRun& event)
 	{
-		delegate(event);
+		for (Reporter* reporter: reporters_)
+		{
+			reporter->signal(event);
+		}
 	}
 
 	void Broadcast::signal(const event::TestFail& event)
 	{
-		delegate(event);
+		for (Reporter* reporter: reporters_)
+		{
+			reporter->signal(event);
+		}
 	}
 
 	void Broadcast::signal(const event::TestPass& event)
 	{
-		delegate(event);
+		for (Reporter* reporter: reporters_)
+		{
+			reporter->signal(event);
+		}
 	}
 
 	void Broadcast::signal(const event::AssertionFail& event)
 	{
-		delegate(event);
+		for (Reporter* reporter: reporters_)
+		{
+			reporter->signal(event);
+		}
 	}
 
 	void Broadcast::signal(const event::AssertionPass& event)
 	{
-		delegate(event);
+		for (Reporter* reporter: reporters_)
+		{
+			reporter->signal(event);
+		}
 	}
 
 	void Broadcast::signal(const event::AssertionSkip& event)
 	{
-		delegate(event);
+		for (Reporter* reporter: reporters_)
+		{
+			reporter->signal(event);
+		}
 	}
 
 	void Broadcast::signal(const event::Summary& event)
 	{
-		delegate(event);
+		for (Reporter* reporter: reporters_)
+		{
+			reporter->signal(event);
+		}
+	}
+
+	RunnerContext::RunnerContext(std::span<Reporter*> reporters) :
+		broadcaster(reporters)
+	{
 	}
 }

@@ -1,8 +1,8 @@
-
 module synodic.honesty.test:runner;
 
-import :backend;
-import :runner;
+import :types;
+import :reporter;
+import :registry;
 
 /**
  * @brief The type is already constrained via the reporter interface. No need to pollute the definition here with

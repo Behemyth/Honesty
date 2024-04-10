@@ -1,4 +1,4 @@
-export module synodic.honesty.platform:platform;
+export module synodic.honesty.platform;
 
 import std;
 
@@ -113,5 +113,12 @@ export namespace synodic::honesty::platform
 	{
 		return debug_;
 	}
+
+}
+
+module :private;
+
+namespace synodic::honesty::platform
+{
 
 }

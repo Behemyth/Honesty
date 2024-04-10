@@ -2,13 +2,9 @@
 export module synodic.honesty.test:interface;
 
 import std;
-import :backend;
+import :registry;
 import :reporter;
 import :runner;
-
-namespace synodic::honesty
-{
-}
 
 namespace synodic::honesty::test
 {

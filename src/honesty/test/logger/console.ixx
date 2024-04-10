@@ -1,4 +1,4 @@
-export module synodic.honesty.test:logger.console;
+export module synodic.honesty.test.logger.console;
 
 import std;
 import synodic.honesty.terminal;

@@ -1,42 +1,26 @@
-import synodic.honesty.test;
+module synodic.honesty.test;
+
 import std;
+import :registry;
+import :reporter;
+import :runner;
 
-int main(int argc, char* argv[])
+namespace synodic::honesty::test
 {
-	// Convert all the input arguments to modern types.
-	// TODO: Reflection parsing, removing the runtime overhead of converting to std::string_view
-	auto arguments = std::span(argv, argc) | std::views::transform(
-		                 [](const char* v)
-		                 {
-			                 // strlen - linear search under the hood
-			                 return std::string_view(v);
-		                 });
-
-	try
+	result::Execute Interface::Execute(const parameter::Execute& parameters)
 	{
-		synodic::honesty::test::logger::Console logger;
-		synodic::honesty::test::reporter::Console reporter(logger);
-		synodic::honesty::test::runner::Local runner;
+		Broadcast broadcaster;
 
-		synodic::honesty::test::API api(reporter, runner);
-
-		if (std::ranges::contains(arguments, "list-tests"))
+		for (Runner* runner: runners_)
 		{
-			synodic::honesty::test::parameters::List parameters;
+			runner->Run(broadcaster);
+		}
 
-			api.List(parameters);
-		}
-		else
-		{
-			synodic::honesty::test::parameters::Execute parameters;
-			api.Execute(parameters);
-		}
-		return 0;
+		return {};
 	}
-	catch (const std::invalid_argument& exception)
-	{
-		std::println("Error: {0}", exception.what());
 
-		return 1;
+	result::List Interface::List(const parameter::List& parameters)
+	{
+		return {};
 	}
 }

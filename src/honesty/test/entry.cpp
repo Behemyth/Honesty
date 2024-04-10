@@ -1,4 +1,7 @@
 import synodic.honesty.test;
+import synodic.honesty.test.reporter.console;
+import synodic.honesty.test.runner.local;
+import synodic.honesty.test.logger.console;
 import std;
 
 int main(int argc, char* argv[])

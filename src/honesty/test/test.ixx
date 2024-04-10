@@ -5,7 +5,7 @@ import std;
 import function_ref;
 import :generator;
 import :types;
-import :backend;
+import :registry;
 
 namespace synodic::honesty::test
 {

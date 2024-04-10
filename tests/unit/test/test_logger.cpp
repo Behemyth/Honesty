@@ -1,5 +1,6 @@
 import std;
 import synodic.honesty.test;
+import synodic.honesty.test.logger.console;
 
 using namespace synodic::honesty::test;
 

@@ -3,9 +3,7 @@ target_sources(honesty
 		FILE_SET interfaces
 		FILES
 			"benchmark.ixx"
-			"platform.ixx"
 			"profile.ixx"
-			"terminal.ixx"
 			"test.ixx"
 )
 

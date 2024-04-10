@@ -1,7 +1,11 @@
-module synodic.honesty.test:test;
 
-import :test;
-import :backend;
+module synodic.honesty.test;
+
+import std;
+import function_ref;
+import :generator;
+import :types;
+import :registry;
 
 using namespace synodic::honesty::test::literals;
 

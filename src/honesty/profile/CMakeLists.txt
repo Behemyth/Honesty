@@ -4,5 +4,4 @@ target_sources(honesty
 		FILES
 	PRIVATE
 		FILE_SET implementations
-		FILES
 )

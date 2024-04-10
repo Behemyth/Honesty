@@ -1,4 +1,4 @@
-export module synodic.honesty.test:backend;
+module synodic.honesty.test:registry;
 
 import :runner;
 import :reporter;

@@ -1,36 +1,27 @@
 target_sources(honesty
 	PUBLIC
 		FILE_SET interfaces
-		TYPE CXX_MODULES
 		FILES
-			"backend.ixx"
 			"test.ixx"
 			"types.ixx"
 			"logger.ixx"
 			"reporter.ixx"
 			"runner.ixx"
 			"function_ref.ixx"
-			
 			"generator.ixx"
+			"interface.ixx"
 	PRIVATE
-		"backend.cpp"
-		"test.cpp"
-		"reporter.cpp"
-		"runner.cpp"
-		"logger.cpp"
+		FILE_SET implementations
+		FILES
+			"registry.cpp"
+			"test.cpp"
+			"runner.cpp"
+			"interface.cpp"
 )
 
 target_sources(honesty_main
 	PUBLIC
 		"entry.cpp"
-)
-
-add_subdirectory(
-	interface
-)
-
-add_subdirectory(
-	backend
 )
 
 add_subdirectory(

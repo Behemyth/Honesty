@@ -1,7 +1,6 @@
-export module synodic.honesty.test:reporter.console;
+export module synodic.honesty.test.reporter.console;
 
-import :reporter;
-import :logger;
+import synodic.honesty.test;
 
 import std;
 

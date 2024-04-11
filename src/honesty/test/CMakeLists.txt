@@ -9,7 +9,7 @@ target_sources(honesty
 			"runner.ixx"
 			"function_ref.ixx"
 			"generator.ixx"
-			"interface.ixx"
+			"instance.ixx"
 	PRIVATE
 		FILE_SET implementations
 		FILES
@@ -17,6 +17,7 @@ target_sources(honesty
 			"test.cpp"
 			"runner.cpp"
 			"interface.cpp"
+			"instance.cpp"
 )
 
 target_sources(honesty_main

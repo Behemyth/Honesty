@@ -5,5 +5,5 @@ export import :test;
 export import :reporter;
 export import :logger;
 export import :runner;
-export import :interface;
+export import :instance;
 export import :generator;

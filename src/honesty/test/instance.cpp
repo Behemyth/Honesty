@@ -5,23 +5,36 @@ import :interface;
 
 namespace synodic::honesty::test
 {
-	Instance::Instance(Configuration& configuration, std::span<std::string_view> arguments)
+	Instance::Instance(const Configuration& configuration, std::span<std::string_view> arguments)
 	{
+		Interface::Command command;
+
+		if (std::ranges::contains(arguments, "list-tests"))
+		{
+			command = Interface::Command::LIST;
+		}
+		else
+		{
+			command = Interface::Command::EXECUTE;
+		}
+
+		command_ = command;
+	}
+
+	void Instance::Execute()
+	{
+		Interface interface;
+
 		try
 		{
-			Configuration configuration;
-			Instance instance(configuration, arguments);
-
-			if (std::ranges::contains(arguments, "list-tests"))
+			switch (command_)
 			{
-				parameter::List parameters;
-
-				interface_.List(parameters);
-			}
-			else
-			{
-				parameter::Execute parameters;
-				interface_.Execute(parameters);
+				case Interface::Command::EXECUTE:
+					interface.Execute(configuration_);
+					break;
+				case Interface::Command::LIST:
+					interface.List(configuration_);
+					break;
 			}
 		}
 		catch (const std::invalid_argument& exception)

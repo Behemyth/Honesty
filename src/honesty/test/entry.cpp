@@ -1,13 +1,10 @@
 import synodic.honesty.test;
-import synodic.honesty.test.reporter.console;
-import synodic.honesty.test.runner.local;
-import synodic.honesty.test.logger.console;
+
 import std;
 
 int main(int argc, char* argv[])
 {
 	// Convert all the input arguments to modern types.
-	// TODO: Reflection parsing, removing the runtime overhead of converting to std::string_view
 	std::span<std::string_view> arguments = std::span(argv, argc) | std::views::transform(
 		                                        [](const char* v)
 		                                        {
@@ -17,6 +14,8 @@ int main(int argc, char* argv[])
 
 	synodic::honesty::test::Instance::Configuration configuration;
 	synodic::honesty::test::Instance instance(configuration, arguments);
+
+	instance.Execute();
 
 	return 0;
 }

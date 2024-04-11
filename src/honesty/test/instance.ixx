@@ -15,10 +15,15 @@ namespace synodic::honesty::test
 			Configuration() = default;
 		};
 
-		Instance(Configuration& configuration, std::span<std::string_view> arguments);
+		// Resolved all input into immediately executable state ready for the 'Execute' function
+		Instance(const Configuration& configuration, std::span<std::string_view> arguments);
+
+		void Execute();
 
 	private:
-		Interface interface_;
+
+		Interface::Command command_;
+		Interface::Configuration configuration_;
 	};
 
 }

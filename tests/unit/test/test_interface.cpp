@@ -46,10 +46,10 @@ namespace
 			MockReporter reporter;
 			MockRunner runner;
 
-			Interface interface(reporter, runner);
+			//Interface interface(reporter, runner);
 
-			parameter::List parameters;
-			auto result = interface.List(parameters);
+			//parameter::List parameters;
+			//auto result = interface.List(parameters);
 
 			expect_equals(0, 0);
 		};

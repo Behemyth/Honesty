@@ -9,7 +9,7 @@ namespace synodic::honesty::test
 	{
 		Interface::Command command;
 
-		if (std::ranges::contains(arguments, "list-tests"))
+		if (std::ranges::contains(arguments, "--list-tests"))
 		{
 			command = Interface::Command::LIST;
 		}
@@ -21,12 +21,11 @@ namespace synodic::honesty::test
 		command_ = command;
 	}
 
-	void Instance::Execute()
+	void Instance::Execute() const
 	{
-		Interface interface;
-
 		try
 		{
+			Interface interface;
 			switch (command_)
 			{
 				case Interface::Command::EXECUTE:

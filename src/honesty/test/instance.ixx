@@ -18,7 +18,7 @@ namespace synodic::honesty::test
 		// Resolved all input into immediately executable state ready for the 'Execute' function
 		Instance(const Configuration& configuration, std::span<std::string_view> arguments);
 
-		void Execute();
+		void Execute() const;
 
 	private:
 

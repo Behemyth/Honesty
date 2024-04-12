@@ -14,14 +14,27 @@ namespace synodic::honesty::test
 		FAILURE
 	};
 
+	export struct HelpParameters
+	{
+		HelpParameters() = default;
+	};
+
 	export struct ExecuteParameters
 	{
-		ExecuteParameters() = default;
+		ExecuteParameters(Runner* runner, Reporter* reporter);
+
+		Runner* runner;
+		Reporter* reporter;
 	};
 
 	export struct ListParameters
 	{
 		ListParameters() = default;
+	};
+
+	export struct HelpResult
+	{
+		HelpResult() = default;
 	};
 
 	export struct ExecuteResult
@@ -46,10 +59,10 @@ namespace synodic::honesty::test
 			Configuration() = default;
 		};
 
-		Interface(const Configuration& configuration);
+		explicit Interface(const Configuration& configuration);
 
+		HelpResult Help(const HelpParameters& parameters);
 		ExecuteResult Execute(const ExecuteParameters& parameters);
-
 		ListResult List(const ListParameters& parameters);
 
 	private:

@@ -9,6 +9,8 @@ namespace
 	class MockReporter final : public Reporter
 	{
 	public:
+		consteval MockReporter();
+
 		void signal(const event::SuiteBegin& event) override;
 		void signal(const event::SuiteEnd& event) override;
 		void signal(const event::SuiteSkip& event) override;
@@ -28,13 +30,25 @@ namespace
 		void signal(const event::Summary& event) override;
 	};
 
+	consteval MockReporter::MockReporter() :
+		Reporter("mock")
+	{
+	}
+
 	class MockRunner final : public Runner
 	{
 	public:
+		consteval MockRunner();
+
 		void Run(Broadcast& broadcaster) override;
 		void Submit(const SuiteData* data) override;
 		void Submit(std::span<const SuiteData* const> data) override;
 	};
+
+	consteval MockRunner::MockRunner() :
+		Runner("mock")
+	{
+	}
 
 	auto interfaceGenerator = []() -> generator<TestBase>
 	{

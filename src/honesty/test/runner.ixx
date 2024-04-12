@@ -8,35 +8,36 @@ import std;
 namespace synodic::honesty::test
 {
 
-	export class Broadcast final : public Reporter
+	export class Broadcast final
 	{
 	public:
 		Broadcast(std::span<Reporter*> reporters);
-		~Broadcast() override = default;
 
-		void signal(const event::SuiteBegin& event) override;
-		void signal(const event::SuiteEnd& event) override;
-		void signal(const event::SuiteSkip& event) override;
+		~Broadcast() = default;
 
-		void signal(const event::SuiteRun& event) override;
-		void signal(const event::SuiteFail& event) override;
-		void signal(const event::SuitePass& event) override;
+		void signal(const event::SuiteBegin& event) const;
+		void signal(const event::SuiteEnd& event) const;
+		void signal(const event::SuiteSkip& event) const;
 
-		void signal(const event::SuiteSummary& event) override;
+		void signal(const event::SuiteRun& event) const;
+		void signal(const event::SuiteFail& event) const;
+		void signal(const event::SuitePass& event) const;
 
-		void signal(const event::TestBegin& event) override;
-		void signal(const event::TestEnd& event) override;
-		void signal(const event::TestSkip& event) override;
+		void signal(const event::SuiteSummary& event) const;
 
-		void signal(const event::TestRun& event) override;
-		void signal(const event::TestFail& event) override;
-		void signal(const event::TestPass& event) override;
+		void signal(const event::TestBegin& event) const;
+		void signal(const event::TestEnd& event) const;
+		void signal(const event::TestSkip& event) const;
 
-		void signal(const event::AssertionFail& event) override;
-		void signal(const event::AssertionPass& event) override;
-		void signal(const event::AssertionSkip& event) override;
+		void signal(const event::TestRun& event) const;
+		void signal(const event::TestFail& event) const;
+		void signal(const event::TestPass& event) const;
 
-		void signal(const event::Summary& event) override;
+		void signal(const event::AssertionFail& event) const;
+		void signal(const event::AssertionPass& event) const;
+		void signal(const event::AssertionSkip& event) const;
+
+		void signal(const event::Summary& event) const;
 
 	private:
 		std::span<Reporter*> reporters_;
@@ -55,7 +56,7 @@ namespace synodic::honesty::test
 		/**
 		 * @brief
 		 */
-		explicit constexpr Runner();
+		explicit consteval Runner(std::string_view name);
 
 		virtual ~Runner() = default;
 
@@ -63,10 +64,21 @@ namespace synodic::honesty::test
 
 		virtual void Submit(const SuiteData* data)					= 0;
 		virtual void Submit(std::span<const SuiteData* const> data) = 0;
+
+		constexpr std::string_view Name() const;
+
+	private:
+		std::string_view name_;
 	};
 
-	constexpr Runner::Runner()
+	consteval Runner::Runner(std::string_view name) :
+		name_(name)
 	{
+	}
+
+	constexpr std::string_view Runner::Name() const
+	{
+		return name_;
 	}
 
 	// Emulating std::execution state

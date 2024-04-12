@@ -9,7 +9,7 @@ namespace synodic::honesty::test
 	export class Reporter
 	{
 	public:
-		Reporter()			= default;
+		consteval Reporter(std::string_view name);
 		virtual ~Reporter() = default;
 
 		virtual void signal(const event::SuiteBegin& event) = 0;
@@ -36,8 +36,21 @@ namespace synodic::honesty::test
 
 		virtual void signal(const event::Summary& event) = 0;
 
+		constexpr std::string_view Name() const;
+
 	private:
+		std::string_view name_;
 	};
+
+	consteval Reporter::Reporter(std::string_view name) :
+		name_(name)
+	{
+	}
+
+	constexpr std::string_view Reporter::Name() const
+	{
+		return name_;
+	}
 
 	/**
 	 * @brief TODO: Actually implement this instead of just stubbing it out.
@@ -45,8 +58,8 @@ namespace synodic::honesty::test
 	export class StreamingAdapter : public Reporter
 	{
 	public:
-		StreamingAdapter()			= default;
-		virtual ~StreamingAdapter() = default;
+		StreamingAdapter()			 = default;
+		~StreamingAdapter() override = default;
 
 		void signal(const event::SuiteBegin& event) override {};
 		void signal(const event::SuiteEnd& event) override {};

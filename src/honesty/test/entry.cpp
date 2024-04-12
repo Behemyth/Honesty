@@ -12,6 +12,7 @@ int main(int argc, const char* argv[])
 			            return std::string_view(value);
 		            });
 
+	// Convert the lazy view to contiguous data
 	auto arguments = std::ranges::to<std::vector>(view);
 
 	synodic::honesty::test::Instance::Configuration configuration;

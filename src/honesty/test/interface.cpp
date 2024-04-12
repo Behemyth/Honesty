@@ -14,18 +14,25 @@ namespace synodic::honesty::test
 		FAILURE
 	};
 
-	namespace result
+	struct ExecuteParameters
 	{
-		struct Execute
-		{
-			Execute() = default;
-		};
+		ExecuteParameters() = default;
+	};
 
-		struct List
-		{
-			List() = default;
-		};
-	}
+	struct ListParameters
+	{
+		ListParameters() = default;
+	};
+
+	struct ExecuteResult
+	{
+		ExecuteResult() = default;
+	};
+
+	struct ListResult
+	{
+		ListResult() = default;
+	};
 
 	/**
 	 * @brief The interface to interacting with the test framework. Multiple interfaces are allowed to exist for the
@@ -34,12 +41,6 @@ namespace synodic::honesty::test
 	class Interface
 	{
 	public:
-		enum class Command
-		{
-			EXECUTE,
-			LIST
-		};
-
 		struct Configuration
 		{
 			Configuration() = default;
@@ -47,9 +48,9 @@ namespace synodic::honesty::test
 
 		Interface();
 
-		result::Execute Execute(const Configuration& parameters);
+		ExecuteResult Execute(const ExecuteParameters& parameters);
 
-		result::List List(const Configuration& parameters);
+		ListResult List(const ListParameters& parameters);
 
 	private:
 		std::span<Reporter*> reporters_;
@@ -64,7 +65,7 @@ namespace synodic::honesty::test
 		runners_ = registry.GetRunners();
 	}
 
-	result::Execute Interface::Execute(const Configuration& parameters)
+	ExecuteResult Interface::Execute(const ExecuteParameters& parameters)
 	{
 		RunnerContext& context = GetContext();
 
@@ -79,7 +80,7 @@ namespace synodic::honesty::test
 		return {};
 	}
 
-	result::List Interface::List(const Configuration& parameters)
+	ListResult Interface::List(const ListParameters& parameters)
 	{
 		return {};
 	}

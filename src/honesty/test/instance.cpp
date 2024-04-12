@@ -5,20 +5,22 @@ import :interface;
 
 namespace synodic::honesty::test
 {
+	template<typename... Ts>
+	struct Overload : Ts...
+	{
+		using Ts::operator()...;
+	};
+
 	Instance::Instance(const Configuration& configuration, std::span<std::string_view> arguments)
 	{
-		Interface::Command command;
-
 		if (std::ranges::contains(arguments, "--list-tests"))
 		{
-			command = Interface::Command::LIST;
+			parameters_ = ListParameters();
 		}
 		else
 		{
-			command = Interface::Command::EXECUTE;
+			parameters_ = ExecuteParameters();
 		}
-
-		command_ = command;
 	}
 
 	void Instance::Execute() const
@@ -26,15 +28,18 @@ namespace synodic::honesty::test
 		try
 		{
 			Interface interface;
-			switch (command_)
-			{
-				case Interface::Command::EXECUTE:
-					interface.Execute(configuration_);
-					break;
-				case Interface::Command::LIST:
-					interface.List(configuration_);
-					break;
-			}
+			auto executor = Overload{
+				[&](const ExecuteParameters& parameters)
+				{
+					interface.Execute(parameters);
+				},
+				[&](const ListParameters& parameters)
+				{
+					interface.List(parameters);
+				},
+			};
+
+			std::visit(executor, parameters_);
 		}
 		catch (const std::invalid_argument& exception)
 		{

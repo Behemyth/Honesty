@@ -22,7 +22,7 @@ namespace synodic::honesty::test
 
 	private:
 
-		Interface::Command command_;
+		std::variant<ExecuteParameters, ListParameters> parameters_;
 		Interface::Configuration configuration_;
 	};
 

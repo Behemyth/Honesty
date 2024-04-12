@@ -46,7 +46,7 @@ namespace
 			MockReporter reporter;
 			MockRunner runner;
 
-			//Interface interface(reporter, runner);
+			//Interface interface();
 
 			//parameter::List parameters;
 			//auto result = interface.List(parameters);

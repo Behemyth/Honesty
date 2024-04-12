@@ -1,4 +1,4 @@
-module synodic.honesty.test:interface;
+module synodic.honesty.test;
 
 import std;
 import :registry;
@@ -9,54 +9,6 @@ import :logger;
 
 namespace synodic::honesty::test
 {
-	enum class TestResultCode : std::uint8_t
-	{
-		FAILURE
-	};
-
-	struct ExecuteParameters
-	{
-		ExecuteParameters() = default;
-	};
-
-	struct ListParameters
-	{
-		ListParameters() = default;
-	};
-
-	struct ExecuteResult
-	{
-		ExecuteResult() = default;
-	};
-
-	struct ListResult
-	{
-		ListResult() = default;
-	};
-
-	/**
-	 * @brief The interface to interacting with the test framework. Multiple interfaces are allowed to exist for the
-	 *	same instance
-	 */
-	class Interface
-	{
-	public:
-		struct Configuration
-		{
-			Configuration() = default;
-		};
-
-		Interface();
-
-		ExecuteResult Execute(const ExecuteParameters& parameters);
-
-		ListResult List(const ListParameters& parameters);
-
-	private:
-		std::span<Reporter*> reporters_;
-		std::span<Runner*> runners_;
-	};
-
 	Interface::Interface()
 	{
 		Registry& registry = GetRegistry();

@@ -6,4 +6,6 @@ export import :reporter;
 export import :logger;
 export import :runner;
 export import :instance;
+export import :instance;
 export import :generator;
+export import :interface;

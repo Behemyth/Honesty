@@ -21,9 +21,8 @@ namespace synodic::honesty::test
 		void Execute() const;
 
 	private:
-
+		// Our list of top level commands and the parameters that go with them
 		std::variant<ExecuteParameters, ListParameters> parameters_;
-		Interface::Configuration configuration_;
 	};
 
 }

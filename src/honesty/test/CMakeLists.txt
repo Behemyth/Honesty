@@ -10,6 +10,7 @@ target_sources(honesty
 			"function_ref.ixx"
 			"generator.ixx"
 			"instance.ixx"
+			"interface.ixx"
 	PRIVATE
 		FILE_SET implementations
 		FILES

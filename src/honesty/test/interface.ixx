@@ -46,7 +46,7 @@ namespace synodic::honesty::test
 			Configuration() = default;
 		};
 
-		Interface();
+		Interface(const Configuration& configuration);
 
 		ExecuteResult Execute(const ExecuteParameters& parameters);
 

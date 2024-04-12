@@ -33,10 +33,7 @@ namespace
 	public:
 		void Run(Broadcast& broadcaster) override;
 		void Submit(const SuiteData* data) override;
-
-		void Submit(std::span<const SuiteData* const> data) override
-		{
-		}
+		void Submit(std::span<const SuiteData* const> data) override;
 	};
 
 	auto interfaceGenerator = []() -> generator<TestBase>
@@ -46,7 +43,9 @@ namespace
 			MockReporter reporter;
 			MockRunner runner;
 
-			Interface interface;
+			Interface::Configuration configuration;
+
+			Interface interface(configuration);
 
 			ListParameters parameters;
 			auto result = interface.List(parameters);
@@ -131,6 +130,10 @@ namespace
 	}
 
 	void MockRunner::Submit(const SuiteData* data)
+	{
+	}
+
+	void MockRunner::Submit(std::span<const SuiteData* const> data)
 	{
 	}
 }

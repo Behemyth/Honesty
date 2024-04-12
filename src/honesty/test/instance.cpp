@@ -27,7 +27,9 @@ namespace synodic::honesty::test
 	{
 		try
 		{
-			Interface interface;
+			Interface::Configuration configuration;
+
+			Interface interface(configuration);
 			auto executor = Overload{
 				[&](const ExecuteParameters& parameters)
 				{

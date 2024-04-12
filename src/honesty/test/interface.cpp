@@ -9,7 +9,7 @@ import :logger;
 
 namespace synodic::honesty::test
 {
-	Interface::Interface()
+	Interface::Interface(const Configuration& configuration)
 	{
 		Registry& registry = GetRegistry();
 

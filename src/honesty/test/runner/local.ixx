@@ -5,7 +5,7 @@ import synodic.honesty.test;
 
 namespace synodic::honesty::test::runner
 {
-	export class Local : public Runner
+	export class Local final : public Runner
 	{
 	public:
 		consteval explicit Local(std::string_view name);
@@ -15,14 +15,17 @@ namespace synodic::honesty::test::runner
 		void Submit(std::span<const SuiteData* const> data) override;
 
 	private:
-		std::vector<const SuiteData*> suites_;
+		std::array<const SuiteData*, 30> suitesData_;
+		std::span<const SuiteData*> suites_;
 	};
 
-	consteval Local::Local(std::string_view name): Runner(name)
+	consteval Local::Local(std::string_view name) :
+		Runner(name),
+		suitesData_(),
+		suites_(suitesData_.data(), 0)
 	{
 	}
 }
-
 
 module :private;
 
@@ -50,11 +53,20 @@ namespace synodic::honesty::test::runner
 
 	void Local::Submit(const SuiteData* data)
 	{
-		suites_.push_back(std::move(data));
+		suitesData_[suites_.size()] = std::move(data);
+
+		suites_ = {suites_.data(), suites_.size() + 1};
 	}
 
 	void Local::Submit(std::span<const SuiteData* const> data)
 	{
-		suites_.insert(suites_.end(), std::make_move_iterator(data.begin()), std::make_move_iterator(data.end()));
+		for (const SuiteData* const suite: data)
+		{
+			suitesData_[suites_.size()] = std::move(suite);
+
+			suites_ = {suites_.data(), suites_.size() + 1};
+		}
+
+		// suites_.insert(suites_.end(), std::make_move_iterator(data.begin()), std::make_move_iterator(data.end()));
 	}
 }

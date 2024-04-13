@@ -30,6 +30,9 @@ namespace synodic::honesty::test
 
 	ExecuteResult Interface::Execute(const ExecuteParameters& parameters)
 	{
+		auto suites = GetRegistry().GetSuites();
+		parameters.runner->Submit(suites);
+
 		RunnerContext& context = GetContext();
 
 		// Set the context

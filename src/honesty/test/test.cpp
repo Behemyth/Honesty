@@ -59,6 +59,18 @@ namespace synodic::honesty::test
 		return context;
 	}
 
+	bool RegisterRunner(Runner& runner)
+	{
+		registry.AddRunner(runner);
+		return true;
+	}
+
+	bool RegisterReporter(Reporter& reporter)
+	{
+		registry.AddReporter(reporter);
+		return true;
+	}
+
 	void assert(bool expression, const std::source_location& location)
 	{
 		if (expression)

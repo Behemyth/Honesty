@@ -4,3 +4,8 @@ target_sources(honesty
 		FILES
 			console.ixx
 )
+
+target_sources(honesty
+	INTERFACE
+	export.cpp
+)

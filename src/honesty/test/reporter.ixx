@@ -58,7 +58,11 @@ namespace synodic::honesty::test
 	export class StreamingAdapter : public Reporter
 	{
 	public:
-		StreamingAdapter()			 = default;
+		consteval StreamingAdapter(std::string_view name) :
+			Reporter(name)
+		{
+		}
+
 		~StreamingAdapter() override = default;
 
 		void signal(const event::SuiteBegin& event) override {};

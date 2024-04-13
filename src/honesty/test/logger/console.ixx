@@ -8,6 +8,9 @@ namespace synodic::honesty::test::logger
 	export class Console
 	{
 	public:
+
+		consteval Console() = default;
+
 		template<class... Args>
 		void log(std::format_string<Args...> fmt, Args&&... args)
 		{

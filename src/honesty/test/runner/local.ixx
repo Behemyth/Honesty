@@ -8,7 +8,7 @@ namespace synodic::honesty::test::runner
 	export class Local : public Runner
 	{
 	public:
-		consteval explicit Local();
+		consteval explicit Local(std::string_view name);
 
 		void Run(Broadcast& broadcaster) override;
 		void Submit(const SuiteData* data) override;
@@ -18,7 +18,7 @@ namespace synodic::honesty::test::runner
 		std::vector<const SuiteData*> suites_;
 	};
 
-	consteval Local::Local(): Runner("local")
+	consteval Local::Local(std::string_view name): Runner(name)
 	{
 	}
 }

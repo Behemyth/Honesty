@@ -10,7 +10,7 @@ namespace synodic::honesty::test::reporter
 	class Console : public StreamingAdapter
 	{
 	public:
-		Console(LoggerType logger);
+		consteval Console(std::string_view name, const LoggerType& logger);
 		~Console() override = default;
 
 		void signal(const event::SuiteBegin& event) override
@@ -26,7 +26,11 @@ namespace synodic::honesty::test::reporter
 		void signal(const event::AssertionPass& event) override
 		{
 			std::string styledResult = format(terminal::text_style(terminal::color24_t(0, 255, 0)), "Passed");
-			logger_.log("Assertion {}: File({}), Line({})", styledResult, event.location.file_name(), event.location.line());
+			logger_.log(
+				"Assertion {}: File({}), Line({})",
+				styledResult,
+				event.location.file_name(),
+				event.location.line());
 		}
 
 		void signal(const event::AssertionFail& event) override
@@ -40,7 +44,8 @@ namespace synodic::honesty::test::reporter
 	};
 
 	template<logger_type LoggerType>
-	Console<LoggerType>::Console(LoggerType logger) :
+	consteval Console<LoggerType>::Console(std::string_view name, const LoggerType& logger) :
+		StreamingAdapter(name),
 		logger_(logger)
 	{
 	}

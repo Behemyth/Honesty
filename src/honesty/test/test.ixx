@@ -196,6 +196,9 @@ namespace synodic::honesty::test
 	Registry& GetRegistry();
 	RunnerContext& GetContext();
 
+	export bool RegisterRunner(Runner& runner);
+	export bool RegisterReporter(Reporter& reporter);
+
 	/**
 	 * @brief Allows the static registration of tests in the global scope
 	 */

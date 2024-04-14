@@ -22,6 +22,16 @@ target_link_libraries(tests
 	synodic::honesty::main
 )
 
+target_sources(tests
+	PUBLIC
+		FILE_SET mock
+		TYPE CXX_MODULES
+)
+
+add_subdirectory(
+	mock
+)
+
 add_subdirectory(
 	unit
 )

@@ -8,6 +8,8 @@ using namespace synodic::honesty::test::literals;
 
 namespace
 {
+	constexpr std::uint32_t green = 0x3A'5A'40; // #3A5A40 Hunter Green
+
 	Suite colorSuite(
 		"color",
 		[]() -> generator<TestBase>
@@ -16,7 +18,7 @@ namespace
 			{
 				expect_equals(
 					terminal::color24_t(58, 90, 64),
-					terminal::color24_t(0x3A'5A'40)); // #3A5A40 Hunter Green
+					terminal::color24_t(green));
 			};
 		});
 

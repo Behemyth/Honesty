@@ -2,6 +2,8 @@ export module synodic.honesty.log:logger;
 
 import std;
 import :colour;
+import :sink;
+import :types;
 
 namespace synodic::honesty::log
 {
@@ -10,6 +12,8 @@ namespace synodic::honesty::log
 	{
 	public:
 		consteval Logger(std::string_view name);
+		consteval Logger(std::string_view name, std::span<Sink*> sinks);
+
 		~Logger() = default;
 
 		template<class... Args>
@@ -25,12 +29,22 @@ namespace synodic::honesty::log
 		}
 
 	private:
+		Level level_;
+
 		std::string_view name_;
+		std::span<Sink*> sinks_;
 	};
 
 	consteval Logger::Logger(std::string_view name) :
+		level_(Level::INFO),
 		name_(name)
 	{
 	}
 
+	consteval Logger::Logger(std::string_view name, std::span<Sink*> sinks) :
+		level_(Level::INFO),
+		name_(name),
+		sinks_(sinks)
+	{
+	}
 }

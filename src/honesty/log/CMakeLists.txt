@@ -4,6 +4,7 @@ target_sources(honesty
 		FILES
 			"colour.ixx"
 			"logger.ixx"
+			"types.ixx"
 	PRIVATE
 		FILE_SET implementations
 		FILES

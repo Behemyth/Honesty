@@ -1,7 +1,7 @@
 export module synodic.honesty.test.logger.console;
 
 import std;
-import synodic.honesty.terminal;
+import synodic.honesty.log;
 
 namespace synodic::honesty::test::logger
 {

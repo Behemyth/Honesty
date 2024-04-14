@@ -1,6 +1,6 @@
 import std;
 import synodic.honesty.test;
-import synodic.honesty.terminal;
+import synodic.honesty.log;
 
 using namespace synodic::honesty;
 using namespace synodic::honesty::test;
@@ -16,7 +16,7 @@ namespace
 			{
 				expect_equals(
 					terminal::color24_t(58, 90, 64),
-					terminal::color24_t(0x3A'5A'40));  // #3A5A40 Hunter Green
+					terminal::color24_t(0x3A'5A'40)); // #3A5A40 Hunter Green
 			};
 		});
 

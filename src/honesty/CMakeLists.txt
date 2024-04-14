@@ -5,6 +5,7 @@ target_sources(honesty
 			"benchmark.ixx"
 			"profile.ixx"
 			"test.ixx"
+			"log.ixx"
 )
 
 add_subdirectory(
@@ -20,7 +21,7 @@ add_subdirectory(
 )
 
 add_subdirectory(
-	terminal
+	log
 )
 
 add_subdirectory(

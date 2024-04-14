@@ -4,7 +4,7 @@ module;
 
 #include <cstdio>
 
-export module synodic.honesty.terminal;
+export module synodic.honesty.log:colour;
 
 import std;
 
@@ -130,89 +130,84 @@ namespace synodic::honesty::terminal
 		return attributeMask_;
 	}
 
-	// Implementation details that should not be exported
-	namespace detail
+	template<class... Ts>
+	struct overloaded : Ts...
 	{
-		template<class... Ts>
-		struct overloaded : Ts...
+		using Ts::operator()...;
+	};
+
+	std::uint8_t ConvertIndexToAnsiCode(std::uint8_t maskIndex);
+
+	/**
+	 * @brief Application of a text style to a string
+	 * @param data
+	 * @param style
+	 * @param fmt
+	 * @param args
+	 */
+	template<typename OutputIt, typename BackendBuffer, typename CharT>
+		requires std::output_iterator<OutputIt, const CharT&>
+	OutputIt vformat_to_impl(
+		OutputIt out,
+		const text_style& style,
+		std::basic_string_view<CharT> fmt,
+		std::basic_format_args<std::basic_format_context<BackendBuffer, std::type_identity_t<CharT>>> args)
+	{
+		OutputIt next = out;
+
+		std::uint8_t attributeMask = style.AttributeMask();
+		if (attributeMask)
 		{
-			using Ts::operator()...;
-		};
+			constexpr size_t ATTRIBUTE_COUNT = std::numeric_limits<std::underlying_type_t<attribute>>::digits;
 
-
-		std::uint8_t ConvertIndexToAnsiCode(std::uint8_t maskIndex);
-
-		/**
-		 * @brief Application of a text style to a string
-		 * @param data
-		 * @param style
-		 * @param fmt
-		 * @param args
-		 */
-		template<typename OutputIt, typename BackendBuffer, typename CharT>
-			requires std::output_iterator<OutputIt, const CharT&>
-		OutputIt vformat_to(
-			OutputIt out,
-			const text_style& style,
-			std::basic_string_view<CharT> fmt,
-			std::basic_format_args<std::basic_format_context<BackendBuffer, std::type_identity_t<CharT>>> args)
-		{
-			OutputIt next = out;
-
-			std::uint8_t attributeMask = style.AttributeMask();
-			if (attributeMask)
+			for (int index = 0; index < ATTRIBUTE_COUNT; ++index)
 			{
-				constexpr size_t ATTRIBUTE_COUNT = std::numeric_limits<std::underlying_type_t<attribute>>::digits;
-
-				for (int index = 0; index < ATTRIBUTE_COUNT; ++index)
+				std::uint8_t mask = static_cast<std::uint8_t>(1 << index);
+				if (attributeMask & mask)
 				{
-					std::uint8_t mask = static_cast<std::uint8_t>(1 << index);
-					if (attributeMask & mask)
-					{
-						next = std::format_to(next, "\x1b[{}m", ConvertIndexToAnsiCode(index));
-					}
+					next = std::format_to(next, "\x1b[{}m", ConvertIndexToAnsiCode(index));
 				}
 			}
-
-			std::optional<color_type> foreground = style.Foreground();
-			if (foreground)
-			{
-				color_type& colorType = foreground.value();
-
-				std::visit(
-					overloaded {
-						[&](color8_t arg)
-						{
-							next = std::format_to(next, "\x1b[{}m", arg.code);
-						},
-						[&](color24_t arg)
-						{
-							next = std::format_to(next, "\x1b[38;2;{:03};{:03};{:03}m", arg.red, arg.green, arg.blue);
-						}},
-					colorType);
-			}
-
-			std::optional<color_type> background = style.Background();
-			if (background)
-			{
-				color_type& colorType = background.value();
-
-				std::visit(
-					overloaded {
-						[&](color8_t arg)
-						{
-							next = std::format_to(next, "\x1b[{}m", arg.code + 10);
-						},
-						[&](color24_t arg)
-						{
-							next = std::format_to(next, "\x1b[48;2;{:03};{:03};{:03}m", arg.red, arg.green, arg.blue);
-						}},
-					colorType);
-			}
-
-			next = std::vformat_to(next, fmt, args);
-			return std::format_to(next, "\x1b[0m");
 		}
+
+		std::optional<color_type> foreground = style.Foreground();
+		if (foreground)
+		{
+			color_type& colorType = foreground.value();
+
+			std::visit(
+				overloaded {
+					[&](color8_t arg)
+					{
+						next = std::format_to(next, "\x1b[{}m", arg.code);
+					},
+					[&](color24_t arg)
+					{
+						next = std::format_to(next, "\x1b[38;2;{:03};{:03};{:03}m", arg.red, arg.green, arg.blue);
+					}},
+				colorType);
+		}
+
+		std::optional<color_type> background = style.Background();
+		if (background)
+		{
+			color_type& colorType = background.value();
+
+			std::visit(
+				overloaded {
+					[&](color8_t arg)
+					{
+						next = std::format_to(next, "\x1b[{}m", arg.code + 10);
+					},
+					[&](color24_t arg)
+					{
+						next = std::format_to(next, "\x1b[48;2;{:03};{:03};{:03}m", arg.red, arg.green, arg.blue);
+					}},
+				colorType);
+		}
+
+		next = std::vformat_to(next, fmt, args);
+		return std::format_to(next, "\x1b[0m");
 	}
 
 	/**
@@ -226,7 +221,7 @@ namespace synodic::honesty::terminal
 	export template<std::output_iterator<const char&> OutputIt>
 	OutputIt vformat_to(OutputIt out, const text_style& style, std::string_view fmt, std::format_args args)
 	{
-		return detail::vformat_to(out, style, fmt, args);
+		return vformat_to_impl(out, style, fmt, args);
 	}
 
 	/**
@@ -254,7 +249,7 @@ namespace synodic::honesty::terminal
 	void print(std::FILE* stream, const text_style& style, std::format_string<Args...> fmt, Args&&... args)
 	{
 		std::string data;
-		detail::vformat_to(std::back_inserter(data), style, fmt, args);
+		vformat_to_impl(std::back_inserter(data), style, fmt, args);
 		std::print(stream, "{}", data);
 	}
 
@@ -285,37 +280,4 @@ namespace synodic::honesty::terminal
 		println(stdout, style, fmt, args...);
 	}
 
-}
-
-module :private;
-
-namespace synodic::honesty::terminal
-{
-	std::string vformat(const text_style& style, std::string_view fmt, std::format_args args)
-	{
-		std::string data;
-		detail::vformat_to(std::back_inserter(data), style, fmt, args);
-		return data;
-	}
-
-	namespace detail
-	{
-		constexpr size_t ATTRIBUTE_COUNT = std::numeric_limits<std::underlying_type_t<attribute>>::digits;
-
-		constexpr std::array<std::uint8_t, ATTRIBUTE_COUNT> ATTRIBUTE_ANSI_CODES = {
-			1, // bold
-			2, // faint
-			3, // italic
-			4, // underline
-			5, // blink
-			7, // reverse
-			8, // conceal
-			9, // strike
-		};
-
-		std::uint8_t ConvertIndexToAnsiCode(std::uint8_t maskIndex)
-		{
-			return ATTRIBUTE_ANSI_CODES[maskIndex];
-		}
-	}
 }

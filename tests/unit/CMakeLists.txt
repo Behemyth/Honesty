@@ -3,5 +3,5 @@ add_subdirectory(
 )
 
 add_subdirectory(
-	terminal
+	log
 )

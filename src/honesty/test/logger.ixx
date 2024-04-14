@@ -1,6 +1,6 @@
 export module synodic.honesty.test:logger;
 
-import synodic.honesty.terminal;
+import synodic.honesty.log;
 import std;
 
 namespace synodic::honesty::test

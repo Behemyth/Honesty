@@ -3,14 +3,15 @@ module synodic.honesty.test;
 import std;
 import :interface;
 
+// A helper
+template<typename... Ts>
+struct Overload : Ts...
+{
+	using Ts::operator()...;
+};
+
 namespace synodic::honesty::test
 {
-	template<typename... Ts>
-	struct Overload : Ts...
-	{
-		using Ts::operator()...;
-	};
-
 	Instance::Configuration::Configuration() :
 		defaultRunner("default"),
 		defaultReporter("default")
@@ -101,15 +102,15 @@ namespace synodic::honesty::test
 			auto executor = Overload{
 				[&](const HelpParameters& parameters)
 				{
-					interface.Help(parameters);
+					auto result = interface.Help(parameters);
 				},
 				[&](const ExecuteParameters& parameters)
 				{
-					interface.Execute(parameters);
+					auto result = interface.Execute(parameters);
 				},
 				[&](const ListParameters& parameters)
 				{
-					interface.List(parameters);
+					auto result = interface.List(parameters);
 				},
 			};
 

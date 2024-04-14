@@ -1,16 +1,16 @@
 export module synodic.honesty.test.reporter.console;
 
 import synodic.honesty.test;
+import synodic.honesty.log;
 
 import std;
 
-namespace synodic::honesty::test::reporter
+namespace synodic::honesty::test
 {
-	export template<logger_type LoggerType>
-	class Console : public StreamingAdapter
+	export class Console : public StreamingAdapter
 	{
 	public:
-		consteval Console(std::string_view name, const LoggerType& logger);
+		consteval Console(std::string_view name, const log::Logger& logger);
 		~Console() override = default;
 
 		void signal(const event::SuiteBegin& event) override
@@ -40,11 +40,10 @@ namespace synodic::honesty::test::reporter
 		}
 
 	private:
-		LoggerType logger_;
+		log::Logger logger_;
 	};
 
-	template<logger_type LoggerType>
-	consteval Console<LoggerType>::Console(std::string_view name, const LoggerType& logger) :
+	consteval Console::Console(std::string_view name, const log::Logger& logger) :
 		StreamingAdapter(name),
 		logger_(logger)
 	{

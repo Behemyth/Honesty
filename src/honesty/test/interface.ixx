@@ -5,7 +5,6 @@ import :registry;
 import :reporter;
 import :runner;
 import :test;
-import :logger;
 
 namespace synodic::honesty::test
 {

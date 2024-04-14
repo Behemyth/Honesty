@@ -3,7 +3,7 @@ export module synodic.honesty.test.runner.local;
 import std;
 import synodic.honesty.test;
 
-namespace synodic::honesty::test::runner
+namespace synodic::honesty::test
 {
 	export class Local final : public Runner
 	{
@@ -29,7 +29,7 @@ namespace synodic::honesty::test::runner
 
 module :private;
 
-namespace synodic::honesty::test::runner
+namespace synodic::honesty::test
 {
 	void Local::Run(Broadcast& broadcaster)
 	{

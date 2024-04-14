@@ -1,10 +1,10 @@
 import synodic.honesty.test;
 import synodic.honesty.test.reporter.console;
-import synodic.honesty.test.logger.console;
+import synodic.honesty.log;
 
 namespace
 {
-	constexpr synodic::honesty::test::logger::Console logger;
-	constinit synodic::honesty::test::reporter::Console reporter("default", logger);
+	constexpr synodic::honesty::log::Logger logger("reporter");
+	constinit synodic::honesty::test::Console reporter("default", logger);
 	bool registered = RegisterReporter(reporter);
 }

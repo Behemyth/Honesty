@@ -4,7 +4,6 @@ target_sources(honesty
 		FILES
 			"test.ixx"
 			"types.ixx"
-			"logger.ixx"
 			"reporter.ixx"
 			"runner.ixx"
 			"function_ref.ixx"
@@ -32,8 +31,4 @@ add_subdirectory(
 
 add_subdirectory(
 	reporter
-)
-
-add_subdirectory(
-	logger
 )

@@ -1,15 +1,16 @@
-export module synodic.honesty.test.logger.console;
+export module synodic.honesty.log:logger;
 
 import std;
-import synodic.honesty.log;
+import :colour;
 
-namespace synodic::honesty::test::logger
+namespace synodic::honesty::log
 {
-	export class Console
+
+	export class Logger
 	{
 	public:
-
-		consteval Console() = default;
+		consteval Logger(std::string_view name);
+		~Logger() = default;
 
 		template<class... Args>
 		void log(std::format_string<Args...> fmt, Args&&... args)
@@ -24,5 +25,12 @@ namespace synodic::honesty::test::logger
 		}
 
 	private:
+		std::string_view name_;
 	};
+
+	consteval Logger::Logger(std::string_view name) :
+		name_(name)
+	{
+	}
+
 }

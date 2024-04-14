@@ -3,7 +3,7 @@ module synodic.honesty.test;
 import std;
 import :interface;
 
-// A helper
+// A helper for variant overload deduction
 template<typename... Ts>
 struct Overload : Ts...
 {

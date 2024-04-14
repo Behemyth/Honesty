@@ -373,6 +373,15 @@ namespace synodic::honesty::test
 	}
 
 	export template<class T, class U>
+		requires std::equality_comparable_with<T, U>
+	constexpr bool
+		expect_not_equals(const T& a, const U& b, const std::source_location& location = std::source_location::current())
+	{
+		// TODO: Pass message context
+		return expect(a != b, location);
+	}
+
+	export template<class T, class U>
 		requires std::totally_ordered_with<T, U>
 	constexpr bool
 		expect_greater(const T& a, const U& b, const std::source_location& location = std::source_location::current())

@@ -21,7 +21,8 @@ namespace
 			ListParameters parameters;
 			auto result = interface.List(parameters);
 
-			expect_equals(0, 0);
+			auto size = result.tests.size();
+			expect_greater(size, 0);
 		};
 	};
 

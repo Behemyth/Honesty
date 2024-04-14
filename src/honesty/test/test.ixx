@@ -7,7 +7,6 @@ import :generator;
 import :types;
 import :registry;
 
-
 namespace synodic::honesty::test
 {
 	class VoidTest;
@@ -371,6 +370,46 @@ namespace synodic::honesty::test
 	{
 		// TODO: Pass message context
 		return expect(a == b, location);
+	}
+
+	export template<class T, class U>
+		requires std::totally_ordered_with<T, U>
+	constexpr bool
+		expect_greater(const T& a, const U& b, const std::source_location& location = std::source_location::current())
+	{
+		// TODO: Pass message context
+		return expect(a > b, location);
+	}
+
+	export template<class T, class U>
+		requires std::totally_ordered_with<T, U>
+	constexpr bool
+		expect_less(const T& a, const U& b, const std::source_location& location = std::source_location::current())
+	{
+		// TODO: Pass message context
+		return expect(a < b, location);
+	}
+
+	export template<class T, class U>
+		requires std::totally_ordered_with<T, U>
+	constexpr bool expect_greater_equal(
+		const T& a,
+		const U& b,
+		const std::source_location& location = std::source_location::current())
+	{
+		// TODO: Pass message context
+		return expect(a >= b, location);
+	}
+
+	export template<class T, class U>
+		requires std::totally_ordered_with<T, U>
+	constexpr bool expect_less_equal(
+		const T& a,
+		const U& b,
+		const std::source_location& location = std::source_location::current())
+	{
+		// TODO: Pass message context
+		return expect(a <= b, location);
 	}
 
 	export namespace literals

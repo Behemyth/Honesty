@@ -42,9 +42,18 @@ namespace synodic::honesty::test
 		ExecuteResult() = default;
 	};
 
+	export struct TestDescription
+	{
+		TestDescription() = default;
+
+		std::string name;
+	};
+
 	export struct ListResult
 	{
 		ListResult() = default;
+
+		std::vector<TestDescription> tests;
 	};
 
 	/**

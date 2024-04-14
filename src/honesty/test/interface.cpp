@@ -48,6 +48,22 @@ namespace synodic::honesty::test
 
 	ListResult Interface::List(const ListParameters& parameters)
 	{
-		return {};
+		auto suites = GetRegistry().GetSuites();
+
+		ListResult result;
+
+		for (const SuiteData* const suite: suites)
+		{
+			auto generator = suite->Generator();
+			for (const TestBase& test: generator())
+			{
+				TestDescription description;
+				description.name = test.Name();
+
+				result.tests.push_back(description);
+			}
+		}
+
+		return result;
 	}
 }

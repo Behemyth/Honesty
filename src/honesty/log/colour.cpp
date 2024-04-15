@@ -2,7 +2,7 @@ module synodic.honesty.log;
 
 import std;
 
-namespace synodic::honesty::terminal
+namespace synodic::honesty::log
 {
 	std::string vformat(const text_style& style, std::string_view fmt, std::format_args args)
 	{

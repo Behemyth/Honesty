@@ -8,7 +8,7 @@ export module synodic.honesty.log:colour;
 
 import std;
 
-namespace synodic::honesty::terminal
+namespace synodic::honesty::log
 {
 	export struct color8_t
 	{
@@ -88,8 +88,8 @@ namespace synodic::honesty::terminal
 	export class text_style
 	{
 	public:
-		constexpr explicit text_style(terminal::color8_t color);
-		constexpr explicit text_style(terminal::color24_t color);
+		constexpr explicit text_style(color8_t color);
+		constexpr explicit text_style(color24_t color);
 
 		constexpr std::optional<color_type> Foreground() const;
 		constexpr std::optional<color_type> Background() const;
@@ -103,13 +103,13 @@ namespace synodic::honesty::terminal
 		std::uint8_t attributeMask_;
 	};
 
-	constexpr text_style::text_style(terminal::color8_t color) :
+	constexpr text_style::text_style(color8_t color) :
 		foreground_(color),
 		attributeMask_(0)
 	{
 	}
 
-	constexpr text_style::text_style(terminal::color24_t color) :
+	constexpr text_style::text_style(color24_t color) :
 		foreground_(color),
 		attributeMask_(0)
 	{

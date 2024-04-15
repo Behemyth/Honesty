@@ -10,23 +10,23 @@ namespace synodic::honesty::test
 	export class Console : public StreamingAdapter
 	{
 	public:
-		consteval Console(std::string_view name, const log::Logger& logger);
+		consteval Console(std::string_view name);
 		~Console() override = default;
 
 		void signal(const event::SuiteBegin& event) override
 		{
-			logger_.log("Suite Begin: {}", event.name);
+			logger_.Log("Suite Begin: {}", event.name);
 		}
 
 		void signal(const event::TestBegin& event) override
 		{
-			logger_.log("Test Begin: {}", event.name);
+			logger_.Log("Test Begin: {}", event.name);
 		}
 
 		void signal(const event::AssertionPass& event) override
 		{
-			std::string styledResult = format(terminal::text_style(terminal::color24_t(0, 255, 0)), "Passed");
-			logger_.log(
+			std::string styledResult = format(log::text_style(log::color24_t(0, 255, 0)), "Passed");
+			logger_.Log(
 				"Assertion {}: File({}), Line({})",
 				styledResult,
 				event.location.file_name(),
@@ -35,17 +35,21 @@ namespace synodic::honesty::test
 
 		void signal(const event::AssertionFail& event) override
 		{
-			std::string styledResult = format(terminal::text_style(terminal::color24_t(255, 0, 0)), "Failed");
-			logger_.log("Test {}: File({}), Line({})", styledResult, event.location.file_name(), event.location.line());
+			std::string styledResult = format(log::text_style(log::color24_t(255, 0, 0)), "Failed");
+			logger_.Log("Test {}: File({}), Line({})", styledResult, event.location.file_name(), event.location.line());
 		}
 
 	private:
+		log::Console consoleSink_;
+		std::array<log::Sink*, 1> sinks_;
 		log::Logger logger_;
 	};
 
-	consteval Console::Console(std::string_view name, const log::Logger& logger) :
+	consteval Console::Console(std::string_view name) :
 		StreamingAdapter(name),
-		logger_(logger)
+		consoleSink_(),
+		sinks_ {&consoleSink_},
+		logger_(log::Logger("reporter", sinks_))
 	{
 	}
 }

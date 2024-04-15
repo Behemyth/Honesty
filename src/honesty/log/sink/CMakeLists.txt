@@ -4,5 +4,9 @@ target_sources(honesty
 		FILES
 			"sink.ixx"
 			"console.ixx"
+	PRIVATE
+		FILE_SET implementations
+		FILES
+			"console.cpp"
 )
 

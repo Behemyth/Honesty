@@ -17,8 +17,8 @@ namespace
 			co_yield "construction"_test = []()
 			{
 				expect_equals(
-					terminal::color24_t(58, 90, 64),
-					terminal::color24_t(green));
+					log::color24_t(58, 90, 64),
+					log::color24_t(green));
 			};
 		});
 
@@ -28,15 +28,15 @@ namespace
 		{
 			co_yield "construction"_test = []()
 			{
-				terminal::color24_t hunterGreen(58, 90, 64);
-				terminal::text_style style(hunterGreen);
+				log::color24_t hunterGreen(58, 90, 64);
+				log::text_style style(hunterGreen);
 
 				auto foreground = style.Foreground();
 				assert(foreground.has_value());
 				expect(not style.Background().has_value());
 				expect(not style.AttributeMask());
 
-				auto value = std::get<terminal::color24_t>(foreground.value());
+				auto value = std::get<log::color24_t>(foreground.value());
 				expect_equals(value, hunterGreen);
 			};
 		});
@@ -48,8 +48,8 @@ namespace
 			co_yield "format_to"_test = []()
 			{
 				std::string output;
-				terminal::text_style style(terminal::color24_t(58, 90, 64));
-				terminal::format_to(std::back_inserter(output), style, "{} = (58,90,64)", "Hunter Green");
+				log::text_style style(log::color24_t(58, 90, 64));
+				log::format_to(std::back_inserter(output), style, "{} = (58,90,64)", "Hunter Green");
 
 				std::string expected;
 				std::format_to(
@@ -62,8 +62,8 @@ namespace
 
 			co_yield "format"_test = []()
 			{
-				std::string output = terminal::format(
-					terminal::text_style(terminal::color24_t(58, 90, 64)),
+				std::string output = log::format(
+					log::text_style(log::color24_t(58, 90, 64)),
 					"Hunter Green = (58,90,64)");
 
 				std::string expected = std::format("\x1b[38;2;058;090;064m{}\x1b[0m", "Hunter Green = (58,90,64)");

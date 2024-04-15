@@ -6,22 +6,13 @@ import :sink;
 
 namespace synodic::honesty::log
 {
-	export class Console : Sink
+	export class Console : public Sink
 	{
 	public:
-		consteval Console() = default;
+		Console() = default;
 
-		template<class... Args>
-		void log(std::format_string<Args...> fmt, Args&&... args)
-		{
-			std::println(fmt, std::forward<Args>(args)...);
-		}
-
-		template<class... Args>
-		void log(const terminal::text_style& style, std::format_string<Args...> fmt, Args&&... args)
-		{
-			terminal::println(style, fmt, std::forward<Args>(args)...);
-		}
+		void LogV(std::string_view fmt, std::format_args args) override;
+		void LogV(const text_style& style, std::string_view fmt, std::format_args args) override;
 
 	private:
 	};

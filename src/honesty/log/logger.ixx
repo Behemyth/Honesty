@@ -11,22 +11,25 @@ namespace synodic::honesty::log
 	export class Logger
 	{
 	public:
-		consteval Logger(std::string_view name);
-		consteval Logger(std::string_view name, std::span<Sink*> sinks);
+		constexpr Logger(std::string_view name);
+		constexpr Logger(std::string_view name, std::span<Sink*> sinks);
 
 		~Logger() = default;
 
 		template<class... Args>
-		void log(std::format_string<Args...> fmt, Args&&... args)
+		inline void Log(std::format_string<Args...> fmt, Args&&... args) const
 		{
-			std::println(fmt, std::forward<Args>(args)...);
+			LogV(fmt.get(), std::make_format_args(args...));
 		}
 
 		template<class... Args>
-		void log(const terminal::text_style& style, std::format_string<Args...> fmt, Args&&... args)
+		inline void Log(const text_style& style, std::format_string<Args...> fmt, Args&&... args) const
 		{
-			terminal::println(style, fmt, std::forward<Args>(args)...);
+			LogV(style, fmt.get(), std::make_format_args(args...));
 		}
+
+		void LogV(std::string_view fmt, std::format_args args) const;
+		void LogV(const text_style& style, std::string_view fmt, std::format_args args) const;
 
 	private:
 		Level level_;
@@ -35,13 +38,13 @@ namespace synodic::honesty::log
 		std::span<Sink*> sinks_;
 	};
 
-	consteval Logger::Logger(std::string_view name) :
+	constexpr Logger::Logger(std::string_view name) :
 		level_(Level::INFO),
 		name_(name)
 	{
 	}
 
-	consteval Logger::Logger(std::string_view name, std::span<Sink*> sinks) :
+	constexpr Logger::Logger(std::string_view name, std::span<Sink*> sinks) :
 		level_(Level::INFO),
 		name_(name),
 		sinks_(sinks)

@@ -6,7 +6,7 @@ import std;
 export class MockReporter final : public synodic::honesty::test::Reporter
 {
 public:
-	consteval MockReporter();
+	MockReporter();
 
 	void signal(const synodic::honesty::test::event::SuiteBegin& event) override;
 	void signal(const synodic::honesty::test::event::SuiteEnd& event) override;
@@ -27,7 +27,7 @@ public:
 	void signal(const synodic::honesty::test::event::Summary& event) override;
 };
 
-consteval MockReporter::MockReporter() :
+MockReporter::MockReporter() :
 	Reporter("mock")
 {
 }

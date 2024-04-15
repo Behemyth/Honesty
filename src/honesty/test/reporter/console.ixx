@@ -10,7 +10,7 @@ namespace synodic::honesty::test
 	export class Console : public StreamingAdapter
 	{
 	public:
-		consteval Console(std::string_view name);
+		Console(std::string_view name);
 		~Console() override = default;
 
 		void signal(const event::SuiteBegin& event) override
@@ -41,15 +41,13 @@ namespace synodic::honesty::test
 
 	private:
 		log::Console consoleSink_;
-		std::array<log::Sink*, 1> sinks_;
 		log::Logger logger_;
 	};
 
-	consteval Console::Console(std::string_view name) :
+	Console::Console(std::string_view name) :
 		StreamingAdapter(name),
 		consoleSink_(),
-		sinks_ {&consoleSink_},
-		logger_(log::Logger("reporter", sinks_))
+		logger_(log::Logger("reporter", consoleSink_))
 	{
 	}
 }

@@ -11,8 +11,8 @@ namespace synodic::honesty::log
 	export class Logger
 	{
 	public:
-		constexpr Logger(std::string_view name);
-		constexpr Logger(std::string_view name, std::span<Sink*> sinks);
+		Logger(std::string_view name);
+		Logger(std::string_view name, Sink& sink);
 
 		~Logger() = default;
 
@@ -35,19 +35,19 @@ namespace synodic::honesty::log
 		Level level_;
 
 		std::string_view name_;
-		std::span<Sink*> sinks_;
+		std::vector<Sink*> sinks_;
 	};
 
-	constexpr Logger::Logger(std::string_view name) :
+	Logger::Logger(std::string_view name) :
 		level_(Level::INFO),
 		name_(name)
 	{
 	}
 
-	constexpr Logger::Logger(std::string_view name, std::span<Sink*> sinks) :
+	Logger::Logger(std::string_view name, Sink& sink) :
 		level_(Level::INFO),
-		name_(name),
-		sinks_(sinks)
+		name_(name)
 	{
+		sinks_.push_back(&sink);
 	}
 }

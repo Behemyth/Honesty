@@ -5,6 +5,6 @@ import std;
 
 namespace
 {
-	constinit synodic::honesty::test::Console reporter("default");
+	synodic::honesty::test::Console reporter("default");
 	bool registered = RegisterReporter(reporter);
 }

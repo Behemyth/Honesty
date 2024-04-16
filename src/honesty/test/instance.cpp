@@ -81,15 +81,27 @@ namespace synodic::honesty::test
 			}
 		}
 
-		// TODO: Proper argument parsing
-		if (std::ranges::contains(arguments, "--list-tests"))
-		{
-			parameters_ = ListParameters();
-		}
-		else
+		if (arguments.empty())
 		{
 			parameters_ = ExecuteParameters(defaultRunner, defaultReporter);
+			return;
 		}
+
+		if (arguments[0] == "list")
+		{
+			arguments = arguments.subspan(1);
+			ListParameters parameters;
+
+			if (std::ranges::contains(arguments, "--json"))
+			{
+				parameters.outputType = ListOutputType::JSON;
+			}
+
+			parameters_ = parameters;
+			return;
+		}
+
+		parameters_ = ExecuteParameters(defaultRunner, defaultReporter);
 	}
 
 	void Instance::Execute() const
@@ -111,6 +123,11 @@ namespace synodic::honesty::test
 				[&](const ListParameters& parameters)
 				{
 					auto result = interface.List(parameters);
+
+					for (auto& testDescription: result.tests)
+					{
+						std::println("{}", testDescription.name);
+					}
 				},
 			};
 

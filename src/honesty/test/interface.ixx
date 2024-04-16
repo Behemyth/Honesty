@@ -1,5 +1,6 @@
 export module synodic.honesty.test:interface;
 
+import synodic.honesty.log;
 import std;
 import :registry;
 import :reporter;
@@ -26,9 +27,17 @@ namespace synodic::honesty::test
 		Reporter* reporter;
 	};
 
+	export enum class ListOutputType : std::uint8_t
+	{
+		LOG,
+		JSON
+	};
+
 	export struct ListParameters
 	{
-		ListParameters() = default;
+		ListParameters();
+
+		ListOutputType outputType;
 	};
 
 	export struct HelpResult
@@ -73,7 +82,10 @@ namespace synodic::honesty::test
 		ExecuteResult Execute(const ExecuteParameters& parameters);
 		ListResult List(const ListParameters& parameters);
 
+		const log::Logger& Logger() const;
+
 	private:
+		log::Logger logger_;
 		std::span<Reporter*> reporters_;
 		std::span<Runner*> runners_;
 	};

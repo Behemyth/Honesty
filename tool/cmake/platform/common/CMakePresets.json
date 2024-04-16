@@ -28,7 +28,8 @@
 			"output": {
 				"outputOnFailure": true,
 				"shortProgress": true,
-				"debug": true
+				"debug": true,
+				"verbosity": "verbose"
 			},
 			"execution": {
 				"noTestsAction": "error",

@@ -59,22 +59,37 @@ function(honesty_extract_tests)
 		)
 	endif()
 
+	set(HONESTY_ARGS "--list-tests")
+
+	cmake_path(GET _EXECUTABLE PARENT_PATH EXECUTABLE_PARENT)
+
+	message("Running '${_EXECUTABLE} ${HONESTY_ARGS}' in directory '${EXECUTABLE_PARENT}'")
+
 	# Extract the test list from the Honesty target
 	execute_process(
-		COMMAND "${_EXECUTABLE}" --list-tests
-		WORKING_DIRECTORY "${_EXECUTABLE}"
+		COMMAND ${_EXECUTABLE} ${HONESTY_ARGS}
+		WORKING_DIRECTORY ${EXECUTABLE_PARENT}
 		TIMEOUT ${_DISCOVERY_TIMEOUT}
 		OUTPUT_VARIABLE output
 		RESULT_VARIABLE result
 	)
 
+	string(REPLACE "\n" "\n    " output "${output}")
+	set(path "${_EXECUTABLE}")
+
 	# Handle process errors
 	if(NOT ${result} EQUAL 0)
-		string(REPLACE "\n" "\n    " output "${output}")
-		set(path "${_EXECUTABLE}")
-
 		message(FATAL_ERROR
 			"Error running test executable.\n"
+			"  Path: '${path}'\n"
+			"  Working directory: '${_WORKING_DIR}'\n"
+			"  Result: ${result}\n"
+			"  Output:\n"
+			"    ${output}\n"
+		)
+	else()
+		message(
+			"Test executable result.\n"
 			"  Path: '${path}'\n"
 			"  Working directory: '${_WORKING_DIR}'\n"
 			"  Result: ${result}\n"

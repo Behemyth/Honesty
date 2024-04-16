@@ -46,7 +46,6 @@ namespace synodic::honesty::test
 
 	Console::Console(std::string_view name) :
 		StreamingAdapter(name),
-		consoleSink_(),
 		logger_(log::Logger("reporter", consoleSink_))
 	{
 	}

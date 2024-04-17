@@ -106,11 +106,13 @@ namespace synodic::honesty::test
 
 	void Instance::Execute() const
 	{
+		Interface::Configuration configuration;
+		Interface interface(configuration);
+
+		const log::Logger& logger = interface.Logger();
+
 		try
 		{
-			Interface::Configuration configuration;
-
-			Interface interface(configuration);
 			auto executor = Overload{
 				[&](const HelpParameters& parameters)
 				{
@@ -126,7 +128,7 @@ namespace synodic::honesty::test
 
 					for (auto& testDescription: result.tests)
 					{
-						std::println("{}", testDescription.name);
+						logger.Info("{}", testDescription.name);
 					}
 				},
 			};
@@ -135,7 +137,7 @@ namespace synodic::honesty::test
 		}
 		catch (const std::invalid_argument& exception)
 		{
-			std::println("Error: {0}", exception.what());
+			logger.Error("Error: {0}", exception.what());
 		}
 	}
 }

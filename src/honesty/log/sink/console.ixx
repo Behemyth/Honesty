@@ -3,6 +3,7 @@ export module synodic.honesty.log:sink.console;
 import std;
 import :colour;
 import :sink;
+import :types;
 
 namespace synodic::honesty::log
 {
@@ -11,8 +12,7 @@ namespace synodic::honesty::log
 	public:
 		Console() = default;
 
-		void LogV(std::string_view fmt, std::format_args args) override;
-		void LogV(const text_style& style, std::string_view fmt, std::format_args args) override;
+		void LogV(Level level, std::string_view fmt, std::format_args args) override;
 
 	private:
 	};

@@ -17,19 +17,49 @@ namespace synodic::honesty::log
 		~Logger() = default;
 
 		template<class... Args>
-		inline void Log(std::format_string<Args...> fmt, Args&&... args) const
+		inline void Log(Level level, std::format_string<Args...> fmt, Args&&... args) const
 		{
-			LogV(fmt.get(), std::make_format_args(args...));
+			LogV(level, fmt.get(), std::make_format_args(args...));
+		}
+
+		// Type-erased logging similar to std::format
+		void LogV(Level level, std::string_view fmt, std::format_args args) const;
+
+		template<class... Args>
+		inline void Trace(std::format_string<Args...> fmt, Args&&... args) const
+		{
+			Log(Level::TRACE, fmt, std::forward<Args>(args)...);
 		}
 
 		template<class... Args>
-		inline void Log(const text_style& style, std::format_string<Args...> fmt, Args&&... args) const
+		inline void Debug(std::format_string<Args...> fmt, Args&&... args) const
 		{
-			LogV(style, fmt.get(), std::make_format_args(args...));
+			Log(Level::DEBUG, fmt, std::forward<Args>(args)...);
 		}
 
-		void LogV(std::string_view fmt, std::format_args args) const;
-		void LogV(const text_style& style, std::string_view fmt, std::format_args args) const;
+		template<class... Args>
+		inline void Info(std::format_string<Args...> fmt, Args&&... args) const
+		{
+			Log(Level::INFO, fmt, std::forward<Args>(args)...);
+		}
+
+		template<class... Args>
+		inline void Warning(std::format_string<Args...> fmt, Args&&... args) const
+		{
+			Log(Level::WARNING, fmt, std::forward<Args>(args)...);
+		}
+
+		template<class... Args>
+		inline void Error(std::format_string<Args...> fmt, Args&&... args) const
+		{
+			Log(Level::ERROR, fmt, std::forward<Args>(args)...);
+		}
+
+		template<class... Args>
+		inline void Critical(std::format_string<Args...> fmt, Args&&... args) const
+		{
+			Log(Level::CRITICAL, fmt, std::forward<Args>(args)...);
+		}
 
 	private:
 		Level level_;

@@ -15,18 +15,18 @@ namespace synodic::honesty::test
 
 		void signal(const event::SuiteBegin& event) override
 		{
-			logger_.Log("Suite Begin: {}", event.name);
+			logger_.Info("Suite Begin: {}", event.name);
 		}
 
 		void signal(const event::TestBegin& event) override
 		{
-			logger_.Log("Test Begin: {}", event.name);
+			logger_.Info("Test Begin: {}", event.name);
 		}
 
 		void signal(const event::AssertionPass& event) override
 		{
 			std::string styledResult = format(log::text_style(log::color24_t(0, 255, 0)), "Passed");
-			logger_.Log(
+			logger_.Info(
 				"Assertion {}: File({}), Line({})",
 				styledResult,
 				event.location.file_name(),
@@ -36,7 +36,7 @@ namespace synodic::honesty::test
 		void signal(const event::AssertionFail& event) override
 		{
 			std::string styledResult = format(log::text_style(log::color24_t(255, 0, 0)), "Failed");
-			logger_.Log("Test {}: File({}), Line({})", styledResult, event.location.file_name(), event.location.line());
+			logger_.Info("Test {}: File({}), Line({})", styledResult, event.location.file_name(), event.location.line());
 		}
 
 	private:

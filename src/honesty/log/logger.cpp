@@ -1,5 +1,11 @@
 module synodic.honesty.log;
 
+namespace
+{
+	std::set<synodic::honesty::log::Logger> LOGGERS;
+	const synodic::honesty::log::Logger& ROOT_LOGGER = *LOGGERS.emplace().first;
+}
+
 namespace synodic::honesty::log
 {
 	Logger::Logger(std::string name) :
@@ -45,12 +51,6 @@ namespace synodic::honesty::log
 	void Logger::SetLevel(LevelType level)
 	{
 		level_ = level;
-	}
-
-	const Logger& Logger::Root()
-	{
-		static Logger root;
-		return root;
 	}
 
 	void Logger::AddSink(Sink* sink) const
@@ -118,5 +118,17 @@ namespace synodic::honesty::log
 		propagate_(false),
 		disabled_(false)
 	{
+	}
+
+	const Logger& GetRootLogger()
+	{
+		return ROOT_LOGGER;
+	}
+
+	Logger& GetLogger(std::string name)
+	{
+		if (loggers.contains(name))
+		{
+		}
 	}
 }

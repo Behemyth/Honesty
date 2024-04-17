@@ -11,7 +11,6 @@ namespace synodic::honesty::log
 	export class Logger
 	{
 	public:
-
 		explicit Logger(std::string name);
 		~Logger() = default;
 
@@ -149,12 +148,6 @@ namespace synodic::honesty::log
 		 */
 		void SetDisabled(bool disabled);
 
-		/***
-		 * @brief Returns the root logger
-		 * @return The root logger
-		 */
-		static const Logger& Root();
-
 	private:
 		// Root constructor
 		Logger();
@@ -169,4 +162,8 @@ namespace synodic::honesty::log
 		bool disabled_;
 		mutable std::vector<Sink*> sinks_;
 	};
+
+	export const Logger& GetRootLogger();
+	export Logger& GetLogger(std::string name);
+
 }

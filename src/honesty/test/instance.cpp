@@ -127,9 +127,20 @@ namespace synodic::honesty::test
 				{
 					auto result = interface.List(parameters);
 
-					for (auto& testDescription: result.tests)
+					switch (parameters.outputType)
 					{
-						logger_.Info("{}", testDescription.name);
+						case ListOutputType::LOG:
+						{
+							for (auto& testDescription: result.tests)
+							{
+								logger_.Info("{}", testDescription.name);
+							}
+							break;
+						}
+						case ListOutputType::JSON:
+						{
+							break;
+						}
 					}
 				},
 			};

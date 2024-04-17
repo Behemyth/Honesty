@@ -42,16 +42,6 @@ namespace synodic::honesty::test
 		std::string_view name_;
 	};
 
-	Reporter::Reporter(std::string_view name) :
-		name_(name)
-	{
-	}
-
-	std::string_view Reporter::Name() const
-	{
-		return name_;
-	}
-
 	/**
 	 * @brief TODO: Actually implement this instead of just stubbing it out.
 	 */
@@ -59,7 +49,6 @@ namespace synodic::honesty::test
 	{
 	public:
 		StreamingAdapter(std::string_view name);
-
 		~StreamingAdapter() override = default;
 
 		void signal(const event::SuiteBegin& event) override {};
@@ -86,9 +75,4 @@ namespace synodic::honesty::test
 
 		void signal(const event::Summary& event) override {};
 	};
-
-	StreamingAdapter::StreamingAdapter(std::string_view name):
-		Reporter(name)
-	{
-	}
 }

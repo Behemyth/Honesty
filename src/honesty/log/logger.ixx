@@ -12,8 +12,6 @@ namespace synodic::honesty::log
 	{
 	public:
 		Logger(std::string_view name);
-		Logger(std::string_view name, Sink& sink);
-
 		~Logger() = default;
 
 		template<class... Args>
@@ -61,23 +59,15 @@ namespace synodic::honesty::log
 			Log(Level::CRITICAL, fmt, std::forward<Args>(args)...);
 		}
 
+		Level GetLevel() const;
+
 	private:
 		Level level_;
 
 		std::string_view name_;
-		std::vector<Sink*> sinks_;
+		std::optional<std::vector<Sink*>> sinks_;
 	};
 
-	Logger::Logger(std::string_view name) :
-		level_(Level::INFO),
-		name_(name)
-	{
-	}
 
-	Logger::Logger(std::string_view name, Sink& sink) :
-		level_(Level::INFO),
-		name_(name)
-	{
-		sinks_.push_back(&sink);
-	}
+	const Logger& RootLogger();
 }

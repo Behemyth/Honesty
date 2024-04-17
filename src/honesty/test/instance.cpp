@@ -109,7 +109,7 @@ namespace synodic::honesty::test
 		Interface::Configuration configuration;
 		Interface interface(configuration);
 
-		const log::Logger& logger = interface.Logger();
+		const log::Logger& logger = interface.GetLogger();
 
 		try
 		{

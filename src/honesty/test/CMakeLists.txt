@@ -18,6 +18,7 @@ target_sources(honesty
 			"runner.cpp"
 			"interface.cpp"
 			"instance.cpp"
+			"reporter.cpp"
 )
 
 target_sources(honesty_main

@@ -1,5 +1,4 @@
 import synodic.honesty.test;
-import synodic.honesty.test.reporter.console;
 import std;
 
 int main(int argc, const char* argv[])

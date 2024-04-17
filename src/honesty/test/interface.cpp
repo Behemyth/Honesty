@@ -19,8 +19,7 @@ namespace synodic::honesty::test
 	{
 	}
 
-	Interface::Interface(const Configuration& configuration) :
-		logger_("honesty")
+	Interface::Interface(const Configuration& configuration): logger_("honesty")
 	{
 		Registry& registry = GetRegistry();
 
@@ -72,7 +71,7 @@ namespace synodic::honesty::test
 		return result;
 	}
 
-	const log::Logger& Interface::Logger() const
+	const log::Logger& Interface::GetLogger() const
 	{
 		return logger_;
 	}

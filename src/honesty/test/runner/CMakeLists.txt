@@ -3,6 +3,10 @@ target_sources(honesty
 	FILE_SET interfaces
 	FILES
 	local.ixx
+	PRIVATE
+	FILE_SET implementations
+	FILES
+	local.cpp
 )
 
 target_sources(honesty

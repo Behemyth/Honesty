@@ -9,7 +9,7 @@ namespace synodic::honesty::log
 	export class Sink
 	{
 	public:
-		Sink()			= default;
+		explicit Sink(Level level = Level::DEFER);
 		virtual ~Sink() = default;
 
 		template<class... Args>
@@ -20,6 +20,12 @@ namespace synodic::honesty::log
 
 		virtual void LogV(Level level, std::string_view fmt, std::format_args args) = 0;
 
+		virtual void Flush();
+
+		Level GetLevel() const;
+
 	private:
+		Level level_;
 	};
+
 }

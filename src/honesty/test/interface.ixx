@@ -82,7 +82,7 @@ namespace synodic::honesty::test
 		ExecuteResult Execute(const ExecuteParameters& parameters);
 		ListResult List(const ListParameters& parameters);
 
-		const log::Logger& Logger() const;
+		const log::Logger& GetLogger() const;
 
 	private:
 		log::Logger logger_;

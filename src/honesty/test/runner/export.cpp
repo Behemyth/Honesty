@@ -1,5 +1,4 @@
 import synodic.honesty.test;
-import synodic.honesty.test.runner.local;
 
 namespace
 {

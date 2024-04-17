@@ -1,17 +1,16 @@
-export module synodic.honesty.test.reporter.console;
+export module synodic.honesty.test:reporter.compact;
 
-import synodic.honesty.test;
 import synodic.honesty.log;
-
+import :reporter;
 import std;
 
 namespace synodic::honesty::test
 {
-	export class Console : public StreamingAdapter
+	export class CompactReporter : public StreamingAdapter
 	{
 	public:
-		Console(std::string_view name);
-		~Console() override = default;
+		CompactReporter(std::string_view name);
+		~CompactReporter() override = default;
 
 		void signal(const event::SuiteBegin& event) override
 		{
@@ -44,9 +43,4 @@ namespace synodic::honesty::test
 		log::Logger logger_;
 	};
 
-	Console::Console(std::string_view name) :
-		StreamingAdapter(name),
-		logger_(log::Logger("reporter", consoleSink_))
-	{
-	}
 }

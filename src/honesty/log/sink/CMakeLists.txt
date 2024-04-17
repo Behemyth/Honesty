@@ -8,5 +8,6 @@ target_sources(honesty
 		FILE_SET implementations
 		FILES
 			"console.cpp"
+			"sink.cpp"
 )
 

@@ -18,9 +18,12 @@ namespace synodic::honesty::test
 	{
 	}
 
-	Instance::Instance(const Configuration& configuration, std::span<std::string_view> arguments) : logger_("instance"),
+	Instance::Instance(const Configuration& configuration, std::span<std::string_view> arguments) :
+		logger_("instance"),
 		parameters_(HelpParameters())
 	{
+		logger_.AddSink(&consoleSink_);
+
 		std::span<Runner*> runners = GetRegistry().GetRunners();
 		std::span<Reporter*> reporters = GetRegistry().GetReporters();
 

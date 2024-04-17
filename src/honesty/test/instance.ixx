@@ -25,6 +25,7 @@ namespace synodic::honesty::test
 
 	private:
 		log::Logger logger_;
+		log::Console consoleSink_;
 
 		// Our list of top level commands and the parameters that go with them
 		std::variant<HelpParameters, ExecuteParameters, ListParameters> parameters_;

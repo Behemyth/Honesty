@@ -88,7 +88,7 @@ namespace synodic::honesty::log
 
 	std::span<Logger*> Logger::GetChildren() const
 	{
-		return {};
+		return children_;
 	}
 
 	bool Logger::Propagate() const

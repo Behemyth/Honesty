@@ -162,6 +162,7 @@ namespace synodic::honesty::log
 		LevelType level_;
 
 		Logger* parent_;
+		mutable std::vector<Logger*> children_;
 
 		std::string name_;
 		bool propagate_;

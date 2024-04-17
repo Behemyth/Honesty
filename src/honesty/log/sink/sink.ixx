@@ -6,26 +6,32 @@ import :types;
 
 namespace synodic::honesty::log
 {
+
+	export class Formatter
+	{
+	public:
+		virtual ~Formatter()  = default;
+		virtual void Format() = 0;
+
+	private:
+	};
+
 	export class Sink
 	{
 	public:
-		explicit Sink(Level level = Level::DEFER);
+		explicit Sink(LevelType level = LevelType::DEFER);
 		virtual ~Sink() = default;
 
-		template<class... Args>
-		inline void Log(Level level, std::format_string<Args...> fmt, Args&&... args)
-		{
-			LogV(level, fmt.get(), std::make_format_args(args...));
-		}
-
-		virtual void LogV(Level level, std::string_view fmt, std::format_args args) = 0;
+		virtual void LogV(LevelType level, std::string_view fmt, std::format_args args) = 0;
 
 		virtual void Flush();
+		virtual void SetFormatter(Formatter* formatter);
 
-		Level GetLevel() const;
+		LevelType Level() const;
+		void SetLevel(LevelType level);
 
-	private:
-		Level level_;
+	protected:
+		LevelType level_;
 	};
 
 }

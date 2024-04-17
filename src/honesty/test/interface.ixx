@@ -82,10 +82,7 @@ namespace synodic::honesty::test
 		ExecuteResult Execute(const ExecuteParameters& parameters);
 		ListResult List(const ListParameters& parameters);
 
-		const log::Logger& GetLogger() const;
-
 	private:
-		log::Logger logger_;
 		std::span<Reporter*> reporters_;
 		std::span<Runner*> runners_;
 	};

@@ -2,7 +2,7 @@ module synodic.honesty.log;
 
 namespace synodic::honesty::log
 {
-	Sink::Sink(Level level) :
+	Sink::Sink(LevelType level) :
 		level_(level)
 	{
 	}
@@ -11,8 +11,17 @@ namespace synodic::honesty::log
 	{
 	}
 
-	Level Sink::GetLevel() const
+	void Sink::SetFormatter(Formatter* formatter)
+	{
+	}
+
+	LevelType Sink::Level() const
 	{
 		return level_;
+	}
+
+	void Sink::SetLevel(LevelType level)
+	{
+		level_ = level;
 	}
 }

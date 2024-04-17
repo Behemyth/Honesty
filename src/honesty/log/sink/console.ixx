@@ -12,7 +12,7 @@ namespace synodic::honesty::log
 	public:
 		Console() = default;
 
-		void LogV(Level level, std::string_view fmt, std::format_args args) override;
+		void LogV(LevelType level, std::string_view fmt, std::format_args args) override;
 
 	private:
 	};

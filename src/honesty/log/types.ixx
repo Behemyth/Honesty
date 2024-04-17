@@ -2,9 +2,9 @@ export module synodic.honesty.log:types;
 
 namespace synodic::honesty::log
 {
-	enum class Level
+	enum class LevelType
 	{
-		DEFER,	// Defer logging to the parent level. If the logger is the root logger, this will be treated as TRACE.
+		DEFER,	// Defer logging to the parent level
 		TRACE,
 		DEBUG,
 		INFO,

@@ -24,6 +24,8 @@ namespace synodic::honesty::test
 		void Execute() const;
 
 	private:
+		log::Logger logger_;
+
 		// Our list of top level commands and the parameters that go with them
 		std::variant<HelpParameters, ExecuteParameters, ListParameters> parameters_;
 	};

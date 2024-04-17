@@ -18,7 +18,7 @@ namespace synodic::honesty::test
 	{
 	}
 
-	Instance::Instance(const Configuration& configuration, std::span<std::string_view> arguments) :
+	Instance::Instance(const Configuration& configuration, std::span<std::string_view> arguments) : logger_("instance"),
 		parameters_(HelpParameters())
 	{
 		std::span<Runner*> runners = GetRegistry().GetRunners();
@@ -109,8 +109,6 @@ namespace synodic::honesty::test
 		Interface::Configuration configuration;
 		Interface interface(configuration);
 
-		const log::Logger& logger = interface.GetLogger();
-
 		try
 		{
 			auto executor = Overload{
@@ -128,7 +126,7 @@ namespace synodic::honesty::test
 
 					for (auto& testDescription: result.tests)
 					{
-						logger.Info("{}", testDescription.name);
+						logger_.Info("{}", testDescription.name);
 					}
 				},
 			};
@@ -137,7 +135,7 @@ namespace synodic::honesty::test
 		}
 		catch (const std::invalid_argument& exception)
 		{
-			logger.Error("Error: {0}", exception.what());
+			logger_.Error("Error: {0}", exception.what());
 		}
 	}
 }

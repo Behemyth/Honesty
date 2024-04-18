@@ -3,4 +3,6 @@ export module synodic.honesty.log;
 export import :colour;
 export import :logger;
 export import :sink;
+export import :sink.synchronized;
 export import :sink.console;
+export import :sink.ringbuffer;

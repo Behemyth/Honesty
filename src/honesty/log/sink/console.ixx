@@ -7,7 +7,7 @@ import :types;
 
 namespace synodic::honesty::log
 {
-	export class Console : public Sink
+	export class Console final : public Sink
 	{
 	public:
 		Console() = default;

@@ -4,10 +4,14 @@ target_sources(honesty
 		FILES
 			"sink.ixx"
 			"console.ixx"
+			"ringbuffer.ixx"
+			"synchronized.ixx"
 	PRIVATE
 		FILE_SET implementations
 		FILES
 			"console.cpp"
 			"sink.cpp"
+			"ringbuffer.cpp"
+			"synchronized.cpp"
 )
 

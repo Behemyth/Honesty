@@ -10,8 +10,14 @@ namespace
 		"logger",
 		[]() -> synodic::honesty::test::generator<synodic::honesty::test::TestBase>
 		{
-			co_yield "TODO"_test = []()
+			co_yield "Parent Sink"_test = []()
 			{
+				synodic::honesty::log::Logger& parent = synodic::honesty::log::GetLogger("parent");
+				synodic::honesty::log::Logger& child = synodic::honesty::log::GetLogger("parent.child");
+
+				synodic::honesty::log::RingBuffer<std::mutex> sink;
+
+				parent.AddSink(&sink);
 			};
 		});
 

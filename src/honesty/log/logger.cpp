@@ -3,8 +3,9 @@ module synodic.honesty.log;
 namespace
 {
 	std::map<std::size_t, synodic::honesty::log::Logger> LOGGERS;
+	const auto ROOT_LOGGER_NAME = "root";
 	const synodic::honesty::log::Logger& ROOT_LOGGER =
-		LOGGERS.try_emplace(std::hash<std::string_view>{}(""), "").first->second;
+		LOGGERS.try_emplace(std::hash<std::string_view>{}(ROOT_LOGGER_NAME), ROOT_LOGGER_NAME).first->second;
 }
 
 namespace synodic::honesty::log

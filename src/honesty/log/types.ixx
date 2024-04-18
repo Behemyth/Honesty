@@ -1,8 +1,10 @@
 export module synodic.honesty.log:types;
 
+import std;
+
 namespace synodic::honesty::log
 {
-	enum class LevelType
+	export enum class LevelType
 	{
 		DEFER,	// Defer logging to the parent level
 		TRACE,
@@ -12,4 +14,15 @@ namespace synodic::honesty::log
 		ERROR,
 		CRITICAL
 	};
-}
+
+	export template<typename T>
+	concept mutex = requires(T type) {
+		{
+			type.lock()
+		} -> std::same_as<void>;
+		{
+			type.unlock()
+		} -> std::same_as<void>;
+	};
+};
+

@@ -2,16 +2,17 @@ module synodic.honesty.log;
 
 namespace
 {
-	std::set<synodic::honesty::log::Logger> LOGGERS;
-	const synodic::honesty::log::Logger& ROOT_LOGGER = *LOGGERS.emplace().first;
+	std::map<std::size_t, synodic::honesty::log::Logger> LOGGERS;
+	const synodic::honesty::log::Logger& ROOT_LOGGER =
+		LOGGERS.try_emplace(std::hash<std::string_view>{}(""), "").first->second;
 }
 
 namespace synodic::honesty::log
 {
-	Logger::Logger(std::string name) :
+	Logger::Logger(std::string_view name) :
 		level_(LevelType::DEFER),
 		parent_(nullptr),
-		name_(std::move(name)),
+		name_(name),
 		propagate_(true),
 		disabled_(false)
 	{
@@ -125,10 +126,8 @@ namespace synodic::honesty::log
 		return ROOT_LOGGER;
 	}
 
-	Logger& GetLogger(std::string name)
+	Logger& GetLogger(std::string_view name)
 	{
-		if (loggers.contains(name))
-		{
-		}
+		return LOGGERS.try_emplace(std::hash<std::string_view>{}(name), name).first->second;
 	}
 }

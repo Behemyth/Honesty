@@ -11,8 +11,13 @@ namespace synodic::honesty::log
 	export class Logger
 	{
 	public:
-		explicit Logger(std::string name);
+		explicit(false) Logger(std::string_view name);
 		~Logger() = default;
+
+		Logger(const Logger& other)				   = delete;
+		Logger(Logger&& other) noexcept			   = default;
+		Logger& operator=(const Logger& other)	   = delete;
+		Logger& operator=(Logger&& other) noexcept = default;
 
 		template<class... Args>
 		inline void Log(LevelType level, std::format_string<Args...> fmt, Args&&... args) const
@@ -164,6 +169,6 @@ namespace synodic::honesty::log
 	};
 
 	export const Logger& GetRootLogger();
-	export Logger& GetLogger(std::string name);
+	export Logger& GetLogger(std::string_view name);
 
 }

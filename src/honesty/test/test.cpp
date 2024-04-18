@@ -86,6 +86,8 @@ namespace synodic::honesty::test
 			failed.location = location;
 
 			context.broadcaster.signal(failed);
+
+			// TODO: Quit the specific test
 		}
 	}
 

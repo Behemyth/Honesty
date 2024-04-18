@@ -15,13 +15,12 @@ namespace
 				expect_throw<std::runtime_error>(
 					[]()
 					{
-						throw std::runtime_error {"Test exception"};
+						throw std::runtime_error{"Test exception"};
 					});
 
 				expect_not_throw(
 					[]()
 					{
-
 					});
 			};
 		});

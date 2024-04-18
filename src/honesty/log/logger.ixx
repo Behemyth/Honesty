@@ -19,6 +19,8 @@ namespace synodic::honesty::log
 		Logger& operator=(const Logger& other)	   = delete;
 		Logger& operator=(Logger&& other) noexcept = default;
 
+		auto operator<=>(const Logger&) const = default;
+
 		template<class... Args>
 		inline void Log(LevelType level, std::format_string<Args...> fmt, Args&&... args) const
 		{

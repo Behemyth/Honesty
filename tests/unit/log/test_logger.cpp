@@ -15,6 +15,9 @@ namespace
 				synodic::honesty::log::Logger& parent = synodic::honesty::log::GetLogger("parent");
 				synodic::honesty::log::Logger& child = synodic::honesty::log::GetLogger("parent.child");
 
+				synodic::honesty::test::assert(child.Parent());
+				synodic::honesty::test::expect_equals(parent, *child.Parent());
+
 				synodic::honesty::log::RingBuffer<std::mutex> sink;
 
 				parent.AddSink(&sink);

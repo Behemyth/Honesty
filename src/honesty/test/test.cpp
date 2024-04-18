@@ -70,44 +70,4 @@ namespace synodic::honesty::test
 		registry.AddReporter(reporter);
 		return true;
 	}
-
-	void assert(bool expression, const std::source_location& location)
-	{
-		if (expression)
-		{
-			event::AssertionPass passed;
-			passed.location = location;
-
-			context.broadcaster.signal(passed);
-		}
-		else
-		{
-			event::AssertionFail failed;
-			failed.location = location;
-
-			context.broadcaster.signal(failed);
-
-			// TODO: Quit the specific test
-		}
-	}
-
-	bool expect(bool expression, const std::source_location& location)
-	{
-		if (expression)
-		{
-			event::AssertionPass passed;
-			passed.location = location;
-
-			context.broadcaster.signal(passed);
-		}
-		else
-		{
-			event::AssertionFail failed;
-			failed.location = location;
-
-			context.broadcaster.signal(failed);
-		}
-
-		return expression;
-	}
 }

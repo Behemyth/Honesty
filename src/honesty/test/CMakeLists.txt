@@ -1,29 +1,31 @@
 target_sources(honesty
 	PUBLIC
-		FILE_SET interfaces
-		FILES
-			"test.ixx"
-			"types.ixx"
-			"reporter.ixx"
-			"runner.ixx"
-			"function_ref.ixx"
-			"generator.ixx"
-			"instance.ixx"
-			"interface.ixx"
+	FILE_SET interfaces
+	FILES
+	assert.ixx
+	test.ixx
+	types.ixx
+	reporter.ixx
+	runner.ixx
+	function_ref.ixx
+	generator.ixx
+	instance.ixx
+	interface.ixx
 	PRIVATE
-		FILE_SET implementations
-		FILES
-			"registry.cpp"
-			"test.cpp"
-			"runner.cpp"
-			"interface.cpp"
-			"instance.cpp"
-			"reporter.cpp"
+	FILE_SET implementations
+	FILES
+	assert.cpp
+	registry.cpp
+	test.cpp
+	runner.cpp
+	interface.cpp
+	instance.cpp
+	reporter.cpp
 )
 
 target_sources(honesty_main
 	PUBLIC
-		"entry.cpp"
+	entry.cpp
 )
 
 add_subdirectory(

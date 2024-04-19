@@ -11,36 +11,64 @@ namespace synodic::honesty::test
 	export class Broadcast final
 	{
 	public:
-		Broadcast(std::span<Reporter*> reporters);
+		explicit Broadcast(std::span<Reporter*> reporters);
 
 		~Broadcast() = default;
 
-		void signal(const event::SuiteBegin& event) const;
-		void signal(const event::SuiteEnd& event) const;
-		void signal(const event::SuiteSkip& event) const;
+		void Signal(const event::SuiteBegin& event) const;
+		void Signal(const event::SuiteEnd& event) const;
+		void Signal(const event::SuiteSkip& event) const;
 
-		void signal(const event::SuiteRun& event) const;
-		void signal(const event::SuiteFail& event) const;
-		void signal(const event::SuitePass& event) const;
+		void Signal(const event::SuiteRun& event) const;
+		void Signal(const event::SuiteFail& event) const;
+		void Signal(const event::SuitePass& event) const;
 
-		void signal(const event::SuiteSummary& event) const;
+		void Signal(const event::SuiteSummary& event) const;
 
-		void signal(const event::TestBegin& event) const;
-		void signal(const event::TestEnd& event) const;
-		void signal(const event::TestSkip& event) const;
+		void Signal(const event::TestBegin& event) const;
+		void Signal(const event::TestEnd& event) const;
+		void Signal(const event::TestSkip& event) const;
 
-		void signal(const event::TestRun& event) const;
-		void signal(const event::TestFail& event) const;
-		void signal(const event::TestPass& event) const;
+		void Signal(const event::TestRun& event) const;
+		void Signal(const event::TestFail& event) const;
+		void Signal(const event::TestPass& event) const;
 
-		void signal(const event::AssertionFail& event) const;
-		void signal(const event::AssertionPass& event) const;
-		void signal(const event::AssertionSkip& event) const;
+		void Signal(const event::AssertionFail& event) const;
+		void Signal(const event::AssertionPass& event) const;
+		void Signal(const event::AssertionSkip& event) const;
 
-		void signal(const event::Summary& event) const;
+		void Signal(const event::Summary& event) const;
 
 	private:
 		std::span<Reporter*> reporters_;
+	};
+
+	// Emulating std::execution state
+	export class RunnerContext
+	{
+	public:
+		explicit RunnerContext(std::span<Reporter*> reporters);
+
+		Broadcast broadcaster;
+
+	private:
+	};
+
+	/**
+	 * @brief A wrapper around a test suite that provides automatic management of test data fit for runner usage
+	 */
+	export class Set
+	{
+	public:
+		Set(const SuiteData& data);
+
+		std::string_view Name() const;
+
+		generator<TestBase> YieldTests();
+
+	private:
+		std::string_view name_;
+		generator<TestBase> generator_;
 	};
 
 	/**
@@ -60,10 +88,12 @@ namespace synodic::honesty::test
 
 		virtual ~Runner() = default;
 
-		virtual void Run(Broadcast& broadcaster) = 0;
-
-		virtual void Submit(const SuiteData* data)					= 0;
-		virtual void Submit(std::span<const SuiteData* const> data) = 0;
+		/**
+		 * @brief
+		 * @param sets
+		 * @param generateContext A function that generates a newly created thread local context
+		 */
+		virtual void Run(std::span<Set> sets, std::function_ref<RunnerContext&()> generateContext) = 0;
 
 		constexpr std::string_view Name() const;
 
@@ -80,15 +110,4 @@ namespace synodic::honesty::test
 	{
 		return name_;
 	}
-
-	// Emulating std::execution state
-	export class RunnerContext
-	{
-	public:
-		RunnerContext(std::span<Reporter*> reporters);
-
-		Broadcast broadcaster;
-
-	private:
-	};
 }

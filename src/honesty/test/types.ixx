@@ -24,26 +24,26 @@ namespace synodic::honesty::test
 	public:
 		consteval SuiteData(
 			std::string_view name,
-			std::function_ref<synodic::honesty::test::generator<TestBase>()> generator) noexcept;
+			std::function_ref<generator<TestBase>()> generator) noexcept;
 
 		std::string_view Name() const noexcept
 		{
 			return name_;
 		}
 
-		std::function_ref<synodic::honesty::test::generator<TestBase>()> Generator() const noexcept
+		generator<TestBase> Generator() const noexcept
 		{
-			return generator_;
+			return generator_();
 		}
 
 	private:
 		std::string_view name_;
-		std::function_ref<synodic::honesty::test::generator<TestBase>()> generator_;
+		std::function_ref<generator<TestBase>()> generator_;
 	};
 
 	consteval SuiteData::SuiteData(
 		std::string_view name,
-		std::function_ref<synodic::honesty::test::generator<TestBase>()> generator) noexcept :
+		std::function_ref<generator<TestBase>()> generator) noexcept :
 		name_(name),
 		generator_(std::move(generator))
 	{
@@ -140,4 +140,10 @@ namespace synodic::honesty::test
 		{
 		};
 	}
+
+	class Assert final : public std::exception
+	{
+	public:
+		using std::exception::exception;
+	};
 }

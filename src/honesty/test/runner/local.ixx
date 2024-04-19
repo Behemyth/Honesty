@@ -10,19 +10,11 @@ namespace synodic::honesty::test
 	public:
 		consteval explicit Local(std::string_view name);
 
-		void Run(Broadcast& broadcaster) override;
-		void Submit(const SuiteData* data) override;
-		void Submit(std::span<const SuiteData* const> data) override;
-
-	private:
-		std::array<const SuiteData*, 30> suitesData_;
-		std::span<const SuiteData*> suites_;
+		void Run(std::span<Set> sets, std::function_ref<RunnerContext&()> generateContext) override;
 	};
 
 	consteval Local::Local(std::string_view name) :
-		Runner(name),
-		suitesData_(),
-		suites_(suitesData_.data(), 0)
+		Runner(name)
 	{
 	}
 }

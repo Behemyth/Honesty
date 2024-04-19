@@ -12,12 +12,12 @@ using namespace synodic::honesty::test::literals;
 namespace
 {
 	// The fallback context for tests
-	inline synodic::honesty::test::RunnerContext emptyContext({});
+	inline synodic::honesty::test::RunnerContext EMPTY_CONTEXT({});
 
 	// Each thread has its own context, such that tests can reference global functions without an object
-	inline thread_local synodic::honesty::test::RunnerContext& context = emptyContext;
+	inline thread_local synodic::honesty::test::RunnerContext& CONTEXT = EMPTY_CONTEXT;
 
-	constinit synodic::honesty::test::Registry registry;
+	constinit synodic::honesty::test::Registry REGISTRY;
 }
 
 namespace synodic::honesty::test
@@ -51,23 +51,23 @@ namespace synodic::honesty::test
 
 	Registry& GetRegistry()
 	{
-		return registry;
+		return REGISTRY;
 	}
 
 	RunnerContext& GetContext()
 	{
-		return context;
+		return CONTEXT;
 	}
 
 	bool RegisterRunner(Runner& runner)
 	{
-		registry.AddRunner(runner);
+		REGISTRY.AddRunner(runner);
 		return true;
 	}
 
 	bool RegisterReporter(Reporter& reporter)
 	{
-		registry.AddReporter(reporter);
+		REGISTRY.AddReporter(reporter);
 		return true;
 	}
 }

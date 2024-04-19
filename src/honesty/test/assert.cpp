@@ -1,4 +1,5 @@
 module synodic.honesty.test;
+import :types;
 
 namespace synodic::honesty::test
 {
@@ -9,16 +10,17 @@ namespace synodic::honesty::test
 			event::AssertionPass passed;
 			passed.location = location;
 
-			GetContext().broadcaster.signal(passed);
+			GetContext().broadcaster.Signal(passed);
 		}
 		else
 		{
 			event::AssertionFail failed;
 			failed.location = location;
 
-			GetContext().broadcaster.signal(failed);
+			GetContext().broadcaster.Signal(failed);
 
 			// TODO: Quit the specific test
+			throw Assert("Assertion failed");
 		}
 	}
 
@@ -29,14 +31,14 @@ namespace synodic::honesty::test
 			event::AssertionPass passed;
 			passed.location = location;
 
-			GetContext().broadcaster.signal(passed);
+			GetContext().broadcaster.Signal(passed);
 		}
 		else
 		{
 			event::AssertionFail failed;
 			failed.location = location;
 
-			GetContext().broadcaster.signal(failed);
+			GetContext().broadcaster.Signal(failed);
 		}
 
 		return expression;

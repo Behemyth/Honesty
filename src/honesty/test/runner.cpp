@@ -7,12 +7,12 @@ import std;
 
 namespace synodic::honesty::test
 {
-	Broadcast::Broadcast(std::span<Reporter*> reporters):
+	Broadcast::Broadcast(std::span<Reporter*> reporters) :
 		reporters_(reporters)
 	{
 	}
 
-	void Broadcast::signal(const event::SuiteBegin& event) const
+	void Broadcast::Signal(const event::SuiteBegin& event) const
 	{
 		for (Reporter* reporter: reporters_)
 		{
@@ -20,7 +20,7 @@ namespace synodic::honesty::test
 		}
 	}
 
-	void Broadcast::signal(const event::SuiteEnd& event) const
+	void Broadcast::Signal(const event::SuiteEnd& event) const
 	{
 		for (Reporter* reporter: reporters_)
 		{
@@ -28,7 +28,7 @@ namespace synodic::honesty::test
 		}
 	}
 
-	void Broadcast::signal(const event::SuiteSkip& event) const
+	void Broadcast::Signal(const event::SuiteSkip& event) const
 	{
 		for (Reporter* reporter: reporters_)
 		{
@@ -36,7 +36,7 @@ namespace synodic::honesty::test
 		}
 	}
 
-	void Broadcast::signal(const event::SuiteRun& event) const
+	void Broadcast::Signal(const event::SuiteRun& event) const
 	{
 		for (Reporter* reporter: reporters_)
 		{
@@ -44,7 +44,7 @@ namespace synodic::honesty::test
 		}
 	}
 
-	void Broadcast::signal(const event::SuiteFail& event) const
+	void Broadcast::Signal(const event::SuiteFail& event) const
 	{
 		for (Reporter* reporter: reporters_)
 		{
@@ -52,7 +52,7 @@ namespace synodic::honesty::test
 		}
 	}
 
-	void Broadcast::signal(const event::SuitePass& event) const
+	void Broadcast::Signal(const event::SuitePass& event) const
 	{
 		for (Reporter* reporter: reporters_)
 		{
@@ -60,7 +60,7 @@ namespace synodic::honesty::test
 		}
 	}
 
-	void Broadcast::signal(const event::SuiteSummary& event) const
+	void Broadcast::Signal(const event::SuiteSummary& event) const
 	{
 		for (Reporter* reporter: reporters_)
 		{
@@ -68,7 +68,7 @@ namespace synodic::honesty::test
 		}
 	}
 
-	void Broadcast::signal(const event::TestBegin& event) const
+	void Broadcast::Signal(const event::TestBegin& event) const
 	{
 		for (Reporter* reporter: reporters_)
 		{
@@ -76,7 +76,7 @@ namespace synodic::honesty::test
 		}
 	}
 
-	void Broadcast::signal(const event::TestEnd& event) const
+	void Broadcast::Signal(const event::TestEnd& event) const
 	{
 		for (Reporter* reporter: reporters_)
 		{
@@ -84,7 +84,7 @@ namespace synodic::honesty::test
 		}
 	}
 
-	void Broadcast::signal(const event::TestSkip& event) const
+	void Broadcast::Signal(const event::TestSkip& event) const
 	{
 		for (Reporter* reporter: reporters_)
 		{
@@ -92,7 +92,7 @@ namespace synodic::honesty::test
 		}
 	}
 
-	void Broadcast::signal(const event::TestRun& event) const
+	void Broadcast::Signal(const event::TestRun& event) const
 	{
 		for (Reporter* reporter: reporters_)
 		{
@@ -100,7 +100,7 @@ namespace synodic::honesty::test
 		}
 	}
 
-	void Broadcast::signal(const event::TestFail& event) const
+	void Broadcast::Signal(const event::TestFail& event) const
 	{
 		for (Reporter* reporter: reporters_)
 		{
@@ -108,7 +108,7 @@ namespace synodic::honesty::test
 		}
 	}
 
-	void Broadcast::signal(const event::TestPass& event) const
+	void Broadcast::Signal(const event::TestPass& event) const
 	{
 		for (Reporter* reporter: reporters_)
 		{
@@ -116,7 +116,7 @@ namespace synodic::honesty::test
 		}
 	}
 
-	void Broadcast::signal(const event::AssertionFail& event) const
+	void Broadcast::Signal(const event::AssertionFail& event) const
 	{
 		for (Reporter* reporter: reporters_)
 		{
@@ -124,7 +124,7 @@ namespace synodic::honesty::test
 		}
 	}
 
-	void Broadcast::signal(const event::AssertionPass& event) const
+	void Broadcast::Signal(const event::AssertionPass& event) const
 	{
 		for (Reporter* reporter: reporters_)
 		{
@@ -132,7 +132,7 @@ namespace synodic::honesty::test
 		}
 	}
 
-	void Broadcast::signal(const event::AssertionSkip& event) const
+	void Broadcast::Signal(const event::AssertionSkip& event) const
 	{
 		for (Reporter* reporter: reporters_)
 		{
@@ -140,7 +140,7 @@ namespace synodic::honesty::test
 		}
 	}
 
-	void Broadcast::signal(const event::Summary& event) const
+	void Broadcast::Signal(const event::Summary& event) const
 	{
 		for (Reporter* reporter: reporters_)
 		{
@@ -151,5 +151,24 @@ namespace synodic::honesty::test
 	RunnerContext::RunnerContext(std::span<Reporter*> reporters) :
 		broadcaster(reporters)
 	{
+	}
+
+	Set::Set(const SuiteData& data) :
+		name_(data.Name()),
+		generator_(data.Generator())
+	{
+	}
+
+	std::string_view Set::Name() const
+	{
+		return name_;
+	}
+
+	generator<TestBase> Set::YieldTests()
+	{
+		for (const TestBase& test: generator_)
+		{
+			co_yield test;
+		}
 	}
 }

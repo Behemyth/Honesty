@@ -21,10 +21,6 @@ namespace synodic::honesty::test
 
 	Interface::Interface(const Configuration& configuration)
 	{
-		Registry& registry = GetRegistry();
-
-		reporters_ = registry.GetReporters();
-		runners_ = registry.GetRunners();
 	}
 
 	HelpResult Interface::Help(const HelpParameters& parameters)
@@ -35,17 +31,17 @@ namespace synodic::honesty::test
 	ExecuteResult Interface::Execute(const ExecuteParameters& parameters)
 	{
 		auto suites = GetRegistry().GetSuites();
-		parameters.runner->Submit(suites);
 
 		RunnerContext& context = GetContext();
+		std::ranges::single_view reporters{parameters.reporter};
 
-		// Set the context
-		context = RunnerContext(reporters_);
+		// Lets a runner get the context with proper setup
+		auto generateContext = [&]() -> RunnerContext& {
+			context = RunnerContext(reporters);
+			return context;
+		};
 
-		for (Runner* runner: runners_)
-		{
-			runner->Run(context.broadcaster);
-		}
+		parameters.runner->Run(generateContext);
 
 		return {};
 	}

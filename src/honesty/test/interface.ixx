@@ -83,7 +83,5 @@ namespace synodic::honesty::test
 		ListResult List(const ListParameters& parameters);
 
 	private:
-		std::span<Reporter*> reporters_;
-		std::span<Runner*> runners_;
 	};
 }

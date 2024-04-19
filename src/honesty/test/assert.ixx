@@ -40,21 +40,21 @@ namespace synodic::honesty::test
 			event::AssertionFail failed;
 			failed.location = location;
 
-			GetContext().broadcaster.signal(failed);
+			GetContext().broadcaster.Signal(failed);
 		}
 		catch (const Exception&)
 		{
 			event::AssertionPass passed;
 			passed.location = location;
 
-			GetContext().broadcaster.signal(passed);
+			GetContext().broadcaster.Signal(passed);
 		}
 		catch (...)
 		{
 			event::AssertionFail failed;
 			failed.location = location;
 
-			GetContext().broadcaster.signal(failed);
+			GetContext().broadcaster.Signal(failed);
 		}
 	}
 
@@ -68,14 +68,14 @@ namespace synodic::honesty::test
 			event::AssertionPass passed;
 			passed.location = location;
 
-			GetContext().broadcaster.signal(passed);
+			GetContext().broadcaster.Signal(passed);
 		}
 		catch (...)
 		{
 			event::AssertionFail failed;
 			failed.location = location;
 
-			GetContext().broadcaster.signal(failed);
+			GetContext().broadcaster.Signal(failed);
 		}
 	}
 
@@ -88,21 +88,21 @@ namespace synodic::honesty::test
 			event::AssertionFail failed;
 			failed.location = location;
 
-			GetContext().broadcaster.signal(failed);
+			GetContext().broadcaster.Signal(failed);
 		}
 		catch (const Exception&)
 		{
 			event::AssertionPass passed;
 			passed.location = location;
 
-			GetContext().broadcaster.signal(passed);
+			GetContext().broadcaster.Signal(passed);
 		}
 		catch (...)
 		{
 			event::AssertionFail failed;
 			failed.location = location;
 
-			GetContext().broadcaster.signal(failed);
+			GetContext().broadcaster.Signal(failed);
 		}
 	}
 
@@ -116,14 +116,14 @@ namespace synodic::honesty::test
 			event::AssertionPass passed;
 			passed.location = location;
 
-			GetContext().broadcaster.signal(passed);
+			GetContext().broadcaster.Signal(passed);
 		}
 		catch (...)
 		{
 			event::AssertionFail failed;
 			failed.location = location;
 
-			GetContext().broadcaster.signal(failed);
+			GetContext().broadcaster.Signal(failed);
 		}
 	}
 

@@ -2,6 +2,7 @@ export module synodic.honesty.test.mock;
 
 import synodic.honesty.test;
 import std;
+import function_ref;
 
 export class MockReporter final : public synodic::honesty::test::Reporter
 {
@@ -37,9 +38,9 @@ export class MockRunner final : public synodic::honesty::test::Runner
 public:
 	consteval MockRunner();
 
-	void Run(synodic::honesty::test::Broadcast& broadcaster) override;
-	void Submit(const synodic::honesty::test::SuiteData* data) override;
-	void Submit(std::span<const synodic::honesty::test::SuiteData* const> data) override;
+	void
+		Run(std::span<synodic::honesty::test::Set> sets,
+			std::function_ref<synodic::honesty::test::RunnerContext&()> generateContext) override;
 };
 
 consteval MockRunner::MockRunner() :
@@ -115,14 +116,8 @@ void MockReporter::signal(const synodic::honesty::test::event::Summary& event)
 {
 }
 
-void MockRunner::Run(synodic::honesty::test::Broadcast& broadcaster)
-{
-}
-
-void MockRunner::Submit(const synodic::honesty::test::SuiteData* data)
-{
-}
-
-void MockRunner::Submit(std::span<const synodic::honesty::test::SuiteData* const> data)
+void MockRunner::Run(
+	std::span<synodic::honesty::test::Set> sets,
+	std::function_ref<synodic::honesty::test::RunnerContext&()> generateContext)
 {
 }

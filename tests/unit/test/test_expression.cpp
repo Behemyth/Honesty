@@ -9,9 +9,9 @@ namespace
 {
 	Suite expectationSuite(
 		"expectation",
-		[]() -> generator<TestBase>
+		[]()
 		{
-			co_yield "expectation"_test = []
+			"expectation"_test = []
 			{
 				// TODO: except can fail and continue
 				// TODO: assert stops when it fails

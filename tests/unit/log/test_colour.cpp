@@ -12,9 +12,9 @@ namespace
 
 	Suite colorSuite(
 		"color",
-		[]() -> generator<TestBase>
+		[]() 
 		{
-			co_yield "construction"_test = []()
+			 "construction"_test = []()
 			{
 				expect_equals(
 					log::color24_t(58, 90, 64),
@@ -24,9 +24,9 @@ namespace
 
 	Suite styleSuite(
 		"style",
-		[]() -> generator<TestBase>
+		[]() 
 		{
-			co_yield "construction"_test = []()
+			 "construction"_test = []()
 			{
 				log::color24_t hunterGreen(58, 90, 64);
 				log::text_style style(hunterGreen);
@@ -43,9 +43,9 @@ namespace
 
 	Suite terminalSuite(
 		"terminal",
-		[]() -> generator<TestBase>
+		[]() 
 		{
-			co_yield "format_to"_test = []()
+			 "format_to"_test = []()
 			{
 				std::string output;
 				log::text_style style(log::color24_t(58, 90, 64));
@@ -60,7 +60,7 @@ namespace
 				expect_equals(output, expected);
 			};
 
-			co_yield "format"_test = []()
+			 "format"_test = []()
 			{
 				std::string output = log::format(
 					log::text_style(log::color24_t(58, 90, 64)),
@@ -71,7 +71,7 @@ namespace
 				expect_equals(output, expected);
 			};
 
-			co_yield "print"_test = []()
+			 "print"_test = []()
 			{
 				// TODO: How do we capture the output?
 			};

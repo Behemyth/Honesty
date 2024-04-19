@@ -2,24 +2,10 @@ module synodic.honesty.test;
 
 namespace synodic::honesty::test
 {
-	void Local::Run(std::span<Set> sets, std::function_ref<RunnerContext&()> generateContext)
+	void Local::Run(std::function_ref<void(RunnerContext& context)> generateContext)
 	{
-		const auto& context = generateContext();
+		RunnerContext& context = GetContext();
 
-		for (const Set& set: sets)
-		{
-			event::SuiteBegin event(set.Name());
-
-			context.broadcaster.Signal(event);
-
-			for (const TestBase& test: set.YieldTests())
-			{
-				event::TestBegin beginEvent(test.Name());
-
-				context.broadcaster.Signal(beginEvent);
-
-				test.Run();
-			}
-		}
+		generateContext(context);
 	}
 }

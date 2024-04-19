@@ -154,21 +154,12 @@ namespace synodic::honesty::test
 	}
 
 	Set::Set(const SuiteData& data) :
-		name_(data.Name()),
-		generator_(data.Generator())
+		name_(data.Name())
 	{
 	}
 
 	std::string_view Set::Name() const
 	{
 		return name_;
-	}
-
-	generator<TestBase> Set::YieldTests()
-	{
-		for (const TestBase& test: generator_)
-		{
-			co_yield test;
-		}
 	}
 }

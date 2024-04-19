@@ -5,9 +5,8 @@ using namespace synodic::honesty::test;
 
 namespace
 {
-	auto suiteGenerator = []() -> generator<TestBase>
+	auto suiteGenerator = []()
 	{
-		co_return;
 	};
 
 	Suite suite("suite", suiteGenerator);

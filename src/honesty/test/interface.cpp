@@ -36,9 +36,8 @@ namespace synodic::honesty::test
 		std::ranges::single_view reporters{parameters.reporter};
 
 		// Lets a runner get the context with proper setup
-		auto generateContext = [&]() -> RunnerContext& {
-			context = RunnerContext(reporters);
-			return context;
+		auto generateContext = [&](RunnerContext& context)
+		{
 		};
 
 		parameters.runner->Run(generateContext);
@@ -52,17 +51,17 @@ namespace synodic::honesty::test
 
 		ListResult result;
 
-		for (const SuiteData* const suite: suites)
-		{
-			auto generator = suite->Generator();
-			for (const TestBase& test: generator())
-			{
-				TestDescription description;
-				description.name = test.Name();
+		//for (const SuiteData* const suite: suites)
+		//{
+		//	auto generator = suite->Generator();
+		//	for (const TestBase& test: generator())
+		//	{
+		//		TestDescription description;
+		//		description.name = test.Name();
 
-				result.tests.push_back(description);
-			}
-		}
+		//		result.tests.push_back(description);
+		//	}
+		//}
 
 		return result;
 	}

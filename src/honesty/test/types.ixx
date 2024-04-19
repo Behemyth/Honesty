@@ -2,50 +2,36 @@ export module synodic.honesty.test:types;
 
 import std;
 import function_ref;
-import :generator;
 
 namespace synodic::honesty::test
 {
-	export class TestBase
-	{
-	public:
-		virtual ~TestBase()		 = default;
-		virtual void Run() const = 0;
-
-		virtual std::span<std::string_view> Tags() const = 0;
-
-		virtual std::string_view Name() const = 0;
-
-	private:
-	};
 
 	export class SuiteData
 	{
 	public:
-		consteval SuiteData(
-			std::string_view name,
-			std::function_ref<generator<TestBase>()> generator) noexcept;
+		consteval SuiteData(std::string_view name, std::function_ref<void()> generator) noexcept;
 
-		std::string_view Name() const noexcept
-		{
-			return name_;
-		}
-
-		generator<TestBase> Generator() const noexcept
-		{
-			return generator_();
-		}
+		std::string_view Name() const noexcept;
+		void Execute() const noexcept;
 
 	private:
 		std::string_view name_;
-		std::function_ref<generator<TestBase>()> generator_;
+		std::function_ref<void()> callback_;
 	};
 
-	consteval SuiteData::SuiteData(
-		std::string_view name,
-		std::function_ref<generator<TestBase>()> generator) noexcept :
+	std::string_view SuiteData::Name() const noexcept
+	{
+		return name_;
+	}
+
+	void SuiteData::Execute() const noexcept
+	{
+		return callback_();
+	}
+
+	consteval SuiteData::SuiteData(std::string_view name, std::function_ref<void()> generator) noexcept :
 		name_(name),
-		generator_(std::move(generator))
+		callback_(std::move(generator))
 	{
 	}
 

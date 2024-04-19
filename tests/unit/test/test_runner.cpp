@@ -6,9 +6,9 @@ using namespace synodic::honesty::test::literals;
 
 namespace
 {
-	auto runnerGenerator = []() -> generator<TestBase>
+	auto runnerGenerator = []()
 	{
-		co_yield "declare default"_test = []()
+		"declare default"_test = []()
 		{
 		};
 	};

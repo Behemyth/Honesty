@@ -3,7 +3,6 @@ export module synodic.honesty.test:test;
 
 import std;
 import function_ref;
-import :generator;
 import :types;
 import :registry;
 
@@ -12,74 +11,18 @@ namespace synodic::honesty::test
 	class VoidTest;
 
 	template<typename FuncType, typename RetType>
-	concept SameReturn = requires(FuncType func) {
+	concept same_return = requires(FuncType func) {
 		{
 			func()
 		} -> std::same_as<RetType>;
 	};
 
-	template<typename T>
-	class TinyTest final : public TestBase
-	{
-	public:
-		TinyTest(std::string_view name, std::function_ref<void(const T&)> test, T value);
-
-		void Run() const override;
-		std::span<std::string_view> Tags() const override;
-
-		std::string_view Name() const override;
-
-	private:
-		std::function_ref<void(const T&)> runner_;
-		T value_;
-		std::string_view name_;
-	};
-
-	class VoidTest final : public TestBase
-	{
-	public:
-		VoidTest(std::string_view name, std::function_ref<void()> test);
-
-		VoidTest& operator=(std::function_ref<void()> test);
-
-		void Run() const override;
-		std::span<std::string_view> Tags() const override;
-
-		std::string_view Name() const override;
-
-	private:
-		std::function_ref<void()> runner_;
-		std::string_view name_;
-	};
-
 	// TODO: Distinguish type overloads
 	export template<typename Fn>
-		requires std::invocable<Fn> && SameReturn<Fn, generator<TestBase>>
-	generator<TestBase> Test(std::string_view name, Fn&& generator)
+		requires std::invocable<Fn>
+	void Test(std::string_view name, Fn&& generator)
 	{
-		for (const TestBase& test: generator())
-		{
-			// TODO: inject changes
-			co_yield Test(
-				"TODO",
-				[]()
-				{
-				});
-		}
-	}
-
-	export template<typename Fn>
-		requires std::invocable<Fn> && SameReturn<Fn, void>
-	VoidTest Test(std::string_view name, Fn&& generator)
-	{
-		return VoidTest(name, std::move(generator));
-	}
-
-	export template<typename Fn, typename T>
-		requires std::invocable<Fn, T> && SameReturn<Fn, void>
-	TinyTest<T> Test(std::string_view name, Fn&& generator)
-	{
-		return TinyTest(name, std::move(generator));
+		
 	}
 
 	/**
@@ -99,17 +42,17 @@ namespace synodic::honesty::test
 		TestStub& operator=(const TestStub& other)	   = delete;
 		TestStub& operator=(TestStub&& other) noexcept = delete;
 
-		generator<TestBase> operator=(generator<TestBase>&& generator) const;
+		void operator=() const;
 
 		template<typename Fn>
-			requires std::invocable<Fn> && SameReturn<Fn, generator<TestBase>>
-		generator<TestBase> operator=(Fn&& generator)
+			requires std::invocable<Fn>
+		void operator=(Fn&& generator)
 		{
 			return Test(name_, std::forward<Fn>(generator));
 		}
 
 		template<typename Fn>
-			requires std::invocable<Fn> && SameReturn<Fn, void>
+			requires std::invocable<Fn>
 		VoidTest operator=(Fn&& generator)
 		{
 			return Test(name_, std::forward<Fn>(generator));
@@ -122,74 +65,42 @@ namespace synodic::honesty::test
 		std::string_view name_;
 	};
 
-	template<typename T>
-	TinyTest<T>::TinyTest(std::string_view name, std::function_ref<void(const T&)> test, T value) :
-		runner_(test),
-		value_(value),
-		name_(name)
-	{
-	}
-
-	template<typename T>
-	void TinyTest<T>::Run() const
-	{
-		runner_(value_);
-	}
-
-	template<typename T>
-	std::span<std::string_view> TinyTest<T>::Tags() const
-	{
-		return {};
-	}
-
-	template<typename T>
-	std::string_view TinyTest<T>::Name() const
-	{
-		return name_;
-	}
-
-	export template<std::size_t Size>
-	generator<TestBase> TestStub<Size>::operator=(generator<TestBase>&& generator) const
-	{
-		return generator;
-	}
-
 	// Operators
 
 	export template<std::invocable<int> Fn>
-	[[nodiscard]] generator<TestBase> operator|(Fn&& test, const std::ranges::range auto& range)
+	void operator|(Fn&& test, const std::ranges::range auto& range)
 	{
 		for (const auto& value: range)
 		{
-			co_yield TinyTest<decltype(value)>("", test, value);
+			TinyTest<decltype(value)>("", test, value);
 		}
 	}
 
 	// recursion base case
 	template<typename Fn, typename T>
-	generator<TestBase> ApplyNested(Fn&& test, T arg)
+	void ApplyNested(Fn&& test, T arg)
 	{
-		co_yield TinyTest<T>("", std::forward<Fn>(test), arg);
+		TinyTest<T>("", std::forward<Fn>(test), arg);
 	}
 
 	// recursive function
 	template<typename Fn, typename T, typename... Ts>
-	generator<TestBase> ApplyNested(Fn&& test, T arg, Ts... rest)
+	void ApplyNested(Fn&& test, T arg, Ts... rest)
 	{
-		co_yield TinyTest<T>("", std::forward<Fn>(test), arg);
-		co_yield ApplyNested(std::forward<Fn>(test), rest...);
+		TinyTest<T>("", std::forward<Fn>(test), arg);
+		ApplyNested(std::forward<Fn>(test), rest...);
 	}
 
 	export template<typename Fn, typename... Types>
 		requires(std::invocable<Fn, Types> && ...)
-	[[nodiscard]] generator<TestBase> operator|(Fn&& test, std::tuple<Types...>&& tuple)
+	void operator|(Fn&& test, std::tuple<Types...>&& tuple)
 	{
-		auto applicator = [&]<typename... T>(T&&... args) -> generator<TestBase>
+		auto applicator = [&]<typename... T>(T&&... args) -> void
 		{
-			co_yield ApplyNested(std::forward<Fn>(test), args...);
+			ApplyNested(std::forward<Fn>(test), args...);
 		};
 
-		co_yield std::apply(applicator, tuple);
+		std::apply(applicator, tuple);
 	}
 
 	Registry& GetRegistry();
@@ -197,53 +108,6 @@ namespace synodic::honesty::test
 
 	export bool RegisterRunner(Runner& runner);
 	export bool RegisterReporter(Reporter& reporter);
-
-	/**
-	 * @brief Allows the static registration of tests in the global scope
-	 */
-	export template<size_t Size>
-	class Suite final : SuiteData
-	{
-	public:
-		consteval Suite(const char (&name)[Size], std::function_ref<generator<TestBase>()> generator);
-
-		Suite(const Suite& other)	  = delete;
-		Suite(Suite&& other) noexcept = delete;
-
-		Suite& operator=(const Suite& other)	 = delete;
-		Suite& operator=(Suite&& other) noexcept = delete;
-
-		bool Register() &
-		{
-			SuiteData& data = *this;
-			GetRegistry().AddSuite(data);
-
-			return true;
-		}
-
-	private:
-		std::array<char, Size> name_;
-	};
-
-	template<size_t Size>
-	consteval Suite<Size>::Suite(const char (&name)[Size], std::function_ref<generator<TestBase>()> generator) :
-		name_ {0},
-		SuiteData(std::string_view(name_.data(), Size), generator)
-	{
-		std::copy_n(name, Size, name_.begin());
-	}
-
-	/**
-	 * @brief Registers a suite of tests with the global registry.
-	 * @param ...suites Suites to be registered. Each are expected to be an l-value reference.
-	 * @return TODO
-	 */
-	export template<size_t... Sizes>
-	bool Register(Suite<Sizes>&... suites)
-	{
-		(suites.Register(), ...);
-		return true;
-	}
 
 	export template<std::size_t Size>
 	class Tag

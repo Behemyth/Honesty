@@ -8,19 +8,23 @@ using namespace synodic::honesty::test::literals;
 namespace
 {
 	/**
-	 * @brief Verifies that an empty generator is created
+	 * @brief Verifies that an empty callable works
 	 */
-	auto emptyGenerator = []() -> generator<TestBase>
+	auto emptyGenerator = []()
 	{
-		co_return;
+		Test(
+			"emptyGenerator",
+			[]
+			{
+			});
 	};
 
 	/**
 	 * @brief Verifies that a generator with no capture is created
 	 */
-	auto basicGenerator = []() -> generator<TestBase>
+	auto basicGenerator = []()
 	{
-		co_yield Test(
+		Test(
 			"basicGenerator",
 			[]
 			{
@@ -30,9 +34,9 @@ namespace
 	/**
 	 * @brief Verifies that the literal shorthand generates an empty test
 	 */
-	auto emptyLiteral = []() -> generator<TestBase>
+	auto emptyLiteral = []()
 	{
-		co_yield "emptyLiteral"_test = []
+		"emptyLiteral"_test = []
 		{
 		};
 	};
@@ -40,25 +44,25 @@ namespace
 	/**
 	 * @brief Verifies that the literal shorthand generates an empty test
 	 */
-	auto emptyRecursive = []() -> generator<TestBase>
+	auto emptyRecursive = []()
 	{
-		co_yield Test("emptyRecursive", emptyGenerator);
+		Test("emptyRecursive", emptyGenerator);
 	};
 
 	/**
 	 * @brief Verifies that the literal shorthand generates an empty test
 	 */
-	auto assignedRecursive = []() -> generator<TestBase>
+	auto assignedRecursive = []()
 	{
-		co_yield "emptyRecursive"_test = emptyGenerator;
+		"emptyRecursive"_test = emptyGenerator;
 	};
 
 	/**
 	 * @brief Applies a tuple to a test such that the test is run for each element in the tuple
 	 */
-	auto tupleParameterization = []() -> generator<TestBase>
+	auto tupleParameterization = []()
 	{
-		co_yield "array"_test = [](const auto& parameter)
+		"array"_test = [](const auto& parameter)
 		{
 		} | std::tuple{3u, 4.0f};
 	};
@@ -66,19 +70,19 @@ namespace
 	/**
 	 * @brief Applies an array to a test such that the test is run for each element in the array
 	 */
-	auto arrayParameterization = []() -> generator<TestBase>
+	auto arrayParameterization = []()
 	{
-		co_yield "array"_test = []<typename T>(const T& parameter)
+		"array"_test = []<typename T>(const T& parameter)
 		{
 		} | std::array{3, 4};
 	};
 
-	auto testSuite = []() -> generator<TestBase>
+	auto testSuite = []()
 	{
-		co_yield "run"_test = []()
+		"run"_test = []()
 		{
 			// Runs through each generator and counts the number of test instances recorded
-			auto counter = [](std::function_ref<generator<TestBase>()> function) -> int
+			auto counter = [](std::function_ref<void()> function) -> int
 			{
 				int count = 0;
 				for (const auto& test: function())

@@ -8,9 +8,9 @@ target_sources(honesty
 	reporter.ixx
 	runner.ixx
 	function_ref.ixx
-	generator.ixx
 	instance.ixx
 	interface.ixx
+	suite.ixx
 	PRIVATE
 	FILE_SET implementations
 	FILES
@@ -21,6 +21,7 @@ target_sources(honesty
 	interface.cpp
 	instance.cpp
 	reporter.cpp
+	suite.cpp
 )
 
 target_sources(honesty_main

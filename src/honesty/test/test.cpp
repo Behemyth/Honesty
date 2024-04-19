@@ -2,7 +2,6 @@ module synodic.honesty.test;
 
 import std;
 import function_ref;
-import :generator;
 import :types;
 import :registry;
 import :runner;
@@ -22,33 +21,6 @@ namespace
 
 namespace synodic::honesty::test
 {
-	VoidTest::VoidTest(std::string_view name, std::function_ref<void()> test) :
-		runner_(std::move(test)),
-		name_(name)
-	{
-	}
-
-	VoidTest& VoidTest::operator=(std::function_ref<void()> test)
-	{
-		runner_ = std::move(test);
-		return *this;
-	}
-
-	void VoidTest::Run() const
-	{
-		runner_();
-	}
-
-	std::span<std::string_view> VoidTest::Tags() const
-	{
-		return {};
-	}
-
-	std::string_view VoidTest::Name() const
-	{
-		return name_;
-	}
-
 	Registry& GetRegistry()
 	{
 		return REGISTRY;

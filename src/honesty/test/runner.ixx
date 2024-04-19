@@ -64,11 +64,9 @@ namespace synodic::honesty::test
 
 		std::string_view Name() const;
 
-		generator<TestBase> YieldTests();
 
 	private:
 		std::string_view name_;
-		generator<TestBase> generator_;
 	};
 
 	/**
@@ -90,10 +88,9 @@ namespace synodic::honesty::test
 
 		/**
 		 * @brief
-		 * @param sets
 		 * @param generateContext A function that generates a newly created thread local context
 		 */
-		virtual void Run(std::span<Set> sets, std::function_ref<RunnerContext&()> generateContext) = 0;
+		virtual void Run(std::function_ref<void(RunnerContext& context)> generateContext) = 0;
 
 		constexpr std::string_view Name() const;
 

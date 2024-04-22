@@ -1,8 +1,5 @@
-module synodic.honesty.test:runner;
+module synodic.honesty.test;
 
-import :types;
-import :reporter;
-import :registry;
 import std;
 
 namespace synodic::honesty::test
@@ -161,5 +158,11 @@ namespace synodic::honesty::test
 	std::string_view Set::Name() const
 	{
 		return name_;
+	}
+
+	bool RegisterRunner(Runner& runner)
+	{
+		GetRegistry().AddRunner(runner);
+		return true;
 	}
 }

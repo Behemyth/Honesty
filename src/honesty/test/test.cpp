@@ -21,6 +21,10 @@ namespace
 
 namespace synodic::honesty::test
 {
+	void Test::operator=(std::function_ref<void()> test) const
+	{
+	}
+
 	Registry& GetRegistry()
 	{
 		return REGISTRY;
@@ -29,17 +33,5 @@ namespace synodic::honesty::test
 	RunnerContext& GetContext()
 	{
 		return CONTEXT;
-	}
-
-	bool RegisterRunner(Runner& runner)
-	{
-		REGISTRY.AddRunner(runner);
-		return true;
-	}
-
-	bool RegisterReporter(Reporter& reporter)
-	{
-		REGISTRY.AddReporter(reporter);
-		return true;
 	}
 }

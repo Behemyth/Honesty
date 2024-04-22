@@ -12,6 +12,12 @@ namespace synodic::honesty::test
 		return name_;
 	}
 
+	bool RegisterReporter(Reporter& reporter)
+	{
+		GetRegistry().AddReporter(reporter);
+		return true;
+	}
+
 	StreamingAdapter::StreamingAdapter(std::string_view name) :
 		Reporter(name)
 	{

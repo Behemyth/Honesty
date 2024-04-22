@@ -98,6 +98,13 @@ namespace synodic::honesty::test
 		std::string_view name_;
 	};
 
+	/**
+	 * @brief Registers a runner object with the test framework
+	 * @param runner The runner object to register
+	 * @return Whether the runner was successfully registered
+	 */
+	export bool RegisterRunner(Runner& runner);
+
 	consteval Runner::Runner(std::string_view name) :
 		name_(name)
 	{

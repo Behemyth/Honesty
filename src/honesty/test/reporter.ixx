@@ -42,6 +42,13 @@ namespace synodic::honesty::test
 		std::string_view name_;
 	};
 
+	/***
+	 * @brief Registers a reporter with the test framework
+	 * @param reporter The reporter to register
+	 * @return Whether the reporter was successfully registered
+	 */
+	export bool RegisterReporter(Reporter& reporter);
+
 	/**
 	 * @brief TODO: Actually implement this instead of just stubbing it out.
 	 */

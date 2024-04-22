@@ -8,106 +8,70 @@ import :registry;
 
 namespace synodic::honesty::test
 {
-	class VoidTest;
-
-	template<typename FuncType, typename RetType>
-	concept same_return = requires(FuncType func) {
-		{
-			func()
-		} -> std::same_as<RetType>;
-	};
-
-	// TODO: Distinguish type overloads
-	export template<typename Fn>
-		requires std::invocable<Fn>
-	void Test(std::string_view name, Fn&& generator)
-	{
-		
-	}
-
-	/**
-	 * @brief Strongly typed definition around string_view with construction
-	 */
-	template<std::size_t Size = 0>
-	class [[nodiscard]] TestStub
+	export class Test
 	{
 	public:
-		consteval TestStub(std::string_view name) :
-			name_(name)
-		{
-		}
+		consteval Test(std::string_view name);
 
-		TestStub(const TestStub& other)				   = delete;
-		TestStub(TestStub&& other) noexcept			   = delete;
-		TestStub& operator=(const TestStub& other)	   = delete;
-		TestStub& operator=(TestStub&& other) noexcept = delete;
+		Test(const Test& other)				   = delete;
+		Test(Test&& other) noexcept			   = delete;
+		Test& operator=(const Test& other)	   = delete;
+		Test& operator=(Test&& other) noexcept = delete;
 
-		void operator=() const;
-
-		template<typename Fn>
-			requires std::invocable<Fn>
-		void operator=(Fn&& generator)
-		{
-			return Test(name_, std::forward<Fn>(generator));
-		}
-
-		template<typename Fn>
-			requires std::invocable<Fn>
-		VoidTest operator=(Fn&& generator)
-		{
-			return Test(name_, std::forward<Fn>(generator));
-		}
+		void operator=(std::function_ref<void()> test) const;
 
 	private:
-		template<std::size_t>
-		friend class TestStub;
-
 		std::string_view name_;
 	};
 
+	consteval Test::Test(std::string_view name) :
+		name_(name)
+	{
+	}
+
 	// Operators
 
-	export template<std::invocable<int> Fn>
-	void operator|(Fn&& test, const std::ranges::range auto& range)
+	export template<typename Fn, std::ranges::input_range V>
+		requires std::regular_invocable<Fn&, std::ranges::range_reference_t<V>>
+	constexpr auto operator|(Fn&& function, V&& range)
 	{
-		for (const auto& value: range)
+		return [&]()
 		{
-			TinyTest<decltype(value)>("", test, value);
-		}
-	}
-
-	// recursion base case
-	template<typename Fn, typename T>
-	void ApplyNested(Fn&& test, T arg)
-	{
-		TinyTest<T>("", std::forward<Fn>(test), arg);
-	}
-
-	// recursive function
-	template<typename Fn, typename T, typename... Ts>
-	void ApplyNested(Fn&& test, T arg, Ts... rest)
-	{
-		TinyTest<T>("", std::forward<Fn>(test), arg);
-		ApplyNested(std::forward<Fn>(test), rest...);
+			for (auto&& element: range)
+			{
+				Test("Range") = [&function, &element]()
+				{
+					function(element);
+				};
+			}
+		};
 	}
 
 	export template<typename Fn, typename... Types>
-		requires(std::invocable<Fn, Types> && ...)
-	void operator|(Fn&& test, std::tuple<Types...>&& tuple)
+		requires(std::regular_invocable<Fn&, Types &&> && ...)
+	constexpr auto operator|(Fn&& function, std::tuple<Types...>&& tuple)
 	{
-		auto applicator = [&]<typename... T>(T&&... args) -> void
+		return [&]()
 		{
-			ApplyNested(std::forward<Fn>(test), args...);
-		};
+			std::apply(
+				[&function](auto&&... args)
+				{
+					auto application = [&function](auto&& arg)
+					{
+						Test("Tuple") = [&function, &arg]()
+						{
+							function(arg);
+						};
+					};
 
-		std::apply(applicator, tuple);
+					(application(args), ...);
+				},
+				std::forward<std::tuple<Types...>>(tuple));
+		};
 	}
 
 	Registry& GetRegistry();
 	RunnerContext& GetContext();
-
-	export bool RegisterRunner(Runner& runner);
-	export bool RegisterReporter(Reporter& reporter);
 
 	export template<std::size_t Size>
 	class Tag
@@ -123,21 +87,12 @@ namespace synodic::honesty::test
 		template<std::size_t RSize>
 		consteval Tag<Size + RSize> operator/(Tag<RSize> tag) const;
 
-		consteval TestStub<Size> operator/(const TestStub<>& test) const;
-
 	private:
 		template<std::size_t>
 		friend class Tag;
 
 		std::array<std::string_view, Size> tags_;
 	};
-
-	template<std::size_t Size>
-	consteval TestStub<Size> Tag<Size>::operator/(const TestStub<>& test) const
-	{
-		// TODO
-		return TestStub<Size>("TODO: Tag operator /");
-	}
 
 	template<std::size_t Size>
 	template<std::size_t RSize>
@@ -173,7 +128,7 @@ namespace synodic::honesty::test
 	{
 		[[nodiscard]] consteval auto operator""_test(const char* const name, const std::size_t size)
 		{
-			return TestStub(std::string_view(name, size));
+			return Test(std::string_view(name, size));
 		}
 
 		[[nodiscard]] consteval auto operator""_tag(const char* const name, const std::size_t size)

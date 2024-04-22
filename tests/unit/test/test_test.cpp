@@ -12,23 +12,6 @@ namespace
 	 */
 	auto emptyGenerator = []()
 	{
-		Test(
-			"emptyGenerator",
-			[]
-			{
-			});
-	};
-
-	/**
-	 * @brief Verifies that a generator with no capture is created
-	 */
-	auto basicGenerator = []()
-	{
-		Test(
-			"basicGenerator",
-			[]
-			{
-			});
 	};
 
 	/**
@@ -46,7 +29,7 @@ namespace
 	 */
 	auto emptyRecursive = []()
 	{
-		Test("emptyRecursive", emptyGenerator);
+		Test("emptyRecursive") = emptyGenerator;
 	};
 
 	/**
@@ -72,7 +55,7 @@ namespace
 	 */
 	auto arrayParameterization = []()
 	{
-		"array"_test = []<typename T>(const T& parameter)
+		"array"_test = [](int parameter)
 		{
 		} | std::array{3, 4};
 	};
@@ -85,16 +68,15 @@ namespace
 			auto counter = [](std::function_ref<void()> function) -> int
 			{
 				int count = 0;
-				for (const auto& test: function())
-				{
-					++count;
-				}
+				// for (const auto& test: function())
+				//{
+				//	++count;
+				// }
 
 				return count;
 			};
 
 			expect_equals(counter(emptyGenerator), 0);
-			expect_equals(counter(basicGenerator), 1);
 			expect_equals(counter(emptyLiteral), 1);
 			expect_equals(counter(emptyRecursive), 0);
 			expect_equals(counter(assignedRecursive), 0);

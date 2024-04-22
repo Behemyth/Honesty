@@ -67,3 +67,13 @@ namespace synodic::honesty::test
 		int reporterSize_ = 0;
 	};
 }
+
+namespace
+{
+	constinit synodic::honesty::test::Registry REGISTRY;
+}
+
+synodic::honesty::test::Registry& GetRegistry()
+{
+	return REGISTRY;
+}

@@ -2,10 +2,8 @@ module synodic.honesty.test;
 
 namespace synodic::honesty::test
 {
-	void Local::Run(std::function_ref<void(RunnerContext& context)> generateContext)
+	void Local::Run(std::function_ref<void()> function)
 	{
-		RunnerContext& context = GetContext();
-
-		generateContext(context);
+		function();
 	}
 }

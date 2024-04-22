@@ -16,6 +16,7 @@ target_sources(honesty
 	FILES
 	assert.cpp
 	registry.cpp
+	context.cpp
 	test.cpp
 	runner.cpp
 	interface.cpp

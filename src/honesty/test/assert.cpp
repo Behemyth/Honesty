@@ -1,46 +1,53 @@
 module synodic.honesty.test;
 import :types;
+import :context;
 
 namespace synodic::honesty::test
 {
-	void assert(bool expression, const std::source_location& location)
+	void Signal(const event::AssertionPass& passed)
+	{
+		GetContext().Signal(passed);
+	}
+
+	void Signal(const event::AssertionFail& failed)
+	{
+		GetContext().Signal(failed);
+	}
+
+	void Assert(bool expression, const std::source_location& location)
 	{
 		if (expression)
 		{
 			event::AssertionPass passed;
 			passed.location = location;
 
-			GetContext().broadcaster.Signal(passed);
+			Signal(passed);
 		}
 		else
 		{
 			event::AssertionFail failed;
 			failed.location = location;
 
-			GetContext().broadcaster.Signal(failed);
-
-			// TODO: Quit the specific test
-			throw Assert("Assertion failed");
+			Signal(failed);
+			throw AssertException("Assertion failed");
 		}
 	}
 
-	bool expect(bool expression, const std::source_location& location)
+	void Expect(bool expression, const std::source_location& location)
 	{
 		if (expression)
 		{
 			event::AssertionPass passed;
 			passed.location = location;
 
-			GetContext().broadcaster.Signal(passed);
+			Signal(passed);
 		}
 		else
 		{
 			event::AssertionFail failed;
 			failed.location = location;
 
-			GetContext().broadcaster.Signal(failed);
+			Signal(failed);
 		}
-
-		return expression;
 	}
 }

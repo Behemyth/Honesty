@@ -76,12 +76,12 @@ namespace
 				return count;
 			};
 
-			expect_equals(counter(emptyGenerator), 0);
-			expect_equals(counter(emptyLiteral), 1);
-			expect_equals(counter(emptyRecursive), 0);
-			expect_equals(counter(assignedRecursive), 0);
-			expect_equals(counter(tupleParameterization), 2);
-			expect_equals(counter(arrayParameterization), 2);
+			ExpectEquals(counter(emptyGenerator), 0);
+			ExpectEquals(counter(emptyLiteral), 1);
+			ExpectEquals(counter(emptyRecursive), 0);
+			ExpectEquals(counter(assignedRecursive), 0);
+			ExpectEquals(counter(tupleParameterization), 2);
+			ExpectEquals(counter(arrayParameterization), 2);
 		};
 	};
 

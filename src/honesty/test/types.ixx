@@ -75,11 +75,6 @@ namespace synodic::honesty::test
 
 		struct TestBegin
 		{
-			TestBegin(std::string_view name) :
-				name(name)
-			{
-			}
-
 			std::string_view name;
 		};
 
@@ -110,6 +105,7 @@ namespace synodic::honesty::test
 
 		struct AssertionFail
 		{
+			bool exception; // True if the remainder of the test is skipped
 			std::source_location location;
 		};
 
@@ -127,7 +123,7 @@ namespace synodic::honesty::test
 		};
 	}
 
-	class Assert final : public std::exception
+	class AssertException final : public std::exception
 	{
 	public:
 		using std::exception::exception;

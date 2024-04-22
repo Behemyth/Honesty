@@ -2,37 +2,51 @@ export module synodic.honesty.test:assert;
 
 import std;
 import :test;
+import :runner;
 
 namespace synodic::honesty::test
 {
+
+	/**
+	 * @brief Internal function to signal an assertion passed.
+	 * @param passed 
+	 */
+	void Signal(const event::AssertionPass& passed);
+
+	/**
+	 * @brief Internal function to signal an assertion failure.
+	 * @param failed 
+	 */
+	void Signal(const event::AssertionFail& failed);
+
 	/**
 	 * @brief Asserts that the expression is true. Fatal on failure.
 	 * @param expression The expression to evaluate.
 	 * @param location The source location. Let this parameter be defaulted.
 	 */
-	export void assert(bool expression, const std::source_location& location = std::source_location::current());
+	export void Assert(bool expression, const std::source_location& location = std::source_location::current());
 
 	/**
 	 * @brief Asserts that the expression is true. Nonfatal on failure.
 	 * @param expression The expression to evaluate.
 	 * @param location The source location. Let this parameter be defaulted.
 	 */
-	export bool expect(bool expression, const std::source_location& location = std::source_location::current());
+	export void Expect(bool expression, const std::source_location& location = std::source_location::current());
 
 	export template<std::convertible_to<bool> T>
-	void assert(const T& expression, const std::source_location& location = std::source_location::current())
+	void Assert(const T& expression, const std::source_location& location = std::source_location::current())
 	{
-		return assert(static_cast<bool>(expression), location);
+		return Assert(static_cast<bool>(expression), location);
 	}
 
 	export template<std::convertible_to<bool> T>
-	bool expect(const T& expression, const std::source_location& location = std::source_location::current())
+	void Expect(const T& expression, const std::source_location& location = std::source_location::current())
 	{
-		return expect(static_cast<bool>(expression), location);
+		return Expect(static_cast<bool>(expression), location);
 	}
 
 	export template<std::derived_from<std::exception> Exception = std::exception, std::invocable Fn>
-	constexpr void assert_throw(Fn&& function, const std::source_location& location = std::source_location::current())
+	constexpr void AssertThrow(Fn&& function, const std::source_location& location = std::source_location::current())
 	{
 		try
 		{
@@ -40,27 +54,27 @@ namespace synodic::honesty::test
 			event::AssertionFail failed;
 			failed.location = location;
 
-			GetContext().broadcaster.Signal(failed);
+			Signal(failed);
 		}
 		catch (const Exception&)
 		{
 			event::AssertionPass passed;
 			passed.location = location;
 
-			GetContext().broadcaster.Signal(passed);
+			Signal(passed);
 		}
 		catch (...)
 		{
 			event::AssertionFail failed;
 			failed.location = location;
 
-			GetContext().broadcaster.Signal(failed);
+			Signal(failed);
 		}
 	}
 
 	export template<std::invocable Fn>
 	constexpr void
-		assert_not_throw(Fn&& function, const std::source_location& location = std::source_location::current())
+		AssertNotThrow(Fn&& function, const std::source_location& location = std::source_location::current())
 	{
 		try
 		{
@@ -68,19 +82,19 @@ namespace synodic::honesty::test
 			event::AssertionPass passed;
 			passed.location = location;
 
-			GetContext().broadcaster.Signal(passed);
+			Signal(passed);
 		}
 		catch (...)
 		{
 			event::AssertionFail failed;
 			failed.location = location;
 
-			GetContext().broadcaster.Signal(failed);
+			Signal(failed);
 		}
 	}
 
 	export template<std::derived_from<std::exception> Exception = std::exception, std::invocable Fn>
-	constexpr void expect_throw(Fn&& function, const std::source_location& location = std::source_location::current())
+	constexpr void ExpectThrow(Fn&& function, const std::source_location& location = std::source_location::current())
 	{
 		try
 		{
@@ -88,27 +102,27 @@ namespace synodic::honesty::test
 			event::AssertionFail failed;
 			failed.location = location;
 
-			GetContext().broadcaster.Signal(failed);
+			Signal(failed);
 		}
 		catch (const Exception&)
 		{
 			event::AssertionPass passed;
 			passed.location = location;
 
-			GetContext().broadcaster.Signal(passed);
+			Signal(passed);
 		}
 		catch (...)
 		{
 			event::AssertionFail failed;
 			failed.location = location;
 
-			GetContext().broadcaster.Signal(failed);
+			Signal(failed);
 		}
 	}
 
 	export template<std::invocable Fn>
 	constexpr void
-		expect_not_throw(Fn&& function, const std::source_location& location = std::source_location::current())
+		ExpectNotThrow(Fn&& function, const std::source_location& location = std::source_location::current())
 	{
 		try
 		{
@@ -116,134 +130,134 @@ namespace synodic::honesty::test
 			event::AssertionPass passed;
 			passed.location = location;
 
-			GetContext().broadcaster.Signal(passed);
+			Signal(passed);
 		}
 		catch (...)
 		{
 			event::AssertionFail failed;
 			failed.location = location;
 
-			GetContext().broadcaster.Signal(failed);
+			Signal(failed);
 		}
 	}
 
 	export template<class T, class U>
 		requires std::equality_comparable_with<T, U>
-	constexpr bool
-		assert_equals(const T& a, const U& b, const std::source_location& location = std::source_location::current())
+	constexpr void
+		AssertEquals(const T& a, const U& b, const std::source_location& location = std::source_location::current())
 	{
 		// TODO: Pass message context
-		return assert(a == b, location);
+		Assert(a == b, location);
 	}
 
 	export template<class T, class U>
 		requires std::equality_comparable_with<T, U>
-	constexpr bool assert_not_equals(
+	constexpr void AssertNotEquals(
 		const T& a,
 		const U& b,
 		const std::source_location& location = std::source_location::current())
 	{
 		// TODO: Pass message context
-		return assert(a != b, location);
+		Assert(a != b, location);
 	}
 
 	export template<class T, class U>
 		requires std::equality_comparable_with<T, U>
-	constexpr bool
-		expect_equals(const T& a, const U& b, const std::source_location& location = std::source_location::current())
+	constexpr void
+		ExpectEquals(const T& a, const U& b, const std::source_location& location = std::source_location::current())
 	{
 		// TODO: Pass message context
-		return expect(a == b, location);
+		Expect(a == b, location);
 	}
 
 	export template<class T, class U>
 		requires std::equality_comparable_with<T, U>
-	constexpr bool expect_not_equals(
+	constexpr void ExpectNotEquals(
 		const T& a,
 		const U& b,
 		const std::source_location& location = std::source_location::current())
 	{
 		// TODO: Pass message context
-		return expect(a != b, location);
+		Expect(a != b, location);
 	}
 
 	export template<class T, class U>
 		requires std::totally_ordered_with<T, U>
-	constexpr bool
-		assert_greater(const T& a, const U& b, const std::source_location& location = std::source_location::current())
+	constexpr void
+		AssertGreater(const T& a, const U& b, const std::source_location& location = std::source_location::current())
 	{
 		// TODO: Pass message context
-		return assert(a > b, location);
+		Assert(a > b, location);
 	}
 
 	export template<class T, class U>
 		requires std::totally_ordered_with<T, U>
-	constexpr bool
-		assert_less(const T& a, const U& b, const std::source_location& location = std::source_location::current())
+	constexpr void
+		AssertLess(const T& a, const U& b, const std::source_location& location = std::source_location::current())
 	{
 		// TODO: Pass message context
-		return assert(a < b, location);
+		Assert(a < b, location);
 	}
 
 	export template<class T, class U>
 		requires std::totally_ordered_with<T, U>
-	constexpr bool assert_greater_equal(
+	constexpr void AssertGreaterEqual(
 		const T& a,
 		const U& b,
 		const std::source_location& location = std::source_location::current())
 	{
 		// TODO: Pass message context
-		return assert(a >= b, location);
+		Assert(a >= b, location);
 	}
 
 	export template<class T, class U>
 		requires std::totally_ordered_with<T, U>
-	constexpr bool assert_less_equal(
+	constexpr void AssertLessEqual(
 		const T& a,
 		const U& b,
 		const std::source_location& location = std::source_location::current())
 	{
 		// TODO: Pass message context
-		return assert(a <= b, location);
+		Assert(a <= b, location);
 	}
 
 	export template<class T, class U>
 		requires std::totally_ordered_with<T, U>
-	constexpr bool
-		expect_greater(const T& a, const U& b, const std::source_location& location = std::source_location::current())
+	constexpr void
+		ExpectGreater(const T& a, const U& b, const std::source_location& location = std::source_location::current())
 	{
 		// TODO: Pass message context
-		return expect(a > b, location);
+		Expect(a > b, location);
 	}
 
 	export template<class T, class U>
 		requires std::totally_ordered_with<T, U>
-	constexpr bool
-		expect_less(const T& a, const U& b, const std::source_location& location = std::source_location::current())
+	constexpr void
+		ExpectLess(const T& a, const U& b, const std::source_location& location = std::source_location::current())
 	{
 		// TODO: Pass message context
-		return expect(a < b, location);
+		Expect(a < b, location);
 	}
 
 	export template<class T, class U>
 		requires std::totally_ordered_with<T, U>
-	constexpr bool expect_greater_equal(
+	constexpr void ExpectGreaterEqual(
 		const T& a,
 		const U& b,
 		const std::source_location& location = std::source_location::current())
 	{
 		// TODO: Pass message context
-		return expect(a >= b, location);
+		Expect(a >= b, location);
 	}
 
 	export template<class T, class U>
 		requires std::totally_ordered_with<T, U>
-	constexpr bool expect_less_equal(
+	constexpr void ExpectLessEqual(
 		const T& a,
 		const U& b,
 		const std::source_location& location = std::source_location::current())
 	{
 		// TODO: Pass message context
-		return expect(a <= b, location);
+		Expect(a <= b, location);
 	}
 }

@@ -12,11 +12,11 @@ namespace
 
 	Suite colorSuite(
 		"color",
-		[]() 
+		[]()
 		{
-			 "construction"_test = []()
+			"construction"_test = []()
 			{
-				expect_equals(
+				ExpectEquals(
 					log::color24_t(58, 90, 64),
 					log::color24_t(green));
 			};
@@ -24,28 +24,28 @@ namespace
 
 	Suite styleSuite(
 		"style",
-		[]() 
+		[]()
 		{
-			 "construction"_test = []()
+			"construction"_test = []()
 			{
 				log::color24_t hunterGreen(58, 90, 64);
 				log::text_style style(hunterGreen);
 
 				auto foreground = style.Foreground();
-				assert(foreground.has_value());
-				expect(not style.Background().has_value());
-				expect(not style.AttributeMask());
+				Assert(foreground.has_value());
+				Expect(not style.Background().has_value());
+				Expect(not style.AttributeMask());
 
 				auto value = std::get<log::color24_t>(foreground.value());
-				expect_equals(value, hunterGreen);
+				ExpectEquals(value, hunterGreen);
 			};
 		});
 
 	Suite terminalSuite(
 		"terminal",
-		[]() 
+		[]()
 		{
-			 "format_to"_test = []()
+			"format_to"_test = []()
 			{
 				std::string output;
 				log::text_style style(log::color24_t(58, 90, 64));
@@ -57,10 +57,10 @@ namespace
 					"\x1b[38;2;058;090;064m{}\x1b[0m",
 					"Hunter Green = (58,90,64)");
 
-				expect_equals(output, expected);
+				ExpectEquals(output, expected);
 			};
 
-			 "format"_test = []()
+			"format"_test = []()
 			{
 				std::string output = log::format(
 					log::text_style(log::color24_t(58, 90, 64)),
@@ -68,10 +68,10 @@ namespace
 
 				std::string expected = std::format("\x1b[38;2;058;090;064m{}\x1b[0m", "Hunter Green = (58,90,64)");
 
-				expect_equals(output, expected);
+				ExpectEquals(output, expected);
 			};
 
-			 "print"_test = []()
+			"print"_test = []()
 			{
 				// TODO: How do we capture the output?
 			};

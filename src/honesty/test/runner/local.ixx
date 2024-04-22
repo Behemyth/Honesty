@@ -10,7 +10,7 @@ namespace synodic::honesty::test
 	public:
 		consteval explicit Local(std::string_view name);
 
-		void Run(std::function_ref<void(RunnerContext& context)> generateContext) override;
+		void Run(std::function_ref<void()> function) override;
 	};
 
 	consteval Local::Local(std::string_view name) :

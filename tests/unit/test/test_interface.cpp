@@ -7,9 +7,9 @@ using namespace synodic::honesty::test::literals;
 
 namespace
 {
-	auto interfaceGenerator = []() 
+	auto interfaceGenerator = []()
 	{
-		 "list"_test = []()
+		"list"_test = []()
 		{
 			MockReporter reporter;
 			MockRunner runner;
@@ -22,7 +22,7 @@ namespace
 			auto result = interface.List(parameters);
 
 			auto size = result.tests.size();
-			expect_greater(size, 0);
+			ExpectGreater(size, 0);
 		};
 	};
 

@@ -38,7 +38,7 @@ export class MockRunner final : public synodic::honesty::test::Runner
 public:
 	consteval MockRunner();
 
-	void Run(std::function_ref<void(synodic::honesty::test::RunnerContext& context)> generateContext) override;
+	void Run(std::function_ref<void()> function) override;
 };
 
 consteval MockRunner::MockRunner() :
@@ -114,6 +114,6 @@ void MockReporter::signal(const synodic::honesty::test::event::Summary& event)
 {
 }
 
-void MockRunner::Run(std::function_ref<void(synodic::honesty::test::RunnerContext& context)> generateContext)
+void MockRunner::Run(std::function_ref<void()> function)
 {
 }

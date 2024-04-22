@@ -29,13 +29,11 @@ namespace synodic::honesty::test
 	{
 	}
 
-	// Operators
-
 	export template<typename Fn, std::ranges::input_range V>
 		requires std::regular_invocable<Fn&, std::ranges::range_reference_t<V>>
 	constexpr auto operator|(Fn&& function, V&& range)
 	{
-		return [&]()
+		return [&function, &range]()
 		{
 			for (auto&& element: range)
 			{
@@ -69,9 +67,6 @@ namespace synodic::honesty::test
 				std::forward<std::tuple<Types...>>(tuple));
 		};
 	}
-
-	Registry& GetRegistry();
-	RunnerContext& GetContext();
 
 	export template<std::size_t Size>
 	class Tag

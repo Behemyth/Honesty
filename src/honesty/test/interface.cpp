@@ -5,6 +5,7 @@ import :registry;
 import :reporter;
 import :runner;
 import :test;
+import :context;
 
 namespace synodic::honesty::test
 {
@@ -32,11 +33,11 @@ namespace synodic::honesty::test
 	{
 		auto suites = GetRegistry().GetSuites();
 
-		RunnerContext& context = GetContext();
+		Context& context = GetContext();
 		std::ranges::single_view reporters{parameters.reporter};
 
 		// Lets a runner get the context with proper setup
-		auto generateContext = [&](RunnerContext& context)
+		auto generateContext = [&]()
 		{
 		};
 

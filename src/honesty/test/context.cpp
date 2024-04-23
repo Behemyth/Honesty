@@ -46,6 +46,10 @@ namespace synodic::honesty::test
 		reporters_(reporters),
 		runner_(runner)
 	{
+		if (!runner)
+		{
+			throw std::invalid_argument("Runner cannot be null");
+		}
 	}
 
 	void Context::Signal(const event::SuiteBegin& event) const
@@ -186,10 +190,7 @@ namespace synodic::honesty::test
 
 	void Context::Run(const std::function_ref<void()> function) const
 	{
-		if (runner_)
-		{
-			runner_->Run(function);
-		}
+		runner_->Run(function);
 	}
 }
 

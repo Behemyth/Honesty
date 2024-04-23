@@ -48,8 +48,8 @@ namespace synodic::honesty::test
 
 	template<size_t Size>
 	consteval Suite<Size>::Suite(const char (&name)[Size], const std::function_ref<void()> generator) :
-		name_ {0},
-		SuiteData({name_.data(), name_.size()}, generator)
+		SuiteData({name_.data(), name_.size()}, generator),
+		name_ {0}
 	{
 		std::copy_n(name, Size, name_.begin());
 	}

@@ -13,7 +13,12 @@ namespace synodic::honesty::test
 {
 	void Test::operator=(const std::function_ref<void()> test) const
 	{
-		// Prior to sending the test to a runner, we need to update the context
-		GetContext().Run(test);
+		try
+		{
+			GetContext().Run(test);
+		}
+		catch (const AssertException& exception)
+		{
+		}
 	}
 }

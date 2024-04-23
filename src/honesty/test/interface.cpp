@@ -36,12 +36,13 @@ namespace synodic::honesty::test
 		Context& context = GetContext();
 		std::ranges::single_view reporters{parameters.reporter};
 
-		// Lets a runner get the context with proper setup
-		auto generateContext = [&]()
-		{
-		};
+		// Before starting a suite, we need to set up the current thread's context
+		context = Context(parameters.runner, reporters);
 
-		parameters.runner->Run(generateContext);
+		for (SuiteData* suite: suites)
+		{
+			parameters.runner->Run(suite->generator);
+		}
 
 		return {};
 	}
@@ -52,7 +53,7 @@ namespace synodic::honesty::test
 
 		ListResult result;
 
-		//for (const SuiteData* const suite: suites)
+		// for (const SuiteData* const suite: suites)
 		//{
 		//	auto generator = suite->Generator();
 		//	for (const TestBase& test: generator())

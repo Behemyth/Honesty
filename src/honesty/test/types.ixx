@@ -5,35 +5,11 @@ import function_ref;
 
 namespace synodic::honesty::test
 {
-
-	export class SuiteData
+	export class AssertException final : public std::exception
 	{
 	public:
-		consteval SuiteData(std::string_view name, std::function_ref<void()> generator) noexcept;
-
-		std::string_view Name() const noexcept;
-		void Execute() const noexcept;
-
-	private:
-		std::string_view name_;
-		std::function_ref<void()> callback_;
+		using std::exception::exception;
 	};
-
-	std::string_view SuiteData::Name() const noexcept
-	{
-		return name_;
-	}
-
-	void SuiteData::Execute() const noexcept
-	{
-		return callback_();
-	}
-
-	consteval SuiteData::SuiteData(std::string_view name, std::function_ref<void()> generator) noexcept :
-		name_(name),
-		callback_(std::move(generator))
-	{
-	}
 
 	export namespace event
 	{
@@ -105,7 +81,7 @@ namespace synodic::honesty::test
 
 		struct AssertionFail
 		{
-			bool exception; // True if the remainder of the test is skipped
+			bool exception;	 // True if the remainder of the test is skipped
 			std::source_location location;
 		};
 
@@ -122,10 +98,4 @@ namespace synodic::honesty::test
 		{
 		};
 	}
-
-	class AssertException final : public std::exception
-	{
-	public:
-		using std::exception::exception;
-	};
 }

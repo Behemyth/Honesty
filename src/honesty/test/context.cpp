@@ -9,7 +9,7 @@ namespace synodic::honesty::test
 	class Context
 	{
 	public:
-		explicit Context(std::span<Reporter*> reporters);
+		explicit Context(Runner* runner, std::span<Reporter*> reporters);
 
 		void Signal(const event::SuiteBegin& event) const;
 		void Signal(const event::SuiteEnd& event) const;
@@ -35,12 +35,16 @@ namespace synodic::honesty::test
 
 		void Signal(const event::Summary& event) const;
 
+		inline void Run(std::function_ref<void()> function) const;
+
 	private:
 		std::span<Reporter*> reporters_;
+		Runner* runner_;
 	};
 
-	Context::Context(std::span<Reporter*> reporters) :
-		reporters_(reporters)
+	Context::Context(Runner* runner, const std::span<Reporter*> reporters) :
+		reporters_(reporters),
+		runner_(runner)
 	{
 	}
 
@@ -179,12 +183,20 @@ namespace synodic::honesty::test
 			reporter->signal(event);
 		}
 	}
+
+	void Context::Run(const std::function_ref<void()> function) const
+	{
+		if (runner_)
+		{
+			runner_->Run(function);
+		}
+	}
 }
 
 namespace
 {
 	// The fallback context for tests
-	inline synodic::honesty::test::Context EMPTY_CONTEXT({});
+	inline synodic::honesty::test::Context EMPTY_CONTEXT(nullptr, {});
 
 	// Each thread has its own context, such that tests can reference global functions without an object
 	inline thread_local synodic::honesty::test::Context& CONTEXT = EMPTY_CONTEXT;

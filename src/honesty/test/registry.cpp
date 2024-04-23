@@ -2,7 +2,7 @@ module synodic.honesty.test:registry;
 
 import :runner;
 import :reporter;
-import :types;
+import :suite;
 
 import std;
 import function_ref;

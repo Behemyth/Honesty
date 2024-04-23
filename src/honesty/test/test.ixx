@@ -4,7 +4,6 @@ export module synodic.honesty.test:test;
 import std;
 import function_ref;
 import :types;
-import :registry;
 
 namespace synodic::honesty::test
 {

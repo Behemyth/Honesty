@@ -6,6 +6,14 @@ import :test;
 namespace synodic::honesty::test
 {
 
+	struct SuiteData
+	{
+		consteval SuiteData(std::string_view name, std::function_ref<void()> generator);
+
+		std::string_view name;
+		std::function_ref<void()> generator;
+	};
+
 	/**
 	 * @brief Allows the static registration of tests in the global scope
 	 */
@@ -23,8 +31,7 @@ namespace synodic::honesty::test
 
 		bool Register() &
 		{
-			SuiteData& data = *this;
-			GetRegistry().AddSuite(data);
+			RegisterSuite(*this);
 
 			return true;
 		}
@@ -33,10 +40,16 @@ namespace synodic::honesty::test
 		std::array<char, Size> name_;
 	};
 
+	consteval SuiteData::SuiteData(std::string_view name, std::function_ref<void()> generator):
+		name(name),
+		generator(generator)
+	{
+	}
+
 	template<size_t Size>
-	consteval Suite<Size>::Suite(const char (&name)[Size], std::function_ref<void()> generator) :
+	consteval Suite<Size>::Suite(const char (&name)[Size], const std::function_ref<void()> generator) :
 		name_ {0},
-		SuiteData(std::string_view(name_.data(), Size), generator)
+		SuiteData({name_.data(), name_.size()}, generator)
 	{
 		std::copy_n(name, Size, name_.begin());
 	}
@@ -53,4 +66,5 @@ namespace synodic::honesty::test
 		return true;
 	}
 
+	void RegisterSuite(SuiteData& suite);
 }

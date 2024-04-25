@@ -194,7 +194,7 @@ namespace synodic::honesty::test
 namespace
 {
 	// The default context for tests
-	inline synodic::honesty::test::Context DEFAULT_CONTEXT(nullptr, {});
+	inline synodic::honesty::test::Context DEFAULT_CONTEXT(GetDefaultRunner(), {});
 
 	// Each thread has its own context, such that tests can reference global functions without an object
 	inline thread_local synodic::honesty::test::Context& CONTEXT = DEFAULT_CONTEXT;

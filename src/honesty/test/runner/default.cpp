@@ -1,8 +1,10 @@
 module synodic.honesty.test;
 
+import :runner.default;
+
 namespace synodic::honesty::test
 {
-	void Local::Run(std::function_ref<void()> function)
+	void DefaultRunner::Run(std::function_ref<void()> function)
 	{
 		function();
 	}

@@ -8,16 +8,17 @@ import :types;
 namespace synodic::honesty::log
 {
 
-	export class Logger
+	class Logger
 	{
 	public:
-		explicit(false) Logger(std::string_view name);
+		// TODO:  Hide constructor
+		explicit(false) constexpr Logger(std::string_view name);
 		~Logger() = default;
 
-		Logger(const Logger& other)				   = delete;
-		Logger(Logger&& other) noexcept			   = default;
-		Logger& operator=(const Logger& other)	   = delete;
-		Logger& operator=(Logger&& other) noexcept = default;
+		Logger(const Logger& other)							 = delete;
+		constexpr Logger(Logger&& other) noexcept			 = default;
+		Logger& operator=(const Logger& other)				 = delete;
+		constexpr Logger& operator=(Logger&& other) noexcept = default;
 
 		auto operator<=>(const Logger&) const = default;
 
@@ -27,7 +28,7 @@ namespace synodic::honesty::log
 			LogV(level, fmt.get(), std::make_format_args(args...));
 		}
 
-		/***
+		/**
 		 * @brief Logs a message with the given level. This is the internal function that all other log functions call
 		 * @param level The level of the message
 		 * @param fmt The format string
@@ -96,18 +97,6 @@ namespace synodic::honesty::log
 		void SetLevel(LevelType level);
 
 		/**
-		 * @brief Adds a sink to this logger
-		 * @param sink The sink to add
-		 */
-		void AddSink(Sink* sink) const;
-
-		/**
-		 * @brief Removes a sink from this logger
-		 * @param sink The sink to remove
-		 */
-		void RemoveSink(Sink* sink) const;
-
-		/**
 		 * @brief Returns the sinks of this logger
 		 * @return The sinks
 		 */
@@ -129,7 +118,7 @@ namespace synodic::honesty::log
 		 * @brief Returns the direct children of this logger
 		 * @return The children
 		 */
-		std::span<Logger*> GetChildren() const;
+		std::span<Logger*> Children() const;
 
 		/**
 		 * @brief Checks if this logger is propagating messages
@@ -156,21 +145,76 @@ namespace synodic::honesty::log
 		void SetDisabled(bool disabled);
 
 	private:
-		// Root constructor
-		Logger();
-
 		LevelType level_;
 
 		Logger* parent_;
-		mutable std::vector<Logger*> children_;
 
 		std::string name_;
 		bool propagate_;
 		bool disabled_;
+	};
+
+	constexpr Logger::Logger(std::string_view name) :
+		level_(LevelType::DEFER),
+		parent_(nullptr),
+		name_(name),
+		propagate_(true),
+		disabled_(false)
+	{
+	}
+
+	/**
+	 * @brief TODO: comment
+	 */
+	export template<std::size_t SinkSize, std::size_t ChildSize>
+	class StaticLogger : public Logger
+	{
+	public:
+		explicit(false) constexpr StaticLogger(std::string_view name);
+
+	private:
+		std::array<Sink*, SinkSize> sinks_;
+		std::array<Logger*, ChildSize> children_;
+	};
+
+	template<std::size_t SinkSize, std::size_t ChildSize>
+	constexpr StaticLogger<SinkSize, ChildSize>::StaticLogger(const std::string_view name) :
+		Logger(name)
+	{
+	}
+
+	/**
+	 * @brief TODO: comment
+	 */
+	export class DynamicLogger : public Logger
+	{
+	public:
+		// TODO:  Hide constructor
+		explicit(false) DynamicLogger(std::string_view name);
+		~DynamicLogger() = default;
+
+		DynamicLogger(const DynamicLogger& other)				 = delete;
+		DynamicLogger(DynamicLogger&& other) noexcept			 = default;
+		DynamicLogger& operator=(const DynamicLogger& other)	 = delete;
+		DynamicLogger& operator=(DynamicLogger&& other) noexcept = default;
+
+		/**
+		 * @brief Adds a sink to this logger
+		 * @param sink The sink to add
+		 */
+		void AddSink(Sink* sink) const;
+
+		/**
+		 * @brief Removes a sink from this logger
+		 * @param sink The sink to remove
+		 */
+		void RemoveSink(Sink* sink) const;
+
+	private:
+		mutable std::vector<DynamicLogger*> children_;
 		mutable std::vector<Sink*> sinks_;
 	};
 
-	export const Logger& GetRootLogger();
-	export Logger& GetLogger(std::string_view name);
-
+	export const DynamicLogger& GetRootLogger();
+	export DynamicLogger& GetLogger(std::string_view name);
 }

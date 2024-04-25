@@ -24,7 +24,7 @@ namespace synodic::honesty::test
 		void Execute() const;
 
 	private:
-		log::Logger logger_;
+		log::DynamicLogger logger_;
 		log::Console consoleSink_;
 
 		// Our list of top level commands and the parameters that go with them

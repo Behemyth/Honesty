@@ -8,8 +8,3 @@ target_sources(honesty
 	FILES
 	local.cpp
 )
-
-target_sources(honesty
-	INTERFACE
-	export.cpp
-)

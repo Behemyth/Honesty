@@ -3,12 +3,10 @@ target_sources(honesty
 	FILE_SET interfaces
 	FILES
 	compact.ixx
+	default.ixx
 	PRIVATE
 	FILE_SET implementations
 	FILES
 	compact.cpp
-)
-target_sources(honesty
-	INTERFACE
-	export.cpp
+	default.cpp
 )

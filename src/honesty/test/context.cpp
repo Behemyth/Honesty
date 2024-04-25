@@ -2,6 +2,7 @@ module synodic.honesty.test:context;
 
 import std;
 import :runner;
+import :reporter;
 
 namespace synodic::honesty::test
 {
@@ -9,7 +10,7 @@ namespace synodic::honesty::test
 	class Context
 	{
 	public:
-		explicit Context(Runner* runner, std::span<Reporter*> reporters);
+		explicit Context(Runner& runner, std::span<Reporter*> reporters);
 
 		void Signal(const event::SuiteBegin& event) const;
 		void Signal(const event::SuiteEnd& event) const;
@@ -42,21 +43,17 @@ namespace synodic::honesty::test
 		Runner* runner_;
 	};
 
-	Context::Context(Runner* runner, const std::span<Reporter*> reporters) :
+	Context::Context(Runner& runner, const std::span<Reporter*> reporters) :
 		reporters_(reporters),
-		runner_(runner)
+		runner_(&runner)
 	{
-		if (!runner)
-		{
-			throw std::invalid_argument("Runner cannot be null");
-		}
 	}
 
 	void Context::Signal(const event::SuiteBegin& event) const
 	{
 		for (Reporter* reporter: reporters_)
 		{
-			reporter->signal(event);
+			reporter->Signal(event);
 		}
 	}
 
@@ -64,7 +61,7 @@ namespace synodic::honesty::test
 	{
 		for (Reporter* reporter: reporters_)
 		{
-			reporter->signal(event);
+			reporter->Signal(event);
 		}
 	}
 
@@ -72,7 +69,7 @@ namespace synodic::honesty::test
 	{
 		for (Reporter* reporter: reporters_)
 		{
-			reporter->signal(event);
+			reporter->Signal(event);
 		}
 	}
 
@@ -80,7 +77,7 @@ namespace synodic::honesty::test
 	{
 		for (Reporter* reporter: reporters_)
 		{
-			reporter->signal(event);
+			reporter->Signal(event);
 		}
 	}
 
@@ -88,7 +85,7 @@ namespace synodic::honesty::test
 	{
 		for (Reporter* reporter: reporters_)
 		{
-			reporter->signal(event);
+			reporter->Signal(event);
 		}
 	}
 
@@ -96,7 +93,7 @@ namespace synodic::honesty::test
 	{
 		for (Reporter* reporter: reporters_)
 		{
-			reporter->signal(event);
+			reporter->Signal(event);
 		}
 	}
 
@@ -104,7 +101,7 @@ namespace synodic::honesty::test
 	{
 		for (Reporter* reporter: reporters_)
 		{
-			reporter->signal(event);
+			reporter->Signal(event);
 		}
 	}
 
@@ -112,7 +109,7 @@ namespace synodic::honesty::test
 	{
 		for (Reporter* reporter: reporters_)
 		{
-			reporter->signal(event);
+			reporter->Signal(event);
 		}
 	}
 
@@ -120,7 +117,7 @@ namespace synodic::honesty::test
 	{
 		for (Reporter* reporter: reporters_)
 		{
-			reporter->signal(event);
+			reporter->Signal(event);
 		}
 	}
 
@@ -128,7 +125,7 @@ namespace synodic::honesty::test
 	{
 		for (Reporter* reporter: reporters_)
 		{
-			reporter->signal(event);
+			reporter->Signal(event);
 		}
 	}
 
@@ -136,7 +133,7 @@ namespace synodic::honesty::test
 	{
 		for (Reporter* reporter: reporters_)
 		{
-			reporter->signal(event);
+			reporter->Signal(event);
 		}
 	}
 
@@ -144,7 +141,7 @@ namespace synodic::honesty::test
 	{
 		for (Reporter* reporter: reporters_)
 		{
-			reporter->signal(event);
+			reporter->Signal(event);
 		}
 	}
 
@@ -152,7 +149,7 @@ namespace synodic::honesty::test
 	{
 		for (Reporter* reporter: reporters_)
 		{
-			reporter->signal(event);
+			reporter->Signal(event);
 		}
 	}
 
@@ -160,7 +157,7 @@ namespace synodic::honesty::test
 	{
 		for (Reporter* reporter: reporters_)
 		{
-			reporter->signal(event);
+			reporter->Signal(event);
 		}
 	}
 
@@ -168,7 +165,7 @@ namespace synodic::honesty::test
 	{
 		for (Reporter* reporter: reporters_)
 		{
-			reporter->signal(event);
+			reporter->Signal(event);
 		}
 	}
 
@@ -176,7 +173,7 @@ namespace synodic::honesty::test
 	{
 		for (Reporter* reporter: reporters_)
 		{
-			reporter->signal(event);
+			reporter->Signal(event);
 		}
 	}
 
@@ -184,7 +181,7 @@ namespace synodic::honesty::test
 	{
 		for (Reporter* reporter: reporters_)
 		{
-			reporter->signal(event);
+			reporter->Signal(event);
 		}
 	}
 
@@ -196,11 +193,11 @@ namespace synodic::honesty::test
 
 namespace
 {
-	// The fallback context for tests
-	inline synodic::honesty::test::Context EMPTY_CONTEXT(nullptr, {});
+	// The default context for tests
+	inline synodic::honesty::test::Context DEFAULT_CONTEXT(nullptr, {});
 
 	// Each thread has its own context, such that tests can reference global functions without an object
-	inline thread_local synodic::honesty::test::Context& CONTEXT = EMPTY_CONTEXT;
+	inline thread_local synodic::honesty::test::Context& CONTEXT = DEFAULT_CONTEXT;
 }
 
 synodic::honesty::test::Context& GetContext()

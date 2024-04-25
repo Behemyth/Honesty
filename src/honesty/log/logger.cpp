@@ -2,23 +2,14 @@ module synodic.honesty.log;
 
 namespace
 {
-	std::map<std::size_t, synodic::honesty::log::Logger> LOGGERS;
+	std::map<std::size_t, synodic::honesty::log::DynamicLogger> LOGGERS;
 	const auto ROOT_LOGGER_NAME = "root";
-	const synodic::honesty::log::Logger& ROOT_LOGGER =
+	const synodic::honesty::log::DynamicLogger& ROOT_LOGGER =
 		LOGGERS.try_emplace(std::hash<std::string_view>{}(ROOT_LOGGER_NAME), ROOT_LOGGER_NAME).first->second;
 }
 
 namespace synodic::honesty::log
 {
-	Logger::Logger(std::string_view name) :
-		level_(LevelType::DEFER),
-		parent_(nullptr),
-		name_(name),
-		propagate_(true),
-		disabled_(false)
-	{
-	}
-
 	void Logger::LogV(LevelType level, std::string_view fmt, std::format_args args) const
 	{
 		for (Sink* sink: sinks_)
@@ -55,19 +46,6 @@ namespace synodic::honesty::log
 		level_ = level;
 	}
 
-	void Logger::AddSink(Sink* sink) const
-	{
-		sinks_.push_back(sink);
-	}
-
-	void Logger::RemoveSink(Sink* sink) const
-	{
-		if (const auto iterator = std::ranges::find(sinks_, sink); iterator != sinks_.end())
-		{
-			sinks_.erase(iterator);
-		}
-	}
-
 	std::span<Sink*> Logger::Sinks() const
 	{
 		return sinks_;
@@ -83,12 +61,12 @@ namespace synodic::honesty::log
 		return !sinks_.empty() || parentHasSink;
 	}
 
-	Logger* Logger::Parent() const
+	DynamicLogger* Logger::Parent() const
 	{
 		return parent_;
 	}
 
-	std::span<Logger*> Logger::GetChildren() const
+	std::span<DynamicLogger*> Logger::Children() const
 	{
 		return children_;
 	}
@@ -113,21 +91,30 @@ namespace synodic::honesty::log
 		disabled_ = disabled;
 	}
 
-	Logger::Logger() :
-		level_(LevelType::TRACE),
-		parent_(nullptr),
-		name_(""),
-		propagate_(false),
-		disabled_(false)
+	DynamicLogger::DynamicLogger(std::string_view name) :
+		Logger(name)
 	{
 	}
 
-	const Logger& GetRootLogger()
+	void DynamicLogger::AddSink(Sink* sink) const
+	{
+		sinks_.push_back(sink);
+	}
+
+	void DynamicLogger::RemoveSink(Sink* sink) const
+	{
+		if (const auto iterator = std::ranges::find(sinks_, sink); iterator != sinks_.end())
+		{
+			sinks_.erase(iterator);
+		}
+	}
+
+	const DynamicLogger& GetRootLogger()
 	{
 		return ROOT_LOGGER;
 	}
 
-	Logger& GetLogger(std::string_view name)
+	DynamicLogger& GetLogger(std::string_view name)
 	{
 		return LOGGERS.try_emplace(std::hash<std::string_view>{}(name), name).first->second;
 	}

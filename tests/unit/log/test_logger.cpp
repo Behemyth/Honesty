@@ -12,8 +12,8 @@ namespace
 		{
 			"Parent Sink"_test = []()
 			{
-				synodic::honesty::log::Logger& parent = synodic::honesty::log::GetLogger("parent");
-				synodic::honesty::log::Logger& child = synodic::honesty::log::GetLogger("parent.child");
+				synodic::honesty::log::DynamicLogger& parent = synodic::honesty::log::GetLogger("parent");
+				synodic::honesty::log::DynamicLogger& child = synodic::honesty::log::GetLogger("parent.child");
 
 				synodic::honesty::test::Assert(child.Parent());
 				synodic::honesty::test::ExpectEquals(parent, *child.Parent());

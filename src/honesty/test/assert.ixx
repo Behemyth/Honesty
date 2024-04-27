@@ -9,13 +9,13 @@ namespace synodic::honesty::test
 
 	/**
 	 * @brief Internal function to signal an assertion passed.
-	 * @param passed 
+	 * @param passed
 	 */
 	void Signal(const event::AssertionPass& passed);
 
 	/**
 	 * @brief Internal function to signal an assertion failure.
-	 * @param failed 
+	 * @param failed
 	 */
 	void Signal(const event::AssertionFail& failed);
 
@@ -261,3 +261,50 @@ namespace synodic::honesty::test
 		Expect(a <= b, location);
 	}
 }
+
+	void Signal(const event::AssertionPass& passed)
+	{
+		GetContext().Signal(passed);
+	}
+
+	void Signal(const event::AssertionFail& failed)
+	{
+		GetContext().Signal(failed);
+	}
+
+	void Assert(bool expression, const std::source_location& location)
+	{
+		if (expression)
+		{
+			event::AssertionPass passed;
+			passed.location = location;
+
+			Signal(passed);
+		}
+		else
+		{
+			event::AssertionFail failed;
+			failed.location = location;
+
+			Signal(failed);
+			throw AssertException("Assertion failed");
+		}
+	}
+
+	void Expect(bool expression, const std::source_location& location)
+	{
+		if (expression)
+		{
+			event::AssertionPass passed;
+			passed.location = location;
+
+			Signal(passed);
+		}
+		else
+		{
+			event::AssertionFail failed;
+			failed.location = location;
+
+			Signal(failed);
+		}
+	}

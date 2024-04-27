@@ -14,15 +14,8 @@ target_sources(honesty
 	PRIVATE
 	FILE_SET implementations
 	FILES
-	assert.cpp
 	registry.cpp
 	context.cpp
-	test.cpp
-	runner.cpp
-	interface.cpp
-	instance.cpp
-	reporter.cpp
-	suite.cpp
 )
 
 target_sources(honesty_main

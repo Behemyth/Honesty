@@ -24,7 +24,7 @@ namespace synodic::honesty::test
 
 		void Signal(const event::AssertionPass& event) override
 		{
-			std::string styledResult = format(log::text_style(log::color24_t(0, 255, 0)), "Passed");
+			std::string styledResult = format(log::TextStyle(log::color24_t(0, 255, 0)), "Passed");
 			logger_.Info(
 				"Assertion {}: File({}), Line({})",
 				styledResult,
@@ -34,13 +34,13 @@ namespace synodic::honesty::test
 
 		void Signal(const event::AssertionFail& event) override
 		{
-			std::string styledResult = format(log::text_style(log::color24_t(255, 0, 0)), "Failed");
+			std::string styledResult = format(log::TextStyle(log::color24_t(255, 0, 0)), "Failed");
 			logger_.Info("Test {}: File({}), Line({})", styledResult, event.location.file_name(), event.location.line());
 		}
 
 	private:
 		log::Console consoleSink_;
-		log::StaticLogger<1, 0> logger_;
+		log::StaticLogger<1> logger_;
 	};
 
 	constexpr CompactReporter::CompactReporter(const std::string_view name) :

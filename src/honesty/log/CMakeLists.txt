@@ -5,11 +5,6 @@ target_sources(honesty
 			"colour.ixx"
 			"logger.ixx"
 			"types.ixx"
-	PRIVATE
-		FILE_SET implementations
-		FILES
-			"colour.cpp"
-			"logger.cpp"
 )
 
 add_subdirectory(sink)

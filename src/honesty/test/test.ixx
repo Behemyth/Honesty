@@ -4,6 +4,7 @@ export module synodic.honesty.test:test;
 import std;
 import function_ref;
 import :types;
+import :context;
 
 namespace synodic::honesty::test
 {
@@ -17,7 +18,16 @@ namespace synodic::honesty::test
 		Test& operator=(const Test& other)	   = delete;
 		Test& operator=(Test&& other) noexcept = delete;
 
-		void operator=(std::function_ref<void()> test) const;
+		void operator=(std::function_ref<void()> test) const
+		{
+			try
+			{
+				GetContext().Run(test);
+			}
+			catch (const AssertException& exception)
+			{
+			}
+		}
 
 	private:
 		std::string_view name_;

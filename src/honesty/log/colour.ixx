@@ -12,7 +12,7 @@ namespace synodic::honesty::log
 {
 	export struct color8_t
 	{
-		constexpr color8_t(std::uint8_t code) :
+		constexpr color8_t(const std::uint8_t code) :
 			code(code)
 		{
 		}
@@ -24,14 +24,14 @@ namespace synodic::honesty::log
 
 	export struct color24_t
 	{
-		constexpr color24_t(std::uint32_t hexCode) :
+		constexpr color24_t(const std::uint32_t hexCode) :
 			red((hexCode >> 16) & 0xFF),
 			green((hexCode >> 8) & 0xFF),
 			blue(hexCode & 0xFF)
 		{
 		}
 
-		constexpr color24_t(std::uint8_t red, std::uint8_t green, std::uint8_t blue) :
+		constexpr color24_t(const std::uint8_t red, const std::uint8_t green, const std::uint8_t blue) :
 			red(red),
 			green(green),
 			blue(blue)
@@ -48,54 +48,67 @@ namespace synodic::honesty::log
 	/**
 	 * @brief Supported SGR parameter mask
 	 */
-	export enum class attribute : std::uint8_t
+	export enum class Attribute : std::uint8_t
 	{
-		bold	  = 1,
-		faint	  = 1 << 1,
-		italic	  = 1 << 2,
-		underline = 1 << 3,
-		blink	  = 1 << 4,
-		reverse	  = 1 << 5,
-		conceal	  = 1 << 6,
-		strike	  = 1 << 7,
+		BOLD	  = 1,
+		FAINT	  = 1 << 1,
+		ITALIC	  = 1 << 2,
+		UNDERLINE = 1 << 3,
+		BLINK	  = 1 << 4,
+		REVERSE	  = 1 << 5,
+		CONCEAL	  = 1 << 6,
+		STRIKE	  = 1 << 7,
+	};
+
+	constexpr size_t ATTRIBUTE_COUNT = std::numeric_limits<std::underlying_type_t<Attribute>>::digits;
+
+	constexpr std::array<std::uint8_t, ATTRIBUTE_COUNT> ATTRIBUTE_ANSI_CODES = {
+		1,	// bold
+		2,	// faint
+		3,	// italic
+		4,	// underline
+		5,	// blink
+		7,	// reverse
+		8,	// conceal
+		9,	// strike
 	};
 
 	/**
 	 * @brief ANSI color escape codes
 	 */
-	enum class terminal_color : std::uint8_t
+	enum class TerminalColor : std::uint8_t
 	{
-		black = 30,
-		red,
-		green,
-		yellow,
-		blue,
-		magenta,
-		cyan,
-		white,
-		bright_black = 90,
-		bright_red,
-		bright_green,
-		bright_yellow,
-		bright_blue,
-		bright_magenta,
-		bright_cyan,
-		bright_white
+		BLACK = 30,
+		RED,
+		GREEN,
+		YELLOW,
+		BLUE,
+		MAGENTA,
+		CYAN,
+		WHITE,
+		BRIGHT_BLACK = 90,
+		BRIGHT_RED,
+		BRIGHT_GREEN,
+		BRIGHT_YELLOW,
+		BRIGHT_BLUE,
+		BRIGHT_MAGENTA,
+		BRIGHT_CYAN,
+		BRIGHT_WHITE
 	};
 
 	export using color_type = std::variant<color8_t, color24_t>;
 
-	export class text_style
+	export class TextStyle
 	{
 	public:
-		constexpr explicit text_style(color8_t color);
-		constexpr explicit text_style(color24_t color);
+		constexpr explicit TextStyle(color8_t color);
+		constexpr explicit TextStyle(color24_t color);
 
 		constexpr std::optional<color_type> Foreground() const;
 		constexpr std::optional<color_type> Background() const;
 		constexpr std::uint8_t AttributeMask() const;
 
-		friend bool operator<=>(const text_style&, const text_style&) = default;
+		friend bool operator<=>(const TextStyle&, const TextStyle&) = default;
 
 	private:
 		std::optional<color_type> foreground_;
@@ -103,44 +116,47 @@ namespace synodic::honesty::log
 		std::uint8_t attributeMask_;
 	};
 
-	constexpr text_style::text_style(color8_t color) :
+	constexpr TextStyle::TextStyle(color8_t color) :
 		foreground_(color),
 		attributeMask_(0)
 	{
 	}
 
-	constexpr text_style::text_style(color24_t color) :
+	constexpr TextStyle::TextStyle(color24_t color) :
 		foreground_(color),
 		attributeMask_(0)
 	{
 	}
 
-	constexpr std::optional<color_type> text_style::Foreground() const
+	constexpr std::optional<color_type> TextStyle::Foreground() const
 	{
 		return foreground_;
 	}
 
-	constexpr std::optional<color_type> text_style::Background() const
+	constexpr std::optional<color_type> TextStyle::Background() const
 	{
 		return background_;
 	}
 
-	constexpr std::uint8_t text_style::AttributeMask() const
+	constexpr std::uint8_t TextStyle::AttributeMask() const
 	{
 		return attributeMask_;
 	}
 
 	template<class... Ts>
-	struct overloaded : Ts...
+	struct Overloaded : Ts...
 	{
 		using Ts::operator()...;
 	};
 
-	std::uint8_t ConvertIndexToAnsiCode(std::uint8_t maskIndex);
+	std::uint8_t ConvertIndexToAnsiCode(std::uint8_t maskIndex)
+	{
+		return ATTRIBUTE_ANSI_CODES[maskIndex];
+	}
 
 	/**
 	 * @brief Application of a text style to a string
-	 * @param data
+	 * @param out
 	 * @param style
 	 * @param fmt
 	 * @param args
@@ -149,34 +165,31 @@ namespace synodic::honesty::log
 		requires std::output_iterator<OutputIt, const CharT&>
 	OutputIt vformat_to_impl(
 		OutputIt out,
-		const text_style& style,
+		const TextStyle& style,
 		std::basic_string_view<CharT> fmt,
 		std::basic_format_args<std::basic_format_context<BackendBuffer, std::type_identity_t<CharT>>> args)
 	{
 		OutputIt next = out;
 
-		std::uint8_t attributeMask = style.AttributeMask();
-		if (attributeMask)
+		if (const std::uint8_t attributeMask = style.AttributeMask())
 		{
-			constexpr size_t ATTRIBUTE_COUNT = std::numeric_limits<std::underlying_type_t<attribute>>::digits;
+			constexpr size_t attributeCount = std::numeric_limits<std::underlying_type_t<Attribute>>::digits;
 
-			for (int index = 0; index < ATTRIBUTE_COUNT; ++index)
+			for (int index = 0; index < attributeCount; ++index)
 			{
-				std::uint8_t mask = static_cast<std::uint8_t>(1 << index);
-				if (attributeMask & mask)
+				if (const std::uint8_t mask = static_cast<std::uint8_t>(1 << index); attributeMask & mask)
 				{
 					next = std::format_to(next, "\x1b[{}m", ConvertIndexToAnsiCode(index));
 				}
 			}
 		}
 
-		std::optional<color_type> foreground = style.Foreground();
-		if (foreground)
+		if (std::optional<color_type> foreground = style.Foreground())
 		{
 			color_type& colorType = foreground.value();
 
 			std::visit(
-				overloaded {
+				Overloaded {
 					[&](color8_t arg)
 					{
 						next = std::format_to(next, "\x1b[{}m", arg.code);
@@ -188,13 +201,12 @@ namespace synodic::honesty::log
 				colorType);
 		}
 
-		std::optional<color_type> background = style.Background();
-		if (background)
+		if (std::optional<color_type> background = style.Background())
 		{
 			color_type& colorType = background.value();
 
 			std::visit(
-				overloaded {
+				Overloaded {
 					[&](color8_t arg)
 					{
 						next = std::format_to(next, "\x1b[{}m", arg.code + 10);
@@ -213,13 +225,18 @@ namespace synodic::honesty::log
 	/**
 	 * @brief Overload (1) - https://en.cppreference.com/w/cpp/utility/format/vformat
 	 */
-	export std::string vformat(const text_style& style, std::string_view fmt, std::format_args args);
+	export std::string vformat(const TextStyle& style, std::string_view fmt, std::format_args args)
+	{
+		std::string data;
+		vformat_to_impl(std::back_inserter(data), style, fmt, args);
+		return data;
+	}
 
 	/**
 	 * @brief Overload (1) - https://en.cppreference.com/w/cpp/utility/format/vformat_to
 	 */
 	export template<std::output_iterator<const char&> OutputIt>
-	OutputIt vformat_to(OutputIt out, const text_style& style, std::string_view fmt, std::format_args args)
+	OutputIt vformat_to(OutputIt out, const TextStyle& style, std::string_view fmt, std::format_args args)
 	{
 		return vformat_to_impl(out, style, fmt, args);
 	}
@@ -228,7 +245,7 @@ namespace synodic::honesty::log
 	 * @brief  Overload (1) - https://en.cppreference.com/w/cpp/utility/format/format
 	 */
 	export template<typename... Args>
-	std::string format(const text_style& style, std::format_string<Args...> fmt, Args&&... args)
+	std::string format(const TextStyle& style, std::format_string<Args...> fmt, Args&&... args)
 	{
 		return vformat(style, fmt.get(), std::make_format_args(args...));
 	}
@@ -237,7 +254,7 @@ namespace synodic::honesty::log
 	 * @brief Overload (1) - https://en.cppreference.com/w/cpp/utility/format/format_to
 	 */
 	export template<std::output_iterator<const char&> OutputIt, typename... Args>
-	OutputIt format_to(OutputIt out, const text_style& style, std::format_string<Args...> fmt, Args&&... args)
+	OutputIt format_to(OutputIt out, const TextStyle& style, std::format_string<Args...> fmt, Args&&... args)
 	{
 		return vformat_to(std::move(out), style, fmt.get(), std::make_format_args(args...));
 	}
@@ -246,7 +263,7 @@ namespace synodic::honesty::log
 	 * @brief Overload (1) - https://en.cppreference.com/w/cpp/io/print
 	 */
 	export template<typename... Args>
-	void print(std::FILE* stream, const text_style& style, std::format_string<Args...> fmt, Args&&... args)
+	void print(std::FILE* stream, const TextStyle& style, std::format_string<Args...> fmt, Args&&... args)
 	{
 		std::string data;
 		vformat_to_impl(std::back_inserter(data), style, fmt, args);
@@ -257,7 +274,7 @@ namespace synodic::honesty::log
 	 * @brief Overload (2) - https://en.cppreference.com/w/cpp/io/print
 	 */
 	export template<typename... Args>
-	void print(const text_style& style, std::format_string<Args...> fmt, Args&&... args)
+	void print(const TextStyle& style, std::format_string<Args...> fmt, Args&&... args)
 	{
 		return print(stdout, style, fmt, std::forward<Args>(args)...);
 	}
@@ -266,7 +283,7 @@ namespace synodic::honesty::log
 	 * @brief Overload (1) - https://en.cppreference.com/w/cpp/io/println
 	 */
 	export template<class... Args>
-	void println(std::FILE* stream, const text_style& style, std::format_string<Args...> fmt, Args&&... args)
+	void println(std::FILE* stream, const TextStyle& style, std::format_string<Args...> fmt, Args&&... args)
 	{
 		print(stream, style, "{}\n", std::format(fmt, args...));
 	}
@@ -275,7 +292,7 @@ namespace synodic::honesty::log
 	 * @brief Overload (2) - https://en.cppreference.com/w/cpp/io/println
 	 */
 	export template<class... Args>
-	void println(const text_style& style, std::format_string<Args...> fmt, Args&&... args)
+	void println(const TextStyle& style, std::format_string<Args...> fmt, Args&&... args)
 	{
 		println(stdout, style, fmt, args...);
 	}

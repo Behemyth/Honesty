@@ -13,13 +13,10 @@ namespace synodic::honesty::log
 	public:
 		RingBuffer() = default;
 
-		void SynchronizedLogV(LevelType level, std::string_view fmt, std::format_args args) override;
+		void SynchronizedLogV(LevelType level, std::string_view fmt, std::format_args args) override
+		{
+		}
 
 	private:
 	};
-
-	template<mutex Mutex>
-	void RingBuffer<Mutex>::SynchronizedLogV(LevelType level, std::string_view fmt, std::format_args args)
-	{
-	}
 }

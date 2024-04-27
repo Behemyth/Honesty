@@ -4,9 +4,4 @@ target_sources(honesty
 	FILES
 	compact.ixx
 	default.ixx
-	PRIVATE
-	FILE_SET implementations
-	FILES
-	compact.cpp
-	default.cpp
 )

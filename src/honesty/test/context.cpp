@@ -2,7 +2,10 @@ module synodic.honesty.test:context;
 
 import std;
 import :runner;
+import :runner.default;
 import :reporter;
+import :reporter.compact;
+import :reporter.default;
 
 namespace synodic::honesty::test
 {
@@ -193,8 +196,17 @@ namespace synodic::honesty::test
 
 namespace
 {
+	constinit synodic::honesty::test::DefaultRunner DEFAULT_RUNNER("default");
+
+	constinit std::array<synodic::honesty::test::Runner*, 1> RUNNERS = {&DEFAULT_RUNNER};
+
+	constinit synodic::honesty::test::CompactReporter COMPACT_REPORTER;
+	constinit synodic::honesty::test::DefaultReporter DEFAULT_REPORTER;
+
+	constinit std::array<synodic::honesty::test::Reporter*, 2> REPORTERS = {&COMPACT_REPORTER, &DEFAULT_REPORTER};
+
 	// The default context for tests
-	inline synodic::honesty::test::Context DEFAULT_CONTEXT(GetDefaultRunner(), {});
+	inline synodic::honesty::test::Context DEFAULT_CONTEXT(DEFAULT_RUNNER, {});
 
 	// Each thread has its own context, such that tests can reference global functions without an object
 	inline thread_local synodic::honesty::test::Context& CONTEXT = DEFAULT_CONTEXT;
@@ -203,4 +215,24 @@ namespace
 synodic::honesty::test::Context& GetContext()
 {
 	return CONTEXT;
+}
+
+std::span<synodic::honesty::test::Reporter*> GetBuiltinReporters()
+{
+	return REPORTERS;
+}
+
+const synodic::honesty::test::Reporter& GetDefaultReporter()
+{
+	return DEFAULT_REPORTER;
+}
+
+std::span<synodic::honesty::test::Runner*> GetBuiltinRunners()
+{
+	return RUNNERS;
+}
+
+const synodic::honesty::test::Runner& GetDefaultRunner()
+{
+	return DEFAULT_RUNNER;
 }

@@ -36,7 +36,10 @@ namespace synodic::honesty::test
 
 		virtual void Signal(const event::Summary& event) = 0;
 
-		std::string_view Name() const;
+		std::string_view Name() const
+		{
+			return name_;
+		}
 
 	private:
 		std::string_view name_;
@@ -46,13 +49,6 @@ namespace synodic::honesty::test
 		name_(name)
 	{
 	}
-
-	/***
-	 * @brief Registers a reporter with the test framework
-	 * @param reporter The reporter to register
-	 * @return Whether the reporter was successfully registered
-	 */
-	export bool RegisterReporter(Reporter& reporter);
 
 	/**
 	 * @brief TODO: Actually implement this instead of just stubbing it out.

@@ -10,10 +10,13 @@ namespace synodic::honesty::test
 	public:
 		consteval explicit DefaultRunner(std::string_view name);
 
-		void Run(std::function_ref<void()> function) override;
+		void Run(const std::function_ref<void()> function) override
+		{
+			function();
+		}
 	};
 
-	consteval DefaultRunner::DefaultRunner(std::string_view name) :
+	consteval DefaultRunner::DefaultRunner(const std::string_view name) :
 		Runner(name)
 	{
 	}

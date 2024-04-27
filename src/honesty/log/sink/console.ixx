@@ -10,9 +10,12 @@ namespace synodic::honesty::log
 	export class Console final : public Sink
 	{
 	public:
-		Console() = default;
+		constexpr Console() = default;
 
-		void LogV(LevelType level, std::string_view fmt, std::format_args args) override;
+		void LogV(LevelType level, std::string_view fmt, std::format_args args) override
+		{
+			std::println("{}", std::vformat(fmt, args));
+		}
 
 	private:
 	};

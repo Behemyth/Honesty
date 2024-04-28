@@ -178,4 +178,9 @@ namespace synodic::honesty::test
 		return true;
 	}
 
+	void RegisterSuite(SuiteData& suite)
+	{
+		GetRegistry().AddSuite(suite);
+	}
+
 }

@@ -45,7 +45,7 @@ namespace synodic::honesty::test
 
 	constexpr DefaultReporter::DefaultReporter(const std::string_view name) :
 		StreamingAdapter(name),
-		logger_("reporter")
+		logger_("reporter", &consoleSink_)
 	{
 	}
 }

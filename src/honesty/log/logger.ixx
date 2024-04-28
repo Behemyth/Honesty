@@ -11,6 +11,7 @@ namespace synodic::honesty::log
 	class Logger
 	{
 	public:
+		virtual ~Logger()									 = default;
 		Logger(const Logger& other)							 = delete;
 		constexpr Logger(Logger&& other) noexcept			 = default;
 		Logger& operator=(const Logger& other)				 = delete;
@@ -19,7 +20,7 @@ namespace synodic::honesty::log
 		auto operator<=>(const Logger&) const = default;
 
 		template<class... Args>
-		inline void Log(const LevelType level, std::format_string<Args...> fmt, Args&&... args) const
+		inline void Log(const LevelType level, std::format_string<Args...> fmt, Args&&... args)
 		{
 			LogV(level, fmt.get(), std::make_format_args(args...));
 		}
@@ -30,7 +31,7 @@ namespace synodic::honesty::log
 		 * @param fmt The format string
 		 * @param args The arguments
 		 */
-		void LogV(const LevelType level, const std::string_view fmt, const std::format_args args) const
+		void LogV(const LevelType level, const std::string_view fmt, const std::format_args args)
 		{
 			for (Sink* sink: Sinks())
 			{
@@ -39,37 +40,37 @@ namespace synodic::honesty::log
 		}
 
 		template<class... Args>
-		inline void Trace(std::format_string<Args...> fmt, Args&&... args) const
+		inline void Trace(std::format_string<Args...> fmt, Args&&... args)
 		{
 			Log(LevelType::TRACE, fmt, std::forward<Args>(args)...);
 		}
 
 		template<class... Args>
-		inline void Debug(std::format_string<Args...> fmt, Args&&... args) const
+		inline void Debug(std::format_string<Args...> fmt, Args&&... args)
 		{
 			Log(LevelType::DEBUG, fmt, std::forward<Args>(args)...);
 		}
 
 		template<class... Args>
-		inline void Info(std::format_string<Args...> fmt, Args&&... args) const
+		inline void Info(std::format_string<Args...> fmt, Args&&... args)
 		{
 			Log(LevelType::INFO, fmt, std::forward<Args>(args)...);
 		}
 
 		template<class... Args>
-		inline void Warning(std::format_string<Args...> fmt, Args&&... args) const
+		inline void Warning(std::format_string<Args...> fmt, Args&&... args)
 		{
 			Log(LevelType::WARNING, fmt, std::forward<Args>(args)...);
 		}
 
 		template<class... Args>
-		inline void Error(std::format_string<Args...> fmt, Args&&... args) const
+		inline void Error(std::format_string<Args...> fmt, Args&&... args)
 		{
 			Log(LevelType::ERROR, fmt, std::forward<Args>(args)...);
 		}
 
 		template<class... Args>
-		inline void Critical(std::format_string<Args...> fmt, Args&&... args) const
+		inline void Critical(std::format_string<Args...> fmt, Args&&... args)
 		{
 			Log(LevelType::CRITICAL, fmt, std::forward<Args>(args)...);
 		}
@@ -119,10 +120,16 @@ namespace synodic::honesty::log
 		}
 
 		/**
+		 * @brief Returns the sinks of this logger
+		 * @return The sinks
+		 */
+		virtual std::span<Sink*> Sinks() = 0;
+
+		/**
 		 * @brief Checks to see if this logger or its ancestors have any sinks
 		 * @return Whether sinks were found
 		 */
-		bool HasSink() const
+		bool HasSink()
 		{
 			bool parentHasSink = false;
 			if (parent_)
@@ -145,7 +152,7 @@ namespace synodic::honesty::log
 		 * @brief Returns the direct children of this logger
 		 * @return The children
 		 */
-		std::span<Logger*> Children() const;
+		virtual std::span<Logger*> Children() const = 0;
 
 		/**
 		 * @brief Checks if this logger is propagating messages
@@ -188,7 +195,7 @@ namespace synodic::honesty::log
 		 * @brief Constructs a logger with the given name. Forces inheritance for construction
 		 * @param name The name of the logger
 		 */
-		explicit(false) constexpr Logger(std::string_view name) :
+		explicit(false) constexpr Logger(const std::string_view name) :
 			level_(LevelType::DEFER),
 			parent_(nullptr),
 			name_(name),
@@ -202,7 +209,7 @@ namespace synodic::honesty::log
 
 		Logger* parent_;
 
-		std::string name_;
+		std::string_view name_;
 		bool propagate_;
 		bool disabled_;
 	};
@@ -214,17 +221,18 @@ namespace synodic::honesty::log
 	class StaticLogger final : public Logger
 	{
 	public:
-		explicit(false) constexpr StaticLogger(const std::string_view name) :
-			Logger(name)
+		explicit(false) constexpr StaticLogger(const std::string_view name, Sink* sinks) :
+			Logger(name),
+			sinks_(sinks)
 		{
 		}
 
-		std::span<Sink*> Sinks() const
+		std::span<Sink*> Sinks() override
 		{
 			return sinks_;
 		}
 
-		std::span<Logger*> Children() const
+		std::span<Logger*> Children() const override
 		{
 			return {};
 		}
@@ -273,12 +281,12 @@ namespace synodic::honesty::log
 			}
 		}
 
-		std::span<Sink*> Sinks() const
+		std::span<Sink*> Sinks() override
 		{
 			return sinks_;
 		}
 
-		std::span<Logger*> Children() const
+		std::span<Logger*> Children() const override
 		{
 			return children_;
 		}

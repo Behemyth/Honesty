@@ -200,8 +200,8 @@ namespace
 
 	constinit std::array<synodic::honesty::test::Runner*, 1> RUNNERS = {&DEFAULT_RUNNER};
 
-	constinit synodic::honesty::test::CompactReporter COMPACT_REPORTER;
-	constinit synodic::honesty::test::DefaultReporter DEFAULT_REPORTER;
+	constinit synodic::honesty::test::CompactReporter COMPACT_REPORTER("compact");
+	constinit synodic::honesty::test::DefaultReporter DEFAULT_REPORTER("default");
 
 	constinit std::array<synodic::honesty::test::Reporter*, 2> REPORTERS = {&COMPACT_REPORTER, &DEFAULT_REPORTER};
 

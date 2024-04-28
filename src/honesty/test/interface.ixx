@@ -4,6 +4,7 @@ import synodic.honesty.log;
 import std;
 import :suite;
 import :registry;
+import :context;
 import :reporter;
 import :runner;
 import :test;
@@ -40,11 +41,13 @@ namespace synodic::honesty::test
 
 	export struct ListParameters
 	{
-		ListParameters() :
+		ListParameters(Runner* runner) :
+			runner(runner),
 			outputType(ListOutputType::LOG)
 		{
 		}
 
+		Runner* runner;
 		ListOutputType outputType;
 	};
 
@@ -97,15 +100,20 @@ namespace synodic::honesty::test
 		{
 			const auto suites = GetRegistry().GetSuites();
 
-			Context& context = GetContext();
-			std::ranges::single_view reporters {parameters.reporter};
+			//Context& context = GetContext();
+			//std::ranges::single_view reporters {parameters.reporter};
 
-			// Before starting a suite, we need to set up the current thread's context
-			context = Context(*parameters.runner, reporters);
+			//// Before starting a suite, we need to set up the current thread's context
+			//context = Context(*parameters.runner, reporters);
 
-			for (SuiteData* suite: suites)
+			for (const SuiteData* suite: suites)
 			{
-				parameters.runner->Run(suite->generator);
+				auto wrapper = [this, suite]
+				{
+					SuiteWrapper(suite);
+				};
+
+				parameters.runner->Run(wrapper);
 			}
 
 			return {};
@@ -113,26 +121,43 @@ namespace synodic::honesty::test
 
 		ListResult List(const ListParameters& parameters)
 		{
-			auto suites = GetRegistry().GetSuites();
+			const auto suites = GetRegistry().GetSuites();
+
+			//Context& context = GetContext();
+
+			//std::ranges::single_view reporters {&GetListReporter()};
+			//context = Context(*parameters.runner, reporters);
 
 			ListResult result;
 
-			// for (const SuiteData* const suite: suites)
-			//{
-			//	auto generator = suite->Generator();
-			//	for (const TestBase& test: generator())
-			//	{
-			//		TestDescription description;
-			//		description.name = test.Name();
+			for (const SuiteData* suite: suites)
+			{
+				auto wrapper = [this, suite]
+				{
+					SuiteWrapper(suite);
+				};
 
-			//		result.tests.push_back(description);
-			//	}
-			//}
+				parameters.runner->Run(wrapper);
+			}
 
 			return result;
 		}
 
 	private:
+		void SuiteWrapper(const SuiteData* suite)
+		{
+			event::SuiteBegin begin;
+			begin.name = suite->name;
+
+			GetContext().Signal(begin);
+
+			suite->generator();
+
+			event::SuiteEnd end;
+			end.name = suite->name;
+
+			GetContext().Signal(end);
+		}
 	};
 
 	/**

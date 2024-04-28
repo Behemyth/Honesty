@@ -10,7 +10,10 @@ namespace synodic::honesty::test
 	{
 	public:
 		explicit(false) constexpr Reporter(const std::string_view name) :
-			name_(name) {};
+			name_(name)
+		{
+		}
+
 		virtual ~Reporter() = default;
 
 		virtual void Signal(const event::SuiteBegin& event) = 0;
@@ -47,13 +50,16 @@ namespace synodic::honesty::test
 	};
 
 	/**
-	 * @brief TODO: Actually implement this instead of just stubbing it out.
+	 * @brief TODO: Comment
 	 */
 	export class StreamingAdapter : public Reporter
 	{
 	public:
 		explicit(false) constexpr StreamingAdapter(const std::string_view name) :
-			Reporter(name) {};
+			Reporter(name)
+		{
+		}
+
 		~StreamingAdapter() override = default;
 
 		void Signal(const event::SuiteBegin& event) override
@@ -123,5 +129,89 @@ namespace synodic::honesty::test
 		void Signal(const event::Summary& event) override
 		{
 		}
+	};
+
+	/**
+	 * @brief TODO: Comment
+	 */
+	export class CumulativeAdapter : public Reporter
+	{
+	public:
+		explicit(false) constexpr CumulativeAdapter(const std::string_view name) :
+			Reporter(name)
+		{
+		}
+
+		~CumulativeAdapter() override = default;
+
+		void Signal(const event::SuiteBegin& event) final
+		{
+		}
+
+		void Signal(const event::SuiteEnd& event) final
+		{
+		}
+
+		void Signal(const event::SuiteSkip& event) final
+		{
+		}
+
+		void Signal(const event::SuiteRun& event) final
+		{
+		}
+
+		void Signal(const event::SuiteFail& event) final
+		{
+		}
+
+		void Signal(const event::SuitePass& event) final
+		{
+		}
+
+		void Signal(const event::SuiteSummary& event) final
+		{
+		}
+
+		void Signal(const event::TestBegin& event) final
+		{
+		}
+
+		void Signal(const event::TestEnd& event) final
+		{
+		}
+
+		void Signal(const event::TestSkip& event) final
+		{
+		}
+
+		void Signal(const event::TestRun& event) final
+		{
+		}
+
+		void Signal(const event::TestFail& event) final
+		{
+		}
+
+		void Signal(const event::TestPass& event) final
+		{
+		}
+
+		void Signal(const event::AssertionFail& event) final
+		{
+		}
+
+		void Signal(const event::AssertionPass& event) final
+		{
+		}
+
+		void Signal(const event::AssertionSkip& event) final
+		{
+		}
+
+		void Signal(const event::Summary& event) final
+		{
+		}
+
+		virtual void Finalize() = 0;
 	};
 }

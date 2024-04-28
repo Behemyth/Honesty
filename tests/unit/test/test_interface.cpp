@@ -18,11 +18,10 @@ namespace
 
 			Interface interface(configuration);
 
-			ListParameters parameters;
-			auto result = interface.List(parameters);
+			ListParameters parameters(&runner);
+			const auto result = interface.List(parameters);
 
-			auto size = result.tests.size();
-			ExpectGreater(size, 0);
+			ExpectGreater(result.tests.size(), 0);
 		};
 	};
 

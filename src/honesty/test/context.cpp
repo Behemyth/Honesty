@@ -6,6 +6,7 @@ import :runner.default;
 import :reporter;
 import :reporter.compact;
 import :reporter.default;
+import :reporter.list;
 
 namespace synodic::honesty::test
 {
@@ -13,7 +14,7 @@ namespace synodic::honesty::test
 	class Context
 	{
 	public:
-		explicit Context(Runner& runner, std::span<Reporter*> reporters) :
+		constexpr Context(Runner& runner, std::span<Reporter*> reporters) :
 			reporters_(reporters),
 			runner_(&runner)
 		{
@@ -174,14 +175,19 @@ namespace
 
 	constinit synodic::honesty::test::CompactReporter COMPACT_REPORTER("compact");
 	constinit synodic::honesty::test::DefaultReporter DEFAULT_REPORTER("default");
+	constinit synodic::honesty::test::ListReporter LIST_REPORTER("list");
 
-	constinit std::array<synodic::honesty::test::Reporter*, 2> REPORTERS = {&COMPACT_REPORTER, &DEFAULT_REPORTER};
+	constinit std::array<synodic::honesty::test::Reporter*, 1> PRIVATE_REPORTERS = {&LIST_REPORTER};
+
+	constinit std::array<synodic::honesty::test::Reporter*, 2> PUBLIC_REPORTERS = {
+		&COMPACT_REPORTER,
+		&DEFAULT_REPORTER};
 
 	// The default context for tests
-	inline synodic::honesty::test::Context DEFAULT_CONTEXT(DEFAULT_RUNNER, {});
+	constinit synodic::honesty::test::Context DEFAULT_CONTEXT(DEFAULT_RUNNER, {});
 
 	// Each thread has its own context, such that tests can reference global functions without an object
-	inline thread_local synodic::honesty::test::Context& CONTEXT = DEFAULT_CONTEXT;
+	constinit thread_local synodic::honesty::test::Context& CONTEXT = DEFAULT_CONTEXT;
 }
 
 synodic::honesty::test::Context& GetContext()
@@ -189,22 +195,32 @@ synodic::honesty::test::Context& GetContext()
 	return CONTEXT;
 }
 
-std::span<synodic::honesty::test::Reporter*> GetBuiltinReporters()
+std::span<synodic::honesty::test::Reporter*> GetPublicReporters()
 {
-	return REPORTERS;
+	return PUBLIC_REPORTERS;
 }
 
-const synodic::honesty::test::Reporter& GetDefaultReporter()
+synodic::honesty::test::Reporter& GetDefaultReporter()
 {
 	return DEFAULT_REPORTER;
 }
 
-std::span<synodic::honesty::test::Runner*> GetBuiltinRunners()
+synodic::honesty::test::Reporter& GetCompactReporter()
+{
+	return COMPACT_REPORTER;
+}
+
+synodic::honesty::test::Reporter& GetListReporter()
+{
+	return LIST_REPORTER;
+}
+
+std::span<synodic::honesty::test::Runner*> GetPublicRunners()
 {
 	return RUNNERS;
 }
 
-const synodic::honesty::test::Runner& GetDefaultRunner()
+synodic::honesty::test::Runner& GetDefaultRunner()
 {
 	return DEFAULT_RUNNER;
 }

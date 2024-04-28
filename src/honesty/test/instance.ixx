@@ -36,8 +36,8 @@ namespace synodic::honesty::test
 			logger_.AddSink(&consoleSink_);
 
 			// Gather our user and library provided runners and reporters
-			const auto providedRunners	 = {GetRegistry().GetRunners(), GetBuiltinRunners()};
-			const auto providedReporters = {GetRegistry().GetReporters(), GetBuiltinReporters()};
+			const auto providedRunners	 = {GetRegistry().GetRunners(), GetPublicRunners()};
+			const auto providedReporters = {GetRegistry().GetReporters(), GetPublicReporters()};
 
 			// Flatten the ranges
 			auto runners   = std::ranges::join_view(providedRunners);
@@ -100,27 +100,30 @@ namespace synodic::honesty::test
 				}
 			}
 
-			if (arguments.empty())
+			// Handle the command setup
 			{
-				parameters_ = ExecuteParameters(defaultRunner, defaultReporter);
-				return;
-			}
-
-			if (arguments[0] == "list")
-			{
-				arguments = arguments.subspan(1);
-				ListParameters parameters;
-
-				if (std::ranges::contains(arguments, "--json"))
+				if (arguments.empty())
 				{
-					parameters.outputType = ListOutputType::JSON;
+					parameters_ = ExecuteParameters(defaultRunner, defaultReporter);
+					return;
 				}
 
-				parameters_ = parameters;
-				return;
-			}
+				if (arguments[0] == "list")
+				{
+					arguments = arguments.subspan(1);
+					ListParameters parameters(defaultRunner);
 
-			parameters_ = ExecuteParameters(defaultRunner, defaultReporter);
+					if (std::ranges::contains(arguments, "--json"))
+					{
+						parameters.outputType = ListOutputType::JSON;
+					}
+
+					parameters_ = parameters;
+					return;
+				}
+
+				parameters_ = ExecuteParameters(defaultRunner, defaultReporter);
+			}
 		}
 
 		void Execute()

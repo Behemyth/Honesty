@@ -28,15 +28,15 @@ namespace
 		{
 			"construction"_test = []()
 			{
-				log::color24_t hunterGreen(58, 90, 64);
-				log::TextStyle style(hunterGreen);
+				constexpr log::color24_t hunterGreen(58, 90, 64);
+				constexpr log::TextStyle style(hunterGreen);
 
-				auto foreground = style.Foreground();
+				constexpr auto foreground = style.Foreground();
 				Assert(foreground.has_value());
 				Expect(not style.Background().has_value());
 				Expect(not style.AttributeMask());
 
-				auto value = std::get<log::color24_t>(foreground.value());
+				constexpr auto value = std::get<log::color24_t>(foreground.value());
 				ExpectEquals(value, hunterGreen);
 			};
 		});
@@ -48,7 +48,7 @@ namespace
 			"format_to"_test = []()
 			{
 				std::string output;
-				log::TextStyle style(log::color24_t(58, 90, 64));
+				constexpr log::TextStyle style(log::color24_t(58, 90, 64));
 				log::format_to(std::back_inserter(output), style, "{} = (58,90,64)", "Hunter Green");
 
 				std::string expected;
@@ -77,5 +77,5 @@ namespace
 			};
 		});
 
-	bool registered = Register(styleSuite, colorSuite, terminalSuite);
+	bool registered = RegisterSuite(styleSuite, colorSuite, terminalSuite);
 }

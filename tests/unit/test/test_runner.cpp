@@ -13,5 +13,5 @@ namespace
 		};
 	};
 	Suite suite("runner", runnerGenerator);
-	bool result = suite.Register();
+	bool result = RegisterSuite(suite);
 }

@@ -26,5 +26,5 @@ namespace
 	};
 
 	Suite suite("tag", tagSuite);
-	bool result = suite.Register();
+	bool result = RegisterSuite(suite);
 }

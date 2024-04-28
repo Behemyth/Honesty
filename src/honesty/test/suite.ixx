@@ -6,8 +6,9 @@ import :test;
 namespace synodic::honesty::test
 {
 
-	struct SuiteData
+	class SuiteData
 	{
+	public:
 		consteval SuiteData(std::string_view name, std::function_ref<void()> generator);
 
 		std::string_view name;
@@ -18,7 +19,7 @@ namespace synodic::honesty::test
 	 * @brief Allows the static registration of tests in the global scope
 	 */
 	export template<size_t Size>
-	class Suite final : SuiteData
+	class Suite final : public SuiteData
 	{
 	public:
 		consteval Suite(const char (&name)[Size], std::function_ref<void()> generator);
@@ -29,18 +30,11 @@ namespace synodic::honesty::test
 		Suite& operator=(const Suite& other)	 = delete;
 		Suite& operator=(Suite&& other) noexcept = delete;
 
-		bool Register() &
-		{
-			RegisterSuite(*this);
-
-			return true;
-		}
-
 	private:
 		std::array<char, Size> name_;
 	};
 
-	consteval SuiteData::SuiteData(std::string_view name, std::function_ref<void()> generator):
+	consteval SuiteData::SuiteData(std::string_view name, std::function_ref<void()> generator) :
 		name(name),
 		generator(generator)
 	{
@@ -53,17 +47,4 @@ namespace synodic::honesty::test
 	{
 		std::copy_n(name, Size, name_.begin());
 	}
-
-	/**
-	 * @brief Registers a suite of tests with the global registry.
-	 * @param ...suites Suites to be registered. Each are expected to be an l-value reference.
-	 * @return TODO
-	 */
-	export template<size_t... Sizes>
-	bool Register(Suite<Sizes>&... suites)
-	{
-		(suites.Register(), ...);
-		return true;
-	}
-
 }

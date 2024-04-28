@@ -13,185 +13,157 @@ namespace synodic::honesty::test
 	class Context
 	{
 	public:
-		explicit Context(Runner& runner, std::span<Reporter*> reporters);
+		explicit Context(Runner& runner, std::span<Reporter*> reporters) :
+			reporters_(reporters),
+			runner_(&runner)
+		{
+		}
 
-		void Signal(const event::SuiteBegin& event) const;
-		void Signal(const event::SuiteEnd& event) const;
-		void Signal(const event::SuiteSkip& event) const;
+		void Signal(const event::SuiteBegin& event) const
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->Signal(event);
+			}
+		}
 
-		void Signal(const event::SuiteRun& event) const;
-		void Signal(const event::SuiteFail& event) const;
-		void Signal(const event::SuitePass& event) const;
+		void Signal(const event::SuiteEnd& event) const
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->Signal(event);
+			}
+		}
 
-		void Signal(const event::SuiteSummary& event) const;
+		void Signal(const event::SuiteSkip& event) const
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->Signal(event);
+			}
+		}
 
-		void Signal(const event::TestBegin& event) const;
-		void Signal(const event::TestEnd& event) const;
-		void Signal(const event::TestSkip& event) const;
+		void Signal(const event::SuiteRun& event) const
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->Signal(event);
+			}
+		}
 
-		void Signal(const event::TestRun& event) const;
-		void Signal(const event::TestFail& event) const;
-		void Signal(const event::TestPass& event) const;
+		void Signal(const event::SuiteFail& event) const
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->Signal(event);
+			}
+		}
 
-		void Signal(const event::AssertionFail& event) const;
-		void Signal(const event::AssertionPass& event) const;
-		void Signal(const event::AssertionSkip& event) const;
+		void Signal(const event::SuitePass& event) const
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->Signal(event);
+			}
+		}
 
-		void Signal(const event::Summary& event) const;
+		void Signal(const event::SuiteSummary& event) const
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->Signal(event);
+			}
+		}
 
-		inline void Run(std::function_ref<void()> function) const;
+		void Signal(const event::TestBegin& event) const
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->Signal(event);
+			}
+		}
+
+		void Signal(const event::TestEnd& event) const
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->Signal(event);
+			}
+		}
+
+		void Signal(const event::TestSkip& event) const
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->Signal(event);
+			}
+		}
+
+		void Signal(const event::TestRun& event) const
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->Signal(event);
+			}
+		}
+
+		void Signal(const event::TestFail& event) const
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->Signal(event);
+			}
+		}
+
+		void Signal(const event::TestPass& event) const
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->Signal(event);
+			}
+		}
+
+		void Signal(const event::AssertionFail& event) const
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->Signal(event);
+			}
+		}
+
+		void Signal(const event::AssertionPass& event) const
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->Signal(event);
+			}
+		}
+
+		void Signal(const event::AssertionSkip& event) const
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->Signal(event);
+			}
+		}
+
+		void Signal(const event::Summary& event) const
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->Signal(event);
+			}
+		}
+
+		inline void Run(std::function_ref<void()> function) const
+		{
+			runner_->Run(function);
+		}
 
 	private:
 		std::span<Reporter*> reporters_;
 		Runner* runner_;
 	};
-
-	Context::Context(Runner& runner, const std::span<Reporter*> reporters) :
-		reporters_(reporters),
-		runner_(&runner)
-	{
-	}
-
-	void Context::Signal(const event::SuiteBegin& event) const
-	{
-		for (Reporter* reporter: reporters_)
-		{
-			reporter->Signal(event);
-		}
-	}
-
-	void Context::Signal(const event::SuiteEnd& event) const
-	{
-		for (Reporter* reporter: reporters_)
-		{
-			reporter->Signal(event);
-		}
-	}
-
-	void Context::Signal(const event::SuiteSkip& event) const
-	{
-		for (Reporter* reporter: reporters_)
-		{
-			reporter->Signal(event);
-		}
-	}
-
-	void Context::Signal(const event::SuiteRun& event) const
-	{
-		for (Reporter* reporter: reporters_)
-		{
-			reporter->Signal(event);
-		}
-	}
-
-	void Context::Signal(const event::SuiteFail& event) const
-	{
-		for (Reporter* reporter: reporters_)
-		{
-			reporter->Signal(event);
-		}
-	}
-
-	void Context::Signal(const event::SuitePass& event) const
-	{
-		for (Reporter* reporter: reporters_)
-		{
-			reporter->Signal(event);
-		}
-	}
-
-	void Context::Signal(const event::SuiteSummary& event) const
-	{
-		for (Reporter* reporter: reporters_)
-		{
-			reporter->Signal(event);
-		}
-	}
-
-	void Context::Signal(const event::TestBegin& event) const
-	{
-		for (Reporter* reporter: reporters_)
-		{
-			reporter->Signal(event);
-		}
-	}
-
-	void Context::Signal(const event::TestEnd& event) const
-	{
-		for (Reporter* reporter: reporters_)
-		{
-			reporter->Signal(event);
-		}
-	}
-
-	void Context::Signal(const event::TestSkip& event) const
-	{
-		for (Reporter* reporter: reporters_)
-		{
-			reporter->Signal(event);
-		}
-	}
-
-	void Context::Signal(const event::TestRun& event) const
-	{
-		for (Reporter* reporter: reporters_)
-		{
-			reporter->Signal(event);
-		}
-	}
-
-	void Context::Signal(const event::TestFail& event) const
-	{
-		for (Reporter* reporter: reporters_)
-		{
-			reporter->Signal(event);
-		}
-	}
-
-	void Context::Signal(const event::TestPass& event) const
-	{
-		for (Reporter* reporter: reporters_)
-		{
-			reporter->Signal(event);
-		}
-	}
-
-	void Context::Signal(const event::AssertionFail& event) const
-	{
-		for (Reporter* reporter: reporters_)
-		{
-			reporter->Signal(event);
-		}
-	}
-
-	void Context::Signal(const event::AssertionPass& event) const
-	{
-		for (Reporter* reporter: reporters_)
-		{
-			reporter->Signal(event);
-		}
-	}
-
-	void Context::Signal(const event::AssertionSkip& event) const
-	{
-		for (Reporter* reporter: reporters_)
-		{
-			reporter->Signal(event);
-		}
-	}
-
-	void Context::Signal(const event::Summary& event) const
-	{
-		for (Reporter* reporter: reporters_)
-		{
-			reporter->Signal(event);
-		}
-	}
-
-	void Context::Run(const std::function_ref<void()> function) const
-	{
-		runner_->Run(function);
-	}
 }
 
 namespace

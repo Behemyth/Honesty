@@ -18,5 +18,5 @@ namespace
 			};
 		});
 
-	bool registered = Register(expectationSuite);
+	bool registered = RegisterSuite(expectationSuite);
 }

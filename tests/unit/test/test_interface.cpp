@@ -27,5 +27,5 @@ namespace
 	};
 
 	Suite suite("suite", interfaceGenerator);
-	bool result = suite.Register();
+	bool result = RegisterSuite(suite);
 }

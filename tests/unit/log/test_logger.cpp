@@ -24,5 +24,5 @@ namespace
 			};
 		});
 
-	bool registered = Register(loggerSuite);
+	bool registered = RegisterSuite(loggerSuite);
 }

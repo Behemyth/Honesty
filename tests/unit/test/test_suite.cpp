@@ -10,5 +10,5 @@ namespace
 	};
 
 	Suite suite("suite", suiteGenerator);
-	bool result = suite.Register();
+	bool result = RegisterSuite(suite);
 }

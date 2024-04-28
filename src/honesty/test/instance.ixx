@@ -3,6 +3,7 @@ export module synodic.honesty.test:instance;
 
 import std;
 import :interface;
+import :context;
 
 // A helper for variant overload deduction
 template<typename... Ts>
@@ -23,8 +24,8 @@ namespace synodic::honesty::test
 				defaultRunner("default"),
 				defaultReporter("default") {};
 
-			std::string_view defaultRunner;	 // The default runner to use if none is specified
-			std::string_view defaultReporter;  // The default reporter to use if none is specified
+			std::string_view defaultRunner;	 // The default runner to use
+			std::string_view defaultReporter;  // The default reporter to use
 		};
 
 		// Resolve all input into immediately executable state ready for the 'Execute' function
@@ -34,11 +35,16 @@ namespace synodic::honesty::test
 		{
 			logger_.AddSink(&consoleSink_);
 
-			std::span<Runner*> runners	   = GetRegistry().GetRunners();
-			std::span<Reporter*> reporters = GetRegistry().GetReporters();
+			// Gather our user and library provided runners and reporters
+			const auto providedRunners	 = {GetRegistry().GetRunners(), GetBuiltinRunners()};
+			const auto providedReporters = {GetRegistry().GetReporters(), GetBuiltinReporters()};
 
-			Runner* defaultRunner	  = nullptr;
-			Reporter* defaultReporter = nullptr;
+			// Flatten the ranges
+			auto runners   = std::ranges::join_view(providedRunners);
+			auto reporters = std::ranges::join_view(providedReporters);
+
+			Runner* defaultRunner;
+			Reporter* defaultReporter;
 
 			std::string_view defaultRunnerName	 = "default";
 			std::string_view defaultReporterName = "default";

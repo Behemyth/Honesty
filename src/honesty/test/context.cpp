@@ -183,8 +183,13 @@ namespace
 		&COMPACT_REPORTER,
 		&DEFAULT_REPORTER};
 
+	// The default reporters for tests.
+	constinit std::array<synodic::honesty::test::Reporter*, 1> DEFAULT_REPORTERS = {
+		&DEFAULT_REPORTER,
+	};
+
 	// The default context for tests
-	constinit synodic::honesty::test::Context DEFAULT_CONTEXT(DEFAULT_RUNNER, {});
+	constinit synodic::honesty::test::Context DEFAULT_CONTEXT(DEFAULT_RUNNER, DEFAULT_REPORTERS);
 
 	// Each thread has its own context, such that tests can reference global functions without an object
 	constinit thread_local synodic::honesty::test::Context& CONTEXT = DEFAULT_CONTEXT;

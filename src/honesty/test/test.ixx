@@ -11,7 +11,10 @@ namespace synodic::honesty::test
 	export class Test
 	{
 	public:
-		consteval Test(std::string_view name);
+		explicit(false) consteval Test(const std::string_view name) :
+			name_(name)
+		{
+		}
 
 		Test(const Test& other)				   = delete;
 		Test(Test&& other) noexcept			   = delete;
@@ -32,11 +35,6 @@ namespace synodic::honesty::test
 	private:
 		std::string_view name_;
 	};
-
-	consteval Test::Test(std::string_view name) :
-		name_(name)
-	{
-	}
 
 	export template<typename Fn, std::ranges::input_range V>
 		requires std::regular_invocable<Fn&, std::ranges::range_reference_t<V>>
@@ -89,7 +87,26 @@ namespace synodic::honesty::test
 		}
 
 		template<std::size_t RSize>
-		consteval Tag<Size + RSize> operator/(Tag<RSize> tag) const;
+		consteval Tag<Size + RSize> operator/(Tag<RSize> tag) const
+		{
+			Tag<Size + RSize> result(tags_[0]);
+
+			// Concat
+			std::size_t index = 0;
+
+			for (auto& el: tag.tags_)
+			{
+				result.tags_[index] = std::move(el);
+				++index;
+			}
+			for (auto& el: tags_)
+			{
+				result.tags_[index] = std::move(el);
+				++index;
+			}
+
+			return result;
+		}
 
 	private:
 		template<std::size_t>
@@ -98,35 +115,12 @@ namespace synodic::honesty::test
 		std::array<std::string_view, Size> tags_;
 	};
 
-	template<std::size_t Size>
-	template<std::size_t RSize>
-	consteval Tag<Size + RSize> Tag<Size>::operator/(Tag<RSize> tag) const
-	{
-		Tag<Size + RSize> result(tags_[0]);
-
-		// Concat
-		std::size_t index = 0;
-
-		for (auto& el: tag.tags_)
-		{
-			result.tags_[index] = std::move(el);
-			++index;
-		}
-		for (auto& el: tags_)
-		{
-			result.tags_[index] = std::move(el);
-			++index;
-		}
-
-		return result;
-	}
-
 	export Tag(std::string_view) -> Tag<1>;
 
 	export template<typename... T>
 	Tag(std::string_view, T...) -> Tag<1 + sizeof...(T)>;
 
-	export constexpr Tag skip("skip");
+	export constexpr Tag SKIP("skip");
 
 	export namespace literals
 	{

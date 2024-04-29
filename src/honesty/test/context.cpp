@@ -167,6 +167,7 @@ namespace synodic::honesty::test
 	};
 }
 
+// TODO: Move data to single object
 namespace
 {
 	constinit synodic::honesty::test::DefaultRunner DEFAULT_RUNNER("default");

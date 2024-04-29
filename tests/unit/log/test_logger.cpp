@@ -8,9 +8,9 @@ namespace
 {
 	synodic::honesty::test::Suite loggerSuite(
 		"logger",
-		[]()
+		[]()-> synodic::honesty::test::Generator
 		{
-			"Parent Sink"_test = []()
+			co_yield "Parent Sink"_test = []()
 			{
 				synodic::honesty::log::DynamicLogger& parent = synodic::honesty::log::GetLogger("parent");
 				synodic::honesty::log::DynamicLogger& child = synodic::honesty::log::GetLogger("parent.child");

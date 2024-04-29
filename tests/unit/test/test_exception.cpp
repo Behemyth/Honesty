@@ -8,9 +8,9 @@ namespace
 {
 	Suite exceptionSuite(
 		"exception",
-		[]()
+		[]()-> Generator
 		{
-			"exception"_test = []
+			co_yield "exception"_test = []
 			{
 				ExpectThrow<std::runtime_error>(
 					[]()

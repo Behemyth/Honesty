@@ -16,10 +16,10 @@ namespace
 		//skip / "test"_tag / "inner"_test = emptyGenerator;
 	};
 
-	auto tagSuite = []()
+	auto tagSuite = []() -> Generator
 	{
 		// Verify the count of tags for each test. The two tests each have two tags
-		"tag"_test = []()
+		co_yield "tag"_test = []()
 		{
 			// expect_equals(test.Tags().size(), 2);
 		};

@@ -60,9 +60,9 @@ namespace
 		} | std::array{3, 4};
 	};
 
-	auto testSuite = []()
+	auto testSuite = []() -> Generator
 	{
-		"run"_test = []()
+		co_yield "run"_test = []()
 		{
 			// Runs through each generator and counts the number of test instances recorded
 			auto counter = [](std::function_ref<void()> function) -> int

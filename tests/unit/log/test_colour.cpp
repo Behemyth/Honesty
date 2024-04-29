@@ -12,21 +12,19 @@ namespace
 
 	Suite colorSuite(
 		"color",
-		[]()
+		[]() -> Generator
 		{
-			"construction"_test = []()
+			co_yield "construction"_test = []()
 			{
-				ExpectEquals(
-					log::color24_t(58, 90, 64),
-					log::color24_t(green));
+				ExpectEquals(log::color24_t(58, 90, 64), log::color24_t(green));
 			};
 		});
 
 	Suite styleSuite(
 		"style",
-		[]()
+		[]() -> Generator
 		{
-			"construction"_test = []()
+			co_yield "construction"_test = []()
 			{
 				constexpr log::color24_t hunterGreen(58, 90, 64);
 				constexpr log::TextStyle style(hunterGreen);
@@ -43,9 +41,9 @@ namespace
 
 	Suite terminalSuite(
 		"terminal",
-		[]()
+		[]() -> Generator
 		{
-			"format_to"_test = []()
+			co_yield "format_to"_test = []()
 			{
 				std::string output;
 				constexpr log::TextStyle style(log::color24_t(58, 90, 64));
@@ -60,18 +58,17 @@ namespace
 				ExpectEquals(output, expected);
 			};
 
-			"format"_test = []()
+			co_yield "format"_test = []()
 			{
-				std::string output = log::format(
-					log::TextStyle(log::color24_t(58, 90, 64)),
-					"Hunter Green = (58,90,64)");
+				std::string output =
+					log::format(log::TextStyle(log::color24_t(58, 90, 64)), "Hunter Green = (58,90,64)");
 
 				std::string expected = std::format("\x1b[38;2;058;090;064m{}\x1b[0m", "Hunter Green = (58,90,64)");
 
 				ExpectEquals(output, expected);
 			};
 
-			"print"_test = []()
+			co_yield "print"_test = []()
 			{
 				// TODO: How do we capture the output?
 			};

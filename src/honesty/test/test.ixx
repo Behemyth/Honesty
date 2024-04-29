@@ -5,6 +5,7 @@ import std;
 import function_ref;
 import :types;
 import :context;
+import generator;
 
 namespace synodic::honesty::test
 {
@@ -35,6 +36,8 @@ namespace synodic::honesty::test
 	private:
 		std::string_view name_;
 	};
+
+	export using Generator = std::generator<Test>;
 
 	export template<typename Fn, std::ranges::input_range V>
 		requires std::regular_invocable<Fn&, std::ranges::range_reference_t<V>>

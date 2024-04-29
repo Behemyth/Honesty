@@ -7,9 +7,9 @@ using namespace synodic::honesty::test::literals;
 
 namespace
 {
-	auto interfaceGenerator = []()
+	auto interfaceGenerator = []() -> Generator
 	{
-		"list"_test = []()
+		co_yield "list"_test = []()
 		{
 			MockReporter reporter;
 			MockRunner runner;

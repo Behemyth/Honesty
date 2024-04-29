@@ -9,10 +9,14 @@ namespace synodic::honesty::test
 	class SuiteData
 	{
 	public:
-		consteval SuiteData(std::string_view name, std::function_ref<void()> generator);
+		consteval SuiteData(const std::string_view name, const std::function_ref<Generator()> generator) :
+			name(name),
+			generator(generator)
+		{
+		}
 
 		std::string_view name;
-		std::function_ref<void()> generator;
+		std::function_ref<Generator()> generator;
 	};
 
 	/**
@@ -22,7 +26,12 @@ namespace synodic::honesty::test
 	class Suite final : public SuiteData
 	{
 	public:
-		consteval Suite(const char (&name)[Size], std::function_ref<void()> generator);
+		consteval Suite(const char (&name)[Size], std::function_ref<Generator()> generator) :
+			SuiteData({name_.data(), name_.size()}, generator),
+			name_ {0}
+		{
+			std::copy_n(name, Size, name_.begin());
+		}
 
 		Suite(const Suite& other)	  = delete;
 		Suite(Suite&& other) noexcept = delete;
@@ -33,18 +42,4 @@ namespace synodic::honesty::test
 	private:
 		std::array<char, Size> name_;
 	};
-
-	consteval SuiteData::SuiteData(std::string_view name, std::function_ref<void()> generator) :
-		name(name),
-		generator(generator)
-	{
-	}
-
-	template<size_t Size>
-	consteval Suite<Size>::Suite(const char (&name)[Size], const std::function_ref<void()> generator) :
-		SuiteData({name_.data(), name_.size()}, generator),
-		name_ {0}
-	{
-		std::copy_n(name, Size, name_.begin());
-	}
 }

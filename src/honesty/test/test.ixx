@@ -9,11 +9,26 @@ import generator;
 
 namespace synodic::honesty::test
 {
-	export class Test
+
+	export class Test;
+	export using Generator = std::generator<Test>;
+
+	class Test
 	{
 	public:
-		explicit(false) consteval Test(const std::string_view name) :
-			name_(name)
+		explicit(false) constexpr Test(const std::string_view name, const std::function_ref<void()> test) :
+			name_(name),
+			test_(
+				[]() -> Generator
+				{
+					co_return;
+				})
+		{
+		}
+
+		explicit(false) constexpr Test(const std::string_view name, const std::function_ref<Generator()> test) :
+			name_(name),
+			test_(test)
 		{
 		}
 
@@ -22,60 +37,90 @@ namespace synodic::honesty::test
 		Test& operator=(const Test& other)	   = delete;
 		Test& operator=(Test&& other) noexcept = delete;
 
-		void operator=(std::function_ref<void()> test) const
+	private:
+		std::string_view name_;
+		std::function_ref<Generator()> test_;
+	};
+
+	class TestLiteral
+	{
+	public:
+		explicit(false) consteval TestLiteral(const std::string_view name) :
+			name_(name)
 		{
-			try
-			{
-				GetContext().Run(test);
-			}
-			catch (const AssertException& exception)
-			{
-			}
+		}
+
+		TestLiteral(const TestLiteral& other)				 = delete;
+		TestLiteral(TestLiteral&& other) noexcept			 = delete;
+		TestLiteral& operator=(const TestLiteral& other)	 = delete;
+		TestLiteral& operator=(TestLiteral&& other) noexcept = delete;
+
+		consteval Test operator=(const std::function_ref<void()> test) const
+		{
+			return Test(name_, test);
+		}
+
+		Test operator=(const std::function_ref<Generator()> test) const
+		{
+			return Test(name_, test);
+		}
+
+		Test operator=(Generator&& generator) const
+		{
+			return Test(
+				name_,
+				[&generator]
+				{
+					// TODO: Implement
+					//co_yield generator;
+				});
 		}
 
 	private:
 		std::string_view name_;
 	};
 
-	export using Generator = std::generator<Test>;
-
 	export template<typename Fn, std::ranges::input_range V>
 		requires std::regular_invocable<Fn&, std::ranges::range_reference_t<V>>
-	constexpr auto operator|(Fn&& function, V&& range)
+	Generator operator|(Fn&& function, V&& range)
 	{
-		return [&function, &range]()
+		for (auto&& element: range)
 		{
-			for (auto&& element: range)
-			{
-				Test("Range") = [&function, &element]()
+			co_yield Test(
+				std::format("{}", element),
+				[&function, &element]()
 				{
 					function(element);
-				};
-			}
-		};
+				});
+		}
 	}
 
 	export template<typename Fn, typename... Types>
 		requires(std::regular_invocable<Fn&, Types &&> && ...)
-	constexpr auto operator|(Fn&& function, std::tuple<Types...>&& tuple)
+	Generator operator|(Fn&& function, std::tuple<Types...>&& tuple)
 	{
-		return [&]()
-		{
-			std::apply(
-				[&function](auto&&... args)
+		co_yield std::apply(
+			[&function](auto&&... args) -> Generator
+			{
+				auto application = [&function](auto&& arg) -> Generator
 				{
-					auto application = [&function](auto&& arg)
-					{
-						Test("Tuple") = [&function, &arg]()
+					co_yield Test(
+						std::format("{}", arg),
+						[&function, &arg]()
 						{
 							function(arg);
-						};
-					};
+						});
+				};
 
-					(application(args), ...);
-				},
-				std::forward<std::tuple<Types...>>(tuple));
-		};
+				std::array<Generator, sizeof...(args)> generators{application(args)...};
+				for (auto& generator: generators)
+				{
+					// TODO: Use elements_of
+
+					//co_yield generator;
+				}
+			},
+			std::forward<std::tuple<Types...>>(tuple));
 	}
 
 	export template<std::size_t Size>
@@ -129,7 +174,7 @@ namespace synodic::honesty::test
 	{
 		[[nodiscard]] consteval auto operator""_test(const char* const name, const std::size_t size)
 		{
-			return Test(std::string_view(name, size));
+			return TestLiteral(std::string_view(name, size));
 		}
 
 		[[nodiscard]] consteval auto operator""_tag(const char* const name, const std::size_t size)

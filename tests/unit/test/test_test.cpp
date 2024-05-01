@@ -27,14 +27,6 @@ namespace
 	/**
 	 * @brief Verifies that the literal shorthand generates an empty test
 	 */
-	auto emptyRecursive = []()
-	{
-		Test("emptyRecursive") = emptyGenerator;
-	};
-
-	/**
-	 * @brief Verifies that the literal shorthand generates an empty test
-	 */
 	auto assignedRecursive = []()
 	{
 		"emptyRecursive"_test = emptyGenerator;
@@ -78,7 +70,6 @@ namespace
 
 			ExpectEquals(counter(emptyGenerator), 0);
 			ExpectEquals(counter(emptyLiteral), 1);
-			ExpectEquals(counter(emptyRecursive), 0);
 			ExpectEquals(counter(assignedRecursive), 0);
 			ExpectEquals(counter(tupleParameterization), 2);
 			ExpectEquals(counter(arrayParameterization), 2);

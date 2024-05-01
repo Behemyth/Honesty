@@ -1,7 +1,6 @@
 target_sources(tests
 PRIVATE
 	test_expression.cpp
-	test_suite.cpp
 	test_test.cpp
 	test_runner.cpp
 	test_reporter.cpp

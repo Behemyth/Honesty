@@ -106,7 +106,7 @@ namespace synodic::honesty::test
 			//// Before starting a suite, we need to set up the current thread's context
 			//context = Context(*parameters.runner, reporters);
 
-			for (const SuiteData* suite: suites)
+			for (const SuiteView& suite: suites)
 			{
 				auto wrapper = [this, suite]
 				{
@@ -130,7 +130,7 @@ namespace synodic::honesty::test
 
 			ListResult result;
 
-			for (const SuiteData* suite: suites)
+			for (const SuiteView& suite: suites)
 			{
 				auto wrapper = [this, suite]
 				{
@@ -144,17 +144,17 @@ namespace synodic::honesty::test
 		}
 
 	private:
-		void SuiteWrapper(const SuiteData* suite)
+		void SuiteWrapper(const SuiteView& suite)
 		{
 			event::SuiteBegin begin;
-			begin.name = suite->name;
+			begin.name = suite.name;
 
 			GetContext().Signal(begin);
 
-			suite->generator();
+			//suite.tests();
 
 			event::SuiteEnd end;
-			end.name = suite->name;
+			end.name = suite.name;
 
 			GetContext().Signal(end);
 		}
@@ -182,8 +182,8 @@ namespace synodic::honesty::test
 		return true;
 	}
 
-	export template<size_t... Sizes>
-	bool RegisterSuite(Suite<Sizes>&... suites)
+	export template<size_t... NameSizes>
+	bool RegisterSuite(Suite<NameSizes>&... suites)
 	{
 		(GetRegistry().AddSuite(suites), ...);
 

@@ -5,32 +5,29 @@ import :test;
 
 namespace synodic::honesty::test
 {
-
-	class SuiteData
-	{
-	public:
-		consteval SuiteData(const std::string_view name, const std::function_ref<Generator()> generator) :
-			name(name),
-			generator(generator)
+	template<typename T, typename R, typename... Args>
+	concept invocable_r = std::invocable<T, Args...> && requires(Args&&... args) {
 		{
-		}
-
-		std::string_view name;
-		std::function_ref<Generator()> generator;
+			invoke(forward<Args>(args...))
+		} -> std::convertible_to<R>;
 	};
 
+	struct SuiteView;
+
 	/**
-	 * @brief Allows the static registration of tests in the global scope
+	 * @brief Allows the static registration of tests in the global scope. Constructed at compile-time so that test
+	 * registration is constrained. We don't want a suite wrapper to be a generic fixture that can contain expensive
+	 * calculations. All tests are known up-front and parameterized tests are expanded at run-time
 	 */
-	export template<size_t Size>
-	class Suite final : public SuiteData
+	export template<size_t NameSize>
+	class Suite final
 	{
 	public:
-		consteval Suite(const char (&name)[Size], std::function_ref<Generator()> generator) :
-			SuiteData({name_.data(), name_.size()}, generator),
-			name_ {0}
+		consteval Suite(const char (&name)[NameSize], const std::function_ref<Generator()> generator) :
+			name_ {0},
+			testGenerator_(generator)
 		{
-			std::copy_n(name, Size, name_.begin());
+			std::copy_n(name, NameSize, name_.begin());
 		}
 
 		Suite(const Suite& other)	  = delete;
@@ -40,6 +37,30 @@ namespace synodic::honesty::test
 		Suite& operator=(Suite&& other) noexcept = delete;
 
 	private:
-		std::array<char, Size> name_;
+		friend SuiteView;
+
+		std::array<char, NameSize> name_;
+		std::function_ref<Generator()> testGenerator_;
 	};
+
+	struct SuiteView
+	{
+		constexpr SuiteView() :
+			testGenerator(
+				[]() -> Generator
+				{
+					co_return;
+				}) {};
+
+		template<size_t NameSize>
+		explicit(false) constexpr SuiteView(const Suite<NameSize>& suite) :
+			name(suite.name_),
+			testGenerator(suite.testGenerator_)
+		{
+		}
+
+		std::string_view name;
+		std::function_ref<Generator()> testGenerator;
+	};
+
 }

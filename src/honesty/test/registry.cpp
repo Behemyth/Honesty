@@ -19,9 +19,9 @@ namespace synodic::honesty::test
 		constexpr Registry() = default;
 		~Registry() = default;
 
-		void AddSuite(SuiteData& data)
+		void AddSuite(SuiteView data)
 		{
-			suites_[suiteSize_++] = &data;
+			suites_[suiteSize_++] = std::move(data);
 		}
 
 		void AddReporter(Reporter& reporter)
@@ -34,7 +34,7 @@ namespace synodic::honesty::test
 			runners_[runnerSize_++] = &runner;
 		}
 
-		std::span<SuiteData*> GetSuites()
+		std::span<SuiteView> GetSuites()
 		{
 			return std::span(suites_.data(), suiteSize_);
 		}
@@ -60,7 +60,7 @@ namespace synodic::honesty::test
 
 		std::array<Runner*, RUNNER_COUNT> runners_{};
 		std::array<Reporter*, REPORTER_COUNT> reporters_{};
-		std::array<SuiteData*, SUITE_COUNT> suites_{};
+		std::array<SuiteView, SUITE_COUNT> suites_{};
 
 		int suiteSize_ = 0;
 		int runnerSize_ = 0;

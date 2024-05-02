@@ -72,7 +72,7 @@ namespace synodic::honesty::test
 				[&generator]
 				{
 					// TODO: Implement
-					//co_yield generator;
+					// co_yield generator;
 				});
 		}
 
@@ -99,28 +99,18 @@ namespace synodic::honesty::test
 		requires(std::regular_invocable<Fn&, Types &&> && ...)
 	Generator operator|(Fn&& function, std::tuple<Types...>&& tuple)
 	{
-		co_yield std::apply(
+		co_yield std::ranges::elements_of(std::apply(
 			[&function](auto&&... args) -> Generator
 			{
-				auto application = [&function](auto&& arg) -> Generator
-				{
-					co_yield Test(
-						std::format("{}", arg),
-						[&function, &arg]()
-						{
-							function(arg);
-						});
-				};
-
-				std::array<Generator, sizeof...(args)> generators{application(args)...};
-				for (auto& generator: generators)
-				{
-					// TODO: Use elements_of
-
-					//co_yield generator;
-				}
+				(co_yield Test(
+					 std::format("{}", args),
+					 [&function, &args]()
+					 {
+						 function(args);
+					 }),
+				 ...);
 			},
-			std::forward<std::tuple<Types...>>(tuple));
+			std::forward<std::tuple<Types...>>(tuple)));
 	}
 
 	export template<std::size_t Size>

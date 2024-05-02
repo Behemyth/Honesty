@@ -19,7 +19,6 @@ namespace synodic::honesty::test
 			catch (AssertException)
 			{
 			}
-			
 		}
 	};
 

@@ -24,13 +24,6 @@ namespace synodic::honesty::test
 		{
 		}
 
-		// explicit(false) constexpr Test(const std::string_view name, const std::function_ref<Generator()> test) :
-		//	name_(name),
-		//	test_(test)
-		//{
-
-		//}
-
 		Test(const Test& other)				   = delete;
 		Test(Test&& other) noexcept			   = delete;
 		Test& operator=(const Test& other)	   = delete;
@@ -74,25 +67,14 @@ namespace synodic::honesty::test
 		TestLiteral& operator=(const TestLiteral& other)	 = delete;
 		TestLiteral& operator=(TestLiteral&& other) noexcept = delete;
 
-		consteval Test operator=(const std::function_ref<void()> test) const
+		Test operator=(const std::function_ref<void()> test) const
 		{
 			return Test(name_, test);
 		}
 
-		Test operator=(const std::function_ref<Generator()> test) const
+		auto operator=(Generator&& generator) const
 		{
-			return Test(name_, test);
-		}
-
-		Test operator=(Generator&& generator) const
-		{
-			return Test(
-				name_,
-				[&generator]
-				{
-					// TODO: Implement
-					// co_yield generator;
-				});
+			return std::ranges::elements_of(std::forward<Generator>(generator));
 		}
 
 	private:

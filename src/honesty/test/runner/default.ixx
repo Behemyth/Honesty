@@ -12,7 +12,14 @@ namespace synodic::honesty::test
 
 		void Run(const std::function_ref<void()> function) override
 		{
-			function();
+			try
+			{
+				function();
+			}
+			catch (AssertException)
+			{
+			}
+			
 		}
 	};
 

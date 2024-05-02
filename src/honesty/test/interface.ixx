@@ -100,20 +100,40 @@ namespace synodic::honesty::test
 		{
 			const auto suites = GetRegistry().GetSuites();
 
-			//Context& context = GetContext();
-			//std::ranges::single_view reporters {parameters.reporter};
+			// Context& context = GetContext();
+			// std::ranges::single_view reporters {parameters.reporter};
 
 			//// Before starting a suite, we need to set up the current thread's context
-			//context = Context(*parameters.runner, reporters);
+			// context = Context(*parameters.runner, reporters);
 
 			for (const SuiteView& suite: suites)
 			{
-				auto wrapper = [this, suite]
-				{
-					SuiteWrapper(suite);
-				};
+				event::SuiteBegin begin;
+				begin.name = suite.name;
 
-				parameters.runner->Run(wrapper);
+				GetContext().Signal(begin);
+
+				for (const Test& test: suite.testGenerator())
+				{
+					TestView view(test);
+
+					event::TestBegin testBegin;
+					begin.name = view.name;
+
+					GetContext().Signal(testBegin);
+
+					parameters.runner->Run(view.test);
+
+					event::TestEnd testEnd;
+					testEnd.name = view.name;
+
+					GetContext().Signal(testEnd);
+				}
+
+				event::SuiteEnd end;
+				end.name = suite.name;
+
+				GetContext().Signal(end);
 			}
 
 			return {};
@@ -121,24 +141,10 @@ namespace synodic::honesty::test
 
 		ListResult List(const ListParameters& parameters)
 		{
-			const auto suites = GetRegistry().GetSuites();
-
-			//Context& context = GetContext();
-
-			//std::ranges::single_view reporters {&GetListReporter()};
-			//context = Context(*parameters.runner, reporters);
-
 			ListResult result;
 
-			for (const SuiteView& suite: suites)
-			{
-				auto wrapper = [this, suite]
-				{
-					SuiteWrapper(suite);
-				};
-
-				parameters.runner->Run(wrapper);
-			}
+			const ExecuteParameters executeParameters(parameters.runner, &GetListReporter());
+			Execute(executeParameters);
 
 			return result;
 		}
@@ -151,7 +157,22 @@ namespace synodic::honesty::test
 
 			GetContext().Signal(begin);
 
-			//suite.tests();
+			for (const Test& test: suite.testGenerator())
+			{
+				TestView view(test);
+
+				event::TestBegin testBegin;
+				begin.name = view.name;
+
+				GetContext().Signal(testBegin);
+
+				view.test();
+
+				event::TestEnd testEnd;
+				testEnd.name = view.name;
+
+				GetContext().Signal(testEnd);
+			}
 
 			event::SuiteEnd end;
 			end.name = suite.name;

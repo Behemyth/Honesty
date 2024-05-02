@@ -11,6 +11,8 @@ namespace synodic::honesty::test
 {
 
 	export class Test;
+	class TestView;
+
 	export using Generator = std::generator<Test>;
 
 	class Test
@@ -18,19 +20,16 @@ namespace synodic::honesty::test
 	public:
 		explicit(false) constexpr Test(const std::string_view name, const std::function_ref<void()> test) :
 			name_(name),
-			test_(
-				[]() -> Generator
-				{
-					co_return;
-				})
-		{
-		}
-
-		explicit(false) constexpr Test(const std::string_view name, const std::function_ref<Generator()> test) :
-			name_(name),
 			test_(test)
 		{
 		}
+
+		// explicit(false) constexpr Test(const std::string_view name, const std::function_ref<Generator()> test) :
+		//	name_(name),
+		//	test_(test)
+		//{
+
+		//}
 
 		Test(const Test& other)				   = delete;
 		Test(Test&& other) noexcept			   = delete;
@@ -38,8 +37,28 @@ namespace synodic::honesty::test
 		Test& operator=(Test&& other) noexcept = delete;
 
 	private:
+		friend TestView;
+
 		std::string_view name_;
-		std::function_ref<Generator()> test_;
+		std::function_ref<void()> test_;
+	};
+
+	class TestView
+	{
+	public:
+		explicit(false) constexpr TestView(const Test& test) :
+			name(test.name_),
+			test(test.test_)
+		{
+		}
+
+		TestView(const TestView& other)				   = delete;
+		TestView(TestView&& other) noexcept			   = delete;
+		TestView& operator=(const TestView& other)	   = delete;
+		TestView& operator=(TestView&& other) noexcept = delete;
+
+		std::string_view name;
+		std::function_ref<void()> test;
 	};
 
 	class TestLiteral

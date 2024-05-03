@@ -6,7 +6,6 @@ import :runner.default;
 import :reporter;
 import :reporter.compact;
 import :reporter.default;
-import :reporter.list;
 
 namespace synodic::honesty::test
 {
@@ -176,9 +175,6 @@ namespace
 
 	constinit synodic::honesty::test::CompactReporter COMPACT_REPORTER("compact");
 	constinit synodic::honesty::test::DefaultReporter DEFAULT_REPORTER("default");
-	constinit synodic::honesty::test::ListReporter LIST_REPORTER("list");
-
-	constinit std::array<synodic::honesty::test::Reporter*, 1> PRIVATE_REPORTERS = {&LIST_REPORTER};
 
 	constinit std::array<synodic::honesty::test::Reporter*, 2> PUBLIC_REPORTERS = {
 		&COMPACT_REPORTER,
@@ -214,11 +210,6 @@ synodic::honesty::test::Reporter& GetDefaultReporter()
 synodic::honesty::test::Reporter& GetCompactReporter()
 {
 	return COMPACT_REPORTER;
-}
-
-synodic::honesty::test::Reporter& GetListReporter()
-{
-	return LIST_REPORTER;
 }
 
 std::span<synodic::honesty::test::Runner*> GetPublicRunners()

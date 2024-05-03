@@ -8,6 +8,8 @@ import :context;
 import :reporter;
 import :runner;
 import :test;
+import :types;
+import :reporter.list;
 
 namespace synodic::honesty::test
 {
@@ -31,12 +33,6 @@ namespace synodic::honesty::test
 
 		Runner* runner;
 		Reporter* reporter;
-	};
-
-	export enum class ListOutputType : std::uint8_t
-	{
-		LOG,
-		JSON
 	};
 
 	export struct ListParameters
@@ -143,41 +139,15 @@ namespace synodic::honesty::test
 		{
 			ListResult result;
 
-			const ExecuteParameters executeParameters(parameters.runner, &GetListReporter());
+			ListReporterParameters reporterParameters;
+			reporterParameters.outputType = parameters.outputType;
+
+			ListReporter listReporter(reporterParameters);
+
+			const ExecuteParameters executeParameters(parameters.runner, &listReporter);
 			Execute(executeParameters);
 
 			return result;
-		}
-
-	private:
-		void SuiteWrapper(const SuiteView& suite)
-		{
-			event::SuiteBegin begin;
-			begin.name = suite.name;
-
-			GetContext().Signal(begin);
-
-			for (const Test& test: suite.testGenerator())
-			{
-				TestView view(test);
-
-				event::TestBegin testBegin;
-				begin.name = view.name;
-
-				GetContext().Signal(testBegin);
-
-				view.test();
-
-				event::TestEnd testEnd;
-				testEnd.name = view.name;
-
-				GetContext().Signal(testEnd);
-			}
-
-			event::SuiteEnd end;
-			end.name = suite.name;
-
-			GetContext().Signal(end);
 		}
 	};
 

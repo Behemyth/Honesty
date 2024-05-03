@@ -5,6 +5,12 @@ import function_ref;
 
 namespace synodic::honesty::test
 {
+	export enum class ListOutputType : std::uint8_t
+	{
+		LOG,
+		JSON
+	};
+
 	export class AssertException final : public std::exception
 	{
 	public:

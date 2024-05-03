@@ -133,14 +133,14 @@ namespace synodic::honesty::test
 			// Concat
 			std::size_t index = 0;
 
-			for (auto& el: tag.tags_)
+			for (auto& element: tag.tags_)
 			{
-				result.tags_[index] = std::move(el);
+				result.tags_[index] = std::move(element);
 				++index;
 			}
-			for (auto& el: tags_)
+			for (auto& element: tags_)
 			{
-				result.tags_[index] = std::move(el);
+				result.tags_[index] = std::move(element);
 				++index;
 			}
 

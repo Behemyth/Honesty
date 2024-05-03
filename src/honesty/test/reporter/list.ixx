@@ -3,21 +3,45 @@ export module synodic.honesty.test:reporter.list;
 import synodic.honesty.log;
 import :reporter;
 import std;
+import :types;
 
 namespace synodic::honesty::test
 {
-	export class ListReporter final : public CumulativeAdapter
+
+	struct ListReporterParameters
+	{
+		ListReporterParameters() = default;
+
+		ListOutputType outputType;
+	};
+
+	class ListReporter final : public CumulativeAdapter
 	{
 	public:
-		explicit(false) constexpr ListReporter(const std::string_view name) :
-			CumulativeAdapter(name)
+		explicit(false) constexpr ListReporter(const ListReporterParameters& parameters) :
+			CumulativeAdapter("list"),
+			parameters_(parameters)
 		{
 		}
 
 		~ListReporter() override = default;
 
-		void Finalize() override
+		void Finalize(CumulativeData data) override
 		{
+			switch (parameters_.outputType)
+			{
+				case ListOutputType::LOG :
+					log::Console sink;
+					log::Logger& logger = log::GetLogger("reporter");
+
+					break;
+				case ListOutputType::JSON :
+
+					break;
+			}
 		}
+
+	private:
+		ListReporterParameters parameters_;
 	};
 }

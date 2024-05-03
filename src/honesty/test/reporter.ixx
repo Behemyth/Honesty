@@ -136,6 +136,26 @@ namespace synodic::honesty::test
 	 */
 	export class CumulativeAdapter : public Reporter
 	{
+	protected:
+		struct TestData
+		{
+			event::TestBegin begin;
+			event::TestEnd end;
+		};
+
+		struct SuiteData
+		{
+			event::SuiteBegin begin;
+			event::SuiteEnd end;
+
+			std::vector<TestData> tests;
+		};
+
+		struct CumulativeData
+		{
+			std::vector<SuiteData> suites;
+		};
+
 	public:
 		explicit(false) constexpr CumulativeAdapter(const std::string_view name) :
 			Reporter(name)
@@ -146,10 +166,14 @@ namespace synodic::honesty::test
 
 		void Signal(const event::SuiteBegin& event) final
 		{
+			SuiteData& suiteData = data_.suites.emplace_back();
+			suiteData.begin		 = event;
 		}
 
 		void Signal(const event::SuiteEnd& event) final
 		{
+			SuiteData& suiteData = data_.suites.back();
+			suiteData.end		 = event;
 		}
 
 		void Signal(const event::SuiteSkip& event) final
@@ -174,10 +198,16 @@ namespace synodic::honesty::test
 
 		void Signal(const event::TestBegin& event) final
 		{
+			SuiteData& suiteData = data_.suites.back();
+			TestData& testData	 = suiteData.tests.emplace_back();
+			testData.begin		 = event;
 		}
 
 		void Signal(const event::TestEnd& event) final
 		{
+			SuiteData& suiteData = data_.suites.back();
+			TestData& testData	 = suiteData.tests.back();
+			testData.end		 = event;
 		}
 
 		void Signal(const event::TestSkip& event) final
@@ -210,8 +240,12 @@ namespace synodic::honesty::test
 
 		void Signal(const event::Summary& event) final
 		{
+			Finalize(std::move(data_));
 		}
 
-		virtual void Finalize() = 0;
+		virtual void Finalize(CumulativeData data) = 0;
+
+	private:
+		CumulativeData data_;
 	};
 }

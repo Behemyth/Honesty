@@ -179,7 +179,7 @@ namespace synodic::honesty::test
 
 		void Run(std::function_ref<void()> function) override
 		{
-			throw NotImplemented();
+			throw utility::NotImplemented();
 		}
 	};
 

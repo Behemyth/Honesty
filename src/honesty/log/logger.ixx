@@ -5,6 +5,8 @@ import :colour;
 import :sink;
 import :types;
 
+import synodic.honesty.utility;
+
 namespace synodic::honesty::log
 {
 	export class Logger
@@ -215,6 +217,11 @@ namespace synodic::honesty::log
 			}
 		}
 
+		[[nodiscard]] constexpr bool operator==(const Logger& rhs) const
+		{
+			return name_ == rhs.name_;
+		}
+
 	private:
 		friend class LoggerRegistry;
 
@@ -251,7 +258,7 @@ namespace synodic::honesty::log
 		LoggerRegistry()
 		{
 			Logger root(ROOT_LOGGER_NAME);
-			loggers_.insert({std::hash<std::string_view> {}(ROOT_LOGGER_NAME), std::move(root)});
+			loggers_.insert({utility::Hash(ROOT_LOGGER_NAME), std::move(root)});
 		}
 
 		LoggerRegistry(const LoggerRegistry& other) = delete;
@@ -262,25 +269,26 @@ namespace synodic::honesty::log
 
 		~LoggerRegistry() = default;
 
-		Logger& GetLogger(std::string_view name)
+		Logger& GetLogger(const std::string_view name)
 		{
-			const std::size_t hash = std::hash<std::string_view> {}(name);
+			const utility::Hash hash(name);
+
 			if (const auto search = loggers_.find(hash); search != loggers_.end())
 			{
 				return loggers_.at(hash);
 			}
 
 			Logger logger(name);
-			return loggers_.try_emplace(std::hash<std::string_view> {}(name), std::move(logger)).first->second;
+			return loggers_.try_emplace(utility::Hash(name), std::move(logger)).first->second;
 		}
 
 		const Logger& GetRootLogger()
 		{
-			return loggers_.at(std::hash<std::string_view> {}(ROOT_LOGGER_NAME));
+			return loggers_.at(utility::Hash(ROOT_LOGGER_NAME));
 		}
 
 	private:
-		std::unordered_map<std::size_t, Logger> loggers_;
+		std::unordered_map<utility::Hash, Logger> loggers_;
 	};
 
 }

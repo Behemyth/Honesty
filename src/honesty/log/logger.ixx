@@ -253,12 +253,12 @@ namespace synodic::honesty::log
 	class LoggerRegistry
 	{
 		static constexpr std::string_view ROOT_LOGGER_NAME = "root";
-
+		static constexpr auto ROOT_LOGGER_HASH = utility::Hash(ROOT_LOGGER_NAME);
 	public:
 		LoggerRegistry()
 		{
 			Logger root(ROOT_LOGGER_NAME);
-			loggers_.insert({utility::Hash(ROOT_LOGGER_NAME), std::move(root)});
+			loggers_.insert({ROOT_LOGGER_HASH, std::move(root)});
 		}
 
 		LoggerRegistry(const LoggerRegistry& other) = delete;
@@ -272,19 +272,13 @@ namespace synodic::honesty::log
 		Logger& GetLogger(const std::string_view name)
 		{
 			const utility::Hash hash(name);
-
-			if (const auto search = loggers_.find(hash); search != loggers_.end())
-			{
-				return loggers_.at(hash);
-			}
-
 			Logger logger(name);
-			return loggers_.try_emplace(utility::Hash(name), std::move(logger)).first->second;
+			return loggers_.try_emplace(hash, std::move(logger)).first->second;
 		}
 
 		const Logger& GetRootLogger()
 		{
-			return loggers_.at(utility::Hash(ROOT_LOGGER_NAME));
+			return loggers_.at(ROOT_LOGGER_HASH);
 		}
 
 	private:

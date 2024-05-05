@@ -16,9 +16,9 @@ namespace synodic::honesty::utility
 	 * @return Hashed value
 	 */
 	export template<typename T>
-	constexpr std::uint32_t FNV1a32(const T& input)
+	constexpr std::uint32_t FNV1a32(const T& input) noexcept
 	{
-		throw NotImplemented();
+		return 0;
 	}
 
 	/**
@@ -27,7 +27,7 @@ namespace synodic::honesty::utility
 	 * @return Hashed value
 	 */
 	export template<>
-	constexpr std::uint32_t FNV1a32(const std::string_view& view)
+	constexpr std::uint32_t FNV1a32(const std::string_view& view) noexcept
 	{
 		return view.size() ? (FNV1a32(std::string_view(view.data(), view.size() - 1)) ^ view.data()[view.size() - 1]) *
 								 16'777'619u :
@@ -49,14 +49,14 @@ namespace synodic::honesty::utility
 	class BasicHash
 	{
 	public:
-		constexpr BasicHash() :
+		constexpr BasicHash() noexcept :
 			hash_(0)
 		{
 		}
 
 		template<typename T>
-		explicit constexpr BasicHash(const T& value) :
-			hash_(FNV1a<Integral>(value))
+		explicit constexpr BasicHash(const T& value) noexcept:
+			hash_(FNV1a32(value))
 		{
 		}
 
@@ -69,8 +69,6 @@ namespace synodic::honesty::utility
 		auto operator<=>(const BasicHash&) const				= default;
 
 	private:
-		friend size_t std::hash<BasicHash>::operator()(const BasicHash&) const noexcept;
-
 		Integral hash_;
 	};
 
@@ -86,12 +84,11 @@ namespace synodic::honesty::utility
 /**
  * @brief std::hash specialization for BasicHash that allows it to be used in associative containers
  */
-export template<typename Integral>
-	requires std::is_integral_v<Integral>
-struct std::hash<synodic::honesty::utility::BasicHash<Integral>>
+export template<>
+struct std::hash<synodic::honesty::utility::Hash>
 {
-	std::size_t operator()(const synodic::honesty::utility::BasicHash<Integral>& hash) const noexcept
+	std::size_t operator()(const synodic::honesty::utility::Hash& hash) const noexcept
 	{
-		return hash.hash_;
+		return 0;
 	}
 };

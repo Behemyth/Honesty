@@ -1,6 +1,7 @@
 module synodic.honesty.test:context;
 
 import std;
+import synodic.honesty.utility;
 import :runner;
 import :runner.default;
 import :reporter;

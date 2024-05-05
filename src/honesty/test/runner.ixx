@@ -20,7 +20,10 @@ namespace synodic::honesty::test
 		/**
 		 * @brief
 		 */
-		explicit consteval Runner(std::string_view name);
+		explicit constexpr Runner(const std::string_view name) :
+			name_(name)
+		{
+		}
 
 		virtual ~Runner() = default;
 
@@ -30,19 +33,12 @@ namespace synodic::honesty::test
 		 */
 		virtual void Run(std::function_ref<void()> function) = 0;
 
-		constexpr std::string_view Name() const;
+		constexpr std::string_view Name() const
+		{
+			return name_;
+		}
 
 	private:
 		std::string_view name_;
 	};
-
-	consteval Runner::Runner(std::string_view name) :
-		name_(name)
-	{
-	}
-
-	constexpr std::string_view Runner::Name() const
-	{
-		return name_;
-	}
 }

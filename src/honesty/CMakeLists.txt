@@ -6,6 +6,7 @@ target_sources(honesty
 			"profile.ixx"
 			"test.ixx"
 			"log.ixx"
+			"utility.ixx"
 )
 
 add_subdirectory(
@@ -26,4 +27,8 @@ add_subdirectory(
 
 add_subdirectory(
 	test
+)
+
+add_subdirectory(
+	utility
 )

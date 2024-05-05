@@ -157,7 +157,7 @@ namespace synodic::honesty::test
 		};
 
 	public:
-		explicit(false) constexpr CumulativeAdapter(const std::string_view name) :
+		explicit(false) CumulativeAdapter(const std::string_view name) :
 			Reporter(name)
 		{
 		}

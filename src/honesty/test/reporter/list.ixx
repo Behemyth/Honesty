@@ -18,7 +18,7 @@ namespace synodic::honesty::test
 	class ListReporter final : public CumulativeAdapter
 	{
 	public:
-		explicit(false) constexpr ListReporter(const ListReporterParameters& parameters) :
+		explicit(false) ListReporter(const ListReporterParameters& parameters) :
 			CumulativeAdapter("list"),
 			parameters_(parameters)
 		{
@@ -31,13 +31,16 @@ namespace synodic::honesty::test
 			switch (parameters_.outputType)
 			{
 				case ListOutputType::LOG :
+				{
 					log::Console sink;
 					log::Logger& logger = log::GetLogger("reporter");
 
 					break;
+				}
 				case ListOutputType::JSON :
-
-					break;
+				{
+				}
+				break;
 			}
 		}
 
@@ -45,3 +48,4 @@ namespace synodic::honesty::test
 		ListReporterParameters parameters_;
 	};
 }
+

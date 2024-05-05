@@ -17,6 +17,13 @@ namespace synodic::honesty::test
 		using std::exception::exception;
 	};
 
+	export class NotImplemented final : public std::logic_error
+	{
+	public:
+		NotImplemented() :
+			std::logic_error("Function is not implemented") {};
+	};
+
 	export namespace event
 	{
 

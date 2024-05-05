@@ -1,5 +1,6 @@
 export module synodic.honesty.log;
 
+export import :types;
 export import :colour;
 export import :logger;
 export import :sink;

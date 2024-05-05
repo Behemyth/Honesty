@@ -7,11 +7,9 @@ import :types;
 
 namespace synodic::honesty::log
 {
-
-	class Logger
+	export class Logger
 	{
 	public:
-		virtual ~Logger()									 = default;
 		Logger(const Logger& other)							 = delete;
 		constexpr Logger(Logger&& other) noexcept			 = default;
 		Logger& operator=(const Logger& other)				 = delete;
@@ -123,7 +121,10 @@ namespace synodic::honesty::log
 		 * @brief Returns the sinks of this logger
 		 * @return The sinks
 		 */
-		virtual std::span<Sink*> Sinks() = 0;
+		std::span<Sink*> Sinks()
+		{
+			return sinks_;
+		}
 
 		/**
 		 * @brief Checks to see if this logger or its ancestors have any sinks
@@ -152,7 +153,10 @@ namespace synodic::honesty::log
 		 * @brief Returns the direct children of this logger
 		 * @return The children
 		 */
-		virtual std::span<Logger*> Children() const = 0;
+		std::span<Logger*> Children() const
+		{
+			return children_;
+		}
 
 		/**
 		 * @brief Checks if this logger is propagating messages
@@ -190,76 +194,6 @@ namespace synodic::honesty::log
 			disabled_ = disabled;
 		}
 
-	protected:
-		/***
-		 * @brief Constructs a logger with the given name. Forces inheritance for construction
-		 * @param name The name of the logger
-		 */
-		explicit(false) constexpr Logger(const std::string_view name) :
-			level_(LevelType::DEFER),
-			parent_(nullptr),
-			name_(name),
-			propagate_(true),
-			disabled_(false)
-		{
-		}
-
-	private:
-		LevelType level_;
-
-		Logger* parent_;
-
-		std::string_view name_;
-		bool propagate_;
-		bool disabled_;
-	};
-
-	/**
-	 * @brief TODO: comment
-	 */
-	export template<std::size_t SinkSize>
-	class StaticLogger final : public Logger
-	{
-	public:
-		explicit(false) constexpr StaticLogger(const std::string_view name, Sink* sinks) :
-			Logger(name),
-			sinks_(sinks)
-		{
-		}
-
-		std::span<Sink*> Sinks() override
-		{
-			return sinks_;
-		}
-
-		std::span<Logger*> Children() const override
-		{
-			return {};
-		}
-
-	private:
-		std::array<Sink*, SinkSize> sinks_;
-	};
-
-	/**
-	 * @brief TODO: comment
-	 */
-	export class DynamicLogger final : public Logger
-	{
-	public:
-		// TODO:  Hide constructor
-		explicit(false) DynamicLogger(const std::string_view name) :
-			Logger(name)
-		{
-		}
-
-		~DynamicLogger() = default;
-
-		DynamicLogger(const DynamicLogger& other)				 = delete;
-		DynamicLogger(DynamicLogger&& other) noexcept			 = default;
-		DynamicLogger& operator=(const DynamicLogger& other)	 = delete;
-		DynamicLogger& operator=(DynamicLogger&& other) noexcept = default;
-
 		/**
 		 * @brief Adds a sink to this logger
 		 * @param sink The sink to add
@@ -281,43 +215,88 @@ namespace synodic::honesty::log
 			}
 		}
 
-		std::span<Sink*> Sinks() override
-		{
-			return sinks_;
-		}
-
-		std::span<Logger*> Children() const override
-		{
-			return children_;
-		}
-
 	private:
+		friend class LoggerRegistry;
+
+		/***
+		 * @brief Constructs a logger with the given name. Prevents a user from creating a logger type directly
+		 * @param name The name of the logger
+		 */
+		explicit(false) Logger(const std::string_view name) :
+			level_(LevelType::DEFER),
+			parent_(nullptr),
+			name_(name),
+			propagate_(true),
+			disabled_(false)
+		{
+		}
+
+		LevelType level_;
+
+		Logger* parent_;
+
+		std::string_view name_;
+		bool propagate_;
+		bool disabled_;
+
 		mutable std::vector<Logger*> children_;
 		mutable std::vector<Sink*> sinks_;
 	};
 
-	export const DynamicLogger& GetRootLogger();
-	export DynamicLogger& GetLogger(std::string_view name);
+	class LoggerRegistry
+	{
+		static constexpr std::string_view ROOT_LOGGER_NAME = "root";
+
+	public:
+		LoggerRegistry()
+		{
+			Logger root(ROOT_LOGGER_NAME);
+			loggers_.insert({std::hash<std::string_view> {}(ROOT_LOGGER_NAME), std::move(root)});
+		}
+
+		LoggerRegistry(const LoggerRegistry& other) = delete;
+		LoggerRegistry(LoggerRegistry&& other)		= delete;
+
+		LoggerRegistry& operator=(const LoggerRegistry& other) = delete;
+		LoggerRegistry& operator=(LoggerRegistry&& other)	   = delete;
+
+		~LoggerRegistry() = default;
+
+		Logger& GetLogger(std::string_view name)
+		{
+			const std::size_t hash = std::hash<std::string_view> {}(name);
+			if (const auto search = loggers_.find(hash); search != loggers_.end())
+			{
+				return loggers_.at(hash);
+			}
+
+			Logger logger(name);
+			return loggers_.try_emplace(std::hash<std::string_view> {}(name), std::move(logger)).first->second;
+		}
+
+		const Logger& GetRootLogger()
+		{
+			return loggers_.at(std::hash<std::string_view> {}(ROOT_LOGGER_NAME));
+		}
+
+	private:
+		std::unordered_map<std::size_t, Logger> loggers_;
+	};
+
 }
 
-namespace
-{
-	std::map<std::size_t, synodic::honesty::log::DynamicLogger> LOGGERS;
-	const auto ROOT_LOGGER_NAME = "root";
-	const synodic::honesty::log::DynamicLogger& ROOT_LOGGER =
-		LOGGERS.try_emplace(std::hash<std::string_view> {}(ROOT_LOGGER_NAME), ROOT_LOGGER_NAME).first->second;
-}
+static synodic::honesty::log::LoggerRegistry LOGGER_REGISTRY {};
 
 namespace synodic::honesty::log
 {
 
-	const DynamicLogger& GetRootLogger()
+	export inline const Logger& GetRootLogger()
 	{
-		return ROOT_LOGGER;
+		return LOGGER_REGISTRY.GetRootLogger();
 	}
 
-	DynamicLogger& GetLogger(std::string_view name)
+	export inline Logger& GetLogger(const std::string_view name)
 	{
-		return LOGGERS.try_emplace(std::hash<std::string_view> {}(name), name).first->second;
+		return LOGGER_REGISTRY.GetLogger(name);
 	}
 }

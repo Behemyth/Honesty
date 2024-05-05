@@ -164,60 +164,56 @@ namespace synodic::honesty::test
 		std::span<Reporter*> reporters_;
 		Runner* runner_;
 	};
+
+	/**
+	 * @brief An empty runner that throws an exception if it is used as a runner. We want instances where the default
+	 * runner isn't replaced to notify the developer
+	 */
+	class EmptyRunner final : public Runner
+	{
+	public:
+		consteval EmptyRunner() :
+			Runner("empty")
+		{
+		}
+
+		void Run(std::function_ref<void()> function) override
+		{
+			throw NotImplemented();
+		}
+	};
+
+	/**
+	 * @brief An empty reporter that does nothing
+	 */
+	class EmptyReporter final : public StreamingAdapter
+	{
+	public:
+		consteval EmptyReporter() :
+			StreamingAdapter("empty")
+		{
+		}
+	};
 }
 
-// TODO: Move data to single object
 namespace
 {
-	constinit synodic::honesty::test::DefaultRunner DEFAULT_RUNNER("default");
-
-	constinit std::array<synodic::honesty::test::Runner*, 1> RUNNERS = {&DEFAULT_RUNNER};
-
-	constinit synodic::honesty::test::CompactReporter COMPACT_REPORTER("compact");
-	constinit synodic::honesty::test::DefaultReporter DEFAULT_REPORTER("default");
-
-	constinit std::array<synodic::honesty::test::Reporter*, 2> PUBLIC_REPORTERS = {
-		&COMPACT_REPORTER,
-		&DEFAULT_REPORTER};
+	constinit synodic::honesty::test::EmptyRunner EMPTY_RUNNER;
+	constinit synodic::honesty::test::EmptyReporter EMPTY_REPORTER;
 
 	// The default reporters for tests.
 	constinit std::array<synodic::honesty::test::Reporter*, 1> DEFAULT_REPORTERS = {
-		&DEFAULT_REPORTER,
+		&EMPTY_REPORTER,
 	};
 
 	// The default context for tests
-	constinit synodic::honesty::test::Context DEFAULT_CONTEXT(DEFAULT_RUNNER, DEFAULT_REPORTERS);
+	constinit synodic::honesty::test::Context EMPTY_CONTEXT(EMPTY_RUNNER, DEFAULT_REPORTERS);
 
 	// Each thread has its own context, such that tests can reference global functions without an object
-	constinit thread_local synodic::honesty::test::Context& CONTEXT = DEFAULT_CONTEXT;
+	constinit thread_local synodic::honesty::test::Context& CONTEXT = EMPTY_CONTEXT;
 }
 
 synodic::honesty::test::Context& GetContext()
 {
 	return CONTEXT;
-}
-
-std::span<synodic::honesty::test::Reporter*> GetPublicReporters()
-{
-	return PUBLIC_REPORTERS;
-}
-
-synodic::honesty::test::Reporter& GetDefaultReporter()
-{
-	return DEFAULT_REPORTER;
-}
-
-synodic::honesty::test::Reporter& GetCompactReporter()
-{
-	return COMPACT_REPORTER;
-}
-
-std::span<synodic::honesty::test::Runner*> GetPublicRunners()
-{
-	return RUNNERS;
-}
-
-synodic::honesty::test::Runner& GetDefaultRunner()
-{
-	return DEFAULT_RUNNER;
 }

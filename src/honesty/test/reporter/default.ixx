@@ -9,10 +9,11 @@ namespace synodic::honesty::test
 	export class DefaultReporter final : public StreamingAdapter
 	{
 	public:
-		explicit(false) constexpr DefaultReporter(const std::string_view name) :
-			StreamingAdapter(name),
-			logger_("reporter", &consoleSink_)
+		explicit(false) DefaultReporter() :
+			StreamingAdapter("default"),
+			logger_(log::GetLogger("reporter"))
 		{
+			logger_.AddSink(&consoleSink_);
 		}
 
 		~DefaultReporter() override = default;
@@ -46,7 +47,7 @@ namespace synodic::honesty::test
 
 	private:
 		log::Console consoleSink_;
-		log::StaticLogger<1> logger_;
+		log::Logger& logger_;
 	};
 
 }

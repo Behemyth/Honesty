@@ -30,14 +30,14 @@ namespace synodic::honesty::test
 
 		// Resolve all input into immediately executable state ready for the 'Execute' function
 		Instance(const Configuration& configuration, std::span<std::string_view> arguments) :
-			logger_("instance"),
+			logger_(log::GetLogger("instance")),
 			parameters_(HelpParameters())
 		{
 			logger_.AddSink(&consoleSink_);
 
 			// Gather our user and library provided runners and reporters
-			const auto providedRunners	 = {GetRegistry().GetRunners(), GetPublicRunners()};
-			const auto providedReporters = {GetRegistry().GetReporters(), GetPublicReporters()};
+			const auto providedRunners	 = {GetRegistry().GetRunners()};
+			const auto providedReporters = {GetRegistry().GetReporters()};
 
 			// Flatten the ranges
 			auto runners   = std::ranges::join_view(providedRunners);
@@ -173,7 +173,7 @@ namespace synodic::honesty::test
 		}
 
 	private:
-		log::DynamicLogger logger_;
+		log::Logger& logger_;
 		log::Console consoleSink_;
 
 		// Our list of top level commands and the parameters that go with them

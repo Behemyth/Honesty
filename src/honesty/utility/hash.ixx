@@ -26,7 +26,8 @@ namespace synodic::honesty::utility
 	 * @param view The input string
 	 * @return Hashed value
 	 */
-	export constexpr std::uint32_t FNV1a32(const std::string_view& view)
+	export template<>
+	constexpr std::uint32_t FNV1a32(const std::string_view& view)
 	{
 		return view.size() ? (FNV1a32(std::string_view(view.data(), view.size() - 1)) ^ view.data()[view.size() - 1]) *
 								 16'777'619u :

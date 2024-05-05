@@ -8,58 +8,65 @@ namespace synodic::honesty::utility
 	export template<typename Char, std::size_t Size, typename Traits = std::char_traits<Char>>
 	class BasicFixedString
 	{
-		static constexpr std::size_t SIZE_WITH_NULL = Size + 1;
+		static constexpr std::size_t VIEW_SIZE = Size - 1;
 
 	public:
 		using StringViewType = std::basic_string_view<Char, Traits>;
 
-		explicit(false) consteval BasicFixedString(const Char (&str)[SIZE_WITH_NULL])
+		explicit(false) constexpr BasicFixedString(const Char (&str)[Size])
 		{
 			std::copy(std::begin(str), std::end(str), std::begin(data_));
 		}
 
-		explicit consteval operator std::basic_string_view<Char>() const noexcept
+		constexpr operator std::basic_string_view<Char>() const noexcept
 		{
-			return {data_.data(), Size};
-		}
-
-		template<std::size_t SizeOther>
-		[[nodiscard]] constexpr bool operator==(const BasicFixedString<Char, SizeOther, Traits>& other)
-		{
-			if constexpr (Size != SizeOther)
-			{
-				return false;
-			}
-			using OtherType = std::decay_t<decltype(other)>;
-			using OtherViewType  = typename OtherType::string_view_type;
-			return static_cast<OtherViewType>(*this) == other;
-		}
-
-		[[nodiscard]] constexpr bool operator==(std::basic_string_view<Char, Traits> other)
-		{
-			using OtherType = std::decay_t<decltype(other)>;
-			using OtherViewType  = typename OtherType::string_view_type;
-			return static_cast<OtherViewType>(*this) == other;
-		}
-
-		template<std::size_t SizeOther>
-		[[nodiscard]] constexpr auto operator<=>(const BasicFixedString<Char, SizeOther, Traits>& other)
-		{
-			using OtherType = std::decay_t<decltype(other)>;
-			using OtherViewType  = typename OtherType::string_view_type;
-			return static_cast<OtherViewType>(*this) <=> other;
-		}
-
-		[[nodiscard]] constexpr auto operator<=>(std::basic_string_view<Char, Traits> other)
-		{
-			using OtherType = std::decay_t<decltype(other)>;
-			using OtherViewType  = typename OtherType::string_view_type;
-			return static_cast<OtherViewType>(*this) <=> other;
+			return {data_.data(), VIEW_SIZE};
 		}
 
 	private:
-		std::array<Char, SIZE_WITH_NULL> data_;
+		std::array<Char, Size> data_;
 	};
+
+	export template<typename Char, typename Traits, std::size_t SizeLeft, std::size_t SizeRight>
+	[[nodiscard]] constexpr bool operator==(
+		const BasicFixedString<Char, SizeLeft, Traits>& lhs,
+		const BasicFixedString<Char, SizeRight, Traits>& rhs)
+	{
+		if constexpr (SizeLeft != SizeRight)
+		{
+			return false;
+		}
+
+		using ViewType = typename BasicFixedString<Char, SizeLeft, Traits>::StringViewType;
+		return static_cast<ViewType>(rhs) == lhs;
+	}
+
+	export template<typename Char, typename Traits, std::size_t SizeLeft>
+	[[nodiscard]] constexpr bool operator==(
+		const BasicFixedString<Char, SizeLeft, Traits>& lhs,
+		std::type_identity_t<std::basic_string_view<Char, Traits>> rhs)
+	{
+		using ViewType = typename BasicFixedString<Char, SizeLeft, Traits>::StringViewType;
+		return static_cast<ViewType>(lhs) == rhs;
+	}
+
+	export template<typename Char, typename Traits, std::size_t SizeLeft, std::size_t SizeRight>
+	[[nodiscard]] constexpr auto operator<=>(
+		const BasicFixedString<Char, SizeLeft, Traits>& lhs,
+		const BasicFixedString<Char, SizeRight, Traits>& rhs)
+	{
+		using ViewType = typename BasicFixedString<Char, SizeLeft, Traits>::StringViewType;
+		return static_cast<ViewType>(lhs) <=> rhs;
+	}
+
+	export template<typename Char, typename Traits, std::size_t SizeLeft>
+	[[nodiscard]] constexpr auto operator<=>(
+		const BasicFixedString<Char, SizeLeft, Traits>& lhs,
+		std::type_identity_t<std::basic_string_view<Char, Traits>> rhs)
+	{
+		using ViewType = typename BasicFixedString<Char, SizeLeft, Traits>::StringViewType;
+		return static_cast<ViewType>(lhs) <=> rhs;
+	}
 
 	export template<std::size_t Size>
 	using FixedString = BasicFixedString<char, Size>;
@@ -72,7 +79,4 @@ namespace synodic::honesty::utility
 
 	export template<std::size_t Size>
 	using FixedStringU32 = BasicFixedString<char32_t, Size>;
-
-	template<typename Char, std::size_t Size>
-	BasicFixedString(const Char (&)[Size]) -> BasicFixedString<Char, Size - 1>;
 }

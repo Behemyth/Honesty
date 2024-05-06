@@ -155,7 +155,7 @@ namespace synodic::honesty::log
 		 * @brief Returns the direct children of this logger
 		 * @return The children
 		 */
-		std::span<Logger*> Children() const
+		std::span<Logger> Children() const
 		{
 			return children_;
 		}
@@ -228,10 +228,11 @@ namespace synodic::honesty::log
 		/***
 		 * @brief Constructs a logger with the given name. Prevents a user from creating a logger type directly
 		 * @param name The name of the logger
+		 * @param parent The logger parent to associate with
 		 */
-		explicit(false) Logger(const std::string_view name) :
+		explicit(false) Logger(const std::string_view name, Logger* parent) :
 			level_(LevelType::DEFER),
-			parent_(nullptr),
+			parent_(parent),
 			name_(name),
 			propagate_(true),
 			disabled_(false)
@@ -240,25 +241,24 @@ namespace synodic::honesty::log
 
 		LevelType level_;
 
-		Logger* parent_;
-
 		std::string_view name_;
 		bool propagate_;
 		bool disabled_;
 
-		mutable std::vector<Logger*> children_;
-		mutable std::vector<Sink*> sinks_;
+		Logger* parent_;
+
+		mutable std::vector<Sink> sinks_;
 	};
 
 	class LoggerRegistry
 	{
 		static constexpr std::string_view ROOT_LOGGER_NAME = "root";
-		static constexpr auto ROOT_LOGGER_HASH = utility::Hash(ROOT_LOGGER_NAME);
+		static constexpr auto ROOT_LOGGER_HASH			   = utility::Hash(ROOT_LOGGER_NAME);
+
 	public:
-		LoggerRegistry()
+		LoggerRegistry() :
+			root_(ROOT_LOGGER_NAME, nullptr)
 		{
-			Logger root(ROOT_LOGGER_NAME);
-			loggers_.insert({ROOT_LOGGER_HASH, std::move(root)});
 		}
 
 		LoggerRegistry(const LoggerRegistry& other) = delete;
@@ -269,36 +269,28 @@ namespace synodic::honesty::log
 
 		~LoggerRegistry() = default;
 
-		Logger& GetLogger(const std::string_view name)
+		const Logger& RootLogger()
 		{
-			const utility::Hash hash(name);
-			Logger logger(name);
-			return loggers_.try_emplace(hash, std::move(logger)).first->second;
-		}
-
-		const Logger& GetRootLogger()
-		{
-			return loggers_.at(ROOT_LOGGER_HASH);
+			return root_;
 		}
 
 	private:
-		std::unordered_map<utility::Hash, Logger> loggers_;
+		Logger root_;
 	};
 
 }
 
-static synodic::honesty::log::LoggerRegistry LOGGER_REGISTRY {};
+namespace
+{
+	synodic::honesty::log::LoggerRegistry LOGGER_REGISTRY {};
+}
 
 namespace synodic::honesty::log
 {
 
-	export inline const Logger& GetRootLogger()
+	export inline const Logger& RootLogger()
 	{
-		return LOGGER_REGISTRY.GetRootLogger();
+		return LOGGER_REGISTRY.RootLogger();
 	}
 
-	export inline Logger& GetLogger(const std::string_view name)
-	{
-		return LOGGER_REGISTRY.GetLogger(name);
-	}
 }

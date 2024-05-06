@@ -74,7 +74,6 @@ namespace synodic::honesty::utility
 		}
 
 	private:
-
 		Integral hash_;
 	};
 

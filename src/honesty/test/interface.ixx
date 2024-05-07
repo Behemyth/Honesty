@@ -37,13 +37,16 @@ namespace synodic::honesty::test
 
 	export struct ListParameters
 	{
-		ListParameters(Runner* runner) :
+		ListParameters(Runner* runner, log::Logger logger) :
 			runner(runner),
+			logger(std::move(logger)),
 			outputType(ListOutputType::LOG)
 		{
 		}
 
 		Runner* runner;
+		log::Logger logger;
+
 		ListOutputType outputType;
 	};
 
@@ -135,14 +138,14 @@ namespace synodic::honesty::test
 			return {};
 		}
 
-		ListResult List(const ListParameters& parameters)
+		ListResult List(ListParameters& parameters)
 		{
 			ListResult result;
 
 			ListReporterParameters reporterParameters;
 			reporterParameters.outputType = parameters.outputType;
 
-			ListReporter listReporter(reporterParameters);
+			ListReporter listReporter(reporterParameters, std::move(parameters.logger));
 
 			const ExecuteParameters executeParameters(parameters.runner, &listReporter);
 			Execute(executeParameters);

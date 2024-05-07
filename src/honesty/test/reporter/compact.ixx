@@ -9,18 +9,12 @@ namespace synodic::honesty::test
 	export class CompactReporter final : public StreamingAdapter
 	{
 	public:
-		explicit(false) CompactReporter() :
-			StreamingAdapter("default"),
-			logger_(log::GetLogger("reporter"))
+		explicit CompactReporter(log::Logger logger) :
+			StreamingAdapter("compact", std::move(logger))
 		{
-			logger_.AddSink(&consoleSink_);
 		}
 
 		~CompactReporter() override = default;
-
-	private:
-		log::Console consoleSink_;
-		log::Logger& logger_;
 	};
 
 }

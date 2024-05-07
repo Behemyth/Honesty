@@ -8,19 +8,18 @@ namespace
 {
 	synodic::honesty::test::Suite loggerSuite(
 		"logger",
-		[]()-> synodic::honesty::test::Generator
+		[]() -> synodic::honesty::test::Generator
 		{
 			co_yield "Parent Sink"_test = []()
 			{
-				synodic::honesty::log::Logger& parent = synodic::honesty::log::GetLogger("parent");
-				synodic::honesty::log::Logger& child = synodic::honesty::log::GetLogger("parent.child");
+				synodic::honesty::log::Logger& root = synodic::honesty::log::RootLogger();
+				synodic::honesty::log::Logger parent = root.CreateLogger("parent");
+				synodic::honesty::log::Logger child = parent.CreateLogger("child");
 
 				synodic::honesty::test::Assert(child.Parent());
 				synodic::honesty::test::ExpectEquals(parent, *child.Parent());
 
 				synodic::honesty::log::RingBuffer<std::mutex> sink;
-
-				parent.AddSink(&sink);
 			};
 		});
 

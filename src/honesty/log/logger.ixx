@@ -12,15 +12,13 @@ namespace synodic::honesty::log
 	export class Logger
 	{
 	public:
-		Logger(const Logger& other)							 = delete;
+		Logger(const Logger& other)							 = default;
 		constexpr Logger(Logger&& other) noexcept			 = default;
-		Logger& operator=(const Logger& other)				 = delete;
+		Logger& operator=(const Logger& other)				 = default;
 		constexpr Logger& operator=(Logger&& other) noexcept = default;
 
-		auto operator<=>(const Logger&) const = default;
-
 		template<class... Args>
-		inline void Log(const LevelType level, std::format_string<Args...> fmt, Args&&... args)
+		inline void Log(const LevelType level, std::format_string<Args...> fmt, Args&&... args) const
 		{
 			LogV(level, fmt.get(), std::make_format_args(args...));
 		}
@@ -31,46 +29,46 @@ namespace synodic::honesty::log
 		 * @param fmt The format string
 		 * @param args The arguments
 		 */
-		void LogV(const LevelType level, const std::string_view fmt, const std::format_args args)
+		void LogV(const LevelType level, const std::string_view fmt, const std::format_args args) const
 		{
-			for (Sink* sink: Sinks())
+			if (sink_)
 			{
-				sink->LogV(level, fmt, args);
+				sink_->LogV(level, fmt, args);
 			}
 		}
 
 		template<class... Args>
-		inline void Trace(std::format_string<Args...> fmt, Args&&... args)
+		inline void Trace(std::format_string<Args...> fmt, Args&&... args) const
 		{
 			Log(LevelType::TRACE, fmt, std::forward<Args>(args)...);
 		}
 
 		template<class... Args>
-		inline void Debug(std::format_string<Args...> fmt, Args&&... args)
+		inline void Debug(std::format_string<Args...> fmt, Args&&... args) const
 		{
 			Log(LevelType::DEBUG, fmt, std::forward<Args>(args)...);
 		}
 
 		template<class... Args>
-		inline void Info(std::format_string<Args...> fmt, Args&&... args)
+		inline void Info(std::format_string<Args...> fmt, Args&&... args) const
 		{
 			Log(LevelType::INFO, fmt, std::forward<Args>(args)...);
 		}
 
 		template<class... Args>
-		inline void Warning(std::format_string<Args...> fmt, Args&&... args)
+		inline void Warning(std::format_string<Args...> fmt, Args&&... args) const
 		{
 			Log(LevelType::WARNING, fmt, std::forward<Args>(args)...);
 		}
 
 		template<class... Args>
-		inline void Error(std::format_string<Args...> fmt, Args&&... args)
+		inline void Error(std::format_string<Args...> fmt, Args&&... args) const
 		{
 			Log(LevelType::ERROR, fmt, std::forward<Args>(args)...);
 		}
 
 		template<class... Args>
-		inline void Critical(std::format_string<Args...> fmt, Args&&... args)
+		inline void Critical(std::format_string<Args...> fmt, Args&&... args) const
 		{
 			Log(LevelType::CRITICAL, fmt, std::forward<Args>(args)...);
 		}
@@ -123,23 +121,23 @@ namespace synodic::honesty::log
 		 * @brief Returns the sinks of this logger
 		 * @return The sinks
 		 */
-		std::span<Sink*> Sinks()
+		Sink* Sink() const
 		{
-			return sinks_;
+			return sink_;
 		}
 
 		/**
 		 * @brief Checks to see if this logger or its ancestors have any sinks
 		 * @return Whether sinks were found
 		 */
-		bool HasSink()
+		bool HasSink() const
 		{
 			bool parentHasSink = false;
 			if (parent_)
 			{
 				parentHasSink = parent_->HasSink();
 			}
-			return !Sinks().empty() || parentHasSink;
+			return sink_ || parentHasSink;
 		}
 
 		/**
@@ -149,15 +147,6 @@ namespace synodic::honesty::log
 		Logger* Parent() const
 		{
 			return parent_;
-		}
-
-		/**
-		 * @brief Returns the direct children of this logger
-		 * @return The children
-		 */
-		std::span<Logger> Children() const
-		{
-			return children_;
 		}
 
 		/**
@@ -196,30 +185,19 @@ namespace synodic::honesty::log
 			disabled_ = disabled;
 		}
 
-		/**
-		 * @brief Adds a sink to this logger
-		 * @param sink The sink to add
-		 */
-		void AddSink(Sink* sink) const
+		Logger CreateLogger(const std::string_view name)
 		{
-			sinks_.push_back(sink);
+			return Logger(name, this);
 		}
 
-		/**
-		 * @brief Removes a sink from this logger
-		 * @param sink The sink to remove
-		 */
-		void RemoveSink(Sink* sink) const
-		{
-			if (const auto iterator = std::ranges::find(sinks_, sink); iterator != sinks_.end())
-			{
-				sinks_.erase(iterator);
-			}
-		}
-
-		[[nodiscard]] constexpr bool operator==(const Logger& rhs) const
+		[[nodiscard]] bool operator==(const Logger& rhs) const
 		{
 			return name_ == rhs.name_;
+		}
+
+		[[nodiscard]] auto operator<=>(const Logger& rhs) const
+		{
+			return name_ <=> rhs.name_;
 		}
 
 	private:
@@ -230,24 +208,25 @@ namespace synodic::honesty::log
 		 * @param name The name of the logger
 		 * @param parent The logger parent to associate with
 		 */
-		explicit(false) Logger(const std::string_view name, Logger* parent) :
+		explicit(false) constexpr Logger(const std::string_view name, Logger* parent) :
 			level_(LevelType::DEFER),
-			parent_(parent),
 			name_(name),
 			propagate_(true),
-			disabled_(false)
+			disabled_(false),
+			parent_(parent),
+			sink_(nullptr)
 		{
 		}
 
 		LevelType level_;
-
 		std::string_view name_;
+
 		bool propagate_;
 		bool disabled_;
 
 		Logger* parent_;
 
-		mutable std::vector<Sink> sinks_;
+		log::Sink* sink_;
 	};
 
 	class LoggerRegistry
@@ -256,7 +235,7 @@ namespace synodic::honesty::log
 		static constexpr auto ROOT_LOGGER_HASH			   = utility::Hash(ROOT_LOGGER_NAME);
 
 	public:
-		LoggerRegistry() :
+		consteval LoggerRegistry() :
 			root_(ROOT_LOGGER_NAME, nullptr)
 		{
 		}
@@ -269,7 +248,7 @@ namespace synodic::honesty::log
 
 		~LoggerRegistry() = default;
 
-		const Logger& RootLogger()
+		constexpr Logger& RootLogger()
 		{
 			return root_;
 		}
@@ -280,15 +259,12 @@ namespace synodic::honesty::log
 
 }
 
-namespace
-{
-	synodic::honesty::log::LoggerRegistry LOGGER_REGISTRY {};
-}
+constinit synodic::honesty::log::LoggerRegistry LOGGER_REGISTRY;
 
 namespace synodic::honesty::log
 {
 
-	export inline const Logger& RootLogger()
+	export constexpr Logger& RootLogger()
 	{
 		return LOGGER_REGISTRY.RootLogger();
 	}

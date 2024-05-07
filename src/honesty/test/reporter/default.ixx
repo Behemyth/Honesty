@@ -9,29 +9,27 @@ namespace synodic::honesty::test
 	export class DefaultReporter final : public StreamingAdapter
 	{
 	public:
-		explicit(false) DefaultReporter() :
-			StreamingAdapter("default"),
-			logger_(log::GetLogger("reporter"))
+		explicit DefaultReporter(log::Logger logger) :
+			StreamingAdapter("default", std::move(logger))
 		{
-			logger_.AddSink(&consoleSink_);
 		}
 
 		~DefaultReporter() override = default;
 
 		void Signal(const event::SuiteBegin& event) override
 		{
-			logger_.Info("Suite Begin: {}", event.name);
+			Logger().Info("Suite Begin: {}", event.name);
 		}
 
 		void Signal(const event::TestBegin& event) override
 		{
-			logger_.Info("Test Begin: {}", event.name);
+			Logger().Info("Test Begin: {}", event.name);
 		}
 
 		void Signal(const event::AssertionPass& event) override
 		{
 			std::string styledResult = format(log::TextStyle(log::color24_t(0, 255, 0)), "Passed");
-			logger_.Info(
+			Logger().Info(
 				"Assertion {}: File({}), Line({})",
 				styledResult,
 				event.location.file_name(),
@@ -41,13 +39,9 @@ namespace synodic::honesty::test
 		void Signal(const event::AssertionFail& event) override
 		{
 			std::string styledResult = format(log::TextStyle(log::color24_t(255, 0, 0)), "Failed");
-			logger_
+			Logger()
 				.Info("Test {}: File({}), Line({})", styledResult, event.location.file_name(), event.location.line());
 		}
-
-	private:
-		log::Console consoleSink_;
-		log::Logger& logger_;
 	};
 
 }

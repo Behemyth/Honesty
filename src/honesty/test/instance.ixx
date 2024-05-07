@@ -29,24 +29,21 @@ namespace synodic::honesty::test
 		};
 
 		// Resolve all input into immediately executable state ready for the 'Execute' function
-		Instance(const Configuration& configuration, std::span<std::string_view> arguments) :
-			logger_(log::GetLogger("instance")),
+		Instance(const Configuration& configuration, std::span<std::string_view> arguments) : logger_(log::RootLogger().CreateLogger("instance")),
 			parameters_(HelpParameters())
 		{
-			logger_.AddSink(&consoleSink_);
-
 			// Gather our user and library provided runners and reporters
-			const auto providedRunners	 = {GetRegistry().GetRunners()};
+			const auto providedRunners = {GetRegistry().GetRunners()};
 			const auto providedReporters = {GetRegistry().GetReporters()};
 
 			// Flatten the ranges
-			auto runners   = std::ranges::join_view(providedRunners);
+			auto runners = std::ranges::join_view(providedRunners);
 			auto reporters = std::ranges::join_view(providedReporters);
 
 			Runner* defaultRunner;
 			Reporter* defaultReporter;
 
-			std::string_view defaultRunnerName	 = "default";
+			std::string_view defaultRunnerName = "default";
 			std::string_view defaultReporterName = "default";
 
 			// Override the default runner and reporter if the input configuration is empty
@@ -111,7 +108,8 @@ namespace synodic::honesty::test
 				if (arguments[0] == "list")
 				{
 					arguments = arguments.subspan(1);
-					ListParameters parameters(defaultRunner);
+
+					ListParameters parameters(defaultRunner, logger_.CreateLogger("list"));
 
 					if (std::ranges::contains(arguments, "--json"))
 					{
@@ -142,7 +140,7 @@ namespace synodic::honesty::test
 					{
 						auto result = interface.Execute(parameters);
 					},
-					[&](const ListParameters& parameters)
+					[&](ListParameters& parameters)
 					{
 						auto result = interface.List(parameters);
 
@@ -173,8 +171,8 @@ namespace synodic::honesty::test
 		}
 
 	private:
-		log::Logger& logger_;
 		log::Console consoleSink_;
+		log::Logger logger_;
 
 		// Our list of top level commands and the parameters that go with them
 		std::variant<HelpParameters, ExecuteParameters, ListParameters> parameters_;

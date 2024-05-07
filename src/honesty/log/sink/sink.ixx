@@ -19,12 +19,17 @@ namespace synodic::honesty::log
 	export class Sink
 	{
 	public:
-		explicit constexpr Sink(LevelType level = LevelType::DEFER) :
+		explicit constexpr Sink(const LevelType level = LevelType::DEFER) :
 			level_(level)
 		{
 		}
 
 		virtual ~Sink() = default;
+
+		Sink(const Sink& other)				   = delete;
+		Sink(Sink&& other) noexcept			   = default;
+		Sink& operator=(const Sink& other)	   = delete;
+		Sink& operator=(Sink&& other) noexcept = default;
 
 		virtual void LogV(LevelType level, std::string_view fmt, std::format_args args) = 0;
 
@@ -41,7 +46,7 @@ namespace synodic::honesty::log
 			return level_;
 		}
 
-		void SetLevel(LevelType level)
+		void SetLevel(const LevelType level)
 		{
 			level_ = level;
 		}

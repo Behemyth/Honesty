@@ -1,5 +1,7 @@
 export module synodic.honesty.test:reporter;
 
+import synodic.honesty.log;
+
 import std;
 import function_ref;
 import :types;
@@ -11,6 +13,12 @@ namespace synodic::honesty::test
 	public:
 		explicit(false) constexpr Reporter(const std::string_view name) :
 			name_(name)
+		{
+		}
+
+		explicit(false) Reporter(const std::string_view name, log::Logger logger) :
+			name_(name),
+			logger_(std::move(logger))
 		{
 		}
 
@@ -45,8 +53,20 @@ namespace synodic::honesty::test
 			return name_;
 		}
 
+		const log::Logger& Logger() const
+		{
+			// We don't use value_or here because the const reference is not convertible to a value
+			if(logger_)
+			{
+				return logger_.value();
+			}
+
+			return log::RootLogger();
+		}
+
 	private:
 		std::string_view name_;
+		std::optional<log::Logger> logger_;
 	};
 
 	/**
@@ -57,6 +77,11 @@ namespace synodic::honesty::test
 	public:
 		explicit(false) constexpr StreamingAdapter(const std::string_view name) :
 			Reporter(name)
+		{
+		}
+
+		explicit(false) StreamingAdapter(const std::string_view name, log::Logger logger) :
+			Reporter(name, std::move(logger))
 		{
 		}
 
@@ -157,8 +182,8 @@ namespace synodic::honesty::test
 		};
 
 	public:
-		explicit(false) CumulativeAdapter(const std::string_view name) :
-			Reporter(name)
+		explicit(false) CumulativeAdapter(const std::string_view name, log::Logger logger) :
+			Reporter(name, std::move(logger))
 		{
 		}
 
@@ -166,14 +191,16 @@ namespace synodic::honesty::test
 
 		void Signal(const event::SuiteBegin& event) final
 		{
-			SuiteData& suiteData = data_.suites.emplace_back();
-			suiteData.begin		 = event;
+			auto& [begin, end, tests] = data_.suites.emplace_back();
+
+			begin = event;
 		}
 
 		void Signal(const event::SuiteEnd& event) final
 		{
-			SuiteData& suiteData = data_.suites.back();
-			suiteData.end		 = event;
+			auto& [begin, end, tests] = data_.suites.back();
+
+			end = event;
 		}
 
 		void Signal(const event::SuiteSkip& event) final

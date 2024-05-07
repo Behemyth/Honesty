@@ -12,9 +12,13 @@ namespace synodic::honesty::log
 	export class Logger
 	{
 	public:
-		Logger(const Logger& other)							 = default;
+		// Copying is disabled because it would invalidate the parent pointer for any children, and we
+		//	don't track children as they are implicit on user lifetimes. Moving does so also, but the r-value cast makes
+		//	the motive explicit
+
+		Logger(const Logger& other)							 = delete;
 		constexpr Logger(Logger&& other) noexcept			 = default;
-		Logger& operator=(const Logger& other)				 = default;
+		Logger& operator=(const Logger& other)				 = delete;
 		constexpr Logger& operator=(Logger&& other) noexcept = default;
 
 		template<class... Args>
@@ -126,6 +130,11 @@ namespace synodic::honesty::log
 			return sink_;
 		}
 
+		void SetSink(log::Sink* sink = nullptr)
+		{
+			sink_ = sink;
+		}
+
 		/**
 		 * @brief Checks to see if this logger or its ancestors have any sinks
 		 * @return Whether sinks were found
@@ -144,7 +153,7 @@ namespace synodic::honesty::log
 		 * @brief Returns the parent logger
 		 * @return The parent logger
 		 */
-		Logger* Parent() const
+		const Logger* Parent() const
 		{
 			return parent_;
 		}
@@ -185,7 +194,7 @@ namespace synodic::honesty::log
 			disabled_ = disabled;
 		}
 
-		Logger CreateLogger(const std::string_view name)
+		Logger CreateLogger(const std::string_view name) const
 		{
 			return Logger(name, this);
 		}
@@ -208,7 +217,7 @@ namespace synodic::honesty::log
 		 * @param name The name of the logger
 		 * @param parent The logger parent to associate with
 		 */
-		explicit(false) constexpr Logger(const std::string_view name, Logger* parent) :
+		explicit(false) constexpr Logger(const std::string_view name, const Logger* parent) :
 			level_(LevelType::DEFER),
 			name_(name),
 			propagate_(true),
@@ -224,7 +233,7 @@ namespace synodic::honesty::log
 		bool propagate_;
 		bool disabled_;
 
-		Logger* parent_;
+		const Logger* parent_;
 
 		log::Sink* sink_;
 	};
@@ -248,7 +257,7 @@ namespace synodic::honesty::log
 
 		~LoggerRegistry() = default;
 
-		constexpr Logger& RootLogger()
+		constexpr const Logger& RootLogger() const
 		{
 			return root_;
 		}
@@ -264,7 +273,7 @@ constinit synodic::honesty::log::LoggerRegistry LOGGER_REGISTRY;
 namespace synodic::honesty::log
 {
 
-	export constexpr Logger& RootLogger()
+	export constexpr const Logger& RootLogger()
 	{
 		return LOGGER_REGISTRY.RootLogger();
 	}

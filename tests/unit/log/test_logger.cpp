@@ -12,7 +12,7 @@ namespace
 		{
 			co_yield "Parent Sink"_test = []()
 			{
-				synodic::honesty::log::Logger& root = synodic::honesty::log::RootLogger();
+				const synodic::honesty::log::Logger& root = synodic::honesty::log::RootLogger();
 				synodic::honesty::log::Logger parent = root.CreateLogger("parent");
 				synodic::honesty::log::Logger child = parent.CreateLogger("child");
 

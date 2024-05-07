@@ -19,9 +19,9 @@ namespace
 
 			Interface interface(configuration);
 
-			const synodic::honesty::log::Logger logger = synodic::honesty::log::RootLogger();
+			const synodic::honesty::log::Logger& root = synodic::honesty::log::RootLogger();
 
-			ListParameters parameters(&runner, logger);
+			ListParameters parameters(&runner, root.CreateLogger("test"));
 			const auto result = interface.List(parameters);
 
 			ExpectGreater(result.tests.size(), 0);

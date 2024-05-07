@@ -116,7 +116,7 @@ namespace synodic::honesty::test
 						parameters.outputType = ListOutputType::JSON;
 					}
 
-					parameters_ = parameters;
+					parameters_ = std::move(parameters);
 					return;
 				}
 

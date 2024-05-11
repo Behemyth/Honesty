@@ -56,7 +56,7 @@ namespace synodic::honesty::test
 		const log::Logger& Logger() const
 		{
 			// We don't use value_or here because the const reference is not convertible to a value
-			if(logger_)
+			if (logger_)
 			{
 				return logger_.value();
 			}
@@ -274,5 +274,17 @@ namespace synodic::honesty::test
 
 	private:
 		CumulativeData data_;
+	};
+
+	export template<typename T>
+	class ReporterRegistrar
+	{
+	public:
+		consteval ReporterRegistrar()
+		{
+			
+		}
+
+	private:
 	};
 }

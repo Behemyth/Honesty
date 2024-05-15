@@ -15,7 +15,6 @@ target_sources(honesty
 	PRIVATE
 	FILE_SET implementations
 	FILES
-	registry.cpp
 	context.cpp
 )
 

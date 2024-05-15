@@ -276,13 +276,39 @@ namespace synodic::honesty::test
 		CumulativeData data_;
 	};
 
-	export template<typename T>
-	class ReporterRegistrar
+	class ReporterRegistry
 	{
 	public:
-		consteval ReporterRegistrar()
+		ReporterRegistry()
 		{
-			
+			registrars_.push_back(this);
+		}
+
+		virtual ~ReporterRegistry() = default;
+
+		virtual std::unique_ptr<Reporter> Create() = 0;
+		virtual std::string_view Name()			   = 0;
+
+	private:
+		constinit static std::vector<ReporterRegistry*> registrars_;
+	};
+
+	export template<typename T>
+	class ReporterRegistrar final : private ReporterRegistry
+	{
+	public:
+		ReporterRegistrar()
+		{
+		}
+
+		std::unique_ptr<Reporter> Create() override
+		{
+			return std::make_unique<T>();
+		}
+
+		std::string_view Name() override
+		{
+			return T::Name();
 		}
 
 	private:

@@ -14,7 +14,7 @@ namespace synodic::honesty::test
 	class Context
 	{
 	public:
-		constexpr Context(Runner& runner, std::span<Reporter*> reporters) :
+		constexpr Context(Runner& runner, const std::span<Reporter*> reporters) :
 			reporters_(reporters),
 			runner_(&runner)
 		{
@@ -156,7 +156,7 @@ namespace synodic::honesty::test
 			}
 		}
 
-		inline void Run(std::function_ref<void()> function) const
+		inline void Run(const std::function_ref<void()> function) const
 		{
 			runner_->Run(function);
 		}

@@ -48,5 +48,5 @@ namespace synodic::honesty::test
 
 namespace
 {
-	constinit ReporterRegistrar<DefaultReporter> registrar;
+	synodic::honesty::test::ReporterRegistrar<synodic::honesty::test::DefaultReporter> REGISTRAR;
 }

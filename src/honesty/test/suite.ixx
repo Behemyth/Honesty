@@ -63,4 +63,40 @@ namespace synodic::honesty::test
 		std::function_ref<Generator()> testGenerator;
 	};
 
+	class SuiteRegistry
+	{
+	public:
+		SuiteRegistry()
+		{
+			registrars_.push_back(this);
+		}
+
+		virtual ~SuiteRegistry() = default;
+	private:
+
+		constinit static std::vector<SuiteView> registrars_;
+	};
+
+	export template<typename T>
+	class SuiteRegistrar final : private SuiteRegistry
+	{
+	public:
+		SuiteRegistrar()
+		{
+			
+		}
+
+	private:
+
+		
+	};
+
+	export template<size_t... NameSizes>
+	bool RegisterSuite(Suite<NameSizes>&... suites)
+	{
+		(GetRegistry().AddSuite(suites), ...);
+
+		return true;
+	}
+
 }

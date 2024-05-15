@@ -114,7 +114,7 @@ namespace synodic::honesty::test
 
 				for (const Test& test: suite.testGenerator())
 				{
-					TestView view(test);
+					const TestView view(test);
 
 					event::TestBegin testBegin;
 					begin.name = view.name;
@@ -153,34 +153,4 @@ namespace synodic::honesty::test
 			return result;
 		}
 	};
-
-	/**
-	 * @brief Registers a runner object with the test framework
-	 * @param runner The runner object to register
-	 * @return Whether the runner was successfully registered
-	 */
-	export bool RegisterRunner(Runner& runner)
-	{
-		GetRegistry().AddRunner(runner);
-		return true;
-	}
-
-	/***
-	 * @brief Registers a reporter with the test framework
-	 * @param reporter The reporter to register
-	 * @return Whether the reporter was successfully registered
-	 */
-	export bool RegisterReporter(Reporter& reporter)
-	{
-		GetRegistry().AddReporter(reporter);
-		return true;
-	}
-
-	export template<size_t... NameSizes>
-	bool RegisterSuite(Suite<NameSizes>&... suites)
-	{
-		(GetRegistry().AddSuite(suites), ...);
-
-		return true;
-	}
 }

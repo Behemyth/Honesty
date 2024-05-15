@@ -68,7 +68,6 @@ namespace synodic::honesty::test
 	public:
 		SuiteRegistry()
 		{
-			registrars_.push_back(this);
 		}
 
 		virtual ~SuiteRegistry() = default;

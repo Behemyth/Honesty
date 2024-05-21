@@ -10,11 +10,16 @@ namespace synodic::honesty::test
 	{
 	public:
 		explicit CompactReporter(log::Logger logger) :
-			StreamingAdapter("compact", std::move(logger))
+			StreamingAdapter(std::move(logger))
 		{
 		}
 
 		~CompactReporter() override = default;
+
+		consteval std::string_view Name() const
+		{
+			return "compact";
+		}
 	};
 
 }

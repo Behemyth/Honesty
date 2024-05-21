@@ -190,9 +190,11 @@ namespace synodic::honesty::test
 	class EmptyReporter final : public StreamingAdapter
 	{
 	public:
-		consteval EmptyReporter() :
-			StreamingAdapter("empty")
+		consteval EmptyReporter() = default;
+
+		static consteval auto Name() -> std::string_view
 		{
+			return "empty";
 		}
 	};
 }

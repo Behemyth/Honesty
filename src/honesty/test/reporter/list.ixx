@@ -19,12 +19,17 @@ namespace synodic::honesty::test
 	{
 	public:
 		explicit(false) ListReporter(const ListReporterParameters& parameters, log::Logger logger) :
-			CumulativeAdapter("list", std::move(logger)),
+			CumulativeAdapter(std::move(logger)),
 			parameters_(parameters)
 		{
 		}
 
 		~ListReporter() override = default;
+
+		consteval std::string_view Name() const
+		{
+			return "list";
+		}
 
 		void Finalize(CumulativeData data) override
 		{

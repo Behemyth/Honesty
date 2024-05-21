@@ -28,8 +28,7 @@ public:
 	void Signal(const synodic::honesty::test::event::Summary& event) override;
 };
 
-MockReporter::MockReporter() :
-	Reporter("mock")
+MockReporter::MockReporter()
 {
 }
 

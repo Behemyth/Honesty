@@ -11,13 +11,11 @@ namespace synodic::honesty::test
 	export class Reporter
 	{
 	public:
-		explicit(false) constexpr Reporter(const std::string_view name) :
-			name_(name)
+		explicit(false) constexpr Reporter()
 		{
 		}
 
-		explicit(false) Reporter(const std::string_view name, log::Logger logger) :
-			name_(name),
+		explicit(false) Reporter(log::Logger logger) :
 			logger_(std::move(logger))
 		{
 		}
@@ -48,11 +46,6 @@ namespace synodic::honesty::test
 
 		virtual void Signal(const event::Summary& event) = 0;
 
-		std::string_view Name() const
-		{
-			return name_;
-		}
-
 		const log::Logger& Logger() const
 		{
 			// We don't use value_or here because the const reference is not convertible to a value
@@ -75,13 +68,12 @@ namespace synodic::honesty::test
 	export class StreamingAdapter : public Reporter
 	{
 	public:
-		explicit(false) constexpr StreamingAdapter(const std::string_view name) :
-			Reporter(name)
+		explicit(false) constexpr StreamingAdapter()
 		{
 		}
 
-		explicit(false) StreamingAdapter(const std::string_view name, log::Logger logger) :
-			Reporter(name, std::move(logger))
+		explicit(false) StreamingAdapter(log::Logger logger) :
+			Reporter(std::move(logger))
 		{
 		}
 
@@ -182,8 +174,8 @@ namespace synodic::honesty::test
 		};
 
 	public:
-		explicit(false) CumulativeAdapter(const std::string_view name, log::Logger logger) :
-			Reporter(name, std::move(logger))
+		explicit(false) CumulativeAdapter(log::Logger logger) :
+			Reporter(std::move(logger))
 		{
 		}
 
@@ -286,27 +278,35 @@ namespace synodic::honesty::test
 
 		virtual ~ReporterRegistry() = default;
 
-		virtual std::unique_ptr<Reporter> Create() = 0;
-		virtual std::string_view Name()			   = 0;
+		virtual std::unique_ptr<Reporter> Create(log::Logger logger) = 0;
 
 	private:
-		constinit static std::vector<ReporterRegistry*> registrars_;
+		static std::vector<ReporterRegistry*> registrars_;
 	};
 
-	export template<typename T>
-	class ReporterRegistrar final : private ReporterRegistry
+	template<typename T>
+	concept reporter = requires {
+		T::Name();
+		{
+			std::bool_constant<(T::Name(), true)>()
+		} -> std::same_as<std::true_type>;
+		std::derived_from<Reporter, T>;
+	};
+
+	export template<reporter T>
+	class ReporterRegistrar final : ReporterRegistry
 	{
 	public:
 		ReporterRegistrar()
 		{
 		}
 
-		std::unique_ptr<Reporter> Create() override
+		std::unique_ptr<Reporter> Create(log::Logger logger) override
 		{
-			return std::make_unique<T>();
+			return std::make_unique<T>(std::move(logger));
 		}
 
-		std::string_view Name() override
+		std::string_view Name()
 		{
 			return T::Name();
 		}

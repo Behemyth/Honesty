@@ -29,21 +29,18 @@ namespace synodic::honesty::test
 		};
 
 		// Resolve all input into immediately executable state ready for the 'Execute' function
-		Instance(const Configuration& configuration, std::span<std::string_view> arguments) : logger_(log::RootLogger().CreateLogger("instance")),
+		Instance(const Configuration& configuration, std::span<std::string_view> arguments) :
+			logger_(log::RootLogger().CreateLogger("instance")),
 			parameters_(HelpParameters())
 		{
-			// Gather our user and library provided runners and reporters
-			const auto providedRunners = {GetRegistry().GetRunners()};
-			const auto providedReporters = {GetRegistry().GetReporters()};
-
-			// Flatten the ranges
-			auto runners = std::ranges::join_view(providedRunners);
-			auto reporters = std::ranges::join_view(providedReporters);
+			// Gather our runners and reporters
+			const std::span<std::string_view> runners	= {};
+			const std::span<std::string_view> reporters = {};
 
 			Runner* defaultRunner;
 			Reporter* defaultReporter;
 
-			std::string_view defaultRunnerName = "default";
+			std::string_view defaultRunnerName	 = "default";
 			std::string_view defaultReporterName = "default";
 
 			// Override the default runner and reporter if the input configuration is empty
@@ -63,14 +60,14 @@ namespace synodic::honesty::test
 			{
 				auto iterator = std::ranges::find_if(
 					runners,
-					[&](const Runner* runner) -> bool
+					[&](const std::string_view runner) -> bool
 					{
-						return runner->Name() == defaultRunnerName;
+						return runner == defaultRunnerName;
 					});
 
 				if (iterator != runners.end())
 				{
-					defaultRunner = *iterator;
+					//defaultRunner = *iterator;
 				}
 				else
 				{
@@ -82,14 +79,14 @@ namespace synodic::honesty::test
 			{
 				auto iterator = std::ranges::find_if(
 					reporters,
-					[&](const Reporter* reporter) -> bool
+					[&](const std::string_view reporter) -> bool
 					{
-						return reporter->Name() == defaultReporterName;
+						return reporter == defaultReporterName;
 					});
 
 				if (iterator != reporters.end())
 				{
-					defaultReporter = *iterator;
+					//defaultReporter = *iterator;
 				}
 				else
 				{

@@ -10,11 +10,16 @@ namespace synodic::honesty::test
 	{
 	public:
 		explicit DefaultReporter(log::Logger logger) :
-			StreamingAdapter("default", std::move(logger))
+			StreamingAdapter(std::move(logger))
 		{
 		}
 
 		~DefaultReporter() override = default;
+
+		static consteval std::string_view Name()
+		{
+			return "default";
+		}
 
 		void Signal(const event::SuiteBegin& event) override
 		{

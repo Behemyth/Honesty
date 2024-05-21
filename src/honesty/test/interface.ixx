@@ -3,7 +3,6 @@ export module synodic.honesty.test:interface;
 import synodic.honesty.log;
 import std;
 import :suite;
-import :registry;
 import :context;
 import :reporter;
 import :runner;
@@ -97,7 +96,7 @@ namespace synodic::honesty::test
 
 		ExecuteResult Execute(const ExecuteParameters& parameters)
 		{
-			const auto suites = GetRegistry().GetSuites();
+			const std::span<SuiteView> suites = {};
 
 			// Context& context = GetContext();
 			// std::ranges::single_view reporters {parameters.reporter};

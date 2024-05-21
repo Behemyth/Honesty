@@ -66,15 +66,21 @@ namespace synodic::honesty::test
 
 namespace
 {
-	constinit std::vector<synodic::honesty::test::SuiteView> SUITES;
+	std::vector<synodic::honesty::test::SuiteView> SUITES;
 }
 
 namespace synodic::honesty::test
 {
+
+	void AddSuite(const SuiteView& suite)
+	{
+		SUITES.push_back(suite);
+	}
+
 	export template<size_t... NameSizes>
 	bool RegisterSuite(Suite<NameSizes>&... suites)
 	{
-		(SUITESAddSuite(suites), ...);
+		(AddSuite(suites), ...);
 
 		return true;
 	}

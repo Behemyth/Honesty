@@ -73,16 +73,21 @@ namespace
 namespace synodic::honesty::test
 {
 
+	export struct RegisterResult
+	{
+		RegisterResult() = default;
+	};
+
 	void AddSuite(SuiteView suite)
 	{
 		SUITES.push_back(std::move(suite));
 	}
 
 	export template<size_t... NameSizes>
-	bool RegisterSuite(Suite<NameSizes>&... suites)
+	RegisterResult RegisterSuite(Suite<NameSizes>&... suites)
 	{
 		(AddSuite(suites), ...);
 
-		return true;
+		return {};
 	}
 }

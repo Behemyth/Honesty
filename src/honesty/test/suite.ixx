@@ -2,6 +2,7 @@ export module synodic.honesty.test:suite;
 
 import :types;
 import :test;
+import inplace_vector;
 
 namespace synodic::honesty::test
 {
@@ -66,15 +67,15 @@ namespace synodic::honesty::test
 
 namespace
 {
-	std::vector<synodic::honesty::test::SuiteView> SUITES;
+	constinit std::inplace_vector<synodic::honesty::test::SuiteView, 50> SUITES;
 }
 
 namespace synodic::honesty::test
 {
 
-	void AddSuite(const SuiteView& suite)
+	void AddSuite(SuiteView suite)
 	{
-		SUITES.push_back(suite);
+		SUITES.push_back(std::move(suite));
 	}
 
 	export template<size_t... NameSizes>

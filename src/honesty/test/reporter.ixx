@@ -5,6 +5,7 @@ import synodic.honesty.log;
 import std;
 import function_ref;
 import :types;
+import inplace_vector;
 
 namespace synodic::honesty::test
 {
@@ -281,7 +282,7 @@ namespace synodic::honesty::test
 		virtual std::unique_ptr<Reporter> Create(log::Logger logger) = 0;
 
 	private:
-		static std::vector<ReporterRegistry*> registrars_;
+		constinit static std::inplace_vector<ReporterRegistry*, 50> registrars_;
 	};
 
 	template<typename T>

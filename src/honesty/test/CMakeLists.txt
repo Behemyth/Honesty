@@ -8,6 +8,7 @@ target_sources(honesty
 	reporter.ixx
 	runner.ixx
 	function_ref.ixx
+	inplace_vector.ixx
 	generator.ixx
 	instance.ixx
 	interface.ixx

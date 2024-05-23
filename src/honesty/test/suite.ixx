@@ -73,6 +73,38 @@ namespace
 namespace synodic::honesty::test
 {
 
+
+	template<typename T>
+	concept suite = requires {
+		T::Name();
+		{
+			std::bool_constant<(T::Name(), true)>()
+		} -> std::same_as<std::true_type>;
+		std::derived_from<Reporter, T>;
+	};
+
+	export template<suite T>
+	class SuiteRegistrar final : Registry<Suite>
+	{
+	public:
+		SuiteRegistrar()
+		{
+		}
+
+		std::unique_ptr<Reporter> Create(log::Logger logger) override
+		{
+			return std::make_unique<T>(std::move(logger));
+		}
+
+		std::string_view Name()
+		{
+			return T::Name();
+		}
+
+	private:
+	};
+
+
 	export struct RegisterResult
 	{
 		RegisterResult() = default;

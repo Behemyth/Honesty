@@ -5,7 +5,6 @@ import synodic.honesty.log;
 import std;
 import function_ref;
 import :types;
-import inplace_vector;
 
 namespace synodic::honesty::test
 {
@@ -269,22 +268,6 @@ namespace synodic::honesty::test
 		CumulativeData data_;
 	};
 
-	class ReporterRegistry
-	{
-	public:
-		ReporterRegistry()
-		{
-			registrars_.push_back(this);
-		}
-
-		virtual ~ReporterRegistry() = default;
-
-		virtual std::unique_ptr<Reporter> Create(log::Logger logger) = 0;
-
-	private:
-		constinit static std::inplace_vector<ReporterRegistry*, 50> registrars_;
-	};
-
 	template<typename T>
 	concept reporter = requires {
 		T::Name();
@@ -295,7 +278,7 @@ namespace synodic::honesty::test
 	};
 
 	export template<reporter T>
-	class ReporterRegistrar final : ReporterRegistry
+	class ReporterRegistrar final : Registry<Reporter>
 	{
 	public:
 		ReporterRegistrar()

@@ -25,5 +25,5 @@ namespace
 			};
 		});
 
-	bool registered = RegisterSuite(exceptionSuite);
+	SuiteRegistrar _(exceptionSuite);
 }

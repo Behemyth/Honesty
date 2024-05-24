@@ -74,5 +74,5 @@ namespace
 			};
 		});
 
-	bool registered = RegisterSuite(styleSuite, colorSuite, terminalSuite);
+	SuiteRegistrar _(styleSuite, colorSuite, terminalSuite);
 }

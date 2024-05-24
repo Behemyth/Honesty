@@ -23,5 +23,5 @@ namespace
 			};
 		});
 
-	bool registered = RegisterSuite(loggerSuite);
+	synodic::honesty::test::SuiteRegistrar _(loggerSuite);
 }

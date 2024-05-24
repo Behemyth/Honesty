@@ -70,5 +70,5 @@ namespace
 	};
 
 	Suite suite("test", testSuite);
-	bool result = RegisterSuite(suite);
+	SuiteRegistrar _(suite);
 }

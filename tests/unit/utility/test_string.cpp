@@ -73,5 +73,5 @@ namespace
 			};
 		});
 
-	bool registered = RegisterSuite(stringSuite);
+	SuiteRegistrar _(stringSuite);
 }

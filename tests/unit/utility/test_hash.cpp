@@ -14,5 +14,5 @@ namespace
 			co_return;
 		});
 
-	bool registered = RegisterSuite(hashSuite);
+	SuiteRegistrar _(hashSuite);
 }

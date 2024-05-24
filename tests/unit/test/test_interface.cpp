@@ -29,5 +29,5 @@ namespace
 	};
 
 	Suite suite("suite", interfaceGenerator);
-	bool result = RegisterSuite(suite);
+	SuiteRegistrar _(suite);
 }

@@ -1,5 +1,6 @@
 module synodic.honesty.test:context;
 
+import synodic.honesty.log;
 import std;
 import synodic.honesty.utility;
 import :runner;
@@ -173,8 +174,8 @@ namespace synodic::honesty::test
 	class EmptyRunner final : public Runner
 	{
 	public:
-		consteval EmptyRunner() :
-			Runner("empty")
+		explicit(false) consteval EmptyRunner(log::Logger logger) :
+			Runner(std::move(logger))
 		{
 		}
 
@@ -190,7 +191,10 @@ namespace synodic::honesty::test
 	class EmptyReporter final : public StreamingAdapter
 	{
 	public:
-		consteval EmptyReporter() = default;
+		explicit(false) consteval EmptyReporter(log::Logger logger) :
+			StreamingAdapter(std::move(logger))
+		{
+		}
 
 		static consteval auto Name() -> std::string_view
 		{
@@ -201,8 +205,10 @@ namespace synodic::honesty::test
 
 namespace
 {
-	constinit synodic::honesty::test::EmptyRunner EMPTY_RUNNER;
-	constinit synodic::honesty::test::EmptyReporter EMPTY_REPORTER;
+	constinit synodic::honesty::test::EmptyRunner
+	EMPTY_RUNNER(synodic::honesty::log::RootLogger().CreateLogger("empty_runner"));
+	constinit synodic::honesty::test::EmptyReporter
+	EMPTY_REPORTER(synodic::honesty::log::RootLogger().CreateLogger("empty_reporter"));
 
 	// The default reporters for tests.
 	constinit std::array<synodic::honesty::test::Reporter*, 1> DEFAULT_REPORTERS = {

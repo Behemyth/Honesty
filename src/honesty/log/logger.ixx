@@ -194,7 +194,10 @@ namespace synodic::honesty::log
 			disabled_ = disabled;
 		}
 
-		Logger CreateLogger(const std::string_view name) const
+		/**
+		 * @brief Creates a child logger with the given name
+		 */
+		constexpr Logger CreateLogger(const std::string_view name) const
 		{
 			return Logger(name, this);
 		}

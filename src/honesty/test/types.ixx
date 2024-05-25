@@ -2,7 +2,6 @@ export module synodic.honesty.test:types;
 
 import std;
 import function_ref;
-import inplace_vector;
 import synodic.honesty.log;
 
 namespace synodic::honesty::test
@@ -17,23 +16,6 @@ namespace synodic::honesty::test
 	{
 	public:
 		using std::exception::exception;
-	};
-
-	template<typename T>
-	class Registry
-	{
-	public:
-		Registry()
-		{
-			registrars_.push_back(this);
-		}
-
-		virtual ~Registry() = default;
-
-		virtual std::unique_ptr<T> Create(log::Logger logger) = 0;
-
-	private:
-		constinit static std::inplace_vector<Registry*, 2> registrars_;
 	};
 
 	export namespace event

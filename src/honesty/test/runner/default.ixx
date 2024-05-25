@@ -8,7 +8,15 @@ namespace synodic::honesty::test
 	export class DefaultRunner final : public Runner
 	{
 	public:
-		consteval explicit DefaultRunner(std::string_view name);
+		explicit DefaultRunner(log::Logger logger)
+			: Runner(std::move(logger))
+		{
+		}
+
+		static consteval std::string_view Name()
+		{
+			return "default";
+		}
 
 		void Run(const std::function_ref<void()> function) override
 		{
@@ -21,9 +29,9 @@ namespace synodic::honesty::test
 			}
 		}
 	};
+}
 
-	consteval DefaultRunner::DefaultRunner(const std::string_view name) :
-		Runner(name)
-	{
-	}
+namespace
+{
+	synodic::honesty::test::RunnerRegistrar<synodic::honesty::test::DefaultRunner> REGISTRAR;
 }

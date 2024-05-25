@@ -5,17 +5,18 @@ import synodic.honesty.log;
 import std;
 import function_ref;
 import :types;
+import inplace_vector;
 
 namespace synodic::honesty::test
 {
 	export class Reporter
 	{
 	public:
-		explicit(false) constexpr Reporter()
-		{
-		}
-
-		explicit(false) Reporter(log::Logger logger) :
+		/**
+		 * @brief Constructs a Reporter object
+		 * @param logger The logger to associate with this reporter
+		 */
+		explicit constexpr Reporter(log::Logger logger) :
 			logger_(std::move(logger))
 		{
 		}
@@ -46,6 +47,10 @@ namespace synodic::honesty::test
 
 		virtual void Signal(const event::Summary& event) = 0;
 
+		/**
+		 * @brief Get the logger associated with this reporter
+		 * @return The logger given at construction, or the root logger if one wasn't specified
+		 */
 		const log::Logger& Logger() const
 		{
 			// We don't use value_or here because the const reference is not convertible to a value
@@ -68,11 +73,7 @@ namespace synodic::honesty::test
 	export class StreamingAdapter : public Reporter
 	{
 	public:
-		explicit(false) constexpr StreamingAdapter()
-		{
-		}
-
-		explicit(false) StreamingAdapter(log::Logger logger) :
+		explicit(false) constexpr StreamingAdapter(log::Logger logger) :
 			Reporter(std::move(logger))
 		{
 		}
@@ -277,8 +278,26 @@ namespace synodic::honesty::test
 		std::derived_from<Reporter, T>;
 	};
 
+	class ReporterRegistry
+	{
+	public:
+		ReporterRegistry()
+		{
+			registrars_.push_back(this);
+		}
+
+		virtual ~ReporterRegistry() = default;
+
+		virtual std::unique_ptr<Reporter> Create(log::Logger logger) = 0;
+
+	private:
+		constinit static std::inplace_vector<ReporterRegistry*, 2> registrars_;
+	};
+
+	constinit std::inplace_vector<ReporterRegistry*, 2> ReporterRegistry::registrars_;
+
 	export template<reporter T>
-	class ReporterRegistrar final : Registry<Reporter>
+	class ReporterRegistrar final : ReporterRegistry
 	{
 	public:
 		ReporterRegistrar()
@@ -294,7 +313,5 @@ namespace synodic::honesty::test
 		{
 			return T::Name();
 		}
-
-	private:
 	};
 }

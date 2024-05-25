@@ -4,6 +4,7 @@ export module synodic.honesty.test:runner;
 import :types;
 import :reporter;
 import std;
+import inplace_vector;
 
 namespace synodic::honesty::test
 {
@@ -20,8 +21,8 @@ namespace synodic::honesty::test
 		/**
 		 * @brief
 		 */
-		explicit constexpr Runner(const std::string_view name) :
-			name_(name)
+		explicit constexpr Runner(log::Logger logger) :
+			logger_(std::move(logger))
 		{
 		}
 
@@ -33,12 +34,68 @@ namespace synodic::honesty::test
 		 */
 		virtual void Run(std::function_ref<void()> function) = 0;
 
-		constexpr std::string_view Name() const
+		/**
+		 * @brief Get the logger associated with this reporter
+		 * @return The logger given at construction, or the root logger if one wasn't specified
+		 */
+		const log::Logger& Logger() const
 		{
-			return name_;
+			// We don't use value_or here because the const reference is not convertible to a value
+			if (logger_)
+			{
+				return logger_.value();
+			}
+
+			return log::RootLogger();
 		}
 
 	private:
-		std::string_view name_;
+		std::optional<log::Logger> logger_;
+	};
+
+	template<typename T>
+	concept runner = requires {
+		T::Name();
+		{
+			std::bool_constant<(T::Name(), true)>()
+		} -> std::same_as<std::true_type>;
+		std::derived_from<Runner, T>;
+	};
+
+	class RunnerRegistry
+	{
+	public:
+		RunnerRegistry()
+		{
+			registrars_.push_back(this);
+		}
+
+		virtual ~RunnerRegistry() = default;
+
+		virtual std::unique_ptr<Runner> Create(log::Logger logger) = 0;
+
+	private:
+		constinit static std::inplace_vector<RunnerRegistry*, 2> registrars_;
+	};
+
+	constinit std::inplace_vector<RunnerRegistry*, 2> RunnerRegistry::registrars_;
+
+	export template<runner T>
+	class RunnerRegistrar final : RunnerRegistry
+	{
+	public:
+		RunnerRegistrar()
+		{
+		}
+
+		std::unique_ptr<Runner> Create(log::Logger logger) override
+		{
+			return std::make_unique<T>(std::move(logger));
+		}
+
+		std::string_view Name()
+		{
+			return T::Name();
+		}
 	};
 }

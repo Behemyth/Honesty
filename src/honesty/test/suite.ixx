@@ -77,6 +77,9 @@ namespace synodic::honesty::test
 		RegisterResult() = default;
 	};
 
+	/**
+	 * @brief Don't export. Keeps the SUITES global variable internally linked to the test module
+	 */
 	void AddSuite(SuiteView suite)
 	{
 		SUITES.push_back(std::move(suite));

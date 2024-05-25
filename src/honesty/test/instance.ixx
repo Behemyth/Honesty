@@ -38,11 +38,11 @@ namespace synodic::honesty::test
 			logger_(log::RootLogger().CreateLogger("instance")),
 			parameters_(HelpParameters())
 		{
-			// Manually add the built-in. The user does not link to these static variables
+			// Manually add the built-in runners and reporters
 			ReporterRegistrar<DefaultReporter> defaultReporterRegistrar;
 			RunnerRegistrar<DefaultRunner> defaultRunnerRegistrar;
 
-			// Gather our runners and reporters
+			// Gather our user defined runners and reporters
 			std::span<RunnerRegistry*> runnerRegistrars		= RunnerRegistry::Registrars();
 			std::span<ReporterRegistry*> reporterRegistrars = ReporterRegistry::Registrars();
 

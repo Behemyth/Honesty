@@ -24,26 +24,26 @@ namespace synodic::honesty::test
 
 	export struct ExecuteParameters
 	{
-		ExecuteParameters(Runner* runner, Reporter* reporter) :
-			runner(runner),
-			reporter(reporter)
+		ExecuteParameters(std::unique_ptr<Runner> runner, std::unique_ptr<Reporter> reporter) :
+			runner(std::move(runner)),
+			reporter(std::move(reporter))
 		{
 		}
 
-		Runner* runner;
-		Reporter* reporter;
+		std::unique_ptr<Runner> runner;
+		std::unique_ptr<Reporter> reporter;
 	};
 
 	export struct ListParameters
 	{
-		ListParameters(Runner* runner, log::Logger logger) :
-			runner(runner),
+		ListParameters(std::unique_ptr<Runner> runner, log::Logger logger) :
+			runner(std::move(runner)),
 			logger(std::move(logger)),
 			outputType(ListOutputType::LOG)
 		{
 		}
 
-		Runner* runner;
+		std::unique_ptr<Runner> runner;
 		log::Logger logger;
 
 		ListOutputType outputType;
@@ -96,15 +96,13 @@ namespace synodic::honesty::test
 
 		ExecuteResult Execute(const ExecuteParameters& parameters)
 		{
-			const std::span<SuiteView> suites = {};
-
 			// Context& context = GetContext();
 			// std::ranges::single_view reporters {parameters.reporter};
 
 			//// Before starting a suite, we need to set up the current thread's context
 			// context = Context(*parameters.runner, reporters);
 
-			for (const SuiteView& suite: suites)
+			for (const SuiteView& suite: GetSuites())
 			{
 				event::SuiteBegin begin;
 				begin.name = suite.name;
@@ -144,9 +142,9 @@ namespace synodic::honesty::test
 			ListReporterParameters reporterParameters;
 			reporterParameters.outputType = parameters.outputType;
 
-			ListReporter listReporter(reporterParameters, std::move(parameters.logger));
-
-			const ExecuteParameters executeParameters(parameters.runner, &listReporter);
+			const ExecuteParameters executeParameters(
+				(std::move(parameters.runner)),
+				std::make_unique<ListReporter>(reporterParameters, std::move(parameters.logger)));
 			Execute(executeParameters);
 
 			return result;

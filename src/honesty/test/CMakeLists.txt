@@ -20,7 +20,7 @@ target_sources(honesty
 )
 
 target_sources(honesty_main
-	PUBLIC
+PRIVATE
 	entry.cpp
 )
 

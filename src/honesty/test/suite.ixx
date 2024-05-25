@@ -72,10 +72,11 @@ namespace
 
 namespace synodic::honesty::test
 {
-	export struct RegisterResult
+
+	std::span<SuiteView> GetSuites()
 	{
-		RegisterResult() = default;
-	};
+		return SUITES;
+	}
 
 	/**
 	 * @brief Don't export. Keeps the SUITES global variable internally linked to the test module

@@ -110,7 +110,7 @@ namespace synodic::honesty::test
 			{
 				if (arguments.empty())
 				{
-					parameters_ = ExecuteParameters(defaultRunner.get(), defaultReporter.get());
+					parameters_ = ExecuteParameters(std::move(defaultRunner), std::move(defaultReporter));
 					return;
 				}
 
@@ -118,7 +118,7 @@ namespace synodic::honesty::test
 				{
 					arguments = arguments.subspan(1);
 
-					ListParameters parameters(defaultRunner.get(), logger_.CreateLogger("list"));
+					ListParameters parameters((std::move(defaultRunner)), logger_.CreateLogger("list"));
 
 					if (std::ranges::contains(arguments, "--json"))
 					{
@@ -129,7 +129,7 @@ namespace synodic::honesty::test
 					return;
 				}
 
-				parameters_ = ExecuteParameters(defaultRunner.get(), defaultReporter.get());
+				parameters_ = ExecuteParameters(std::move(defaultRunner), std::move(defaultReporter));
 			}
 		}
 

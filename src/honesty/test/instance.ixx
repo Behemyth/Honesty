@@ -4,13 +4,18 @@ export module synodic.honesty.test:instance;
 import std;
 import :interface;
 import :context;
+import :reporter.default;
+import :runner.default;
 
-// A helper for variant overload deduction
-template<typename... Ts>
-struct Overload : Ts...
+namespace
 {
-	using Ts::operator()...;
-};
+	// A helper for variant overload deduction
+	template<typename... Ts>
+	struct Overload : Ts...
+	{
+		using Ts::operator()...;
+	};
+}
 
 namespace synodic::honesty::test
 {
@@ -33,9 +38,13 @@ namespace synodic::honesty::test
 			logger_(log::RootLogger().CreateLogger("instance")),
 			parameters_(HelpParameters())
 		{
+			// Manually add the built-in. The user does not link to these static variables
+			ReporterRegistrar<DefaultReporter> defaultReporterRegistrar;
+			RunnerRegistrar<DefaultRunner> defaultRunnerRegistrar;
+
 			// Gather our runners and reporters
-			const std::span<RunnerRegistry*> runnerRegistrars	  = RunnerRegistry::Registrars();
-			const std::span<ReporterRegistry*> reporterRegistrars = ReporterRegistry::Registrars();
+			std::span<RunnerRegistry*> runnerRegistrars		= RunnerRegistry::Registrars();
+			std::span<ReporterRegistry*> reporterRegistrars = ReporterRegistry::Registrars();
 
 			// TODO: Allocate memory
 			std::unique_ptr<Runner> defaultRunner;

@@ -291,6 +291,11 @@ namespace synodic::honesty::test
 		virtual std::string_view Name() const						 = 0;
 		virtual std::unique_ptr<Reporter> Create(log::Logger logger) const = 0;
 
+		static void Register(ReporterRegistry* registry)
+		{
+			registrars_.push_back(registry);
+		}
+
 		static std::span<ReporterRegistry*> Registrars()
 		{
 			return registrars_;

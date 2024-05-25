@@ -51,7 +51,3 @@ namespace synodic::honesty::test
 
 }
 
-namespace
-{
-	synodic::honesty::test::ReporterRegistrar<synodic::honesty::test::DefaultReporter> REGISTRAR;
-}

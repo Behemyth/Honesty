@@ -30,8 +30,3 @@ namespace synodic::honesty::test
 		}
 	};
 }
-
-namespace
-{
-	synodic::honesty::test::RunnerRegistrar<synodic::honesty::test::DefaultRunner> REGISTRAR;
-}

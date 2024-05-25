@@ -34,11 +34,12 @@ namespace synodic::honesty::test
 			parameters_(HelpParameters())
 		{
 			// Gather our runners and reporters
-			const std::span<std::string_view> runners	= {};
-			const std::span<std::string_view> reporters = {};
+			const std::span<RunnerRegistry*> runnerRegistrars	  = RunnerRegistry::Registrars();
+			const std::span<ReporterRegistry*> reporterRegistrars = ReporterRegistry::Registrars();
 
-			Runner* defaultRunner;
-			Reporter* defaultReporter;
+			// TODO: Allocate memory
+			std::unique_ptr<Runner> defaultRunner;
+			std::unique_ptr<Reporter> defaultReporter;
 
 			std::string_view defaultRunnerName	 = "default";
 			std::string_view defaultReporterName = "default";
@@ -59,15 +60,16 @@ namespace synodic::honesty::test
 			// Find the default runner
 			{
 				auto iterator = std::ranges::find_if(
-					runners,
-					[&](const std::string_view runner) -> bool
+					runnerRegistrars,
+					[&](const RunnerRegistry* registry) -> bool
 					{
-						return runner == defaultRunnerName;
+						return registry->Name() == defaultRunnerName;
 					});
 
-				if (iterator != runners.end())
+				if (iterator != runnerRegistrars.end())
 				{
-					//defaultRunner = *iterator;
+					const RunnerRegistry* registry = *iterator;
+					defaultRunner				   = registry->Create(logger_.CreateLogger(registry->Name()));
 				}
 				else
 				{
@@ -78,15 +80,16 @@ namespace synodic::honesty::test
 			// Find the default reporter
 			{
 				auto iterator = std::ranges::find_if(
-					reporters,
-					[&](const std::string_view reporter) -> bool
+					reporterRegistrars,
+					[&](const ReporterRegistry* registry) -> bool
 					{
-						return reporter == defaultReporterName;
+						return registry->Name() == defaultReporterName;
 					});
 
-				if (iterator != reporters.end())
+				if (iterator != reporterRegistrars.end())
 				{
-					//defaultReporter = *iterator;
+					const ReporterRegistry* registry = *iterator;
+					defaultReporter					 = registry->Create(logger_.CreateLogger(registry->Name()));
 				}
 				else
 				{
@@ -98,7 +101,7 @@ namespace synodic::honesty::test
 			{
 				if (arguments.empty())
 				{
-					parameters_ = ExecuteParameters(defaultRunner, defaultReporter);
+					parameters_ = ExecuteParameters(defaultRunner.get(), defaultReporter.get());
 					return;
 				}
 
@@ -106,7 +109,7 @@ namespace synodic::honesty::test
 				{
 					arguments = arguments.subspan(1);
 
-					ListParameters parameters(defaultRunner, logger_.CreateLogger("list"));
+					ListParameters parameters(defaultRunner.get(), logger_.CreateLogger("list"));
 
 					if (std::ranges::contains(arguments, "--json"))
 					{
@@ -117,7 +120,7 @@ namespace synodic::honesty::test
 					return;
 				}
 
-				parameters_ = ExecuteParameters(defaultRunner, defaultReporter);
+				parameters_ = ExecuteParameters(defaultRunner.get(), defaultReporter.get());
 			}
 		}
 

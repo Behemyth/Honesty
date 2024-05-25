@@ -72,7 +72,13 @@ namespace synodic::honesty::test
 
 		virtual ~RunnerRegistry() = default;
 
-		virtual std::unique_ptr<Runner> Create(log::Logger logger) = 0;
+		virtual std::string_view Name() const							 = 0;
+		virtual std::unique_ptr<Runner> Create(log::Logger logger) const = 0;
+
+		static std::span<RunnerRegistry*> Registrars()
+		{
+			return registrars_;
+		}
 
 	private:
 		constinit static std::inplace_vector<RunnerRegistry*, 2> registrars_;
@@ -88,12 +94,12 @@ namespace synodic::honesty::test
 		{
 		}
 
-		std::unique_ptr<Runner> Create(log::Logger logger) override
+		std::unique_ptr<Runner> Create(log::Logger logger) const override
 		{
 			return std::make_unique<T>(std::move(logger));
 		}
 
-		std::string_view Name()
+		std::string_view Name() const override
 		{
 			return T::Name();
 		}

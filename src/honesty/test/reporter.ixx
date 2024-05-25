@@ -288,7 +288,13 @@ namespace synodic::honesty::test
 
 		virtual ~ReporterRegistry() = default;
 
-		virtual std::unique_ptr<Reporter> Create(log::Logger logger) = 0;
+		virtual std::string_view Name() const						 = 0;
+		virtual std::unique_ptr<Reporter> Create(log::Logger logger) const = 0;
+
+		static std::span<ReporterRegistry*> Registrars()
+		{
+			return registrars_;
+		}
 
 	private:
 		constinit static std::inplace_vector<ReporterRegistry*, 2> registrars_;
@@ -304,12 +310,12 @@ namespace synodic::honesty::test
 		{
 		}
 
-		std::unique_ptr<Reporter> Create(log::Logger logger) override
+		std::unique_ptr<Reporter> Create(log::Logger logger) const override
 		{
 			return std::make_unique<T>(std::move(logger));
 		}
 
-		std::string_view Name()
+		std::string_view Name() const override
 		{
 			return T::Name();
 		}

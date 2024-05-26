@@ -38,6 +38,8 @@ namespace synodic::honesty::test
 			logger_(log::RootLogger().CreateLogger("instance")),
 			parameters_(HelpParameters())
 		{
+			logger_.SetSink(&consoleSink_);
+
 			// Manually add the built-in runners and reporters
 			ReporterRegistrar<DefaultReporter> defaultReporterRegistrar;
 			RunnerRegistrar<DefaultRunner> defaultRunnerRegistrar;
@@ -147,6 +149,12 @@ namespace synodic::honesty::test
 					},
 					[&](const ExecuteParameters& parameters)
 					{
+						Context& context = GetContext();
+						std::ranges::single_view reporters {parameters.reporter.get()};
+
+						// Before starting a suite, we need to set up the current thread's context
+						context = Context(*parameters.runner, reporters);
+
 						auto result = interface.Execute(parameters);
 					},
 					[&](ListParameters& parameters)

@@ -96,11 +96,7 @@ namespace synodic::honesty::test
 
 		ExecuteResult Execute(const ExecuteParameters& parameters)
 		{
-			// Context& context = GetContext();
-			// std::ranges::single_view reporters {parameters.reporter};
-
-			//// Before starting a suite, we need to set up the current thread's context
-			// context = Context(*parameters.runner, reporters);
+			// If we modify the execution context we should do it outside this function
 
 			for (const SuiteView& suite: GetSuites())
 			{
@@ -139,13 +135,13 @@ namespace synodic::honesty::test
 		{
 			ListResult result;
 
-			ListReporterParameters reporterParameters;
-			reporterParameters.outputType = parameters.outputType;
+			//ListReporterParameters reporterParameters;
+			//reporterParameters.outputType = parameters.outputType;
 
-			const ExecuteParameters executeParameters(
-				(std::move(parameters.runner)),
-				std::make_unique<ListReporter>(reporterParameters, std::move(parameters.logger)));
-			Execute(executeParameters);
+			//const ExecuteParameters executeParameters(
+			//	(std::move(parameters.runner)),
+			//	std::make_unique<ListReporter>(reporterParameters, std::move(parameters.logger)));
+			//Execute(executeParameters);
 
 			return result;
 		}

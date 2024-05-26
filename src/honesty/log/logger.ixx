@@ -39,6 +39,11 @@ namespace synodic::honesty::log
 			{
 				sink_->LogV(level, fmt, args);
 			}
+
+			if(parent_)
+			{
+				parent_->LogV(level, fmt, args);
+			}
 		}
 
 		template<class... Args>

@@ -20,6 +20,8 @@ namespace
 				synodic::honesty::test::ExpectEquals(parent, *child.Parent());
 
 				synodic::honesty::log::RingBuffer<std::mutex> sink;
+
+				// TODO: Compare stuff
 			};
 		});
 

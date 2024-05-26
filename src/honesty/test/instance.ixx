@@ -33,10 +33,44 @@ namespace synodic::honesty::test
 			std::string_view defaultReporter;  // The default reporter to use
 		};
 
+		struct HelpContext
+		{
+			HelpContext() = default;
+		};
+
+		struct ExecuteContext
+		{
+			ExecuteContext(std::unique_ptr<Runner> runner, std::unique_ptr<Reporter> reporter) :
+				runner(runner),
+				reporter(reporter)
+			{
+			}
+
+			std::unique_ptr<Runner> runner;
+			std::unique_ptr<Reporter> reporter;
+		};
+
+		struct ListContext
+		{
+			ListContext(std::unique_ptr<Runner> runner, log::Logger logger) :
+				runner(runner),
+				logger(std::move(logger)),
+				outputType(ListOutputType::LOG)
+			{
+			}
+
+			std::unique_ptr<Runner> runner;
+			log::Logger logger;
+
+			ListOutputType outputType;
+
+		};
+
 		// Resolve all input into immediately executable state ready for the 'Execute' function
 		Instance(const Configuration& configuration, std::span<std::string_view> arguments) :
 			logger_(log::RootLogger().CreateLogger("instance")),
 			parameters_(HelpParameters())
+
 		{
 			logger_.SetSink(&consoleSink_);
 
@@ -112,7 +146,7 @@ namespace synodic::honesty::test
 			{
 				if (arguments.empty())
 				{
-					parameters_ = ExecuteParameters(std::move(defaultRunner), std::move(defaultReporter));
+					parameters_ = ExecuteContext(std::move(defaultRunner), std::move(defaultReporter));
 					return;
 				}
 
@@ -120,7 +154,7 @@ namespace synodic::honesty::test
 				{
 					arguments = arguments.subspan(1);
 
-					ListParameters parameters((std::move(defaultRunner)), logger_.CreateLogger("list"));
+					ListContext parameters((std::move(defaultRunner)), logger_.CreateLogger("list"));
 
 					if (std::ranges::contains(arguments, "--json"))
 					{
@@ -131,7 +165,7 @@ namespace synodic::honesty::test
 					return;
 				}
 
-				parameters_ = ExecuteParameters(std::move(defaultRunner), std::move(defaultReporter));
+				parameters_ = ExecuteContext(std::move(defaultRunner), std::move(defaultReporter));
 			}
 		}
 
@@ -152,13 +186,20 @@ namespace synodic::honesty::test
 						Context& context = GetContext();
 						std::ranges::single_view reporters {parameters.reporter.get()};
 
-						// Before starting a suite, we need to set up the current thread's context
+						// Before start executing, we need to set up the current thread's context
 						context = Context(*parameters.runner, reporters);
 
 						auto result = interface.Execute(parameters);
 					},
 					[&](ListParameters& parameters)
 					{
+						ListReporterParameters reporterParameters;
+						reporterParameters.outputType = parameters.outputType;
+
+						const ExecuteParameters executeParameters(
+							(std::move(parameters.runner)),
+							std::make_unique<ListReporter>(reporterParameters, std::move(parameters.logger)));
+
 						auto result = interface.List(parameters);
 
 						switch (parameters.outputType)
@@ -192,7 +233,7 @@ namespace synodic::honesty::test
 		log::Logger logger_;
 
 		// Our list of top level commands and the parameters that go with them
-		std::variant<HelpParameters, ExecuteParameters, ListParameters> parameters_;
+		std::variant<HelpContext, ExecuteContext, ListContext> parameters_;
 	};
 
 }

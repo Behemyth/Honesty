@@ -24,26 +24,26 @@ namespace synodic::honesty::test
 
 	export struct ExecuteParameters
 	{
-		ExecuteParameters(std::unique_ptr<Runner> runner, std::unique_ptr<Reporter> reporter) :
-			runner(std::move(runner)),
-			reporter(std::move(reporter))
+		ExecuteParameters(Runner* runner, Reporter* reporter) :
+			runner(runner),
+			reporter(reporter)
 		{
 		}
 
-		std::unique_ptr<Runner> runner;
-		std::unique_ptr<Reporter> reporter;
+		Runner* runner;
+		Reporter* reporter;
 	};
 
 	export struct ListParameters
 	{
-		ListParameters(std::unique_ptr<Runner> runner, log::Logger logger) :
-			runner(std::move(runner)),
+		ListParameters(Runner* runner, log::Logger logger) :
+			runner(runner),
 			logger(std::move(logger)),
 			outputType(ListOutputType::LOG)
 		{
 		}
 
-		std::unique_ptr<Runner> runner;
+		Runner* runner;
 		log::Logger logger;
 
 		ListOutputType outputType;
@@ -135,13 +135,7 @@ namespace synodic::honesty::test
 		{
 			ListResult result;
 
-			//ListReporterParameters reporterParameters;
-			//reporterParameters.outputType = parameters.outputType;
-
-			//const ExecuteParameters executeParameters(
-			//	(std::move(parameters.runner)),
-			//	std::make_unique<ListReporter>(reporterParameters, std::move(parameters.logger)));
-			//Execute(executeParameters);
+			Execute(executeParameters);
 
 			return result;
 		}

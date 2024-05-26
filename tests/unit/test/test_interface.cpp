@@ -9,7 +9,7 @@ using namespace synodic::honesty::test::literals;
 namespace
 {
 	Suite SUITE(
-		"suite",
+		"interface",
 		[]() -> Generator
 		{
 			co_yield "list"_test = []()

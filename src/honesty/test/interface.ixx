@@ -25,13 +25,11 @@ namespace synodic::honesty::test
 	export struct ExecuteParameters
 	{
 		ExecuteParameters(Runner* runner, Reporter* reporter) :
-			runner(runner),
-			reporter(reporter)
+			runner(runner)
 		{
 		}
 
 		Runner* runner;
-		Reporter* reporter;
 	};
 
 	export struct ListParameters
@@ -39,16 +37,13 @@ namespace synodic::honesty::test
 		ListParameters(Runner* runner, Reporter* reporter, log::Logger logger) :
 			runner(runner),
 			reporter(reporter),
-			logger(std::move(logger)),
-			outputType(ListOutputType::LOG)
+			logger(std::move(logger))
 		{
 		}
 
 		Runner* runner;
 		Reporter* reporter;
 		log::Logger logger;
-
-		ListOutputType outputType;
 	};
 
 	export struct HelpResult

@@ -186,7 +186,7 @@ namespace synodic::honesty::test
 						ThreadContext& threadContext = GetThreadContext();
 
 						ExecuteParameters parameters(context.runner.get(), context.reporter.get());
-						std::ranges::single_view reporters {parameters.reporter};
+						std::ranges::single_view reporters {context.reporter.get()};
 
 						// Before start executing, we need to set up the current thread's context
 						threadContext = ThreadContext(*parameters.runner, reporters);
@@ -195,7 +195,9 @@ namespace synodic::honesty::test
 					},
 					[&](const ListContext& context)
 					{
+
 						ThreadContext& threadContext = GetThreadContext();
+
 
 						ListReporterParameters listReporterParameters;
 						listReporterParameters.outputType = context.outputType;

@@ -12,10 +12,10 @@ import :reporter.default;
 namespace synodic::honesty::test
 {
 	// Emulating std::execution state
-	class Context
+	class ThreadContext
 	{
 	public:
-		constexpr Context(Runner& runner, const std::span<Reporter*> reporters) :
+		constexpr ThreadContext(Runner& runner, const std::span<Reporter*> reporters) :
 			reporters_(reporters),
 			runner_(&runner)
 		{
@@ -216,13 +216,13 @@ namespace
 	};
 
 	// The default context for tests
-	constinit synodic::honesty::test::Context EMPTY_CONTEXT(EMPTY_RUNNER, DEFAULT_REPORTERS);
+	constinit synodic::honesty::test::ThreadContext EMPTY_CONTEXT(EMPTY_RUNNER, DEFAULT_REPORTERS);
 
 	// Each thread has its own context, such that tests can reference global functions without an object
-	constinit thread_local synodic::honesty::test::Context& CONTEXT = EMPTY_CONTEXT;
+	constinit thread_local synodic::honesty::test::ThreadContext& CONTEXT = EMPTY_CONTEXT;
 }
 
-synodic::honesty::test::Context& GetContext()
+synodic::honesty::test::ThreadContext& GetThreadContext()
 {
 	return CONTEXT;
 }

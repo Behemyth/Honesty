@@ -41,8 +41,8 @@ namespace synodic::honesty::test
 		struct ExecuteContext
 		{
 			ExecuteContext(std::unique_ptr<Runner> runner, std::unique_ptr<Reporter> reporter) :
-				runner(runner),
-				reporter(reporter)
+				runner(std::move(runner)),
+				reporter(std::move(reporter))
 			{
 			}
 
@@ -53,7 +53,7 @@ namespace synodic::honesty::test
 		struct ListContext
 		{
 			ListContext(std::unique_ptr<Runner> runner, log::Logger logger) :
-				runner(runner),
+				runner(std::move(runner)),
 				logger(std::move(logger)),
 				outputType(ListOutputType::LOG)
 			{
@@ -63,13 +63,12 @@ namespace synodic::honesty::test
 			log::Logger logger;
 
 			ListOutputType outputType;
-
 		};
 
 		// Resolve all input into immediately executable state ready for the 'Execute' function
 		Instance(const Configuration& configuration, std::span<std::string_view> arguments) :
 			logger_(log::RootLogger().CreateLogger("instance")),
-			parameters_(HelpParameters())
+			parameters_(HelpContext())
 
 		{
 			logger_.SetSink(&consoleSink_);
@@ -177,32 +176,41 @@ namespace synodic::honesty::test
 			try
 			{
 				auto executor = Overload {
-					[&](const HelpParameters& parameters)
+					[&](const HelpContext& context)
 					{
+						constexpr HelpParameters parameters;
 						auto result = interface.Help(parameters);
 					},
-					[&](const ExecuteParameters& parameters)
+					[&](const ExecuteContext& context)
 					{
-						Context& context = GetContext();
-						std::ranges::single_view reporters {parameters.reporter.get()};
+						ThreadContext& threadContext = GetThreadContext();
+
+						ExecuteParameters parameters(context.runner.get(), context.reporter.get());
+						std::ranges::single_view reporters {parameters.reporter};
 
 						// Before start executing, we need to set up the current thread's context
-						context = Context(*parameters.runner, reporters);
+						threadContext = ThreadContext(*parameters.runner, reporters);
 
 						auto result = interface.Execute(parameters);
 					},
-					[&](ListParameters& parameters)
+					[&](const ListContext& context)
 					{
-						ListReporterParameters reporterParameters;
-						reporterParameters.outputType = parameters.outputType;
+						ThreadContext& threadContext = GetThreadContext();
 
-						const ExecuteParameters executeParameters(
-							(std::move(parameters.runner)),
-							std::make_unique<ListReporter>(reporterParameters, std::move(parameters.logger)));
+						ListReporterParameters listReporterParameters;
+						listReporterParameters.outputType = context.outputType;
+
+						ListReporter reporter(listReporterParameters, logger_.CreateLogger("reporter"));
+
+						ListParameters parameters(context.runner.get(), &reporter, logger_.CreateLogger("list"));
+						std::ranges::single_view reporters {parameters.reporter};
+
+						// Before start executing, we need to set up the current thread's context
+						threadContext = ThreadContext(*parameters.runner, reporters);
 
 						auto result = interface.List(parameters);
 
-						switch (parameters.outputType)
+						switch (context.outputType)
 						{
 							case ListOutputType::LOG :
 							{

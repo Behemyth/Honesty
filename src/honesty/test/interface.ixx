@@ -36,14 +36,16 @@ namespace synodic::honesty::test
 
 	export struct ListParameters
 	{
-		ListParameters(Runner* runner, log::Logger logger) :
+		ListParameters(Runner* runner, Reporter* reporter, log::Logger logger) :
 			runner(runner),
+			reporter(reporter),
 			logger(std::move(logger)),
 			outputType(ListOutputType::LOG)
 		{
 		}
 
 		Runner* runner;
+		Reporter* reporter;
 		log::Logger logger;
 
 		ListOutputType outputType;
@@ -103,7 +105,7 @@ namespace synodic::honesty::test
 				event::SuiteBegin begin;
 				begin.name = suite.name;
 
-				GetContext().Signal(begin);
+				GetThreadContext().Signal(begin);
 
 				for (const Test& test: suite.testGenerator())
 				{
@@ -112,28 +114,30 @@ namespace synodic::honesty::test
 					event::TestBegin testBegin;
 					begin.name = view.name;
 
-					GetContext().Signal(testBegin);
+					GetThreadContext().Signal(testBegin);
 
 					parameters.runner->Run(view.test);
 
 					event::TestEnd testEnd;
 					testEnd.name = view.name;
 
-					GetContext().Signal(testEnd);
+					GetThreadContext().Signal(testEnd);
 				}
 
 				event::SuiteEnd end;
 				end.name = suite.name;
 
-				GetContext().Signal(end);
+				GetThreadContext().Signal(end);
 			}
 
 			return {};
 		}
 
-		ListResult List(ListParameters& parameters)
+		ListResult List(const ListParameters& parameters)
 		{
 			ListResult result;
+
+			const ExecuteParameters executeParameters(parameters.runner, parameters.reporter);
 
 			Execute(executeParameters);
 

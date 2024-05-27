@@ -13,7 +13,7 @@ namespace synodic::honesty::test
 	 */
 	void Signal(const event::AssertionPass& passed)
 	{
-		GetContext().Signal(passed);
+		GetThreadContext().Signal(passed);
 	}
 
 	/**
@@ -22,7 +22,7 @@ namespace synodic::honesty::test
 	 */
 	void Signal(const event::AssertionFail& failed)
 	{
-		GetContext().Signal(failed);
+		GetThreadContext().Signal(failed);
 	}
 
 	/**

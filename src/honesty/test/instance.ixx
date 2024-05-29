@@ -19,7 +19,10 @@ namespace
 
 namespace synodic::honesty::test
 {
-
+	/**
+	 * @brief A class in two parts. First, it resolves the input configuration into commands and parameters that will be
+	 *	executed. Then, when executed, it sets up the running execution state for each thread running the commands.
+	 */
 	export class Instance
 	{
 	public:
@@ -195,9 +198,7 @@ namespace synodic::honesty::test
 					},
 					[&](const ListContext& context)
 					{
-
 						ThreadContext& threadContext = GetThreadContext();
-
 
 						ListReporterParameters listReporterParameters;
 						listReporterParameters.outputType = context.outputType;

@@ -23,12 +23,10 @@ namespace synodic::honesty::test
 
 		void Signal(const event::SuiteBegin& event) override
 		{
-			Logger().Info("Suite Begin: {}", event.name);
 		}
 
 		void Signal(const event::TestBegin& event) override
 		{
-			Logger().Info("Test Begin: {}", event.name);
 		}
 
 		void Signal(const event::AssertionPass& event) override

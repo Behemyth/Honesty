@@ -72,7 +72,7 @@ namespace synodic::honesty::test
 
 	/**
 	 * @brief The interface to interacting with the test framework. Multiple interfaces are allowed to exist for the
-	 *	same instance
+	 *	same instance.
 	 */
 	export class Interface
 	{

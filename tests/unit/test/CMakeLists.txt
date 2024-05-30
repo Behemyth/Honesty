@@ -7,5 +7,4 @@ PRIVATE
 	test_tag.cpp
 	test_interface.cpp
 	test_exception.cpp
-	test_thread_context.cpp
 )

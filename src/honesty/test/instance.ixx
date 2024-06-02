@@ -186,30 +186,19 @@ namespace synodic::honesty::test
 					},
 					[&](const ExecuteContext& context)
 					{
-						ThreadContext& threadContext = GetThreadContext();
 
-						ExecuteParameters parameters(context.runner.get(), context.reporter.get());
 						std::ranges::single_view reporters {context.reporter.get()};
 
 						// Before start executing, we need to set up the current thread's context
-						threadContext = ThreadContext(*parameters.runner, reporters);
+						Context commandContext = Context(*context.runner.get(), reporters);
+						ExecuteParameters parameters(commandContext);
 
 						auto result = interface.Execute(parameters);
 					},
 					[&](const ListContext& context)
 					{
-						ThreadContext& threadContext = GetThreadContext();
+						ListParameters parameters(logger_.CreateLogger("list"));
 
-						ListReporterParameters listReporterParameters;
-						listReporterParameters.outputType = context.outputType;
-
-						ListReporter reporter(listReporterParameters, logger_.CreateLogger("reporter"));
-
-						ListParameters parameters(context.runner.get(), &reporter, logger_.CreateLogger("list"));
-						std::ranges::single_view reporters {parameters.reporter};
-
-						// Before start executing, we need to set up the current thread's context
-						threadContext = ThreadContext(*parameters.runner, reporters);
 
 						auto result = interface.List(parameters);
 

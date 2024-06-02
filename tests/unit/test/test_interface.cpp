@@ -23,14 +23,11 @@ namespace
 			{
 				const synodic::honesty::log::Logger& root = synodic::honesty::log::RootLogger();
 
-				MockRunner runner(root.CreateLogger("mock_runner"));
-				MockReporter reporter(root.CreateLogger("mock_reporter"));
-
 				Interface::Configuration configuration;
 
 				Interface interface(configuration);
 
-				ListParameters parameters(&runner, &reporter, root.CreateLogger("test"));
+				ListParameters parameters(root.CreateLogger("test"));
 				const auto result = interface.List(parameters);
 
 				requirements.ExpectGreater(result.tests.size(), 0);

@@ -103,6 +103,7 @@ public:
 		Run(const synodic::honesty::test::Requirements& requirements,
 			const std::function_ref<void(const synodic::honesty::test::Requirements&)> function) override
 	{
+		function(requirements);
 	}
 };
 

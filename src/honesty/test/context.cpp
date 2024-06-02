@@ -11,11 +11,10 @@ import :reporter.default;
 
 namespace synodic::honesty::test
 {
-	// Emulating std::execution state
-	class ThreadContext
+	class Context
 	{
 	public:
-		constexpr ThreadContext(Runner& runner, const std::span<Reporter*> reporters) :
+		constexpr Context(Runner& runner, const std::span<Reporter*> reporters) :
 			reporters_(reporters),
 			runner_(&runner)
 		{
@@ -173,62 +172,16 @@ namespace synodic::honesty::test
 		Runner* runner_;
 	};
 
-	/**
-	 * @brief An empty runner that throws an exception if it is used as a runner. We want instances where the default
-	 * runner isn't replaced to notify the developer
-	 */
 	class EmptyRunner final : public Runner
 	{
 	public:
-		explicit(false) consteval EmptyRunner(log::Logger logger) :
+		explicit(false) EmptyRunner(log::Logger logger) :
 			Runner(std::move(logger))
 		{
 		}
 
 		void Run(const Requirements& requirements, const std::function_ref<void(const Requirements&)> function) override
 		{
-			throw utility::NotImplemented();
 		}
 	};
-
-	/**
-	 * @brief An empty reporter that does nothing
-	 */
-	class EmptyReporter final : public StreamingAdapter
-	{
-	public:
-		explicit(false) consteval EmptyReporter(log::Logger logger) :
-			StreamingAdapter(std::move(logger))
-		{
-		}
-
-		static consteval auto Name() -> std::string_view
-		{
-			return "empty";
-		}
-	};
-}
-
-namespace
-{
-	constinit synodic::honesty::test::EmptyRunner
-	EMPTY_RUNNER(synodic::honesty::log::RootLogger().CreateLogger("empty_runner"));
-	constinit synodic::honesty::test::EmptyReporter
-	EMPTY_REPORTER(synodic::honesty::log::RootLogger().CreateLogger("empty_reporter"));
-
-	// The default reporters for tests.
-	constinit std::array<synodic::honesty::test::Reporter*, 1> DEFAULT_REPORTERS = {
-		&EMPTY_REPORTER,
-	};
-
-	// The default context for tests
-	constinit synodic::honesty::test::ThreadContext EMPTY_CONTEXT(EMPTY_RUNNER, DEFAULT_REPORTERS);
-
-	// Each thread has its own context, such that tests can reference global functions without an object
-	constinit thread_local synodic::honesty::test::ThreadContext& CONTEXT = EMPTY_CONTEXT;
-}
-
-auto GetThreadContext() -> synodic::honesty::test::ThreadContext&
-{
-	return CONTEXT;
 }

@@ -24,26 +24,23 @@ namespace synodic::honesty::test
 
 	export struct ExecuteParameters
 	{
-		ExecuteParameters(Runner* runner, Reporter* reporter) :
-			runner(runner)
+		ExecuteParameters(const Context& context) :
+			context(context)
 		{
 		}
 
-		Runner* runner;
+		Context context;
 	};
 
 	export struct ListParameters
 	{
-		ListParameters(Runner* runner, Reporter* reporter, log::Logger logger) :
-			runner(runner),
-			reporter(reporter),
+		ListParameters(log::Logger logger) :
 			logger(std::move(logger))
 		{
 		}
 
-		Runner* runner;
-		Reporter* reporter;
 		log::Logger logger;
+		ListOutputType outputType;
 	};
 
 	export struct HelpResult
@@ -100,7 +97,7 @@ namespace synodic::honesty::test
 				event::SuiteBegin begin;
 				begin.name = suite.name;
 
-				GetThreadContext().Signal(begin);
+				parameters.context.Signal(begin);
 
 				for (const Test& test: suite.testGenerator())
 				{
@@ -109,33 +106,58 @@ namespace synodic::honesty::test
 					event::TestBegin testBegin;
 					begin.name = view.name;
 
-					GetThreadContext().Signal(testBegin);
+					parameters.context.Signal(testBegin);
 
-					Requirements requirements(GetThreadContext().Reporters());
-					parameters.runner->Run(requirements, view.test);
+					Requirements requirements(parameters.context.Reporters());
+					parameters.context.Run(requirements, view.test);
 
 					event::TestEnd testEnd;
 					testEnd.name = view.name;
 
-					GetThreadContext().Signal(testEnd);
+					parameters.context.Signal(testEnd);
 				}
 
 				event::SuiteEnd end;
 				end.name = suite.name;
 
-				GetThreadContext().Signal(end);
+				parameters.context.Signal(end);
 			}
+
+			event::Summary summary;
+			parameters.context.Signal(summary);
 
 			return {};
 		}
 
 		ListResult List(const ListParameters& parameters)
 		{
+			ListReporterParameters listReporterParameters;
+			ListReporter listReporter(listReporterParameters, parameters.logger.CreateLogger("reporter"));
+
+			EmptyRunner runner(log::RootLogger().CreateLogger("empty_runner"));
+
+			Reporter* reporter = &listReporter;
+			std::ranges::single_view reporters {reporter};
+
+			Context context(runner, reporters);
+
+			const ExecuteParameters executeParameters(context);
+			Execute(executeParameters);
+
 			ListResult result;
 
-			const ExecuteParameters executeParameters(parameters.runner, parameters.reporter);
+			const auto& data = listReporter.Data();
 
-			Execute(executeParameters);
+			for (auto& suite: data.suites)
+			{
+				for (auto& test: suite.tests)
+				{
+					TestDescription description;
+					description.name = test.begin.name;
+
+					result.tests.push_back(description);
+				}
+			}
 
 			return result;
 		}

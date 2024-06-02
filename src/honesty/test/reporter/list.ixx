@@ -11,8 +11,6 @@ namespace synodic::honesty::test
 	struct ListReporterParameters
 	{
 		ListReporterParameters() = default;
-
-		ListOutputType outputType;
 	};
 
 	class ListReporter final : public CumulativeAdapter
@@ -33,24 +31,17 @@ namespace synodic::honesty::test
 
 		void Finalize(CumulativeData data) override
 		{
-			switch (parameters_.outputType)
-			{
-				case ListOutputType::LOG :
-				{
-					log::Console sink;
-					const log::Logger& logger = Logger();
+			data_ = std::move(data);
+		}
 
-					break;
-				}
-				case ListOutputType::JSON :
-				{
-				}
-				break;
-			}
+		const CumulativeData& Data() const
+		{
+			return data_;
 		}
 
 	private:
 		ListReporterParameters parameters_;
+		CumulativeData data_;
 	};
 }
 

@@ -61,15 +61,15 @@ namespace
 				constexpr synodic::honesty::utility::FixedStringU16 u16StrB(u"b");
 				constexpr synodic::honesty::utility::FixedStringU32 u32StrB(U"b");
 
-				requirements.ExpectGreater(strA, strB);
-				requirements.ExpectGreater(u8StrA, u8StrB);
-				requirements.ExpectGreater(u16StrA, u16StrB);
-				requirements.ExpectGreater(u32StrA, u32StrB);
+				requirements.ExpectLess(strA, strB);
+				requirements.ExpectLess(u8StrA, u8StrB);
+				requirements.ExpectLess(u16StrA, u16StrB);
+				requirements.ExpectLess(u32StrA, u32StrB);
 
-				requirements.ExpectGreater(strA, "b");
-				requirements.ExpectGreater(u8StrA, u8"b");
-				requirements.ExpectGreater(u16StrA, u"b");
-				requirements.ExpectGreater(u32StrA, U"b");
+				requirements.ExpectLess(strA, "b");
+				requirements.ExpectLess(u8StrA, u8"b");
+				requirements.ExpectLess(u16StrA, u"b");
+				requirements.ExpectLess(u32StrA, U"b");
 			};
 		});
 

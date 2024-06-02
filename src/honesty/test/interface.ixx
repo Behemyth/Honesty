@@ -90,7 +90,6 @@ namespace synodic::honesty::test
 
 		ExecuteResult Execute(const ExecuteParameters& parameters)
 		{
-			// If we modify the execution context we should do it outside this function
 
 			for (const SuiteView& suite: GetSuites())
 			{

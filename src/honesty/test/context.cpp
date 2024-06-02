@@ -4,10 +4,7 @@ import synodic.honesty.log;
 import std;
 import synodic.honesty.utility;
 import :runner;
-import :runner.default;
 import :reporter;
-import :reporter.compact;
-import :reporter.default;
 
 namespace synodic::honesty::test
 {

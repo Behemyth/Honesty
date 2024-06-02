@@ -14,9 +14,9 @@ namespace
 		"color",
 		[]() -> Generator
 		{
-			co_yield "construction"_test = []()
+			co_yield "construction"_test = [](const Requirements& requirements)
 			{
-				ExpectEquals(log::color24_t(58, 90, 64), log::color24_t(green));
+				requirements.ExpectEquals(log::color24_t(58, 90, 64), log::color24_t(green));
 			};
 		});
 
@@ -24,18 +24,18 @@ namespace
 		"style",
 		[]() -> Generator
 		{
-			co_yield "construction"_test = []()
+			co_yield "construction"_test = [](const Requirements& requirements)
 			{
 				constexpr log::color24_t hunterGreen(58, 90, 64);
 				constexpr log::TextStyle style(hunterGreen);
 
 				constexpr auto foreground = style.Foreground();
-				Assert(foreground.has_value());
-				Expect(not style.Background().has_value());
-				Expect(not style.AttributeMask());
+				requirements.Assert(foreground.has_value());
+				requirements.Expect(not style.Background().has_value());
+				requirements.Expect(not style.AttributeMask());
 
 				constexpr auto value = std::get<log::color24_t>(foreground.value());
-				ExpectEquals(value, hunterGreen);
+				requirements.ExpectEquals(value, hunterGreen);
 			};
 		});
 
@@ -43,7 +43,7 @@ namespace
 		"terminal",
 		[]() -> Generator
 		{
-			co_yield "format_to"_test = []()
+			co_yield "format_to"_test = [](const Requirements& requirements)
 			{
 				std::string output;
 				constexpr log::TextStyle style(log::color24_t(58, 90, 64));
@@ -55,20 +55,20 @@ namespace
 					"\x1b[38;2;058;090;064m{}\x1b[0m",
 					"Hunter Green = (58,90,64)");
 
-				ExpectEquals(output, expected);
+				requirements.ExpectEquals(output, expected);
 			};
 
-			co_yield "format"_test = []()
+			co_yield "format"_test = [](const Requirements& requirements)
 			{
 				std::string output =
 					log::format(log::TextStyle(log::color24_t(58, 90, 64)), "Hunter Green = (58,90,64)");
 
 				std::string expected = std::format("\x1b[38;2;058;090;064m{}\x1b[0m", "Hunter Green = (58,90,64)");
 
-				ExpectEquals(output, expected);
+				requirements.ExpectEquals(output, expected);
 			};
 
-			co_yield "print"_test = []()
+			co_yield "print"_test = [](const Requirements& requirements)
 			{
 				// TODO: How do we capture the output?
 			};

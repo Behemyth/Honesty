@@ -19,7 +19,7 @@ namespace
 			 *		2. We don't want to have the results duplicated with our normal reporter, the one running this test
 			 *		As a result, the context is unique to the test, and cannot be managed by the Interface class.
 			 */
-			co_yield "list"_test = []()
+			co_yield "list"_test = [](const Requirements& requirements)
 			{
 				const synodic::honesty::log::Logger& root = synodic::honesty::log::RootLogger();
 
@@ -33,7 +33,7 @@ namespace
 				ListParameters parameters(&runner, &reporter, root.CreateLogger("test"));
 				const auto result = interface.List(parameters);
 
-				ExpectGreater(result.tests.size(), 0);
+				requirements.ExpectGreater(result.tests.size(), 0);
 			};
 		});
 	SuiteRegistrar _(SUITE);

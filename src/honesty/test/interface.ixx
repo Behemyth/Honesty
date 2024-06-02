@@ -111,7 +111,8 @@ namespace synodic::honesty::test
 
 					GetThreadContext().Signal(testBegin);
 
-					parameters.runner->Run(view.test);
+					Requirements requirements(GetThreadContext().Reporters());
+					parameters.runner->Run(requirements, view.test);
 
 					event::TestEnd testEnd;
 					testEnd.name = view.name;

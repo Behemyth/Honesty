@@ -11,7 +11,7 @@ namespace
 		"string",
 		[]() -> Generator
 		{
-			co_yield "equality"_test = []()
+			co_yield "equality"_test = [](const Requirements& requirements)
 			{
 				constexpr synodic::honesty::utility::FixedString str("test");
 				constexpr synodic::honesty::utility::FixedStringU8 u8Str(u8"test");
@@ -23,33 +23,33 @@ namespace
 				constexpr synodic::honesty::utility::FixedStringU16 u16StrCopy(u"test");
 				constexpr synodic::honesty::utility::FixedStringU32 u32StrCopy(U"test");
 
-				ExpectEquals(str, str);
-				ExpectEquals(u8Str, u8Str);
-				ExpectEquals(u16Str, u16Str);
-				ExpectEquals(u32Str, u32Str);
+				requirements.ExpectEquals(str, str);
+				requirements.ExpectEquals(u8Str, u8Str);
+				requirements.ExpectEquals(u16Str, u16Str);
+				requirements.ExpectEquals(u32Str, u32Str);
 
-				ExpectEquals(str, strCopy);
-				ExpectEquals(u8Str, u8StrCopy);
-				ExpectEquals(u16Str, u16StrCopy);
-				ExpectEquals(u32Str, u32StrCopy);
+				requirements.ExpectEquals(str, strCopy);
+				requirements.ExpectEquals(u8Str, u8StrCopy);
+				requirements.ExpectEquals(u16Str, u16StrCopy);
+				requirements.ExpectEquals(u32Str, u32StrCopy);
 
-				ExpectEquals(str, std::string_view("test"));
-				ExpectEquals(u8Str, std::u8string_view(u8"test"));
-				ExpectEquals(u16Str, std::u16string_view(u"test"));
-				ExpectEquals(u32Str, std::u32string_view(U"test"));
+				requirements.ExpectEquals(str, std::string_view("test"));
+				requirements.ExpectEquals(u8Str, std::u8string_view(u8"test"));
+				requirements.ExpectEquals(u16Str, std::u16string_view(u"test"));
+				requirements.ExpectEquals(u32Str, std::u32string_view(U"test"));
 
-				ExpectEquals(str, "test");
-				ExpectEquals(u8Str, u8"test");
-				ExpectEquals(u16Str, u"test");
-				ExpectEquals(u32Str, U"test");
+				requirements.ExpectEquals(str, "test");
+				requirements.ExpectEquals(u8Str, u8"test");
+				requirements.ExpectEquals(u16Str, u"test");
+				requirements.ExpectEquals(u32Str, U"test");
 
-				ExpectEquals("test", str);
-				ExpectEquals(u8"test", u8Str);
-				ExpectEquals(u"test", u16Str);
-				ExpectEquals(U"test", u32Str);
+				requirements.ExpectEquals("test", str);
+				requirements.ExpectEquals(u8"test", u8Str);
+				requirements.ExpectEquals(u"test", u16Str);
+				requirements.ExpectEquals(U"test", u32Str);
 			};
 
-			co_yield "comparison"_test = []()
+			co_yield "comparison"_test = [](const Requirements& requirements)
 			{
 				constexpr synodic::honesty::utility::FixedString strA("a");
 				constexpr synodic::honesty::utility::FixedStringU8 u8StrA(u8"a");
@@ -61,15 +61,15 @@ namespace
 				constexpr synodic::honesty::utility::FixedStringU16 u16StrB(u"b");
 				constexpr synodic::honesty::utility::FixedStringU32 u32StrB(U"b");
 
-				ExpectGreater(strA, strB);
-				ExpectGreater(u8StrA, u8StrB);
-				ExpectGreater(u16StrA, u16StrB);
-				ExpectGreater(u32StrA, u32StrB);
+				requirements.ExpectGreater(strA, strB);
+				requirements.ExpectGreater(u8StrA, u8StrB);
+				requirements.ExpectGreater(u16StrA, u16StrB);
+				requirements.ExpectGreater(u32StrA, u32StrB);
 
-				ExpectGreater(strA, "b");
-				ExpectGreater(u8StrA, u8"b");
-				ExpectGreater(u16StrA, u"b");
-				ExpectGreater(u32StrA, U"b");
+				requirements.ExpectGreater(strA, "b");
+				requirements.ExpectGreater(u8StrA, u8"b");
+				requirements.ExpectGreater(u16StrA, u"b");
+				requirements.ExpectGreater(u32StrA, U"b");
 			};
 		});
 

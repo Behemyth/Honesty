@@ -6,6 +6,7 @@ import function_ref;
 import :types;
 import :context;
 import generator;
+import :assert;
 
 namespace synodic::honesty::test
 {
@@ -18,7 +19,9 @@ namespace synodic::honesty::test
 	class Test
 	{
 	public:
-		explicit(false) constexpr Test(const std::string_view name, const std::function_ref<void()> test) :
+		explicit(false) constexpr Test(
+			const std::string_view name,
+			const std::function_ref<void(const Requirements&)> test) :
 			name_(name),
 			test_(test)
 		{
@@ -33,7 +36,7 @@ namespace synodic::honesty::test
 		friend TestView;
 
 		std::string_view name_;
-		std::function_ref<void()> test_;
+		std::function_ref<void(const Requirements&)> test_;
 	};
 
 	class TestView
@@ -51,7 +54,7 @@ namespace synodic::honesty::test
 		TestView& operator=(TestView&& other) noexcept = delete;
 
 		std::string_view name;
-		std::function_ref<void()> test;
+		std::function_ref<void(const Requirements&)> test;
 	};
 
 	class TestLiteral
@@ -67,7 +70,7 @@ namespace synodic::honesty::test
 		TestLiteral& operator=(const TestLiteral& other)	 = delete;
 		TestLiteral& operator=(TestLiteral&& other) noexcept = delete;
 
-		Test operator=(const std::function_ref<void()> test) const
+		Test operator=(const std::function_ref<void(const Requirements&)> test) const
 		{
 			return Test(name_, test);
 		}
@@ -82,22 +85,22 @@ namespace synodic::honesty::test
 	};
 
 	export template<typename Fn, std::ranges::input_range V>
-		requires std::regular_invocable<Fn&, std::ranges::range_reference_t<V>>
+		requires std::regular_invocable<Fn&, const Requirements&, std::ranges::range_reference_t<V>>
 	Generator operator|(Fn&& function, V&& range)
 	{
 		for (auto&& element: range)
 		{
 			co_yield Test(
 				std::format("{}", element),
-				[&function, &element]()
+				[&function, &element](const Requirements& requirements)
 				{
-					function(element);
+					function(requirements, element);
 				});
 		}
 	}
 
 	export template<typename Fn, typename... Types>
-		requires(std::regular_invocable<Fn&, Types &&> && ...)
+		requires(std::regular_invocable<Fn&, const Requirements&, Types &&> && ...)
 	Generator operator|(Fn&& function, std::tuple<Types...>&& tuple)
 	{
 		co_yield std::ranges::elements_of(std::apply(
@@ -105,9 +108,9 @@ namespace synodic::honesty::test
 			{
 				(co_yield Test(
 					 std::format("{}", args),
-					 [&function, &args]()
+					 [&function, &args](const Requirements& requirements)
 					 {
-						 function(args);
+						 function(requirements, args);
 					 }),
 				 ...);
 			},

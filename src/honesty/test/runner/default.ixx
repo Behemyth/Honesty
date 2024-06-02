@@ -18,11 +18,11 @@ namespace synodic::honesty::test
 			return "default";
 		}
 
-		void Run(const std::function_ref<void()> function) override
+		void Run(const Requirements& requirements, const std::function_ref<void(const Requirements&)> function) override
 		{
 			try
 			{
-				function();
+				function(requirements);
 			}
 			catch (AssertException)
 			{

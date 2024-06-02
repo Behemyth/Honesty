@@ -19,7 +19,7 @@ namespace
 	auto tagSuite = []() -> Generator
 	{
 		// Verify the count of tags for each test. The two tests each have two tags
-		co_yield "tag"_test = []()
+		co_yield "tag"_test = [](const Requirements& requirements)
 		{
 			// expect_equals(test.Tags().size(), 2);
 		};

@@ -5,9 +5,14 @@ import :types;
 import :reporter;
 import std;
 import inplace_vector;
+import :assert;
 
 namespace synodic::honesty::test
 {
+
+
+
+
 	/**
 	 * @brief The type of runner can be selected by the user when invoking tests, for example, via the command line
 	 * interface. Additionally, the user can specify a specific runner for a specific test suite. Test suites must be
@@ -30,9 +35,10 @@ namespace synodic::honesty::test
 
 		/**
 		 * @brief
+		 * @param requirements TODO
 		 * @param function A function to execute on a scheduler
 		 */
-		virtual void Run(std::function_ref<void()> function) = 0;
+		virtual void Run(const Requirements& requirements, const std::function_ref<void(const Requirements&)> function) = 0;
 
 		/**
 		 * @brief Get the logger associated with this reporter

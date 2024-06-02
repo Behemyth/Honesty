@@ -99,7 +99,9 @@ public:
 		return "mock";
 	}
 
-	void Run(std::function_ref<void()> function) override
+	void
+		Run(const synodic::honesty::test::Requirements& requirements,
+			const std::function_ref<void(const synodic::honesty::test::Requirements&)> function) override
 	{
 	}
 };

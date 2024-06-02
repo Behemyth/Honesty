@@ -1,7 +1,7 @@
 import synodic.honesty.test;
 import std;
 
-int main(const int argc, const char* argv[])
+auto main(const int argc, const char* argv[]) -> int
 {
 	// Convert all the input arguments to views
 	auto view = std::span(argv, argc) | std::views::transform(

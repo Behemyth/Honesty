@@ -10,14 +10,14 @@ namespace
 		"logger",
 		[]() -> synodic::honesty::test::Generator
 		{
-			co_yield "Parent Sink"_test = []()
+			co_yield "Parent Sink"_test = [](const synodic::honesty::test::Requirements& requirements)
 			{
 				const synodic::honesty::log::Logger& root = synodic::honesty::log::RootLogger();
 				synodic::honesty::log::Logger parent = root.CreateLogger("parent");
 				synodic::honesty::log::Logger child = parent.CreateLogger("child");
 
-				synodic::honesty::test::Assert(child.Parent());
-				synodic::honesty::test::ExpectEquals(parent, *child.Parent());
+				requirements.Assert(child.Parent());
+				requirements.ExpectEquals(parent, *child.Parent());
 
 				synodic::honesty::log::RingBuffer<std::mutex> sink;
 

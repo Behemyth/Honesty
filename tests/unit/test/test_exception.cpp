@@ -10,15 +10,15 @@ namespace
 		"exception",
 		[]()-> Generator
 		{
-			co_yield "exception"_test = []
+			co_yield "exception"_test = [](const Requirements& requirements)
 			{
-				ExpectThrow<std::runtime_error>(
+				requirements.ExpectThrow<std::runtime_error>(
 					[]()
 					{
 						throw std::runtime_error{"Test exception"};
 					});
 
-				ExpectNotThrow(
+				requirements.ExpectNotThrow(
 					[]()
 					{
 					});

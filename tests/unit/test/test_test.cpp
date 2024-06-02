@@ -20,7 +20,7 @@ namespace
 	 */
 	auto emptyLiteral = []() -> Generator
 	{
-		co_yield "emptyLiteral"_test = []
+		co_yield "emptyLiteral"_test = [](const Requirements& requirements)
 		{
 		};
 	};
@@ -30,7 +30,7 @@ namespace
 	 */
 	auto tupleParameterization = []() -> Generator
 	{
-		co_yield "array"_test = [](const auto& parameter)
+		co_yield "array"_test = [](const Requirements& requirements, const auto& parameter)
 		{
 		} | std::tuple{3u, 4.0f};
 	};
@@ -40,14 +40,14 @@ namespace
 	 */
 	auto arrayParameterization = []()-> Generator
 	{
-		co_yield "array"_test = [](int parameter)
+		co_yield "array"_test = [](const Requirements& requirements, int parameter)
 		{
 		} | std::array{3, 4};
 	};
 
 	auto testSuite = []() -> Generator
 	{
-		co_yield "run"_test = []()
+		co_yield "run"_test = [](const Requirements& requirements)
 		{
 			// Runs through each generator and counts the number of test instances recorded
 			auto counter = [](
@@ -62,10 +62,10 @@ namespace
 				return count;
 			};
 
-			ExpectEquals(counter(emptyGenerator), 0);
-			ExpectEquals(counter(emptyLiteral), 1);
-			ExpectEquals(counter(tupleParameterization), 2);
-			ExpectEquals(counter(arrayParameterization), 2);
+			requirements.ExpectEquals(counter(emptyGenerator), 0);
+			requirements.ExpectEquals(counter(emptyLiteral), 1);
+			requirements.ExpectEquals(counter(tupleParameterization), 2);
+			requirements.ExpectEquals(counter(arrayParameterization), 2);
 		};
 	};
 

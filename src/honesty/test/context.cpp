@@ -157,9 +157,15 @@ namespace synodic::honesty::test
 			}
 		}
 
-		inline void Run(const std::function_ref<void()> function) const
+		inline void
+			Run(const Requirements& requirements, const std::function_ref<void(const Requirements&)> function) const
 		{
-			runner_->Run(function);
+			runner_->Run(requirements, function);
+		}
+
+		[[nodiscard]] auto Reporters() const -> std::span<Reporter*>
+		{
+			return reporters_;
 		}
 
 	private:
@@ -179,7 +185,7 @@ namespace synodic::honesty::test
 		{
 		}
 
-		void Run(std::function_ref<void()> function) override
+		void Run(const Requirements& requirements, const std::function_ref<void(const Requirements&)> function) override
 		{
 			throw utility::NotImplemented();
 		}
@@ -222,7 +228,7 @@ namespace
 	constinit thread_local synodic::honesty::test::ThreadContext& CONTEXT = EMPTY_CONTEXT;
 }
 
-synodic::honesty::test::ThreadContext& GetThreadContext()
+auto GetThreadContext() -> synodic::honesty::test::ThreadContext&
 {
 	return CONTEXT;
 }

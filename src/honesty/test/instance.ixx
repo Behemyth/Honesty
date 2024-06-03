@@ -20,8 +20,9 @@ namespace
 namespace synodic::honesty::test
 {
 	/**
-	 * @brief A class in two parts. First, it resolves the input configuration into commands and parameters that will be
-	 *	executed. Then, when executed, it sets up the running execution state for each thread running the commands.
+	 * @brief The proper way to interact with Honesty via a 'main' function. A class in two parts. First, it resolves
+	 *	the input configuration into commands and parameters that will be executed. Then, when executed, it sets up the
+	 *	running execution state for each thread running the commands.
 	 */
 	export class Instance
 	{
@@ -186,7 +187,6 @@ namespace synodic::honesty::test
 					},
 					[&](const ExecuteContext& context)
 					{
-
 						std::ranges::single_view reporters {context.reporter.get()};
 
 						// Before start executing, we need to set up the current thread's context
@@ -198,7 +198,6 @@ namespace synodic::honesty::test
 					[&](const ListContext& context)
 					{
 						ListParameters parameters(logger_.CreateLogger("list"));
-
 
 						auto result = interface.List(parameters);
 

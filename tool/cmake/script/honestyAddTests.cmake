@@ -59,7 +59,7 @@ function(honesty_extract_tests)
 		)
 	endif()
 
-	set(HONESTY_ARGS "--list-tests")
+	set(HONESTY_ARGS "list --json --output honesty_test.json")
 
 	cmake_path(GET _EXECUTABLE PARENT_PATH EXECUTABLE_PARENT)
 

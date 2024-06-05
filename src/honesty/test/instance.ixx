@@ -78,10 +78,13 @@ namespace synodic::honesty::test
 		{
 			logger_.SetSink(&consoleSink_);
 
-			static ReporterRegistrar<DefaultReporter> defaultReporterRegistrar;
-			static ReporterRegistrar<CompactReporter> compactReporterRegistrar;
+			// Register our default runners and reporters
+			{
+				static ReporterRegistrar<DefaultReporter> defaultReporterRegistrar;
+				static ReporterRegistrar<CompactReporter> compactReporterRegistrar;
 
-			static RunnerRegistrar<DefaultRunner> defaultRunnerRegistrar;
+				static RunnerRegistrar<DefaultRunner> defaultRunnerRegistrar;
+			}
 
 			// Gather our user defined runners and reporters
 			std::span<RunnerRegistry*> runnerRegistrars		= RunnerRegistry::Registrars();
@@ -98,7 +101,7 @@ namespace synodic::honesty::test
 
 			// Find the runner
 			{
-				auto iterator = std::ranges::find_if(
+				const auto iterator = std::ranges::find_if(
 					runnerRegistrars,
 					[&](const RunnerRegistry* registry) -> bool
 					{
@@ -118,7 +121,7 @@ namespace synodic::honesty::test
 
 			// Find the reporter
 			{
-				auto iterator = std::ranges::find_if(
+				const auto iterator = std::ranges::find_if(
 					reporterRegistrars,
 					[&](const ReporterRegistry* registry) -> bool
 					{

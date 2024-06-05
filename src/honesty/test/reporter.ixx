@@ -302,10 +302,10 @@ namespace synodic::honesty::test
 		}
 
 	private:
-		constinit static std::inplace_vector<ReporterRegistry*, 2> registrars_;
+		constinit static std::inplace_vector<ReporterRegistry*, 3> registrars_;
 	};
 
-	constinit std::inplace_vector<ReporterRegistry*, 2> ReporterRegistry::registrars_;
+	constinit std::inplace_vector<ReporterRegistry*, 3> ReporterRegistry::registrars_;
 
 	export template<reporter T>
 	class ReporterRegistrar final : ReporterRegistry

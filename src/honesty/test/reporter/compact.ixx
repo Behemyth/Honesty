@@ -16,7 +16,7 @@ namespace synodic::honesty::test
 
 		~CompactReporter() override = default;
 
-		consteval std::string_view Name() const
+		static consteval std::string_view Name()
 		{
 			return "compact";
 		}

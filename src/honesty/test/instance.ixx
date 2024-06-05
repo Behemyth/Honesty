@@ -5,6 +5,7 @@ import std;
 import :interface;
 import :context;
 import :reporter.default;
+import :reporter.compact;
 import :runner.default;
 
 namespace
@@ -77,9 +78,10 @@ namespace synodic::honesty::test
 		{
 			logger_.SetSink(&consoleSink_);
 
-			// Manually add the built-in runners and reporters
-			ReporterRegistrar<DefaultReporter> defaultReporterRegistrar;
-			RunnerRegistrar<DefaultRunner> defaultRunnerRegistrar;
+			static ReporterRegistrar<DefaultReporter> defaultReporterRegistrar;
+			static ReporterRegistrar<CompactReporter> compactReporterRegistrar;
+
+			static RunnerRegistrar<DefaultRunner> defaultRunnerRegistrar;
 
 			// Gather our user defined runners and reporters
 			std::span<RunnerRegistry*> runnerRegistrars		= RunnerRegistry::Registrars();
@@ -89,23 +91,12 @@ namespace synodic::honesty::test
 			std::unique_ptr<Runner> defaultRunner;
 			std::unique_ptr<Reporter> defaultReporter;
 
-			std::string_view defaultRunnerName	 = "default";
-			std::string_view defaultReporterName = "default";
+			std::string_view defaultRunnerName =
+				configuration.defaultRunner.empty() ? "default" : configuration.defaultRunner;
+			std::string_view defaultReporterName =
+				configuration.defaultReporter.empty() ? "default" : configuration.defaultReporter;
 
-			// Override the default runner and reporter if the input configuration is empty
-			{
-				if (configuration.defaultRunner.empty())
-				{
-					defaultRunnerName = configuration.defaultRunner;
-				}
-
-				if (configuration.defaultReporter.empty())
-				{
-					defaultReporterName = configuration.defaultReporter;
-				}
-			}
-
-			// Find the default runner
+			// Find the runner
 			{
 				auto iterator = std::ranges::find_if(
 					runnerRegistrars,
@@ -121,11 +112,11 @@ namespace synodic::honesty::test
 				}
 				else
 				{
-					throw std::invalid_argument("The default runner specified does not exist");
+					throw std::invalid_argument("The runner specified does not exist");
 				}
 			}
 
-			// Find the default reporter
+			// Find the reporter
 			{
 				auto iterator = std::ranges::find_if(
 					reporterRegistrars,
@@ -141,7 +132,7 @@ namespace synodic::honesty::test
 				}
 				else
 				{
-					throw std::invalid_argument("The default reporter specified does not exist");
+					throw std::invalid_argument("The reporter specified does not exist");
 				}
 			}
 

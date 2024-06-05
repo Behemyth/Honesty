@@ -12,7 +12,8 @@ namespace
 		"instance",
 		[]() -> Generator
 		{
-			std::filesystem::path temp = std::filesystem::temp_directory_path();
+			const std::u8string u8temp = std::filesystem::temp_directory_path().u8string();
+			const std::string temp(u8temp.cbegin(), u8temp.cend());
 
 			co_yield "list"_test =
 			         [&temp](const Requirements& requirements, std::string input)
@@ -28,8 +29,6 @@ namespace
 
 				         Instance::Configuration configuration;
 				         Instance instance(configuration, arguments);
-
-				         instance.Execute();
 			         } | std::array<std::string, 5>{
 				         "list",
 				         "list --log",

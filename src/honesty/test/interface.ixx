@@ -93,17 +93,17 @@ namespace synodic::honesty::test
 
 			for (const SuiteView& suite: GetSuites())
 			{
-				event::SuiteBegin begin;
-				begin.name = suite.name;
+				event::SuiteBegin suiteBegin;
+				suiteBegin.name = suite.name;
 
-				parameters.context.Signal(begin);
+				parameters.context.Signal(suiteBegin);
 
 				for (const Test& test: suite.testGenerator())
 				{
 					const TestView view(test);
 
 					event::TestBegin testBegin;
-					begin.name = view.name;
+					testBegin.name = view.name;
 
 					parameters.context.Signal(testBegin);
 

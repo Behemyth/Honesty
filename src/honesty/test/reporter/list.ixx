@@ -24,7 +24,7 @@ namespace synodic::honesty::test
 
 		~ListReporter() override = default;
 
-		consteval std::string_view Name() const
+		static consteval std::string_view Name()
 		{
 			return "list";
 		}

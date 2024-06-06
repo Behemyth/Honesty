@@ -68,6 +68,7 @@ namespace synodic::honesty::test
 			log::Logger logger;
 
 			ListOutputType outputType;
+			std::optional<std::filesystem::path> file;
 		};
 
 		// Resolve all input into immediately executable state ready for the 'Execute' function
@@ -158,12 +159,37 @@ namespace synodic::honesty::test
 						parameters.outputType = ListOutputType::JSON;
 					}
 
+					if (auto itr = std::ranges::find(arguments, "--file"); itr != arguments.end())
+					{
+						if(++itr == arguments.end())
+						{
+							throw std::invalid_argument("You must give a file name when using the '--file' option");
+						}
+
+						parameters.file = *itr;
+					}
+
 					parameters_ = std::move(parameters);
 					return;
 				}
 
 				parameters_ = ExecuteContext(std::move(defaultRunner), std::move(defaultReporter));
 			}
+		}
+
+		const HelpContext* GetHelpContext() const
+		{
+			return std::get_if<HelpContext>(&parameters_);
+		}
+
+		const ExecuteContext* GetExecuteContext() const
+		{
+			return std::get_if<ExecuteContext>(&parameters_);
+		}
+
+		const ListContext* GetListContext() const
+		{
+			return std::get_if<ListContext>(&parameters_);
 		}
 
 		void Execute()

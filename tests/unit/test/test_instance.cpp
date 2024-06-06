@@ -12,29 +12,27 @@ namespace
 		"instance",
 		[]() -> Generator
 		{
-			const std::u8string u8temp = std::filesystem::temp_directory_path().u8string();
-			const std::string temp(u8temp.cbegin(), u8temp.cend());
+			const std::filesystem::path temporaryPath = std::filesystem::temp_directory_path();
+			const std::u8string u8Temp = temporaryPath.u8string();
 
-			co_yield "list"_test =
-			         [&temp](const Requirements& requirements, std::string input)
-			         {
-				         auto argumentsRange = std::views::split(input, " ");
+			const std::string temp(u8Temp.cbegin(), u8Temp.cend());
 
-				         std::vector<std::string_view> arguments;
+			co_yield "list parsing"_test = [&](const Requirements& requirements) -> void
+			{
+				std::array<std::string_view, 4> arguments{"list", "--json", "--file", temp};
 
-				         for (auto argument: argumentsRange)
-				         {
-					         arguments.push_back(std::string_view(argument));
-				         }
+				Instance::Configuration configuration;
+				Instance instance(configuration, arguments);
 
-				         Instance::Configuration configuration;
-				         Instance instance(configuration, arguments);
-			         } | std::array<std::string, 5>{
-				         "list",
-				         "list --log",
-				         "list --json",
-				         std::format("list --log --file {}", temp),
-				         std::format("list --json --file {}", temp)};
+				const Instance::ListContext* context = instance.GetListContext();
+
+				requirements.Assert(context);
+				requirements.ExpectEquals(context->outputType, ListOutputType::JSON);
+				requirements.Assert(context->file.has_value());
+				requirements.ExpectEquals(context->file.value(), temporaryPath);
+
+				instance.Execute();
+			};
 		});
 	SuiteRegistrar _(SUITE);
 }

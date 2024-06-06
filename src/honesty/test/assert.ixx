@@ -16,7 +16,7 @@ namespace synodic::honesty::test
 		 * @param expression The expression to evaluate.
 		 * @param location The source location. Let this parameter be defaulted.
 		 */
-		void Assert(bool expression, const std::source_location& location = std::source_location::current()) const
+		void Assert(const bool expression, const std::source_location& location = std::source_location::current()) const
 		{
 			if (expression)
 			{
@@ -40,7 +40,7 @@ namespace synodic::honesty::test
 		 * @param expression The expression to evaluate.
 		 * @param location The source location. Let this parameter be defaulted.
 		 */
-		void Expect(bool expression, const std::source_location& location = std::source_location::current()) const
+		void Expect(const bool expression, const std::source_location& location = std::source_location::current()) const
 		{
 			if (expression)
 			{

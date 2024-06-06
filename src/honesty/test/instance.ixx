@@ -161,12 +161,17 @@ namespace synodic::honesty::test
 
 					if (auto itr = std::ranges::find(arguments, "--file"); itr != arguments.end())
 					{
-						if(++itr == arguments.end())
+						if (++itr == arguments.end())
 						{
 							throw std::invalid_argument("You must give a file name when using the '--file' option");
 						}
 
 						parameters.file = *itr;
+
+						if (not parameters.file->has_filename())
+						{
+							throw std::invalid_argument("You must give a file name when using the '--file' option");
+						}
 					}
 
 					parameters_ = std::move(parameters);
@@ -221,20 +226,42 @@ namespace synodic::honesty::test
 
 						auto result = interface.List(parameters);
 
-						switch (context.outputType)
+						if (context.file)
 						{
-							case ListOutputType::LOG :
+							std::ofstream file(context.file.value());
+							
+							if (!file.is_open())
 							{
-								for (auto& testDescription: result.tests)
+								throw std::invalid_argument("Could not open file for writing");
+							}
+
+							// Clear the file
+							file.clear();
+
+							switch (context.outputType)
+							{
+								case ListOutputType::LOG :
 								{
-									logger_.Info("{}", testDescription.name);
+									for (auto& testDescription: result.tests)
+									{
+										file << std::format("{}", testDescription.name);
+									}
+									break;
 								}
-								break;
+								case ListOutputType::JSON :
+								{
+									for (auto& testDescription: result.tests)
+									{
+										file << std::format("{}\n", testDescription.name);
+									}
+									break;
+								}
 							}
-							case ListOutputType::JSON :
-							{
-								break;
-							}
+
+							const std::u8string u8Path = context.file.value().u8string();
+							const std::string path(u8Path.cbegin(), u8Path.cend());
+
+							logger_.Info("Written file to {}", path);
 						}
 					},
 				};

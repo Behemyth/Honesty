@@ -5,4 +5,5 @@ target_sources(honesty
 			"exception.ixx"
 			"hash.ixx"
 			"string.ixx"
+			"json.ixx"
 )

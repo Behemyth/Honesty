@@ -154,7 +154,8 @@ namespace synodic::honesty::test
 	 */
 	export class CumulativeAdapter : public Reporter
 	{
-	protected:
+	public:
+
 		struct TestData
 		{
 			event::TestBegin begin;
@@ -174,7 +175,6 @@ namespace synodic::honesty::test
 			std::vector<SuiteData> suites;
 		};
 
-	public:
 		explicit(false) CumulativeAdapter(log::Logger logger) :
 			Reporter(std::move(logger))
 		{

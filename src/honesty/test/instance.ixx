@@ -2,6 +2,7 @@
 export module synodic.honesty.test:instance;
 
 import std;
+import synodic.honesty.utility;
 import :interface;
 import :context;
 import :reporter.default;
@@ -229,7 +230,7 @@ namespace synodic::honesty::test
 						if (context.file)
 						{
 							std::ofstream file(context.file.value());
-							
+
 							if (!file.is_open())
 							{
 								throw std::invalid_argument("Could not open file for writing");
@@ -242,18 +243,30 @@ namespace synodic::honesty::test
 							{
 								case ListOutputType::LOG :
 								{
-									for (auto& testDescription: result.tests)
+									for (auto& suiteDescription: result.suites)
 									{
-										file << std::format("{}", testDescription.name);
+										for (auto& testDescription: suiteDescription.tests)
+										{
+											file << std::format("{}", testDescription.name);
+										}
 									}
 									break;
 								}
 								case ListOutputType::JSON :
 								{
-									for (auto& testDescription: result.tests)
+									utility::JSON json;
+
+									for (auto& suiteDescription: result.suites)
 									{
-										file << std::format("{}\n", testDescription.name);
+										auto& suiteJSON = json["suite"];
+										for (auto& testDescription: suiteDescription.tests)
+										{
+											suiteJSON["test"]  = testDescription.name;
+										}
 									}
+
+									file << json;
+
 									break;
 								}
 							}

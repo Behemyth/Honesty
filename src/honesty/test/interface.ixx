@@ -60,11 +60,19 @@ namespace synodic::honesty::test
 		std::string name;
 	};
 
+	export struct SuiteDescription
+	{
+		SuiteDescription() = default;
+
+		std::string name;
+		std::vector<TestDescription> tests;
+	};
+
 	export struct ListResult
 	{
 		ListResult() = default;
 
-		std::vector<TestDescription> tests;
+		std::vector<SuiteDescription> suites;
 	};
 
 	/**
@@ -145,16 +153,18 @@ namespace synodic::honesty::test
 
 			ListResult result;
 
-			const auto& data = listReporter.Data();
+			const CumulativeAdapter::CumulativeData& data = listReporter.Data();
 
 			for (auto& suite: data.suites)
 			{
+				auto& resultSuite = result.suites.emplace_back();
+
 				for (auto& test: suite.tests)
 				{
 					TestDescription description;
 					description.name = test.begin.name;
 
-					result.tests.push_back(description);
+					resultSuite.tests.push_back(description);
 				}
 			}
 

@@ -3,6 +3,7 @@ target_sources(honesty
 	FILE_SET interfaces
 	FILES
 	assert.ixx
+	fixture.ixx
 	test.ixx
 	types.ixx
 	reporter.ixx

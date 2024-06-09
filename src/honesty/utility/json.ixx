@@ -219,9 +219,9 @@ namespace synodic::honesty::utility
 
 					return result;
 				},
-				[&](const Object& value)
+				[&](const Object& object)
 				{
-					if (value.empty())
+					if (object.empty())
 					{
 						return std::format("{{}}");
 					}
@@ -230,12 +230,12 @@ namespace synodic::honesty::utility
 
 					const std::size_t newIndentCount = indentCount + 1;
 
-					for (const auto& element: value | std::views::take(value.size() - 1))
+					for (const auto& [key, value]: object | std::views::take(object.size() - 1))
 					{
 						result += std::format("{:\t>{}}", "", newIndentCount);
 
-						result += std::format("\"{}\": ", element.first);
-						result += Dump(element.second, newIndentCount);
+						result += std::format("\"{}\": ", key);
+						result += Dump(value, newIndentCount);
 
 						result += std::format(",\n}}");
 					}
@@ -244,8 +244,8 @@ namespace synodic::honesty::utility
 					{
 						result += std::format("{:\t>{}}", "", newIndentCount);
 
-						result += std::format("\"{}\": ", value.rbegin()->first);
-						result += Dump(value.rbegin()->second, newIndentCount);
+						result += std::format("\"{}\": ", object.rbegin()->first);
+						result += Dump(object.rbegin()->second, newIndentCount);
 					}
 
 					result += std::format("\n");

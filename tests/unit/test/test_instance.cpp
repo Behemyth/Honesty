@@ -10,9 +10,10 @@ namespace
 {
 	Suite SUITE(
 		"instance",
-		[]() -> Generator
+		[](Fixture& fixture) -> Generator
 		{
-			const std::filesystem::path temporaryPath = std::filesystem::temp_directory_path() / "testList.json";
+			// We generate a string from the path to the temporary file for comparison.
+			const std::filesystem::path temporaryPath = fixture.TempFilePath();
 			const std::u8string u8Temp = temporaryPath.u8string();
 
 			const std::string temp(u8Temp.cbegin(), u8Temp.cend());

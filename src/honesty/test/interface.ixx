@@ -10,6 +10,16 @@ import :test;
 import :types;
 import :reporter.list;
 
+namespace
+{
+	// A helper for variant overload deduction
+	template<typename... Ts>
+	struct Overload : Ts...
+	{
+		using Ts::operator()...;
+	};
+}
+
 namespace synodic::honesty::test
 {
 	export enum class TestResultCode : std::uint8_t
@@ -98,7 +108,6 @@ namespace synodic::honesty::test
 
 		ExecuteResult Execute(const ExecuteParameters& parameters)
 		{
-
 			for (const SuiteView& suite: GetSuites())
 			{
 				event::SuiteBegin suiteBegin;
@@ -106,7 +115,23 @@ namespace synodic::honesty::test
 
 				parameters.context.Signal(suiteBegin);
 
-				for (const Test& test: suite.testGenerator())
+				auto executor = Overload {
+					[&](
+					const std::function_ref<Generator()> generator) -> Generator
+					{
+						return generator();
+					},
+					[&](
+					const std::function_ref<Generator(Fixture&)> generator) -> Generator
+					{
+						// TODO: Share fixture across suites
+						Fixture fixture;
+						return generator(fixture);
+					}};
+
+				Generator generator = std::visit(executor, suite.testGenerator);
+
+				for (const Test& test: generator)
 				{
 					const TestView view(test);
 

@@ -13,21 +13,16 @@ namespace
 		"json",
 		[]() -> Generator
 		{
-			co_yield "write"_test = [](const Requirements& requirements)
-			{
-				// std::ofstream file("test.json");
-				// JSON data = JSON::Write(file);
-			};
-
-			co_yield "parse"_test = [](const Requirements& requirements)
-			{
-				// std::ifstream file("test.json");
-				// JSON data = JSON::Parse(file);
-			};
-
 			co_yield "empty"_test = [](const Requirements& requirements)
 			{
-				synodic::honesty::utility::JSON json;
+				const synodic::honesty::utility::JSON json;
+
+				std::ofstream file("test.json");
+				file << json;
+
+				std::ifstream t("file.txt");
+				std::stringstream buffer;
+				buffer << t.rdbuf();
 			};
 
 			co_yield "value"_test = [](const Requirements& requirements)

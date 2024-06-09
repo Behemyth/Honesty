@@ -2,6 +2,7 @@ export module synodic.honesty.test:suite;
 
 import :types;
 import :test;
+import :fixture;
 import inplace_vector;
 
 namespace synodic::honesty::test
@@ -31,6 +32,13 @@ namespace synodic::honesty::test
 			std::copy_n(name, NameSize, name_.begin());
 		}
 
+		consteval Suite(const char (&name)[NameSize], const std::function_ref<Generator(Fixture&)> generator) :
+			name_ {0},
+			testGenerator_(generator)
+		{
+			std::copy_n(name, NameSize, name_.begin());
+		}
+
 		Suite(const Suite& other)	  = delete;
 		Suite(Suite&& other) noexcept = delete;
 
@@ -41,7 +49,7 @@ namespace synodic::honesty::test
 		friend SuiteView;
 
 		std::array<char, NameSize> name_;
-		std::function_ref<Generator()> testGenerator_;
+		std::variant<std::function_ref<Generator()>, std::function_ref<Generator(Fixture&)>> testGenerator_;
 	};
 
 	struct SuiteView
@@ -61,7 +69,7 @@ namespace synodic::honesty::test
 		}
 
 		std::string_view name;
-		std::function_ref<Generator()> testGenerator;
+		std::variant<std::function_ref<Generator()>, std::function_ref<Generator(Fixture&)>> testGenerator;
 	};
 }
 

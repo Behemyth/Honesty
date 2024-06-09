@@ -11,18 +11,24 @@ namespace
 {
 	Suite SUITE(
 		"json",
-		[]() -> Generator
+		[](Fixture& fixture) -> Generator
 		{
-			co_yield "empty"_test = [](const Requirements& requirements)
+			co_yield "empty"_test = [&](const Requirements& requirements)
 			{
 				const synodic::honesty::utility::JSON json;
 
-				std::ofstream file("test.json");
+				std::string path = fixture.TempFile();
+
+				std::ofstream file(path);
 				file << json;
 
-				std::ifstream t("file.txt");
+				std::ifstream input(path);
 				std::stringstream buffer;
-				buffer << t.rdbuf();
+				buffer << input.rdbuf();
+
+				std::string expected = "{}";
+
+				requirements.ExpectEquals(buffer.str(), expected);
 			};
 
 			co_yield "value"_test = [](const Requirements& requirements)

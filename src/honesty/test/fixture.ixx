@@ -17,6 +17,7 @@ namespace synodic::honesty::test
 		Fixture()  = default;
 		~Fixture() = default;
 
+
 		Fixture(const Fixture& other)				 = delete;
 		Fixture(Fixture&& other) noexcept			 = delete;
 		Fixture& operator=(const Fixture& other)	 = delete;

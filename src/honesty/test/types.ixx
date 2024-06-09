@@ -88,12 +88,30 @@ namespace synodic::honesty::test
 
 		struct AssertionFail
 		{
+			explicit AssertionFail(
+				std::source_location location,
+				const bool exception		  = false,
+				const std::string_view reason = "") :
+				location(std::move(location)),
+				exception(exception),
+				reason(reason)
+			{
+			}
+
 			bool exception;	 // True if the remainder of the test is skipped
 			std::source_location location;
+
+			std::string_view reason;
 		};
 
 		struct AssertionPass
+
 		{
+			explicit AssertionPass(std::source_location location) :
+				location(std::move(location))
+			{
+			}
+
 			std::source_location location;
 		};
 

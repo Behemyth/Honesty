@@ -20,15 +20,13 @@ namespace synodic::honesty::test
 		{
 			if (expression)
 			{
-				event::AssertionPass passed;
-				passed.location = location;
+				const event::AssertionPass passed(location);
 
 				Signal(passed);
 			}
 			else
 			{
-				event::AssertionFail failed;
-				failed.location = location;
+				const event::AssertionFail failed(location, true);
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -44,15 +42,13 @@ namespace synodic::honesty::test
 		{
 			if (expression)
 			{
-				event::AssertionPass passed;
-				passed.location = location;
+				const event::AssertionPass passed(location);
 
 				Signal(passed);
 			}
 			else
 			{
-				event::AssertionFail failed;
-				failed.location = location;
+				const event::AssertionFail failed(location);
 
 				Signal(failed);
 			}
@@ -79,22 +75,19 @@ namespace synodic::honesty::test
 			try
 			{
 				std::invoke(std::forward<Fn>(function));
-				event::AssertionFail failed;
-				failed.location = location;
+				const event::AssertionFail failed(location);
 
 				Signal(failed);
 			}
 			catch (const Exception&)
 			{
-				event::AssertionPass passed;
-				passed.location = location;
+				const event::AssertionPass passed(location);
 
 				Signal(passed);
 			}
 			catch (...)
 			{
-				event::AssertionFail failed;
-				failed.location = location;
+				const event::AssertionFail failed(location);
 
 				Signal(failed);
 			}
@@ -107,15 +100,13 @@ namespace synodic::honesty::test
 			try
 			{
 				std::invoke(std::forward<Fn>(function));
-				event::AssertionPass passed;
-				passed.location = location;
+				const event::AssertionPass passed(location);
 
 				Signal(passed);
 			}
 			catch (...)
 			{
-				event::AssertionFail failed;
-				failed.location = location;
+				const event::AssertionFail failed(location);
 
 				Signal(failed);
 			}
@@ -128,22 +119,19 @@ namespace synodic::honesty::test
 			try
 			{
 				std::invoke(std::forward<Fn>(function));
-				event::AssertionFail failed;
-				failed.location = location;
+				const event::AssertionFail failed(location);
 
 				Signal(failed);
 			}
 			catch (const Exception&)
 			{
-				event::AssertionPass passed;
-				passed.location = location;
+				const event::AssertionPass passed(location);
 
 				Signal(passed);
 			}
 			catch (...)
 			{
-				event::AssertionFail failed;
-				failed.location = location;
+				const event::AssertionFail failed(location);
 
 				Signal(failed);
 			}
@@ -156,15 +144,13 @@ namespace synodic::honesty::test
 			try
 			{
 				std::invoke(std::forward<Fn>(function));
-				event::AssertionPass passed;
-				passed.location = location;
+				event::AssertionPass passed(location);
 
 				Signal(passed);
 			}
 			catch (...)
 			{
-				event::AssertionFail failed;
-				failed.location = location;
+				event::AssertionFail failed(location);
 
 				Signal(failed);
 			}

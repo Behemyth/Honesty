@@ -38,9 +38,15 @@ namespace synodic::honesty::test
 		{
 			++failCount_;
 
+			const log::Logger& logger = Logger();
+
 			std::string styledResult = format(log::TextStyle(log::color24_t(255, 0, 0)), "Failed");
-			Logger()
-				.Info("Test {}: File({}), Line({})", styledResult, event.location.file_name(), event.location.line());
+			logger.Info("Test {}: File({}), Line({})", styledResult, event.location.file_name(), event.location.line());
+
+			if (not event.reason.empty())
+			{
+				logger.Info("    {}", event.reason);
+			}
 		}
 
 		void Signal(const event::Summary& event) override

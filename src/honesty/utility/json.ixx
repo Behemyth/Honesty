@@ -187,7 +187,7 @@ namespace synodic::honesty::utility
 				},
 				[&](const std::string& value)
 				{
-					return std::format("{}", value);
+					return std::format("\"{}\"", value);
 				},
 				[&](const Array& value)
 				{

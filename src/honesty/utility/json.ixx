@@ -14,15 +14,25 @@ namespace synodic::honesty::utility
 	export class JSON
 	{
 	public:
+		JSON()	= default;
+		~JSON() = default;
+
+		JSON(const JSON& other)				   = default;
+		JSON(JSON&& other) noexcept			   = default;
+		JSON& operator=(const JSON& other)	   = default;
+		JSON& operator=(JSON&& other) noexcept = default;
+
 		JSON& operator[](const std::string_view& key)
 		{
+			if (std::holds_alternative<std::monostate>(data_))
+			{
+			}
+
 			return data_[std::string(key)];
 		}
 
-		JSON(const JSON& other) = default;
-
 	private:
-		std::variant<bool, int, std::uint32_t, float, std::map<std::string, JSON>> data_;
+		std::variant<std::monostate, bool, int, std::uint32_t, float, std::unordered_set<JSON>> data_;
 	};
 
 }

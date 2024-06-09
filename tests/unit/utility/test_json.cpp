@@ -36,7 +36,9 @@ namespace
 
 				json["value"] = 42;
 
-				requirements.ExpectEquals(json["value"], 42);
+				const int storedValue = static_cast<int>(json["value"]);
+
+				requirements.ExpectEquals(storedValue, 42);
 			};
 		});
 	SuiteRegistrar _(SUITE);

@@ -261,7 +261,7 @@ namespace synodic::honesty::test
 										auto& suiteJSON = json["suite"];
 										for (auto& testDescription: suiteDescription.tests)
 										{
-											suiteJSON["test"]  = testDescription.name;
+											suiteJSON["test"] = testDescription.name;
 										}
 									}
 

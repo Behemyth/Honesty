@@ -30,7 +30,7 @@ namespace
 				ListParameters parameters(root.CreateLogger("test"));
 				const auto result = interface.List(parameters);
 
-				requirements.ExpectGreater(result.tests.size(), 0);
+				requirements.ExpectGreater(result.suites.size(), 0);
 			};
 		});
 	SuiteRegistrar _(SUITE);

@@ -28,9 +28,9 @@ namespace
 				const Instance::ListContext* context = instance.GetListContext();
 
 				requirements.Assert(context);
-				requirements.ExpectEquals(context->outputType, ListOutputType::JSON);
+				requirements.Expect(context->outputType == ListOutputType::JSON);
 				requirements.Assert(context->file.has_value());
-				requirements.ExpectEquals(context->file.value(), temporaryPath);
+				requirements.Expect(context->file.value() == temporaryPath);
 
 				instance.Execute();
 			};

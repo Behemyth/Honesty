@@ -40,7 +40,7 @@ namespace synodic::honesty::test
 
 			const log::Logger& logger = Logger();
 
-			std::string styledResult = format(log::TextStyle(log::color24_t(255, 0, 0)), "Failed");
+			std::string styledResult = format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
 			logger.Info("Test {}: File({}), Line({})", styledResult, event.location.file_name(), event.location.line());
 
 			if (not event.reason.empty())
@@ -51,8 +51,8 @@ namespace synodic::honesty::test
 
 		void Signal(const event::Summary& event) override
 		{
-			std::string passedStyled = format(log::TextStyle(log::color24_t(0, 255, 0)), "Passed");
-			std::string failedStyled = format(log::TextStyle(log::color24_t(255, 0, 0)), "Failed");
+			std::string passedStyled = format(log::TextStyle(log::Colour24(0, 255, 0)), "Passed");
+			std::string failedStyled = format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
 
 			Logger().Info("{} Assertions {}\n{} Assertions {}", passCount_, passedStyled, failCount_, failedStyled);
 		}

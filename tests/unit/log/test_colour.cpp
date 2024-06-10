@@ -8,25 +8,25 @@ using namespace synodic::honesty::test::literals;
 
 namespace
 {
-	constexpr std::uint32_t green = 0x3A'5A'40; // #3A5A40 Hunter Green
+	constexpr std::uint32_t GREEN = 0x3A'5A'40; // #3A5A40 Hunter Green
 
-	Suite colorSuite(
+	Suite COLOR_SUITE(
 		"color",
 		[]() -> Generator
 		{
 			co_yield "construction"_test = [](const Requirements& requirements)
 			{
-				requirements.ExpectEquals(log::color24_t(58, 90, 64), log::color24_t(green));
+				requirements.ExpectEquals(log::Colour24(58, 90, 64), log::Colour24(GREEN));
 			};
 		});
 
-	Suite styleSuite(
+	Suite STYLE_SUITE(
 		"style",
 		[]() -> Generator
 		{
 			co_yield "construction"_test = [](const Requirements& requirements)
 			{
-				constexpr log::color24_t hunterGreen(58, 90, 64);
+				constexpr log::Colour24 hunterGreen(58, 90, 64);
 				constexpr log::TextStyle style(hunterGreen);
 
 				constexpr auto foreground = style.Foreground();
@@ -34,19 +34,19 @@ namespace
 				requirements.Expect(not style.Background().has_value());
 				requirements.Expect(not style.AttributeMask());
 
-				constexpr auto value = std::get<log::color24_t>(foreground.value());
+				constexpr auto value = std::get<log::Colour24>(foreground.value());
 				requirements.ExpectEquals(value, hunterGreen);
 			};
 		});
 
-	Suite terminalSuite(
+	Suite TERMINAL_SUITE(
 		"terminal",
 		[]() -> Generator
 		{
 			co_yield "format_to"_test = [](const Requirements& requirements)
 			{
 				std::string output;
-				constexpr log::TextStyle style(log::color24_t(58, 90, 64));
+				constexpr log::TextStyle style(log::Colour24(58, 90, 64));
 				log::format_to(std::back_inserter(output), style, "{} = (58,90,64)", "Hunter Green");
 
 				std::string expected;
@@ -60,10 +60,12 @@ namespace
 
 			co_yield "format"_test = [](const Requirements& requirements)
 			{
-				std::string output =
-					log::format(log::TextStyle(log::color24_t(58, 90, 64)), "Hunter Green = (58,90,64)");
+				const std::string output =
+					log::format(log::TextStyle(log::Colour24(58, 90, 64)), "Hunter Green = (58,90,64)");
 
-				std::string expected = std::format("\x1b[38;2;058;090;064m{}\x1b[0m", "Hunter Green = (58,90,64)");
+				const std::string expected = std::format(
+					"\x1b[38;2;058;090;064m{}\x1b[0m",
+					"Hunter Green = (58,90,64)");
 
 				requirements.ExpectEquals(output, expected);
 			};
@@ -74,5 +76,5 @@ namespace
 			};
 		});
 
-	SuiteRegistrar _(styleSuite, colorSuite, terminalSuite);
+	SuiteRegistrar _(STYLE_SUITE, COLOR_SUITE, TERMINAL_SUITE);
 }

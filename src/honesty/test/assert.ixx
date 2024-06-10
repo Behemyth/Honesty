@@ -157,131 +157,261 @@ namespace synodic::honesty::test
 		}
 
 		template<class T, class U>
-			requires std::equality_comparable_with<T, U>
+			requires std::equality_comparable_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void
 			AssertEquals(const T& a, const U& b, const std::source_location& location = std::source_location::current())
 				const
 		{
-			// TODO: Pass message context
-			Assert(a == b, location);
+			if (a == b)
+			{
+				const event::AssertionPass passed(location);
+
+				Signal(passed);
+			}
+			else
+			{
+				const event::AssertionFail failed(location, true, std::format("{} did not equal {}", a, b));
+
+				Signal(failed);
+				throw AssertException("Assertion failed");
+			}
 		}
 
 		template<class T, class U>
-			requires std::equality_comparable_with<T, U>
+			requires std::equality_comparable_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void AssertNotEquals(
 			const T& a,
 			const U& b,
 			const std::source_location& location = std::source_location::current()) const
 		{
-			// TODO: Pass message context
-			Assert(a != b, location);
+			if (a != b)
+			{
+				const event::AssertionPass passed(location);
+
+				Signal(passed);
+			}
+			else
+			{
+				const event::AssertionFail failed(location, true, std::format("{} was equal to {}", a, b));
+
+				Signal(failed);
+				throw AssertException("Assertion failed");
+			}
 		}
 
+		/**
+		 * @brief A non-fatal assertion that both inputs are equal. If this function is being used it is expected that
+		 *		the inputs are formattable to express contextual information
+		 */
 		template<class T, class U>
-			requires std::equality_comparable_with<T, U>
+			requires std::equality_comparable_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void
 			ExpectEquals(const T& a, const U& b, const std::source_location& location = std::source_location::current())
 				const
 		{
-			// TODO: Pass message context
-			Expect(a == b, location);
+			if (a == b)
+			{
+				const event::AssertionPass passed(location);
+
+				Signal(passed);
+			}
+			else
+			{
+				const event::AssertionFail failed(location, false, std::format("{} did not equal {}", a, b));
+
+				Signal(failed);
+			}
 		}
 
 		template<class T, class U>
-			requires std::equality_comparable_with<T, U>
+			requires std::equality_comparable_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void ExpectNotEquals(
 			const T& a,
 			const U& b,
 			const std::source_location& location = std::source_location::current()) const
 		{
-			// TODO: Pass message context
-			Expect(a != b, location);
+			if (a != b)
+			{
+				const event::AssertionPass passed(location);
+
+				Signal(passed);
+			}
+			else
+			{
+				const event::AssertionFail failed(location, false, std::format("{} was equal to {}", a, b));
+
+				Signal(failed);
+			}
 		}
 
 		template<class T, class U>
-			requires std::totally_ordered_with<T, U>
+			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void AssertGreater(
 			const T& a,
 			const U& b,
 			const std::source_location& location = std::source_location::current()) const
 		{
-			// TODO: Pass message context
-			Assert(a > b, location);
+			if (a > b)
+			{
+				const event::AssertionPass passed(location);
+
+				Signal(passed);
+			}
+			else
+			{
+				const event::AssertionFail failed(location, true, std::format("{} was not greater than {}", a, b));
+
+				Signal(failed);
+				throw AssertException("Assertion failed");
+			}
 		}
 
 		template<class T, class U>
-			requires std::totally_ordered_with<T, U>
+			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void
 			AssertLess(const T& a, const U& b, const std::source_location& location = std::source_location::current())
 				const
 		{
-			// TODO: Pass message context
-			Assert(a < b, location);
+			if (a < b)
+			{
+				const event::AssertionPass passed(location);
+
+				Signal(passed);
+			}
+			else
+			{
+				const event::AssertionFail failed(location, true, std::format("{} was not less than {}", a, b));
+
+				Signal(failed);
+				throw AssertException("Assertion failed");
+			}
 		}
 
 		template<class T, class U>
-			requires std::totally_ordered_with<T, U>
+			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void AssertGreaterEqual(
 			const T& a,
 			const U& b,
 			const std::source_location& location = std::source_location::current()) const
 		{
-			// TODO: Pass message context
-			Assert(a >= b, location);
+			if (a >= b)
+			{
+				const event::AssertionPass passed(location);
+
+				Signal(passed);
+			}
+			else
+			{
+				const event::AssertionFail failed(location, true, std::format("{} was less than {}", a, b));
+
+				Signal(failed);
+				throw AssertException("Assertion failed");
+			}
 		}
 
 		template<class T, class U>
-			requires std::totally_ordered_with<T, U>
+			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void AssertLessEqual(
 			const T& a,
 			const U& b,
 			const std::source_location& location = std::source_location::current()) const
 		{
-			// TODO: Pass message context
-			Assert(a <= b, location);
+			if (a <= b)
+			{
+				const event::AssertionPass passed(location);
+
+				Signal(passed);
+			}
+			else
+			{
+				const event::AssertionFail failed(location, true, std::format("{} was greater than {}", a, b));
+
+				Signal(failed);
+				throw AssertException("Assertion failed");
+			}
 		}
 
 		template<class T, class U>
-			requires std::totally_ordered_with<T, U>
+			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void ExpectGreater(
 			const T& a,
 			const U& b,
 			const std::source_location& location = std::source_location::current()) const
 		{
-			// TODO: Pass message context
-			Expect(a > b, location);
+			if (a > b)
+			{
+				const event::AssertionPass passed(location);
+
+				Signal(passed);
+			}
+			else
+			{
+				const event::AssertionFail failed(location, false, std::format("{} was not greater than {}", a, b));
+
+				Signal(failed);
+			}
 		}
 
 		template<class T, class U>
-			requires std::totally_ordered_with<T, U>
+			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void
 			ExpectLess(const T& a, const U& b, const std::source_location& location = std::source_location::current())
 				const
 		{
-			// TODO: Pass message context
-			Expect(a < b, location);
+			if (a < b)
+			{
+				const event::AssertionPass passed(location);
+
+				Signal(passed);
+			}
+			else
+			{
+				const event::AssertionFail failed(location, false, std::format("{} was not less than {}", a, b));
+
+				Signal(failed);
+			}
 		}
 
 		template<class T, class U>
-			requires std::totally_ordered_with<T, U>
+			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void ExpectGreaterEqual(
 			const T& a,
 			const U& b,
 			const std::source_location& location = std::source_location::current()) const
 		{
-			// TODO: Pass message context
-			Expect(a >= b, location);
+			if (a >= b)
+			{
+				const event::AssertionPass passed(location);
+
+				Signal(passed);
+			}
+			else
+			{
+				const event::AssertionFail failed(location, false, std::format("{} was less than {}", a, b));
+
+				Signal(failed);
+			}
 		}
 
 		template<class T, class U>
-			requires std::totally_ordered_with<T, U>
+			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void ExpectLessEqual(
 			const T& a,
 			const U& b,
 			const std::source_location& location = std::source_location::current()) const
 		{
-			// TODO: Pass message context
-			Expect(a <= b, location);
+			if (a <= b)
+			{
+				const event::AssertionPass passed(location);
+
+				Signal(passed);
+			}
+			else
+			{
+				const event::AssertionFail failed(location, false, std::format("{} was greater than {}", a, b));
+
+				Signal(failed);
+			}
 		}
 
 	private:

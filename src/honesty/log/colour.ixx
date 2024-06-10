@@ -10,28 +10,28 @@ import std;
 
 namespace synodic::honesty::log
 {
-	export struct color8_t
+	export struct Colour8
 	{
-		constexpr color8_t(const std::uint8_t code) :
+		explicit constexpr Colour8(const std::uint8_t code) :
 			code(code)
 		{
 		}
 
 		std::uint8_t code;
 
-		friend bool operator<=>(const color8_t&, const color8_t&) = default;
+		friend auto operator<=>(const Colour8&, const Colour8&) = default;
 	};
 
-	export struct color24_t
+	export struct Colour24
 	{
-		constexpr color24_t(const std::uint32_t hexCode) :
+		explicit constexpr Colour24(const std::uint32_t hexCode) :
 			red((hexCode >> 16) & 0xFF),
 			green((hexCode >> 8) & 0xFF),
 			blue(hexCode & 0xFF)
 		{
 		}
 
-		constexpr color24_t(const std::uint8_t red, const std::uint8_t green, const std::uint8_t blue) :
+		constexpr Colour24(const std::uint8_t red, const std::uint8_t green, const std::uint8_t blue) :
 			red(red),
 			green(green),
 			blue(blue)
@@ -42,7 +42,7 @@ namespace synodic::honesty::log
 		std::uint8_t green;
 		std::uint8_t blue;
 
-		friend bool operator<=>(const color24_t&, const color24_t&) = default;
+		friend auto operator<=>(const Colour24&, const Colour24&) = default;
 	};
 
 	/**
@@ -96,44 +96,44 @@ namespace synodic::honesty::log
 		BRIGHT_WHITE
 	};
 
-	export using color_type = std::variant<color8_t, color24_t>;
+	export using ColorType = std::variant<Colour8, Colour24>;
 
 	export class TextStyle
 	{
 	public:
-		constexpr explicit TextStyle(color8_t color);
-		constexpr explicit TextStyle(color24_t color);
+		constexpr explicit TextStyle(Colour8 color);
+		constexpr explicit TextStyle(Colour24 color);
 
-		constexpr std::optional<color_type> Foreground() const;
-		constexpr std::optional<color_type> Background() const;
+		constexpr std::optional<ColorType> Foreground() const;
+		constexpr std::optional<ColorType> Background() const;
 		constexpr std::uint8_t AttributeMask() const;
 
-		friend bool operator<=>(const TextStyle&, const TextStyle&) = default;
+		friend auto operator<=>(const TextStyle&, const TextStyle&) = default;
 
 	private:
-		std::optional<color_type> foreground_;
-		std::optional<color_type> background_;
+		std::optional<ColorType> foreground_;
+		std::optional<ColorType> background_;
 		std::uint8_t attributeMask_;
 	};
 
-	constexpr TextStyle::TextStyle(color8_t color) :
+	constexpr TextStyle::TextStyle(Colour8 color) :
 		foreground_(color),
 		attributeMask_(0)
 	{
 	}
 
-	constexpr TextStyle::TextStyle(color24_t color) :
+	constexpr TextStyle::TextStyle(Colour24 color) :
 		foreground_(color),
 		attributeMask_(0)
 	{
 	}
 
-	constexpr std::optional<color_type> TextStyle::Foreground() const
+	constexpr std::optional<ColorType> TextStyle::Foreground() const
 	{
 		return foreground_;
 	}
 
-	constexpr std::optional<color_type> TextStyle::Background() const
+	constexpr std::optional<ColorType> TextStyle::Background() const
 	{
 		return background_;
 	}
@@ -184,34 +184,34 @@ namespace synodic::honesty::log
 			}
 		}
 
-		if (std::optional<color_type> foreground = style.Foreground())
+		if (std::optional<ColorType> foreground = style.Foreground())
 		{
-			color_type& colorType = foreground.value();
+			ColorType& colorType = foreground.value();
 
 			std::visit(
 				Overloaded {
-					[&](color8_t arg)
+					[&](Colour8 arg)
 					{
 						next = std::format_to(next, "\x1b[{}m", arg.code);
 					},
-					[&](color24_t arg)
+					[&](Colour24 arg)
 					{
 						next = std::format_to(next, "\x1b[38;2;{:03};{:03};{:03}m", arg.red, arg.green, arg.blue);
 					}},
 				colorType);
 		}
 
-		if (std::optional<color_type> background = style.Background())
+		if (std::optional<ColorType> background = style.Background())
 		{
-			color_type& colorType = background.value();
+			ColorType& colorType = background.value();
 
 			std::visit(
 				Overloaded {
-					[&](color8_t arg)
+					[&](Colour8 arg)
 					{
 						next = std::format_to(next, "\x1b[{}m", arg.code + 10);
 					},
-					[&](color24_t arg)
+					[&](Colour24 arg)
 					{
 						next = std::format_to(next, "\x1b[48;2;{:03};{:03};{:03}m", arg.red, arg.green, arg.blue);
 					}},
@@ -298,3 +298,15 @@ namespace synodic::honesty::log
 	}
 
 }
+
+export template<>
+struct std::formatter<synodic::honesty::log::Colour24> : std::formatter<std::string_view>
+{
+	template<typename Context>
+	auto format(const synodic::honesty::log::Colour24& colour, Context& context) const
+	{
+		return std::formatter<string_view>::format(
+			std::format("({}, {}, {})", colour.red, colour.green, colour.blue),
+			context);
+	}
+};

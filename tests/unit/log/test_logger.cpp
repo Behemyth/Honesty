@@ -17,7 +17,7 @@ namespace
 				synodic::honesty::log::Logger child = parent.CreateLogger("child");
 
 				requirements.Assert(child.Parent());
-				requirements.ExpectEquals(parent, *child.Parent());
+				requirements.Expect(parent == *child.Parent());
 
 				synodic::honesty::log::RingBuffer<std::mutex> sink;
 

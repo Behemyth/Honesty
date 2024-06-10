@@ -8,13 +8,6 @@ namespace synodic::honesty::utility
 	export template<typename CharT, std::size_t Size, typename Traits = std::char_traits<CharT>>
 	class BasicFixedString
 	{
-	public:
-		BasicFixedString(const BasicFixedString& other)				   = default;
-		BasicFixedString(BasicFixedString&& other) noexcept			   = default;
-		BasicFixedString& operator=(const BasicFixedString& other)	   = default;
-		BasicFixedString& operator=(BasicFixedString&& other) noexcept = default;
-
-	private:
 		static constexpr std::size_t VIEW_SIZE = Size - 1;
 
 	public:
@@ -24,6 +17,11 @@ namespace synodic::honesty::utility
 		{
 			std::copy(std::begin(str), std::end(str), std::begin(data_));
 		}
+
+		BasicFixedString(const BasicFixedString& other)				   = default;
+		BasicFixedString(BasicFixedString&& other) noexcept			   = default;
+		BasicFixedString& operator=(const BasicFixedString& other)	   = default;
+		BasicFixedString& operator=(BasicFixedString&& other) noexcept = default;
 
 		explicit constexpr operator std::basic_string_view<CharT>() const noexcept
 		{
@@ -93,7 +91,9 @@ export template<typename CharT, std::size_t Size, typename Traits>
 struct std::formatter<synodic::honesty::utility::BasicFixedString<CharT, Size, Traits>, CharT> :
 	std::formatter<std::basic_string_view<CharT, Traits>, CharT>
 {
-	auto format(const synodic::honesty::utility::BasicFixedString<CharT, Size, Traits>& string, auto& context) const
+	template<typename Context>
+	auto format(const synodic::honesty::utility::BasicFixedString<CharT, Size, Traits>& string, Context& context) const
+		-> typename Context::iterator
 	{
 		return std::formatter<std::basic_string_view<CharT, Traits>, CharT>::format(std::format("{}", string), context);
 	}

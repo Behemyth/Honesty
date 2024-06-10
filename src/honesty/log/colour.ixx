@@ -303,7 +303,7 @@ export template<>
 struct std::formatter<synodic::honesty::log::Colour24> : std::formatter<std::string_view>
 {
 	template<typename Context>
-	auto format(const synodic::honesty::log::Colour24& colour, Context& context) const
+	auto format(const synodic::honesty::log::Colour24& colour, Context& context) const -> typename Context::iterator
 	{
 		return std::formatter<string_view>::format(
 			std::format("({}, {}, {})", colour.red, colour.green, colour.blue),

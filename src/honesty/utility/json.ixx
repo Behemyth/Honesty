@@ -32,7 +32,11 @@ namespace synodic::honesty::utility
 	public:
 		using size_type = Array::size_type;
 
-		JSON()	= default;
+		JSON() :
+			value_(Object())
+		{
+		}
+
 		~JSON() = default;
 
 		JSON(const JSON& other)				   = default;

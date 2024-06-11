@@ -15,12 +15,11 @@ namespace
 		{
 			co_yield "empty"_test = [&](const Requirements& requirements)
 			{
-				const synodic::honesty::utility::JSON json;
-
 				std::filesystem::path path = fixture.TempFilePath();
 				std::stringstream buffer;
 
 				{
+					const synodic::honesty::utility::JSON json;
 					std::ofstream file(path);
 					file << json;
 				}

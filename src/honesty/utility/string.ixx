@@ -23,6 +23,16 @@ namespace synodic::honesty::utility
 		BasicFixedString& operator=(const BasicFixedString& other)	   = default;
 		BasicFixedString& operator=(BasicFixedString&& other) noexcept = default;
 
+		/**
+		 * @brief Explicit conversion to std::basic_string_view
+		 */
+		constexpr std::basic_string_view<CharT> View() const noexcept
+		{
+			return {data_.data(), VIEW_SIZE};
+		}
+
+		[[nodiscard]]
+
 		explicit constexpr operator std::basic_string_view<CharT>() const noexcept
 		{
 			return {data_.data(), VIEW_SIZE};

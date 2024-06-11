@@ -33,10 +33,10 @@ namespace
 				requirements.ExpectEquals(u16Str, u16StrCopy);
 				requirements.ExpectEquals(u32Str, u32StrCopy);
 
-				requirements.ExpectEquals(str, std::string_view("test"));
-				requirements.ExpectEquals(u8Str, std::u8string_view(u8"test"));
-				requirements.ExpectEquals(u16Str, std::u16string_view(u"test"));
-				requirements.ExpectEquals(u32Str, std::u32string_view(U"test"));
+				requirements.ExpectEquals(str.View(), std::string_view("test"));
+				requirements.ExpectEquals(u8Str.View(), std::u8string_view(u8"test"));
+				requirements.ExpectEquals(u16Str.View(), std::u16string_view(u"test"));
+				requirements.ExpectEquals(u32Str.View(), std::u32string_view(U"test"));
 
 				requirements.ExpectEquals(str, "test");
 				requirements.ExpectEquals(u8Str, u8"test");

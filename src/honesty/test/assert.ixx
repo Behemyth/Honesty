@@ -156,7 +156,7 @@ namespace synodic::honesty::test
 			}
 		}
 
-		template<class T, class U>
+		template<typename T, typename U>
 			requires std::equality_comparable_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void
 			AssertEquals(const T& a, const U& b, const std::source_location& location = std::source_location::current())
@@ -177,7 +177,7 @@ namespace synodic::honesty::test
 			}
 		}
 
-		template<class T, class U>
+		template<typename T, typename U>
 			requires std::equality_comparable_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void AssertNotEquals(
 			const T& a,
@@ -203,7 +203,7 @@ namespace synodic::honesty::test
 		 * @brief A non-fatal assertion that both inputs are equal. If this function is being used it is expected that
 		 *		the inputs are formattable to express contextual information
 		 */
-		template<class T, class U>
+		template<typename T, typename U>
 			requires std::equality_comparable_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void
 			ExpectEquals(const T& a, const U& b, const std::source_location& location = std::source_location::current())
@@ -223,7 +223,7 @@ namespace synodic::honesty::test
 			}
 		}
 
-		template<class T, class U>
+		template<typename T, typename U>
 			requires std::equality_comparable_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void ExpectNotEquals(
 			const T& a,
@@ -244,7 +244,7 @@ namespace synodic::honesty::test
 			}
 		}
 
-		template<class T, class U>
+		template<typename T, typename U>
 			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void AssertGreater(
 			const T& a,
@@ -266,7 +266,7 @@ namespace synodic::honesty::test
 			}
 		}
 
-		template<class T, class U>
+		template<typename T, typename U>
 			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void
 			AssertLess(const T& a, const U& b, const std::source_location& location = std::source_location::current())
@@ -287,7 +287,7 @@ namespace synodic::honesty::test
 			}
 		}
 
-		template<class T, class U>
+		template<typename T, typename U>
 			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void AssertGreaterEqual(
 			const T& a,
@@ -309,7 +309,7 @@ namespace synodic::honesty::test
 			}
 		}
 
-		template<class T, class U>
+		template<typename T, typename U>
 			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void AssertLessEqual(
 			const T& a,
@@ -331,7 +331,7 @@ namespace synodic::honesty::test
 			}
 		}
 
-		template<class T, class U>
+		template<typename T, typename U>
 			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void ExpectGreater(
 			const T& a,
@@ -352,7 +352,7 @@ namespace synodic::honesty::test
 			}
 		}
 
-		template<class T, class U>
+		template<typename T, typename U>
 			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void
 			ExpectLess(const T& a, const U& b, const std::source_location& location = std::source_location::current())
@@ -372,7 +372,7 @@ namespace synodic::honesty::test
 			}
 		}
 
-		template<class T, class U>
+		template<typename T, typename U>
 			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void ExpectGreaterEqual(
 			const T& a,
@@ -393,7 +393,7 @@ namespace synodic::honesty::test
 			}
 		}
 
-		template<class T, class U>
+		template<typename T, typename U>
 			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
 		constexpr void ExpectLessEqual(
 			const T& a,

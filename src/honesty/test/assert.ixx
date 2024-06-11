@@ -3,6 +3,8 @@ export module synodic.honesty.test:assert;
 import std;
 import :reporter;
 
+import synodic.honesty.log;
+
 namespace synodic::honesty::test
 {
 	export class Requirements
@@ -170,7 +172,12 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(location, true, std::format("{} did not equal {}", a, b));
+				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
+
+				const event::AssertionFail failed(
+					location,
+					true,
+					std::format("'{}' did not equal '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -192,7 +199,12 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(location, true, std::format("{} was equal to {}", a, b));
+				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
+
+				const event::AssertionFail failed(
+					location,
+					true,
+					std::format("'{}' was equal to '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -217,7 +229,12 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(location, false, std::format("{} did not equal {}", a, b));
+				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
+
+				const event::AssertionFail failed(
+					location,
+					false,
+					std::format("'{}' did not equal '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
 
 				Signal(failed);
 			}
@@ -238,7 +255,12 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(location, false, std::format("{} was equal to {}", a, b));
+				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
+
+				const event::AssertionFail failed(
+					location,
+					false,
+					std::format("'{}' was equal to '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
 
 				Signal(failed);
 			}
@@ -259,7 +281,15 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(location, true, std::format("{} was not greater than {}", a, b));
+				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
+
+				const event::AssertionFail failed(
+					location,
+					true,
+					std::format(
+						"'{}' was not greater than '{}'",
+						format(highlight, "{}", a),
+						format(highlight, "{}", b)));
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -280,7 +310,12 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(location, true, std::format("{} was not less than {}", a, b));
+				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
+
+				const event::AssertionFail failed(
+					location,
+					true,
+					std::format("'{}' was not less than '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -302,7 +337,12 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(location, true, std::format("{} was less than {}", a, b));
+				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
+
+				const event::AssertionFail failed(
+					location,
+					true,
+					std::format("'{}' was less than '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -324,7 +364,12 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(location, true, std::format("{} was greater than {}", a, b));
+				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
+
+				const event::AssertionFail failed(
+					location,
+					true,
+					std::format("'{}' was greater than '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -346,7 +391,15 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(location, false, std::format("{} was not greater than {}", a, b));
+				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
+
+				const event::AssertionFail failed(
+					location,
+					false,
+					std::format(
+						"'{}' was not greater than '{}'",
+						format(highlight, "{}", a),
+						format(highlight, "{}", b)));
 
 				Signal(failed);
 			}
@@ -366,7 +419,12 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(location, false, std::format("{} was not less than {}", a, b));
+				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
+
+				const event::AssertionFail failed(
+					location,
+					false,
+					std::format("'{}' was not less than '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
 
 				Signal(failed);
 			}
@@ -387,7 +445,12 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(location, false, std::format("{} was less than {}", a, b));
+				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
+
+				const event::AssertionFail failed(
+					location,
+					false,
+					std::format("'{}' was less than '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
 
 				Signal(failed);
 			}
@@ -408,7 +471,12 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(location, false, std::format("{} was greater than {}", a, b));
+				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
+
+				const event::AssertionFail failed(
+					location,
+					false,
+					std::format("'{}' was greater than '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
 
 				Signal(failed);
 			}

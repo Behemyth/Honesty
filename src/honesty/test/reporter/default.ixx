@@ -54,7 +54,12 @@ namespace synodic::honesty::test
 			std::string passedStyled = format(log::TextStyle(log::Colour24(0, 255, 0)), "Passed");
 			std::string failedStyled = format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
 
-			Logger().Info("{} Assertions {}\n{} Assertions {}", passCount_, passedStyled, failCount_, failedStyled);
+			Logger().Info("{} Assertions {}", passCount_, passedStyled);
+
+			if (failCount_)
+			{
+				Logger().Info("{} Assertions {}", failCount_, failedStyled);
+			}
 		}
 
 	private:

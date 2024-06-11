@@ -17,14 +17,18 @@ namespace
 			{
 				const synodic::honesty::utility::JSON json;
 
-				std::string path = fixture.TempFile();
-
-				std::ofstream file(path);
-				file << json;
-
-				std::ifstream input(path);
+				std::filesystem::path path = fixture.TempFilePath();
 				std::stringstream buffer;
-				buffer << input.rdbuf();
+
+				{
+					std::ofstream file(path);
+					file << json;
+				}
+
+				{
+					std::ifstream input(path);
+					buffer << input.rdbuf();
+				}
 
 				std::string expected = "{}";
 

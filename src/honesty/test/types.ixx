@@ -91,17 +91,18 @@ namespace synodic::honesty::test
 			explicit AssertionFail(
 				std::source_location location,
 				const bool exception		  = false,
-				const std::string_view reason = "") :
-				location(std::move(location)),
+				std::string reason = "") :
 				exception(exception),
-				reason(reason)
+				location(std::move(location)),
+				reason(std::move(reason))
 			{
 			}
 
 			bool exception;	 // True if the remainder of the test is skipped
 			std::source_location location;
 
-			std::string_view reason;
+			// TODO: Prevent allocation
+			std::string reason;
 		};
 
 		struct AssertionPass

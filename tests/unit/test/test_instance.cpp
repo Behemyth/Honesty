@@ -33,6 +33,15 @@ namespace
 				requirements.Expect(context->file.value() == temporaryPath);
 
 				instance.Execute();
+
+				std::stringstream buffer;
+
+				{
+					std::ifstream input(temporaryPath);
+					buffer << input.rdbuf();
+				}
+
+				requirements.ExpectGreater(buffer.str().size(), 0);
 			};
 		});
 	SuiteRegistrar _(SUITE);

@@ -74,11 +74,12 @@ namespace synodic::honesty::test
 
 		// Resolve all input into immediately executable state ready for the 'Execute' function
 		Instance(const Configuration& configuration, std::span<std::string_view> arguments) :
-			logger_(log::RootLogger().CreateLogger("instance")),
+			sink_(std::move(configuration.sink)),
+			logger_(std::move(configuration.logger)),
 			parameters_(HelpContext())
 
 		{
-			logger_.SetSink(&consoleSink_);
+			logger_.SetSink(&sink_);
 
 			// Register our default runners and reporters
 			{
@@ -288,7 +289,7 @@ namespace synodic::honesty::test
 		}
 
 	private:
-		log::Console consoleSink_;
+		log::Console sink_;
 		log::Logger logger_;
 
 		// Our list of top level commands and the parameters that go with them

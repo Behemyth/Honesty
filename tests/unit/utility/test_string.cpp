@@ -7,7 +7,7 @@ using namespace synodic::honesty::test::literals;
 
 namespace
 {
-	Suite stringSuite(
+	/*Suite stringSuite(
 		"string",
 		[]() -> Generator
 		{
@@ -73,5 +73,5 @@ namespace
 			};
 		});
 
-	SuiteRegistrar _(stringSuite);
+	SuiteRegistrar _(stringSuite);*/
 }

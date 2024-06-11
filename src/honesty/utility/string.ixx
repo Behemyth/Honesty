@@ -95,6 +95,7 @@ struct std::formatter<synodic::honesty::utility::BasicFixedString<CharT, Size, T
 	auto format(const synodic::honesty::utility::BasicFixedString<CharT, Size, Traits>& string, Context& context) const
 		-> typename Context::iterator
 	{
-		return std::formatter<std::basic_string_view<CharT, Traits>, CharT>::format(std::format("{}", string), context);
+		using ViewType = typename synodic::honesty::utility::BasicFixedString<CharT, Size, Traits>::StringViewType;
+		return std::formatter<std::basic_string_view<CharT, Traits>, CharT>::format(static_cast<ViewType>(string), context);
 	}
 };

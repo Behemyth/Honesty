@@ -53,9 +53,9 @@ namespace
 
 				const std::string value = WriteReadJSON(json, path);
 				const std::string expected =
-					"{"
-					" \"value\": 42"
-					"}";
+					"{\n"
+					"    \"value\": 42\n"
+					"}\n";
 
 				requirements.ExpectEquals(value, expected);
 			};

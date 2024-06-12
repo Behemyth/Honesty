@@ -7,6 +7,44 @@ import synodic.honesty.log;
 
 namespace synodic::honesty::test
 {
+	/**
+	 * @brief Provides consistent text styling for assertion failures.
+	 * @param relation The string representing the relationship between the two failed comparisons.
+	 * @param a Comparison value a.
+	 * @param b Comparison value b.
+	 */
+	std::string StyleAssertionReason(std::string_view relation, std::string_view a, std::string_view b)
+	{
+		constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
+		const std::string indent(4, ' ');
+
+		const auto rangeA = a | std::views::split('\n') |
+							std::views::transform(
+								[](auto r)
+								{
+									return std::string_view(r);
+								}) |
+							std::views::join_with("\n" + indent);
+
+		const auto rangeB = b | std::views::split('\n') |
+							std::views::transform(
+								[](auto r)
+								{
+									return std::string_view(r);
+								}) |
+							std::views::join_with("\n" + indent);
+
+		// TODO: Using the ranges requires preview 3.
+		const std::string indentedA = std::format("{}", a);
+		const std::string indentedB = std::format("{}", b);
+
+		return std::format(
+			"{} {} {}",
+			format(highlight, "{}", indentedA),
+			relation,
+			format(highlight, "{}", indentedB));
+	}
+
 	export class Requirements
 	{
 	public:
@@ -146,13 +184,13 @@ namespace synodic::honesty::test
 			try
 			{
 				std::invoke(std::forward<Fn>(function));
-				event::AssertionPass passed(location);
+				const event::AssertionPass passed(location);
 
 				Signal(passed);
 			}
 			catch (...)
 			{
-				event::AssertionFail failed(location);
+				const event::AssertionFail failed(location);
 
 				Signal(failed);
 			}
@@ -172,12 +210,10 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
-
 				const event::AssertionFail failed(
 					location,
 					true,
-					std::format("'{}' did not equal '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
+					StyleAssertionReason("did not equal", std::format("{}", a), std::format("{}", b)));
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -199,12 +235,10 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
-
 				const event::AssertionFail failed(
 					location,
 					true,
-					std::format("'{}' was equal to '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
+					StyleAssertionReason("was equal to", std::format("{}", a), std::format("{}", b)));
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -229,12 +263,10 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
-
 				const event::AssertionFail failed(
 					location,
 					false,
-					std::format("'{}' did not equal '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
+					StyleAssertionReason("did not equal", std::format("{}", a), std::format("{}", b)));
 
 				Signal(failed);
 			}
@@ -255,12 +287,10 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
-
 				const event::AssertionFail failed(
 					location,
 					false,
-					std::format("'{}' was equal to '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
+					StyleAssertionReason("was equal to", std::format("{}", a), std::format("{}", b)));
 
 				Signal(failed);
 			}
@@ -281,15 +311,10 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
-
 				const event::AssertionFail failed(
 					location,
 					true,
-					std::format(
-						"'{}' was not greater than '{}'",
-						format(highlight, "{}", a),
-						format(highlight, "{}", b)));
+					StyleAssertionReason("was not greater than", std::format("{}", a), std::format("{}", b)));
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -310,12 +335,10 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
-
 				const event::AssertionFail failed(
 					location,
 					true,
-					std::format("'{}' was not less than '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
+					StyleAssertionReason("was not less than", std::format("{}", a), std::format("{}", b)));
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -337,12 +360,10 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
-
 				const event::AssertionFail failed(
 					location,
 					true,
-					std::format("'{}' was less than '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
+					StyleAssertionReason("was less than", std::format("{}", a), std::format("{}", b)));
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -364,12 +385,10 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
-
 				const event::AssertionFail failed(
 					location,
 					true,
-					std::format("'{}' was greater than '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
+					StyleAssertionReason("was greater than", std::format("{}", a), std::format("{}", b)));
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -391,15 +410,10 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
-
 				const event::AssertionFail failed(
 					location,
 					false,
-					std::format(
-						"'{}' was not greater than '{}'",
-						format(highlight, "{}", a),
-						format(highlight, "{}", b)));
+					StyleAssertionReason("was not greater than", std::format("{}", a), std::format("{}", b)));
 
 				Signal(failed);
 			}
@@ -419,12 +433,10 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
-
 				const event::AssertionFail failed(
 					location,
 					false,
-					std::format("'{}' was not less than '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
+					StyleAssertionReason("was not less than", std::format("{}", a), std::format("{}", b)));
 
 				Signal(failed);
 			}
@@ -445,12 +457,10 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
-
 				const event::AssertionFail failed(
 					location,
 					false,
-					std::format("'{}' was less than '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
+					StyleAssertionReason("was less than", std::format("{}", a), std::format("{}", b)));
 
 				Signal(failed);
 			}
@@ -471,12 +481,10 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
-
 				const event::AssertionFail failed(
 					location,
 					false,
-					std::format("'{}' was greater than '{}'", format(highlight, "{}", a), format(highlight, "{}", b)));
+					StyleAssertionReason("was greater than", std::format("{}", a), std::format("{}", b)));
 
 				Signal(failed);
 			}

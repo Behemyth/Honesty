@@ -22,7 +22,9 @@ namespace
 			{
 				std::array<std::string_view, 4> arguments{"list", "--json", "--file", temp};
 
-				Instance::Configuration configuration;
+				synodic::honesty::log::RingBuffer<std::mutex> sink;
+
+				Instance::Configuration configuration(&sink);
 				Instance instance(configuration, arguments);
 
 				const Instance::ListContext* context = instance.GetListContext();

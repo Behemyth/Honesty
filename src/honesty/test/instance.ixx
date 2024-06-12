@@ -31,12 +31,17 @@ namespace synodic::honesty::test
 	public:
 		struct Configuration
 		{
-			Configuration() :
+			Configuration(log::Sink* sink) :
 				defaultRunner("default"),
-				defaultReporter("default") {};
+				defaultReporter("default"),
+				sink(sink)
+			{
+			}
 
 			std::string_view defaultRunner;	 // The default runner to use
 			std::string_view defaultReporter;  // The default reporter to use
+
+			log::Sink* sink;
 		};
 
 		struct HelpContext
@@ -74,12 +79,12 @@ namespace synodic::honesty::test
 
 		// Resolve all input into immediately executable state ready for the 'Execute' function
 		Instance(const Configuration& configuration, std::span<std::string_view> arguments) :
-			sink_(std::move(configuration.sink)),
-			logger_(std::move(configuration.logger)),
+			sink_(configuration.sink),
+			logger_(log::RootLogger().CreateLogger("instance")),
 			parameters_(HelpContext())
 
 		{
-			logger_.SetSink(&sink_);
+			logger_.SetSink(sink_);
 
 			// Register our default runners and reporters
 			{
@@ -289,7 +294,7 @@ namespace synodic::honesty::test
 		}
 
 	private:
-		log::Console sink_;
+		log::Sink* sink_;
 		log::Logger logger_;
 
 		// Our list of top level commands and the parameters that go with them

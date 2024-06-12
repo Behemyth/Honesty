@@ -1,4 +1,5 @@
 import synodic.honesty.test;
+import synodic.honesty.log;
 import std;
 
 auto main(const int argc, const char* argv[]) -> int
@@ -14,7 +15,9 @@ auto main(const int argc, const char* argv[]) -> int
 	// Convert the lazy view to contiguous data
 	auto arguments = std::ranges::to<std::vector>(view);
 
-	synodic::honesty::test::Instance::Configuration configuration;
+	synodic::honesty::log::Console sink;
+
+	synodic::honesty::test::Instance::Configuration configuration(&sink);
 	synodic::honesty::test::Instance instance(configuration, arguments);
 
 	instance.Execute();

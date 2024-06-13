@@ -123,21 +123,17 @@ namespace synodic::honesty::test
 			explicit ComparisonFail(
 				std::source_location location,
 				const std::strong_ordering ordering,
-				const bool lexicographic,
 				const std::string_view a,
 				const std::string_view b,
 				const bool exception = false) :
 				AssertionFail(std::move(location), exception),
 				ordering(ordering),
-				lexicographic(lexicographic),
 				a(a),
 				b(b)
 			{
 			}
 
 			std::strong_ordering ordering;	// The ordering that failed between the two values
-
-			bool lexicographic;	 // If the ordering made was lexicographic
 
 			std::string_view a;	 // First value
 			std::string_view b;	 // Second value

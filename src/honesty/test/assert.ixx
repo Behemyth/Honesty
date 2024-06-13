@@ -263,8 +263,7 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::ComparisonFail
-					failed(location, order, false, std::format("{}", a), std::format("{}", b), true);
+				const event::ComparisonFail failed(location, order, std::format("{}", a), std::format("{}", b), true);
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -286,8 +285,7 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::ComparisonFail
-					failed(location, order, false, std::format("{}", a), std::format("{}", b), true);
+				const event::ComparisonFail failed(location, order, std::format("{}", a), std::format("{}", b), true);
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -310,8 +308,7 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::ComparisonFail
-					failed(location, order, false, std::format("{}", a), std::format("{}", b), true);
+				const event::ComparisonFail failed(location, order, std::format("{}", a), std::format("{}", b), true);
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -334,8 +331,7 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::ComparisonFail
-					failed(location, order, false, std::format("{}", a), std::format("{}", b), true);
+				const event::ComparisonFail failed(location, order, std::format("{}", a), std::format("{}", b), true);
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -358,7 +354,7 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::ComparisonFail failed(location, order, false, std::format("{}", a), std::format("{}", b));
+				const event::ComparisonFail failed(location, order, std::format("{}", a), std::format("{}", b));
 
 				Signal(failed);
 			}
@@ -379,7 +375,7 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::ComparisonFail failed(location, order, false, std::format("{}", a), std::format("{}", b));
+				const event::ComparisonFail failed(location, order, std::format("{}", a), std::format("{}", b));
 
 				Signal(failed);
 			}
@@ -401,7 +397,7 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::ComparisonFail failed(location, order, false, std::format("{}", a), std::format("{}", b));
+				const event::ComparisonFail failed(location, order, std::format("{}", a), std::format("{}", b));
 
 				Signal(failed);
 			}
@@ -423,7 +419,7 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::ComparisonFail failed(location, order, false, std::format("{}", a), std::format("{}", b));
+				const event::ComparisonFail failed(location, order, std::format("{}", a), std::format("{}", b));
 
 				Signal(failed);
 			}

@@ -25,6 +25,8 @@ namespace synodic::honesty::test
 
 		auto TempDirectoryPath() -> std::filesystem::path
 		{
+			// TODO: Add application subdirectory
+
 			return std::filesystem::temp_directory_path();
 		}
 
@@ -38,6 +40,9 @@ namespace synodic::honesty::test
 
 		auto TempFilePath() -> std::filesystem::path
 		{
+			// TODO: Add application subdirectory
+			// TODO: Find a better way to generate a temporary file name
+
 			return std::filesystem::temp_directory_path() / std::tmpnam(nullptr);
 		}
 

@@ -100,10 +100,16 @@ namespace synodic::honesty::test
 	public:
 		struct Configuration
 		{
-			Configuration() = default;
+			explicit Configuration(std::string applicationName) :
+				applicationName(std::move(applicationName))
+			{
+			}
+
+			std::string applicationName;
 		};
 
-		explicit Interface(const Configuration& configuration)
+		explicit Interface(const Configuration& configuration) :
+			applicationName_(configuration.applicationName)
 		{
 		}
 
@@ -121,6 +127,9 @@ namespace synodic::honesty::test
 
 				parameters.context.Signal(suiteBegin);
 
+				// Fixture lifetime should be for the whole suite	
+				Fixture fixture(applicationName_, suite.name);
+
 				auto executor = Overload {
 					[&](const std::function_ref<Generator()> generator) -> Generator
 					{
@@ -128,8 +137,6 @@ namespace synodic::honesty::test
 					},
 					[&](const std::function_ref<Generator(Fixture&)> generator) -> Generator
 					{
-						// TODO: Share fixture across suites
-						Fixture fixture;
 						return generator(fixture);
 					}};
 
@@ -203,5 +210,8 @@ namespace synodic::honesty::test
 
 			return result;
 		}
+
+	private:
+		std::string applicationName_;
 	};
 }

@@ -23,7 +23,7 @@ namespace
 			{
 				const synodic::honesty::log::Logger& root = synodic::honesty::log::RootLogger();
 
-				Interface::Configuration configuration;
+				const Interface::Configuration configuration("interfaceTest");
 
 				Interface interface(configuration);
 

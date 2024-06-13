@@ -13,14 +13,12 @@ namespace
 		[](Fixture& fixture) -> Generator
 		{
 			// We generate a string from the path to the temporary file for comparison.
-			const std::filesystem::path temporaryPath = fixture.TempFilePath();
-			const std::u8string u8Temp = temporaryPath.u8string();
-
-			const std::string temp(u8Temp.cbegin(), u8Temp.cend());
+			const std::filesystem::path temporaryPath = fixture.SuiteDirectory() / "passThrough.json";
 
 			co_yield "list parsing"_test = [&](const Requirements& requirements) -> void
 			{
-				std::array<std::string_view, 4> arguments{"list", "--json", "--file", temp};
+				const auto path = temporaryPath.generic_string();
+				std::array<std::string_view, 4> arguments{"list", "--json", "--file", path};
 
 				synodic::honesty::log::RingBuffer<std::mutex> sink;
 

@@ -11,14 +11,23 @@ namespace
 {
 	auto WriteReadJSON(const synodic::honesty::utility::JSON& json, std::filesystem::path path) -> std::string
 	{
-		std::stringstream buffer;
 		{
 			std::ofstream file(path);
+			if (!file.is_open())
+			{
+				throw std::runtime_error("Failed to open file: " + path.generic_string());
+			}
 			file << json;
 		}
 
+		std::stringstream buffer;
+
 		{
 			std::ifstream input(path);
+			if (!input.is_open())
+			{
+				throw std::runtime_error("Failed to open file: " + path.generic_string());
+			}
 			buffer << input.rdbuf();
 		}
 
@@ -31,7 +40,7 @@ namespace
 		{
 			co_yield "empty"_test = [&](const Requirements& requirements)
 			{
-				const std::filesystem::path path = fixture.TempFilePath();
+				const std::filesystem::path path = fixture.SuiteDirectory() / "empty.json";
 				const synodic::honesty::utility::JSON json;
 
 				const std::string value = WriteReadJSON(json, path);
@@ -42,7 +51,7 @@ namespace
 
 			co_yield "value"_test = [&](const Requirements& requirements)
 			{
-				const std::filesystem::path path = fixture.TempFilePath();
+				const std::filesystem::path path = fixture.SuiteDirectory() / "value.json";
 				synodic::honesty::utility::JSON json;
 
 				json["value"] = 42;
@@ -56,6 +65,8 @@ namespace
 					"{\n"
 					"	\"value\": 42\n"
 					"}";
+
+				auto cwd = std::filesystem::current_path();
 
 				requirements.ExpectEquals(value, expected);
 			};

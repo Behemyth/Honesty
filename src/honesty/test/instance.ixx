@@ -31,7 +31,7 @@ namespace synodic::honesty::test
 	public:
 		struct Configuration
 		{
-			Configuration(log::Sink* sink) :
+			explicit Configuration(log::Sink* sink) :
 				defaultRunner("default"),
 				defaultReporter("default"),
 				sink(sink)
@@ -81,7 +81,8 @@ namespace synodic::honesty::test
 		Instance(const Configuration& configuration, std::span<std::string_view> arguments) :
 			sink_(configuration.sink),
 			logger_(log::RootLogger().CreateLogger("instance")),
-			parameters_(HelpContext())
+			parameters_(HelpContext()),
+			applicationName_(std::filesystem::path(arguments.front()).stem().generic_string())
 
 		{
 			logger_.SetSink(sink_);
@@ -177,7 +178,8 @@ namespace synodic::honesty::test
 
 						if (not parameters.file->has_filename())
 						{
-							throw std::invalid_argument("You must give a file name when using the '--file' option");
+							throw std::invalid_argument(
+								"You must give a valid file name when using the '--file' option");
 						}
 					}
 
@@ -206,7 +208,7 @@ namespace synodic::honesty::test
 
 		void Execute()
 		{
-			Interface::Configuration configuration;
+			const Interface::Configuration configuration(applicationName_);
 			Interface interface(configuration);
 
 			auto executor = Overload {
@@ -225,7 +227,7 @@ namespace synodic::honesty::test
 
 					const ExecuteResult result = interface.Execute(parameters);
 
-					if(not result.success)
+					if (not result.success)
 					{
 						// TODO: Replace with a return code
 						std::exit(134);
@@ -239,11 +241,21 @@ namespace synodic::honesty::test
 
 					if (context.file)
 					{
-						std::ofstream file(context.file.value());
+						const std::filesystem::path& path = context.file.value();
+
+						std::ofstream file(path);
+
+						std::error_code code;
+						create_directories(path.parent_path(), code);
+
+						if (code)
+						{
+							throw std::runtime_error("Failed to create directory: " + path.parent_path().string());
+						}
 
 						if (!file.is_open())
 						{
-							throw std::invalid_argument("Could not open file for writing");
+							throw std::runtime_error("Failed to open file: " + path.generic_string());
 						}
 
 						// Clear the file
@@ -281,10 +293,7 @@ namespace synodic::honesty::test
 							}
 						}
 
-						const std::u8string u8Path = context.file.value().u8string();
-						const std::string path(u8Path.cbegin(), u8Path.cend());
-
-						logger_.Info("Written file to {}", path);
+						logger_.Info("Written file to {}", path.generic_string());
 					}
 				},
 			};
@@ -298,6 +307,8 @@ namespace synodic::honesty::test
 
 		// Our list of top level commands and the parameters that go with them
 		std::variant<HelpContext, ExecuteContext, ListContext> parameters_;
+
+		std::string applicationName_;
 	};
 
 }

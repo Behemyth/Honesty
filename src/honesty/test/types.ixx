@@ -114,8 +114,8 @@ namespace synodic::honesty::test
 
 			bool equal;
 
-			std::string_view a;	 // First value
-			std::string_view b;	 // Second value
+			std::string a;	 // First value
+			std::string b;	 // Second value
 		};
 
 		struct ComparisonFail : AssertionFail
@@ -135,8 +135,8 @@ namespace synodic::honesty::test
 
 			std::strong_ordering ordering;	// The ordering that failed between the two values
 
-			std::string_view a;	 // First value
-			std::string_view b;	 // Second value
+			std::string a;	 // First value
+			std::string b;	 // Second value
 		};
 
 		struct AssertionPass

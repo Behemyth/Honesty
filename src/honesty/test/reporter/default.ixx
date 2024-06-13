@@ -17,31 +17,24 @@ namespace synodic::honesty::test
 		constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
 		const std::string indent(4, ' ');
 
-		const auto rangeA = a | std::views::split('\n') |
-							std::views::transform(
-								[](auto r)
-								{
-									return std::string_view(r);
-								}) |
-							std::views::join_with("\n" + indent);
+		auto makeView = [](auto range)
+		{
+			return std::string_view(range);
+		};
 
-		const auto rangeB = b | std::views::split('\n') |
-							std::views::transform(
-								[](auto r)
-								{
-									return std::string_view(r);
-								}) |
-							std::views::join_with("\n" + indent);
+		// First line isn't indented
+		const std::string indentedA = a | std::views::split('\n') | std::views::transform(makeView) |
+									  std::views::join_with("\n" + indent) | std::ranges::to<std::string>();
 
-		// TODO: Using the ranges for formatting requires preview 3.
-		const std::string indentedA = std::format("{}", a);
-		const std::string indentedB = std::format("{}", b);
+		// First line isn't indented
+		const std::string indentedB = b | std::views::split('\n') | std::views::transform(makeView) |
+									  std::views::join_with("\n" + indent) | std::ranges::to<std::string>();
 
 		return std::format(
-			"{} {} {}",
-			format(highlight, "{}", indentedA),
+			"{}\n{}\n{}",
+			format(highlight, "{}{}", indent, indentedA),
 			relation,
-			format(highlight, "{}", indentedB));
+			format(highlight, "{}{}", indent, indentedB));
 	}
 
 	export class DefaultReporter final : public StreamingAdapter
@@ -90,6 +83,10 @@ namespace synodic::honesty::test
 
 			std::string styledResult = format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
 			logger.Info("Test {}: File({}), Line({})", styledResult, event.location.file_name(), event.location.line());
+
+			const std::string relation = event.equal ? "==" : "!=";
+
+			logger.Info("{}", StyleAssertionReason(relation, event.a, event.b));
 		}
 
 		void Signal(const event::ComparisonFail& event) override
@@ -100,6 +97,21 @@ namespace synodic::honesty::test
 
 			std::string styledResult = format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
 			logger.Info("Test {}: File({}), Line({})", styledResult, event.location.file_name(), event.location.line());
+
+			const std::string relation = [](const std::strong_ordering ordering) -> std::string
+			{
+				if (ordering == std::strong_ordering::less)
+				{
+					return "<";
+				}
+				if (ordering == std::strong_ordering::greater)
+				{
+					return ">";
+				}
+				return "==";
+			}(event.ordering);
+
+			logger.Info("{}", StyleAssertionReason(relation, event.a, event.b));
 		}
 
 		void Signal(const event::Summary& event) override

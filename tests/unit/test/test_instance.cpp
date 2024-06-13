@@ -36,13 +36,6 @@ namespace
 
 				instance.Execute();
 
-				std::stringstream buffer;
-
-				{
-					std::ifstream input(temporaryPath);
-					buffer << input.rdbuf();
-				}
-
 				requirements.Expect(exists(temporaryPath));
 			};
 		});

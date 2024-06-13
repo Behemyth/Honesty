@@ -209,88 +209,87 @@ namespace synodic::honesty::test
 			Interface::Configuration configuration;
 			Interface interface(configuration);
 
-			try
-			{
-				auto executor = Overload {
-					[&](const HelpContext& context)
+			auto executor = Overload {
+				[&](const HelpContext& context)
+				{
+					constexpr HelpParameters parameters;
+					auto result = interface.Help(parameters);
+				},
+				[&](const ExecuteContext& context)
+				{
+					std::ranges::single_view reporters {context.reporter.get()};
+
+					// Before start executing, we need to set up the current thread's context
+					Context commandContext = Context(*context.runner.get(), reporters);
+					ExecuteParameters parameters(commandContext);
+
+					const ExecuteResult result = interface.Execute(parameters);
+
+					if(not result.success)
 					{
-						constexpr HelpParameters parameters;
-						auto result = interface.Help(parameters);
-					},
-					[&](const ExecuteContext& context)
+						// TODO: Replace with a return code
+						std::exit(134);
+					}
+				},
+				[&](const ListContext& context)
+				{
+					ListParameters parameters(logger_.CreateLogger("list"));
+
+					auto result = interface.List(parameters);
+
+					if (context.file)
 					{
-						std::ranges::single_view reporters {context.reporter.get()};
+						std::ofstream file(context.file.value());
 
-						// Before start executing, we need to set up the current thread's context
-						Context commandContext = Context(*context.runner.get(), reporters);
-						ExecuteParameters parameters(commandContext);
-
-						auto result = interface.Execute(parameters);
-					},
-					[&](const ListContext& context)
-					{
-						ListParameters parameters(logger_.CreateLogger("list"));
-
-						auto result = interface.List(parameters);
-
-						if (context.file)
+						if (!file.is_open())
 						{
-							std::ofstream file(context.file.value());
-
-							if (!file.is_open())
-							{
-								throw std::invalid_argument("Could not open file for writing");
-							}
-
-							// Clear the file
-							file.clear();
-
-							switch (context.outputType)
-							{
-								case ListOutputType::LOG :
-								{
-									for (auto& suiteDescription: result.suites)
-									{
-										for (auto& testDescription: suiteDescription.tests)
-										{
-											file << std::format("{}", testDescription.name);
-										}
-									}
-									break;
-								}
-								case ListOutputType::JSON :
-								{
-									utility::JSON json;
-
-									for (auto& suiteDescription: result.suites)
-									{
-										auto& suiteJSON = json[suiteDescription.name];
-										for (auto& testDescription: suiteDescription.tests)
-										{
-											suiteJSON[testDescription.name] = utility::JSON();
-										}
-									}
-
-									file << json;
-
-									break;
-								}
-							}
-
-							const std::u8string u8Path = context.file.value().u8string();
-							const std::string path(u8Path.cbegin(), u8Path.cend());
-
-							logger_.Info("Written file to {}", path);
+							throw std::invalid_argument("Could not open file for writing");
 						}
-					},
-				};
 
-				std::visit(executor, parameters_);
-			}
-			catch (const std::invalid_argument& exception)
-			{
-				logger_.Error("Error: {0}", exception.what());
-			}
+						// Clear the file
+						file.clear();
+
+						switch (context.outputType)
+						{
+							case ListOutputType::LOG :
+							{
+								for (auto& suiteDescription: result.suites)
+								{
+									for (auto& testDescription: suiteDescription.tests)
+									{
+										file << std::format("{}", testDescription.name);
+									}
+								}
+								break;
+							}
+							case ListOutputType::JSON :
+							{
+								utility::JSON json;
+
+								for (auto& suiteDescription: result.suites)
+								{
+									auto& suiteJSON = json[suiteDescription.name];
+									for (auto& testDescription: suiteDescription.tests)
+									{
+										suiteJSON[testDescription.name] = utility::JSON();
+									}
+								}
+
+								file << json;
+
+								break;
+							}
+						}
+
+						const std::u8string u8Path = context.file.value().u8string();
+						const std::string path(u8Path.cbegin(), u8Path.cend());
+
+						logger_.Info("Written file to {}", path);
+					}
+				},
+			};
+
+			std::visit(executor, parameters_);
 		}
 
 	private:

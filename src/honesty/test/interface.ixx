@@ -34,7 +34,7 @@ namespace synodic::honesty::test
 
 	export struct ExecuteParameters
 	{
-		ExecuteParameters(const Context& context) :
+		explicit ExecuteParameters(const Context& context) :
 			context(context)
 		{
 		}
@@ -44,8 +44,9 @@ namespace synodic::honesty::test
 
 	export struct ListParameters
 	{
-		ListParameters(log::Logger logger) :
-			logger(std::move(logger))
+		explicit ListParameters(log::Logger logger) :
+			logger(std::move(logger)),
+			outputType(ListOutputType::LOG)
 		{
 		}
 
@@ -60,7 +61,12 @@ namespace synodic::honesty::test
 
 	export struct ExecuteResult
 	{
-		ExecuteResult() = default;
+		explicit ExecuteResult(const bool success) :
+			success(success)
+		{
+		}
+
+		bool success;
 	};
 
 	export struct TestDescription
@@ -106,7 +112,7 @@ namespace synodic::honesty::test
 			return {};
 		}
 
-		ExecuteResult Execute(const ExecuteParameters& parameters)
+		[[nodiscard]] ExecuteResult Execute(const ExecuteParameters& parameters)
 		{
 			for (const SuiteView& suite: GetSuites())
 			{
@@ -116,13 +122,11 @@ namespace synodic::honesty::test
 				parameters.context.Signal(suiteBegin);
 
 				auto executor = Overload {
-					[&](
-					const std::function_ref<Generator()> generator) -> Generator
+					[&](const std::function_ref<Generator()> generator) -> Generator
 					{
 						return generator();
 					},
-					[&](
-					const std::function_ref<Generator(Fixture&)> generator) -> Generator
+					[&](const std::function_ref<Generator(Fixture&)> generator) -> Generator
 					{
 						// TODO: Share fixture across suites
 						Fixture fixture;
@@ -158,7 +162,7 @@ namespace synodic::honesty::test
 			event::Summary summary;
 			parameters.context.Signal(summary);
 
-			return {};
+			return ExecuteResult(false);
 		}
 
 		ListResult List(const ListParameters& parameters)
@@ -174,7 +178,7 @@ namespace synodic::honesty::test
 			Context context(runner, reporters);
 
 			const ExecuteParameters executeParameters(context);
-			Execute(executeParameters);
+			ExecuteResult executeResult = Execute(executeParameters);
 
 			ListResult result;
 

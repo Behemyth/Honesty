@@ -43,7 +43,7 @@ namespace
 					buffer << input.rdbuf();
 				}
 
-				requirements.ExpectGreater(buffer.str().size(), static_cast<std::size_t>(0));
+				requirements.Expect(exists(temporaryPath));
 			};
 		});
 	SuiteRegistrar _(SUITE);

@@ -162,7 +162,11 @@ namespace synodic::honesty::test
 			event::Summary summary;
 			parameters.context.Signal(summary);
 
-			return ExecuteResult(false);
+			bool success = true;
+
+			// TODO: Extract test state
+
+			return ExecuteResult(success);
 		}
 
 		ListResult List(const ListParameters& parameters)

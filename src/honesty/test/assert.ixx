@@ -7,43 +7,6 @@ import synodic.honesty.log;
 
 namespace synodic::honesty::test
 {
-	/**
-	 * @brief Provides consistent text styling for assertion failures.
-	 * @param relation The string representing the relationship between the two failed comparisons.
-	 * @param a Comparison value a.
-	 * @param b Comparison value b.
-	 */
-	std::string StyleAssertionReason(std::string_view relation, std::string_view a, std::string_view b)
-	{
-		constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
-		const std::string indent(4, ' ');
-
-		const auto rangeA = a | std::views::split('\n') |
-							std::views::transform(
-								[](auto r)
-								{
-									return std::string_view(r);
-								}) |
-							std::views::join_with("\n" + indent);
-
-		const auto rangeB = b | std::views::split('\n') |
-							std::views::transform(
-								[](auto r)
-								{
-									return std::string_view(r);
-								}) |
-							std::views::join_with("\n" + indent);
-
-		// TODO: Using the ranges requires preview 3.
-		const std::string indentedA = std::format("{}", a);
-		const std::string indentedB = std::format("{}", b);
-
-		return std::format(
-			"{} {} {}",
-			format(highlight, "{}", indentedA),
-			relation,
-			format(highlight, "{}", indentedB));
-	}
 
 	export class Requirements
 	{
@@ -115,7 +78,7 @@ namespace synodic::honesty::test
 			try
 			{
 				std::invoke(std::forward<Fn>(function));
-				const event::AssertionFail failed(location);
+				const event::AssertionFail failed(location, true);
 
 				Signal(failed);
 			}
@@ -127,7 +90,7 @@ namespace synodic::honesty::test
 			}
 			catch (...)
 			{
-				const event::AssertionFail failed(location);
+				const event::AssertionFail failed(location, true);
 
 				Signal(failed);
 			}
@@ -146,7 +109,7 @@ namespace synodic::honesty::test
 			}
 			catch (...)
 			{
-				const event::AssertionFail failed(location);
+				const event::AssertionFail failed(location, true);
 
 				Signal(failed);
 			}
@@ -210,10 +173,7 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(
-					location,
-					true,
-					StyleAssertionReason("did not equal", std::format("{}", a), std::format("{}", b)));
+				const event::EqualityFail failed(location, false, std::format("{}", a), std::format("{}", b), true);
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -235,10 +195,7 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(
-					location,
-					true,
-					StyleAssertionReason("was equal to", std::format("{}", a), std::format("{}", b)));
+				const event::EqualityFail failed(location, true, std::format("{}", a), std::format("{}", b), true);
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -263,10 +220,7 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(
-					location,
-					false,
-					StyleAssertionReason("did not equal", std::format("{}", a), std::format("{}", b)));
+				const event::EqualityFail failed(location, false, std::format("{}", a), std::format("{}", b));
 
 				Signal(failed);
 			}
@@ -287,23 +241,21 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(
-					location,
-					false,
-					StyleAssertionReason("was equal to", std::format("{}", a), std::format("{}", b)));
+				const event::EqualityFail failed(location, true, std::format("{}", a), std::format("{}", b));
 
 				Signal(failed);
 			}
 		}
 
 		template<typename T, typename U>
-			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
+			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
+					 std::formattable<U, char>
 		constexpr void AssertGreater(
 			const T& a,
 			const U& b,
 			const std::source_location& location = std::source_location::current()) const
 		{
-			if (a > b)
+			if (const std::strong_ordering order = a <=> b; std::is_gt(order))
 			{
 				const event::AssertionPass passed(location);
 
@@ -311,10 +263,8 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(
-					location,
-					true,
-					StyleAssertionReason("was not greater than", std::format("{}", a), std::format("{}", b)));
+				const event::ComparisonFail
+					failed(location, order, false, std::format("{}", a), std::format("{}", b), true);
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -322,12 +272,13 @@ namespace synodic::honesty::test
 		}
 
 		template<typename T, typename U>
-			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
+			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
+					 std::formattable<U, char>
 		constexpr void
 			AssertLess(const T& a, const U& b, const std::source_location& location = std::source_location::current())
 				const
 		{
-			if (a < b)
+			if (const std::strong_ordering order = a <=> b; std::is_lt(order))
 			{
 				const event::AssertionPass passed(location);
 
@@ -335,10 +286,8 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(
-					location,
-					true,
-					StyleAssertionReason("was not less than", std::format("{}", a), std::format("{}", b)));
+				const event::ComparisonFail
+					failed(location, order, false, std::format("{}", a), std::format("{}", b), true);
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -346,13 +295,14 @@ namespace synodic::honesty::test
 		}
 
 		template<typename T, typename U>
-			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
+			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
+					 std::formattable<U, char>
 		constexpr void AssertGreaterEqual(
 			const T& a,
 			const U& b,
 			const std::source_location& location = std::source_location::current()) const
 		{
-			if (a >= b)
+			if (const std::strong_ordering order = a <=> b; std::is_gteq(order))
 			{
 				const event::AssertionPass passed(location);
 
@@ -360,10 +310,8 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(
-					location,
-					true,
-					StyleAssertionReason("was less than", std::format("{}", a), std::format("{}", b)));
+				const event::ComparisonFail
+					failed(location, order, false, std::format("{}", a), std::format("{}", b), true);
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -371,13 +319,14 @@ namespace synodic::honesty::test
 		}
 
 		template<typename T, typename U>
-			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
+			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
+					 std::formattable<U, char>
 		constexpr void AssertLessEqual(
 			const T& a,
 			const U& b,
 			const std::source_location& location = std::source_location::current()) const
 		{
-			if (a <= b)
+			if (const std::strong_ordering order = a <=> b; std::is_lteq(order))
 			{
 				const event::AssertionPass passed(location);
 
@@ -385,10 +334,8 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(
-					location,
-					true,
-					StyleAssertionReason("was greater than", std::format("{}", a), std::format("{}", b)));
+				const event::ComparisonFail
+					failed(location, order, false, std::format("{}", a), std::format("{}", b), true);
 
 				Signal(failed);
 				throw AssertException("Assertion failed");
@@ -396,13 +343,14 @@ namespace synodic::honesty::test
 		}
 
 		template<typename T, typename U>
-			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
+			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
+					 std::formattable<U, char>
 		constexpr void ExpectGreater(
 			const T& a,
 			const U& b,
 			const std::source_location& location = std::source_location::current()) const
 		{
-			if (a > b)
+			if (const std::strong_ordering order = a <=> b; std::is_gt(order))
 			{
 				const event::AssertionPass passed(location);
 
@@ -410,22 +358,20 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(
-					location,
-					false,
-					StyleAssertionReason("was not greater than", std::format("{}", a), std::format("{}", b)));
+				const event::ComparisonFail failed(location, order, false, std::format("{}", a), std::format("{}", b));
 
 				Signal(failed);
 			}
 		}
 
 		template<typename T, typename U>
-			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
+			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
+					 std::formattable<U, char>
 		constexpr void
 			ExpectLess(const T& a, const U& b, const std::source_location& location = std::source_location::current())
 				const
 		{
-			if (a < b)
+			if (const std::strong_ordering order = a <=> b; std::is_lt(order))
 			{
 				const event::AssertionPass passed(location);
 
@@ -433,23 +379,21 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(
-					location,
-					false,
-					StyleAssertionReason("was not less than", std::format("{}", a), std::format("{}", b)));
+				const event::ComparisonFail failed(location, order, false, std::format("{}", a), std::format("{}", b));
 
 				Signal(failed);
 			}
 		}
 
 		template<typename T, typename U>
-			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
+			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
+					 std::formattable<U, char>
 		constexpr void ExpectGreaterEqual(
 			const T& a,
 			const U& b,
 			const std::source_location& location = std::source_location::current()) const
 		{
-			if (a >= b)
+			if (const std::strong_ordering order = a <=> b; std::is_gteq(order))
 			{
 				const event::AssertionPass passed(location);
 
@@ -457,23 +401,21 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(
-					location,
-					false,
-					StyleAssertionReason("was less than", std::format("{}", a), std::format("{}", b)));
+				const event::ComparisonFail failed(location, order, false, std::format("{}", a), std::format("{}", b));
 
 				Signal(failed);
 			}
 		}
 
 		template<typename T, typename U>
-			requires std::totally_ordered_with<T, U> && std::formattable<T, char> && std::formattable<U, char>
+			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
+					 std::formattable<U, char>
 		constexpr void ExpectLessEqual(
 			const T& a,
 			const U& b,
 			const std::source_location& location = std::source_location::current()) const
 		{
-			if (a <= b)
+			if (const std::strong_ordering order = a <=> b; std::is_lteq(order))
 			{
 				const event::AssertionPass passed(location);
 
@@ -481,10 +423,7 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(
-					location,
-					false,
-					StyleAssertionReason("was greater than", std::format("{}", a), std::format("{}", b)));
+				const event::ComparisonFail failed(location, order, false, std::format("{}", a), std::format("{}", b));
 
 				Signal(failed);
 			}
@@ -508,6 +447,30 @@ namespace synodic::honesty::test
 		 * @param failed
 		 */
 		void Signal(const event::AssertionFail& failed) const
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->Signal(failed);
+			}
+		}
+
+		/**
+		 * @brief Internal function to signal an equality failure.
+		 * @param failed
+		 */
+		void Signal(const event::EqualityFail& failed) const
+		{
+			for (Reporter* reporter: reporters_)
+			{
+				reporter->Signal(failed);
+			}
+		}
+
+		/**
+		 * @brief Internal function to signal an ordering failure.
+		 * @param failed
+		 */
+		void Signal(const event::ComparisonFail& failed) const
 		{
 			for (Reporter* reporter: reporters_)
 			{

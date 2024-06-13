@@ -20,7 +20,6 @@ namespace synodic::honesty::test
 
 	export namespace event
 	{
-
 		struct SuiteBegin
 		{
 			std::string_view name;
@@ -88,21 +87,60 @@ namespace synodic::honesty::test
 
 		struct AssertionFail
 		{
-			explicit AssertionFail(
-				std::source_location location,
-				const bool exception		  = false,
-				std::string reason = "") :
+			explicit AssertionFail(std::source_location location, const bool exception = false) :
 				exception(exception),
-				location(std::move(location)),
-				reason(std::move(reason))
+				location(std::move(location))
 			{
 			}
 
 			bool exception;	 // True if the remainder of the test is skipped
 			std::source_location location;
+		};
 
-			// TODO: Prevent allocation
-			std::string reason;
+		struct EqualityFail : AssertionFail
+		{
+			explicit EqualityFail(
+				std::source_location location,
+				const bool equal,
+				const std::string_view a,
+				const std::string_view b,
+				const bool exception = false) :
+				AssertionFail(std::move(location), exception),
+				equal(equal),
+				a(a),
+				b(b)
+			{
+			}
+
+			bool equal;
+
+			std::string_view a;	 // First value
+			std::string_view b;	 // Second value
+		};
+
+		struct ComparisonFail : AssertionFail
+		{
+			explicit ComparisonFail(
+				std::source_location location,
+				const std::strong_ordering ordering,
+				const bool lexicographic,
+				const std::string_view a,
+				const std::string_view b,
+				const bool exception = false) :
+				AssertionFail(std::move(location), exception),
+				ordering(ordering),
+				lexicographic(lexicographic),
+				a(a),
+				b(b)
+			{
+			}
+
+			std::strong_ordering ordering;	// The ordering that failed between the two values
+
+			bool lexicographic;	 // If the ordering made was lexicographic
+
+			std::string_view a;	 // First value
+			std::string_view b;	 // Second value
 		};
 
 		struct AssertionPass

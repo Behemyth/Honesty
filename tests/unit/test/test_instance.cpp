@@ -43,7 +43,7 @@ namespace
 					buffer << input.rdbuf();
 				}
 
-				requirements.ExpectGreater(buffer.str().size(), 0);
+				requirements.ExpectGreater(buffer.str().size(), static_cast<std::size_t>(0));
 			};
 		});
 	SuiteRegistrar _(SUITE);

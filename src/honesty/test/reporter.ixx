@@ -42,6 +42,8 @@ namespace synodic::honesty::test
 		virtual void Signal(const event::TestPass& event) = 0;
 
 		virtual void Signal(const event::AssertionFail& event) = 0;
+		virtual void Signal(const event::EqualityFail& event) = 0;
+		virtual void Signal(const event::ComparisonFail& event) = 0;
 		virtual void Signal(const event::AssertionPass& event) = 0;
 		virtual void Signal(const event::AssertionSkip& event) = 0;
 
@@ -134,6 +136,18 @@ namespace synodic::honesty::test
 
 		void Signal(const event::AssertionFail& event) override
 		{
+		}
+
+		void Signal(const event::EqualityFail& event) override
+		{
+			// If the equality test is not overriden, we splice the input into a generic assertion fail
+			Signal(static_cast<event::AssertionFail>(event));
+		}
+
+		void Signal(const event::ComparisonFail& event) override
+		{
+			// If the ordering test is not overriden, we splice the input into a generic assertion fail
+			Signal(static_cast<event::AssertionFail>(event));
 		}
 
 		void Signal(const event::AssertionPass& event) override
@@ -247,6 +261,14 @@ namespace synodic::honesty::test
 		}
 
 		void Signal(const event::AssertionFail& event) final
+		{
+		}
+
+		void Signal(const event::EqualityFail& event) final
+		{
+		}
+
+		void Signal(const event::ComparisonFail& event) final
 		{
 		}
 

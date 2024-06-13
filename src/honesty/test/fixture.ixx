@@ -18,6 +18,26 @@ namespace synodic::honesty::test
 			applicationName_(applicationName),
 			suiteName_(suiteName)
 		{
+			// Generate a unique directory for the suite
+			{
+				std::string suiteDirectory(suiteName_);
+				suiteDirectory += "_";
+
+				// A distribution fitting 16 characters
+				std::uniform_int_distribution distribution(0, 15);
+				std::random_device device;
+
+				constexpr std::size_t length = 32;
+				suiteDirectory.reserve(suiteDirectory.size() + length);
+
+				for (int iteration = 0; iteration < length; ++iteration)
+				{
+					suiteDirectory += "0123456789ABCDEF"[distribution(device)];
+				}
+
+				suiteTempDirectory_ =
+					std::filesystem::temp_directory_path() / "honesty" / applicationName_ / suiteDirectory;
+			}
 		}
 
 		~Fixture() = default;
@@ -34,33 +54,15 @@ namespace synodic::honesty::test
 		 */
 		[[nodiscard]] auto SuiteDirectory() const -> std::filesystem::path
 		{
-			std::string suiteDirectory(suiteName_);
-			suiteDirectory += "_";
-
-			// A distribution fitting 16 characters
-			std::uniform_int_distribution distribution(0, 15);
-			std::random_device device;
-
-			constexpr std::size_t length = 32;
-			suiteDirectory.reserve(suiteDirectory.size() + length);
-
-			for (int iteration = 0; iteration < length; ++iteration)
-			{
-				suiteDirectory += "0123456789ABCDEF"[distribution(device)];
-			}
-
-			const std::filesystem::path path(
-				std::filesystem::temp_directory_path() / "honesty" / applicationName_ / suiteDirectory);
-
 			std::error_code code;
-			create_directories(path, code);
+			create_directories(suiteTempDirectory_, code);
 
 			if (code)
 			{
-				throw std::runtime_error("Failed to create directory: " + path.string());
+				throw std::runtime_error("Failed to create directory: " + suiteTempDirectory_.generic_string());
 			}
 
-			return path;
+			return suiteTempDirectory_;
 		}
 
 		/**
@@ -92,6 +94,7 @@ namespace synodic::honesty::test
 	private:
 		std::string_view applicationName_;
 		std::string_view suiteName_;
+		std::filesystem::path suiteTempDirectory_;
 	};
 
 }

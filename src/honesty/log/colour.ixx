@@ -50,6 +50,7 @@ namespace synodic::honesty::log
 	 */
 	export enum class Attribute : std::uint8_t
 	{
+		NONE	  = 0,
 		BOLD	  = 1,
 		FAINT	  = 1 << 1,
 		ITALIC	  = 1 << 2,
@@ -98,15 +99,37 @@ namespace synodic::honesty::log
 
 	export using ColorType = std::variant<Colour8, Colour24>;
 
+	// TODO: Support multiple attributes
+
 	export class TextStyle
 	{
 	public:
-		constexpr explicit TextStyle(Colour8 color);
-		constexpr explicit TextStyle(Colour24 color);
+		constexpr explicit TextStyle(Colour8 color, const Attribute attribute = Attribute::NONE) :
+			foreground_(color),
+			attributeMask_(std::to_underlying(attribute))
+		{
+		}
 
-		constexpr std::optional<ColorType> Foreground() const;
-		constexpr std::optional<ColorType> Background() const;
-		constexpr std::uint8_t AttributeMask() const;
+		constexpr explicit TextStyle(Colour24 color, const Attribute attribute = Attribute::NONE) :
+			foreground_(color),
+			attributeMask_(std::to_underlying(attribute))
+		{
+		}
+
+		constexpr std::optional<ColorType> Foreground() const
+		{
+			return foreground_;
+		}
+
+		constexpr std::optional<ColorType> Background() const
+		{
+			return background_;
+		}
+
+		constexpr std::uint8_t AttributeMask() const
+		{
+			return attributeMask_;
+		}
 
 		friend auto operator<=>(const TextStyle&, const TextStyle&) = default;
 
@@ -115,33 +138,6 @@ namespace synodic::honesty::log
 		std::optional<ColorType> background_;
 		std::uint8_t attributeMask_;
 	};
-
-	constexpr TextStyle::TextStyle(Colour8 color) :
-		foreground_(color),
-		attributeMask_(0)
-	{
-	}
-
-	constexpr TextStyle::TextStyle(Colour24 color) :
-		foreground_(color),
-		attributeMask_(0)
-	{
-	}
-
-	constexpr std::optional<ColorType> TextStyle::Foreground() const
-	{
-		return foreground_;
-	}
-
-	constexpr std::optional<ColorType> TextStyle::Background() const
-	{
-		return background_;
-	}
-
-	constexpr std::uint8_t TextStyle::AttributeMask() const
-	{
-		return attributeMask_;
-	}
 
 	template<class... Ts>
 	struct Overloaded : Ts...

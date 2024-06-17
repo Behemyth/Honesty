@@ -11,8 +11,11 @@ namespace synodic::honesty::test
 	export class Requirements
 	{
 	public:
-		explicit Requirements(const std::span<Reporter*> reporters) :
-			reporters_(reporters) {};
+		Requirements(const std::span<Reporter*> reporters, const std::string_view testName) :
+			reporters_(reporters),
+			testName_(testName)
+		{
+		}
 
 		/**
 		 * @brief Asserts that the expression is true. Fatal on failure.
@@ -425,6 +428,11 @@ namespace synodic::honesty::test
 			}
 		}
 
+		std::string_view TestName() const
+		{
+			return testName_;
+		}
+
 	private:
 		/**
 		 * @brief Internal function to signal an assertion passed.
@@ -475,5 +483,6 @@ namespace synodic::honesty::test
 		}
 
 		std::span<Reporter*> reporters_;
+		std::string_view testName_;
 	};
 }

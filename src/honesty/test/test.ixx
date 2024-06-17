@@ -32,6 +32,11 @@ namespace synodic::honesty::test
 		Test& operator=(const Test& other)	   = delete;
 		Test& operator=(Test&& other) noexcept = delete;
 
+		std::string_view Name() const
+		{
+			return name_;
+		}
+
 	private:
 		friend TestView;
 
@@ -84,14 +89,15 @@ namespace synodic::honesty::test
 		std::string_view name_;
 	};
 
-	export template<typename Fn, std::ranges::input_range V>
-		requires std::regular_invocable<Fn&, const Requirements&, std::ranges::range_reference_t<V>>
-	Generator operator|(Fn&& function, V&& range)
+	export template<typename Fn, std::ranges::input_range R>
+		requires std::regular_invocable<Fn&, const Requirements&, std::ranges::range_reference_t<R>>
+	Generator operator|(Fn&& function, R&& range)
 	{
+		int index = 0;
 		for (auto&& element: range)
 		{
 			co_yield Test(
-				std::format("{}", element),
+				std::format("{}", index++),
 				[&function, &element](const Requirements& requirements)
 				{
 					function(requirements, element);
@@ -106,8 +112,9 @@ namespace synodic::honesty::test
 		co_yield std::ranges::elements_of(std::apply(
 			[&function](auto&&... args) -> Generator
 			{
+				int index = 0;
 				(co_yield Test(
-					 std::format("{}", args),
+					 std::format("{}", index++),
 					 [&function, &args](const Requirements& requirements)
 					 {
 						 function(requirements, args);

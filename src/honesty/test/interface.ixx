@@ -151,7 +151,7 @@ namespace synodic::honesty::test
 
 					parameters.context.Signal(testBegin);
 
-					Requirements requirements(parameters.context.Reporters());
+					Requirements requirements(parameters.context.Reporters(), test.Name());
 					parameters.context.Run(requirements, view.test);
 
 					event::TestEnd testEnd;

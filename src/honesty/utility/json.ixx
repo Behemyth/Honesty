@@ -21,6 +21,10 @@ namespace
 
 namespace synodic::honesty::utility
 {
+	template<typename Range, typename Element>
+	concept compatible_range =
+		std::ranges::input_range<Range> && std::convertible_to<std::ranges::range_reference_t<Range>, Element>;
+
 	// TODO: Use c++26 reflection for a simple lexer without pulling in a library
 	export class JSON
 	{
@@ -33,7 +37,27 @@ namespace synodic::honesty::utility
 		using size_type = Array::size_type;
 
 		JSON() :
-			value_(Object())
+			value_(std::monostate())
+		{
+		}
+
+		template<typename T>
+			requires std::constructible_from<Value, T> && !std::same_as<T, JSON>
+													  explicit(false) JSON(const T& other) :
+			value_(other)
+		{
+		}
+
+		template<typename T>
+			requires std::constructible_from<Value, T> && !std::same_as<T, JSON>
+													  explicit(false) JSON(T && other) noexcept :
+			value_(std::move(other))
+		{
+		}
+
+		template<compatible_range<Object> R>
+		explicit(false) JSON(R&& range) noexcept :
+			value_(Object(std::from_range, std::forward<R>(range)))
 		{
 		}
 
@@ -43,20 +67,6 @@ namespace synodic::honesty::utility
 		JSON(JSON&& other) noexcept			   = default;
 		JSON& operator=(const JSON& other)	   = default;
 		JSON& operator=(JSON&& other) noexcept = default;
-
-		template<typename T>
-			requires std::constructible_from<Value, T>
-		explicit(false) JSON(const T& other) :
-			value_(other)
-		{
-		}
-
-		template<typename T>
-			requires std::constructible_from<Value, T>
-		explicit(false) JSON(T&& other) noexcept :
-			value_(std::move(other))
-		{
-		}
 
 		/**
 		 * @brief Extracts a value from the JSON array with a given index. If the key does not exist, a new JSON object
@@ -147,15 +157,15 @@ namespace synodic::honesty::utility
 		}
 
 		template<typename T>
-			requires std::constructible_from<Value, T>
-		explicit operator T() const
+			requires std::constructible_from<Value, T> && !std::same_as<T, JSON>
+													  explicit operator T() const
 		{
 			return std::get<T>(value_);
 		}
 
 		template<typename T>
-			requires std::convertible_to<Value, T>
-		explicit operator const T&() const
+			requires std::convertible_to<Value, T> && !std::same_as<T, JSON>
+												  explicit operator const T&() const
 		{
 			return std::get<T>(value_);
 		}

@@ -52,24 +52,24 @@ namespace
 					// From string
 					const synodic::honesty::utility::JSON json("value");
 				}
-				//{
-				//	// From map
-				//	const std::map<std::string, int> value(
-				//	{
-				//		{"value", 42}
-				//	});
+				{
+					// From map
+					const std::map<std::string, int> value(
+					{
+						{"value", 42}
+					});
 
-				//	const synodic::honesty::utility::JSON json(value);
-				//}
-				//{
-				//	// From unordered_map
-				//	const std::unordered_map<std::string, int> value(
-				//	{
-				//		{"value", 42}
-				//	});
+					const synodic::honesty::utility::JSON json(value);
+				}
+				{
+					// From unordered_map
+					const std::unordered_map<std::string, int> value(
+					{
+						{"value", 42}
+					});
 
-				//	const synodic::honesty::utility::JSON json(value);
-				//}
+					const synodic::honesty::utility::JSON json(value);
+				}
 				//{
 				//	// From array
 				//	constexpr std::array value{42};
@@ -84,16 +84,17 @@ namespace
 
 			using Data = std::tuple<synodic::honesty::utility::JSON, std::string>;
 			std::vector<Data> expectations;
-
-			expectations.push_back({synodic::honesty::utility::JSON(), "{}"});
-
-			std::unordered_map<std::string, int> value(
 			{
-				{"value", 42}
-			});
+				expectations.push_back({synodic::honesty::utility::JSON(), "{}"});
+			}
+			{
+				std::unordered_map<std::string, int> value(
+				{
+					{"value", 42}
+				});
 
-			// expectations.push_back({synodic::honesty::utility::JSON(value), "{\n	\"value\": 42\n}"});
-
+				// expectations.push_back({synodic::honesty::utility::JSON(value), "{\n	\"value\": 42\n}"});
+			}
 			co_yield "write"_test = [&](const Requirements& requirements, const Data& data)
 			{
 				const std::filesystem::path path =

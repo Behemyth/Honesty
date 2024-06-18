@@ -21,43 +21,38 @@ namespace
 
 namespace synodic::honesty::utility
 {
-	template<typename Range, typename Element>
-	concept compatible_range =
-		std::ranges::input_range<Range> && std::convertible_to<std::ranges::range_reference_t<Range>, Element>;
+
+	template<typename T>
+	concept is_null = std::is_same_v<std::remove_cvref_t<T>, std::nullptr_t>;
 
 	// TODO: Use c++26 reflection for a simple lexer without pulling in a library
 	export class JSON
 	{
 		using Array	 = std::vector<JSON>;
 		using Object = std::map<std::string, JSON>;
-		using Value =
-			std::variant<std::monostate, bool, double, std::int32_t, std::uint32_t, std::string, Array, Object>;
+		using Value	 = std::variant<std::monostate, bool, double, std::int32_t, std::uint32_t, std::string>;
+
+		using Data = std::variant<Array, Object, Value>;
 
 	public:
 		using size_type = Array::size_type;
 
 		JSON() :
-			value_(std::monostate())
+			data_(std::monostate())
 		{
 		}
 
 		template<typename T>
-			requires std::constructible_from<Value, T> && !std::same_as<T, JSON>
-													  explicit(false) JSON(const T& other) :
-			value_(other)
+			requires std::constructible_from<Value, T> and not is_null<T>
+													   explicit(false) JSON(const T& other) :
+			data_(Value(other))
 		{
 		}
 
 		template<typename T>
-			requires std::constructible_from<Value, T> && !std::same_as<T, JSON>
-													  explicit(false) JSON(T && other) noexcept :
-			value_(std::move(other))
-		{
-		}
-
-		template<compatible_range<Object> R>
-		explicit(false) JSON(R&& range) noexcept :
-			value_(Object(std::from_range, std::forward<R>(range)))
+			requires std::constructible_from<Value, T> and not is_null<T>
+													   explicit(false) JSON(T && other) noexcept :
+			data_(Value(std::move(other)))
 		{
 		}
 
@@ -76,12 +71,12 @@ namespace synodic::honesty::utility
 		 */
 		JSON& operator[](const size_type index)
 		{
-			if (std::holds_alternative<std::monostate>(value_))
+			if (Null())
 			{
-				value_.emplace<Array>();
+				data_.emplace<Array>();
 			}
 
-			if (Array* arrayPointer = std::get_if<Array>(&value_)) [[likely]]
+			if (Array* arrayPointer = std::get_if<Array>(&data_)) [[likely]]
 			{
 				Array& jsonArray = *arrayPointer;
 
@@ -104,7 +99,7 @@ namespace synodic::honesty::utility
 		 */
 		const JSON& operator[](const size_type index) const
 		{
-			if (const Array* arrayPointer = std::get_if<Array>(&value_)) [[likely]]
+			if (const Array* arrayPointer = std::get_if<Array>(&data_)) [[likely]]
 			{
 				const Array& jsonArray = *arrayPointer;
 				return jsonArray[index];
@@ -121,13 +116,13 @@ namespace synodic::honesty::utility
 		 */
 		JSON& operator[](std::string key)
 		{
-			if (std::holds_alternative<std::monostate>(value_))
+			if (Null())
 			{
-				Object& object = value_.emplace<Object>();
+				Object& object = data_.emplace<Object>();
 				return object[std::move(key)];
 			}
 
-			if (Object* objectPointer = std::get_if<Object>(&value_)) [[likely]]
+			if (Object* objectPointer = std::get_if<Object>(&data_)) [[likely]]
 			{
 				Object& object = *objectPointer;
 				return object[std::move(key)];
@@ -143,7 +138,7 @@ namespace synodic::honesty::utility
 		 */
 		const JSON& operator[](const std::string& key) const
 		{
-			if (const Object* objectPointer = std::get_if<Object>(&value_)) [[likely]]
+			if (const Object* objectPointer = std::get_if<Object>(&data_)) [[likely]]
 			{
 				const Object& object = *objectPointer;
 				const auto iterator	 = object.find(key);
@@ -157,17 +152,27 @@ namespace synodic::honesty::utility
 		}
 
 		template<typename T>
-			requires std::constructible_from<Value, T> && !std::same_as<T, JSON>
-													  explicit operator T() const
+			requires std::constructible_from<Value, T>
+		explicit operator T() const
 		{
-			return std::get<T>(value_);
+			return std::get<T>(data_);
 		}
 
 		template<typename T>
-			requires std::convertible_to<Value, T> && !std::same_as<T, JSON>
-												  explicit operator const T&() const
+			requires std::convertible_to<Value, T>
+		explicit operator const T&() const
 		{
-			return std::get<T>(value_);
+			return std::get<T>(data_);
+		}
+
+		bool Null() const
+		{
+			if (const Value* value = std::get_if<Value>(&data_))
+			{
+				return std::holds_alternative<std::monostate>(*value);
+			}
+
+			return false;
 		}
 
 		std::string Dump() const
@@ -178,34 +183,40 @@ namespace synodic::honesty::utility
 	private:
 		static std::string Dump(const JSON& json, std::size_t indentCount)
 		{
-			auto executor = Overload {
-				[&](const std::monostate& value)
+			auto dataVisitor = Overload {
+				[&](const Value& data)
 				{
-					return std::format("null");
+					auto valueVisitor = Overload {
+
+						[&](const std::monostate& data)
+						{
+							return std::format("null");
+						},
+						[&](const bool& value)
+						{
+							return std::format("{}", value ? "true" : "false");
+						},
+						[&](const double& value)
+						{
+							return std::format("{}", value);
+						},
+						[&](const std::int32_t& value)
+						{
+							return std::format("{}", value);
+						},
+						[&](const std::uint32_t& value)
+						{
+							return std::format("{}", value);
+						},
+						[&](const std::string& value)
+						{
+							return std::format("\"{}\"", value);
+						}};
+					return std::visit(valueVisitor, data);
 				},
-				[&](const bool& value)
+				[&](const Array& data)
 				{
-					return std::format("{}", value ? "true" : "false");
-				},
-				[&](const double& value)
-				{
-					return std::format("{}", value);
-				},
-				[&](const std::int32_t& value)
-				{
-					return std::format("{}", value);
-				},
-				[&](const std::uint32_t& value)
-				{
-					return std::format("{}", value);
-				},
-				[&](const std::string& value)
-				{
-					return std::format("\"{}\"", value);
-				},
-				[&](const Array& value)
-				{
-					if (value.empty())
+					if (data.empty())
 					{
 						return std::format("[]");
 					}
@@ -214,7 +225,7 @@ namespace synodic::honesty::utility
 
 					const std::size_t newIndentCount = indentCount + 1;
 
-					for (const auto& element: value | std::views::take(value.size() - 1))
+					for (const auto& element: data | std::views::take(data.size() - 1))
 					{
 						result += std::format("{:\t>{}}", "", newIndentCount);
 						result += Dump(element, newIndentCount);
@@ -224,7 +235,7 @@ namespace synodic::honesty::utility
 					// Last element
 					{
 						result += std::format("{:\t>{}}", "", newIndentCount);
-						result += Dump(value.back(), newIndentCount);
+						result += Dump(data.back(), newIndentCount);
 					}
 
 					result += std::format("\n");
@@ -233,9 +244,9 @@ namespace synodic::honesty::utility
 
 					return result;
 				},
-				[&](const Object& object)
+				[&](const Object& data)
 				{
-					if (object.empty())
+					if (data.empty())
 					{
 						return std::format("{{}}");
 					}
@@ -244,7 +255,7 @@ namespace synodic::honesty::utility
 
 					const std::size_t newIndentCount = indentCount + 1;
 
-					for (const auto& [key, value]: object | std::views::take(object.size() - 1))
+					for (const auto& [key, value]: data | std::views::take(data.size() - 1))
 					{
 						result += std::format("{:\t>{}}", "", newIndentCount);
 
@@ -258,8 +269,8 @@ namespace synodic::honesty::utility
 					{
 						result += std::format("{:\t>{}}", "", newIndentCount);
 
-						result += std::format("\"{}\": ", object.rbegin()->first);
-						result += Dump(object.rbegin()->second, newIndentCount);
+						result += std::format("\"{}\": ", data.rbegin()->first);
+						result += Dump(data.rbegin()->second, newIndentCount);
 					}
 
 					result += std::format("\n");
@@ -269,10 +280,10 @@ namespace synodic::honesty::utility
 					return result;
 				}};
 
-			return std::visit(executor, json.value_);
+			return std::visit(dataVisitor, json.data_);
 		}
 
-		Value value_;
+		Data data_;
 	};
 
 	export std::ostream& operator<<(std::ostream& stream, const JSON& json)

@@ -43,10 +43,14 @@ namespace
 				{
 					// Empty
 					const synodic::honesty::utility::JSON json;
+
+					requirements.Expect(json.Null());
 				}
 				{
-					// Null will not compile
-					// const synodic::honesty::utility::JSON json(nullptr);
+					// Null
+					const synodic::honesty::utility::JSON json(nullptr);
+
+					requirements.Expect(json.Null());
 				}
 				{
 					// From value
@@ -55,6 +59,27 @@ namespace
 				{
 					// From string
 					const synodic::honesty::utility::JSON json("value");
+				}
+			};
+
+			co_yield "assignment"_test = [&](const Requirements& requirements)
+			{
+				{
+					// From value
+					synodic::honesty::utility::JSON json;
+					json = nullptr;
+
+					requirements.Expect(json.Null());
+				}
+				{
+					// From value
+					synodic::honesty::utility::JSON json;
+					json = 42;
+				}
+				{
+					// From string
+					synodic::honesty::utility::JSON json;
+					json = "value";
 				}
 			};
 

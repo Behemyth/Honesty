@@ -42,6 +42,14 @@ namespace synodic::honesty::utility
 		{
 		}
 
+		JSON(const JSON& other)		= default;
+		JSON(JSON&& other) noexcept = default;
+
+		explicit(false) JSON(const is_null auto& other) :
+			data_(std::monostate())
+		{
+		}
+
 		template<typename T>
 			requires std::constructible_from<Value, T> and not is_null<T>
 													   explicit(false) JSON(const T& other) :
@@ -58,10 +66,30 @@ namespace synodic::honesty::utility
 
 		~JSON() = default;
 
-		JSON(const JSON& other)				   = default;
-		JSON(JSON&& other) noexcept			   = default;
 		JSON& operator=(const JSON& other)	   = default;
 		JSON& operator=(JSON&& other) noexcept = default;
+
+		JSON& operator=(const is_null auto& other) noexcept
+		{
+			data_.emplace<Value>(std::monostate());
+			return *this;
+		}
+
+		template<typename T>
+			requires std::constructible_from<Value, T> and not is_null<T>
+														   auto operator=(const T& other)->JSON&
+		{
+			data_.emplace<Value>(other);
+			return *this;
+		}
+
+		template<typename T>
+			requires std::constructible_from<Value, T> and not is_null<T>
+													   auto operator=(T&& other) noexcept -> JSON&
+		{
+			data_.emplace<Value>(std::move(other));
+			return *this;
+		}
 
 		/**
 		 * @brief Extracts a value from the JSON array with a given index. If the key does not exist, a new JSON object

@@ -45,7 +45,7 @@ namespace synodic::honesty::utility
 		JSON(const JSON& other)		= default;
 		JSON(JSON&& other) noexcept = default;
 
-		explicit(false) JSON(const is_null auto& other) :
+		explicit(false) JSON(const is_null auto&) :
 			data_(std::monostate())
 		{
 		}
@@ -69,7 +69,7 @@ namespace synodic::honesty::utility
 		JSON& operator=(const JSON& other)	   = default;
 		JSON& operator=(JSON&& other) noexcept = default;
 
-		JSON& operator=(const is_null auto& other) noexcept
+		JSON& operator=(const is_null auto&) noexcept
 		{
 			data_.emplace<Value>(std::monostate());
 			return *this;
@@ -179,20 +179,6 @@ namespace synodic::honesty::utility
 			throw std::runtime_error("Invalid type found for '[]' operator access");
 		}
 
-		template<typename T>
-			requires std::constructible_from<Value, T>
-		explicit operator T() const
-		{
-			return std::get<T>(data_);
-		}
-
-		template<typename T>
-			requires std::convertible_to<Value, T>
-		explicit operator const T&() const
-		{
-			return std::get<T>(data_);
-		}
-
 		bool Null() const
 		{
 			if (const Value* value = std::get_if<Value>(&data_))
@@ -216,7 +202,7 @@ namespace synodic::honesty::utility
 				{
 					auto valueVisitor = Overload {
 
-						[&](const std::monostate& data)
+						[&](const std::monostate&)
 						{
 							return std::format("null");
 						},

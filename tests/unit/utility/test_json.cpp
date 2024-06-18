@@ -86,8 +86,23 @@ namespace
 			using Data = std::tuple<synodic::honesty::utility::JSON, std::string>;
 			std::vector<Data> expectations;
 			{
-				expectations.push_back({synodic::honesty::utility::JSON(), "{}"});
+				synodic::honesty::utility::JSON json;
+				expectations.push_back({json, "null"});
 			}
+			{
+				synodic::honesty::utility::JSON json;
+
+				json = 42;
+
+				expectations.push_back({json, "42"});
+			}
+			//{
+			//	synodic::honesty::utility::JSON json;
+
+			//	json = std::array{1, 2, 3, 4};
+
+			//	expectations.push_back({json, "[\n    1,\n    2,\n    3,\n    4\n]"});
+			//}
 
 			co_yield "write"_test = [&](const Requirements& requirements, const Data& data)
 			{

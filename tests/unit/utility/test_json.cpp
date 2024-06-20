@@ -96,13 +96,13 @@ namespace
 
 				expectations.push_back({json, "42"});
 			}
-			//{
-			//	synodic::honesty::utility::JSON json;
+			{
+				synodic::honesty::utility::JSON json;
 
-			//	json = std::array{1, 2, 3, 4};
+				json = std::array{1, 2, 3, 4};
 
-			//	expectations.push_back({json, "[\n    1,\n    2,\n    3,\n    4\n]"});
-			//}
+				expectations.push_back({json, "[\n    1,\n    2,\n    3,\n    4\n]"});
+			}
 
 			co_yield "write"_test = [&](const Requirements& requirements, const Data& data)
 			{

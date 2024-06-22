@@ -171,7 +171,7 @@ namespace
 
 				 json.AssignRange(std::array{1, 2, 3, 4});
 
-				 expectations.push_back({json, "[\n    1,\n    2,\n    3,\n    4\n]"});
+				 expectations.push_back({json, "[\n\t1,\n\t2,\n\t3,\n\t4\n]"});
 			}
 
 			co_yield "write"_test = [&](const Requirements& requirements, const Data& data)

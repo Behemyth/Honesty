@@ -281,7 +281,7 @@ namespace synodic::honesty::utility
 						result += std::format("\"{}\": ", key);
 						result += Dump(value, newIndentCount);
 
-						result += std::format(",\n}}");
+						result += std::format(",\n");
 					}
 
 					// Last element

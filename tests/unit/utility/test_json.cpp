@@ -173,6 +173,18 @@ namespace
 
 				 expectations.push_back({json, "[\n\t1,\n\t2,\n\t3,\n\t4\n]"});
 			}
+			{
+				synodic::honesty::utility::JSON json;
+
+				json.AssignRange(std::map<std::string, int> {
+					{"1", 1},
+					{"2", 2},
+					{"3", 3},
+					{"4", 4}
+				});
+
+				expectations.push_back({json, "{\n\t\"1\": 1,\n\t\"2\": 2,\n\t\"3\": 3,\n\t\"4\": 4\n}"});
+			}
 
 			co_yield "write"_test = [&](const Requirements& requirements, const Data& data)
 			{

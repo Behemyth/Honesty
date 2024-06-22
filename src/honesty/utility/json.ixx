@@ -57,7 +57,7 @@ namespace synodic::honesty::utility
 		}
 
 		// NOTE: Using Array::value_type causes a compile error
-		// Using std::from_range_t to avoid ambiguity with std::string being interpreted as a range
+		// Using std::from_range_t to avoid ambiguity with variant passing
 		template<typename R>
 			requires std::ranges::input_range<R> &&
 					 std::convertible_to<std::ranges::range_reference_t<R>, JSON>
@@ -67,10 +67,11 @@ namespace synodic::honesty::utility
 		}
 
 		// NOTE: Using Object::value_type causes a compile error
+		// Using std::from_range_t to avoid ambiguity with variant passing
 		template<typename R>
 			requires std::ranges::input_range<R> &&
 					 std::convertible_to<std::ranges::range_reference_t<R>, std::pair<const std::string, JSON>>
-		explicit JSON(R&& range) :
+		explicit(false) JSON(std::from_range_t, R&& range) :
 			data_(std::in_place_type<Object>, std::from_range, std::forward<R>(range))
 		{
 		}

@@ -80,6 +80,17 @@ namespace
 						{"3", 3},
 						{"4", 4}
 					};
+					synodic::honesty::utility::JSON json(std::from_range, range);
+				}
+
+				{
+					// From JSON map
+					std::map<std::string, synodic::honesty::utility::JSON> range = {
+						{"1", 1},
+						{"2", 2},
+						{"3", 3},
+						{"4", 4}
+					};
 					synodic::honesty::utility::JSON json(range);
 				}
 			};

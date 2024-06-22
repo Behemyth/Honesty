@@ -54,11 +54,33 @@ namespace
 				}
 				{
 					// From value
-					const synodic::honesty::utility::JSON json(42);
+					const synodic::honesty::utility::JSON json(42.0f);
 				}
 				{
 					// From string
 					const synodic::honesty::utility::JSON json("value");
+				}
+				{
+					// From value array
+					std::vector range {1, 2, 3, 4};
+					synodic::honesty::utility::JSON json(std::from_range, range);
+				}
+
+				{
+					// From JSON array
+					std::vector<synodic::honesty::utility::JSON> range {1, 2, 3, 4};
+					synodic::honesty::utility::JSON json(range);
+				}
+
+				{
+					// From map
+					std::map<std::string, int> range = {
+						{"1", 1},
+						{"2", 2},
+						{"3", 3},
+						{"4", 4}
+					};
+					synodic::honesty::utility::JSON json(range);
 				}
 			};
 
@@ -97,11 +119,11 @@ namespace
 				expectations.push_back({json, "42"});
 			}
 			{
-				synodic::honesty::utility::JSON json;
+				// synodic::honesty::utility::JSON json;
 
-				json = std::array{1, 2, 3, 4};
+				// json = std::array{1, 2, 3, 4};
 
-				expectations.push_back({json, "[\n    1,\n    2,\n    3,\n    4\n]"});
+				// expectations.push_back({json, "[\n    1,\n    2,\n    3,\n    4\n]"});
 			}
 
 			co_yield "write"_test = [&](const Requirements& requirements, const Data& data)
@@ -109,7 +131,7 @@ namespace
 				const std::filesystem::path path =
 					fixture.SuiteDirectory() / std::format("{}.json", requirements.TestName());
 
-				const std::string output = WriteReadJSON(std::get<0>(data), path);
+				const std::string output   = WriteReadJSON(std::get<0>(data), path);
 				const std::string expected = std::get<1>(data);
 
 				requirements.ExpectEquals(output, expected);

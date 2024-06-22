@@ -30,9 +30,8 @@ namespace synodic::honesty::utility
 	{
 		using Array	 = std::vector<JSON>;
 		using Object = std::map<std::string, JSON>;
-		using Value	 = std::variant<std::monostate, bool, double, std::int32_t, std::uint32_t, std::string>;
-
-		using Data = std::variant<Array, Object, Value>;
+		using Value =
+			std::variant<std::monostate, bool, double, std::int32_t, std::uint32_t, std::string, Array, Object>;
 
 	public:
 		using size_type = Array::size_type;
@@ -42,25 +41,37 @@ namespace synodic::honesty::utility
 		{
 		}
 
-		JSON(const JSON& other)		= default;
-		JSON(JSON&& other) noexcept = default;
-
 		explicit(false) JSON(const is_null auto&) :
 			data_(std::monostate())
 		{
 		}
 
+		JSON(const JSON& other)		= default;
+		JSON(JSON&& other) noexcept = default;
+
 		template<typename T>
-			requires std::constructible_from<Value, T> and not is_null<T>
-													   explicit(false) JSON(const T& other) :
-			data_(Value(other))
+			requires std::constructible_from<Value, T>
+		explicit(false) JSON(T&& other) noexcept :
+			data_(std::move(other))
 		{
 		}
 
-		template<typename T>
-			requires std::constructible_from<Value, T> and not is_null<T>
-													   explicit(false) JSON(T && other) noexcept :
-			data_(Value(std::move(other)))
+		// NOTE: Using Array::value_type causes a compile error
+		// Using std::from_range_t to avoid ambiguity with std::string being interpreted as a range
+		template<typename R>
+			requires std::ranges::input_range<R> &&
+					 std::convertible_to<std::ranges::range_reference_t<R>, JSON>
+		explicit(false) JSON(std::from_range_t, R&& range) :
+			data_(std::in_place_type<Array>, std::from_range, std::forward<R>(range))
+		{
+		}
+
+		// NOTE: Using Object::value_type causes a compile error
+		template<typename R>
+			requires std::ranges::input_range<R> &&
+					 std::convertible_to<std::ranges::range_reference_t<R>, std::pair<const std::string, JSON>>
+		explicit JSON(R&& range) :
+			data_(std::in_place_type<Object>, std::from_range, std::forward<R>(range))
 		{
 		}
 
@@ -71,7 +82,7 @@ namespace synodic::honesty::utility
 
 		JSON& operator=(const is_null auto&) noexcept
 		{
-			data_.emplace<Value>(std::monostate());
+			data_.emplace<std::monostate>();
 			return *this;
 		}
 
@@ -79,7 +90,7 @@ namespace synodic::honesty::utility
 			requires std::constructible_from<Value, T> and not is_null<T>
 														   auto operator=(const T& other)->JSON&
 		{
-			data_.emplace<Value>(other);
+			data_ = other;
 			return *this;
 		}
 
@@ -87,7 +98,7 @@ namespace synodic::honesty::utility
 			requires std::constructible_from<Value, T> and not is_null<T>
 													   auto operator=(T&& other) noexcept -> JSON&
 		{
-			data_.emplace<Value>(std::move(other));
+			data_ = std::move(other);
 			return *this;
 		}
 
@@ -181,12 +192,7 @@ namespace synodic::honesty::utility
 
 		bool Null() const
 		{
-			if (const Value* value = std::get_if<Value>(&data_))
-			{
-				return std::holds_alternative<std::monostate>(*value);
-			}
-
-			return false;
+			return std::holds_alternative<std::monostate>(data_);
 		}
 
 		std::string Dump() const
@@ -198,35 +204,29 @@ namespace synodic::honesty::utility
 		static std::string Dump(const JSON& json, std::size_t indentCount)
 		{
 			auto dataVisitor = Overload {
-				[&](const Value& data)
+				[&](const std::monostate&)
 				{
-					auto valueVisitor = Overload {
-
-						[&](const std::monostate&)
-						{
-							return std::format("null");
-						},
-						[&](const bool& value)
-						{
-							return std::format("{}", value ? "true" : "false");
-						},
-						[&](const double& value)
-						{
-							return std::format("{}", value);
-						},
-						[&](const std::int32_t& value)
-						{
-							return std::format("{}", value);
-						},
-						[&](const std::uint32_t& value)
-						{
-							return std::format("{}", value);
-						},
-						[&](const std::string& value)
-						{
-							return std::format("\"{}\"", value);
-						}};
-					return std::visit(valueVisitor, data);
+					return std::format("null");
+				},
+				[&](const bool& value)
+				{
+					return std::format("{}", value ? "true" : "false");
+				},
+				[&](const double& value)
+				{
+					return std::format("{}", value);
+				},
+				[&](const std::int32_t& value)
+				{
+					return std::format("{}", value);
+				},
+				[&](const std::uint32_t& value)
+				{
+					return std::format("{}", value);
+				},
+				[&](const std::string& value)
+				{
+					return std::format("\"{}\"", value);
 				},
 				[&](const Array& data)
 				{
@@ -297,7 +297,7 @@ namespace synodic::honesty::utility
 			return std::visit(dataVisitor, json.data_);
 		}
 
-		Data data_;
+		Value data_;
 	};
 
 	export std::ostream& operator<<(std::ostream& stream, const JSON& json)

@@ -61,7 +61,7 @@ namespace synodic::honesty::utility
 		template<typename R>
 			requires std::ranges::input_range<R> &&
 					 std::convertible_to<std::ranges::range_reference_t<R>, JSON>
-		explicit(false) JSON(std::from_range_t, R&& range) :
+		JSON(std::from_range_t, R&& range) :
 			data_(std::in_place_type<Array>, std::from_range, std::forward<R>(range))
 		{
 		}
@@ -71,7 +71,7 @@ namespace synodic::honesty::utility
 		template<typename R>
 			requires std::ranges::input_range<R> &&
 					 std::convertible_to<std::ranges::range_reference_t<R>, std::pair<const std::string, JSON>>
-		explicit(false) JSON(std::from_range_t, R&& range) :
+		JSON(std::from_range_t, R&& range) :
 			data_(std::in_place_type<Object>, std::from_range, std::forward<R>(range))
 		{
 		}

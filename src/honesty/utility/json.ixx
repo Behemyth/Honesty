@@ -22,9 +22,6 @@ namespace
 namespace synodic::honesty::utility
 {
 
-	template<typename T>
-	concept is_null = std::is_same_v<std::remove_cvref_t<T>, std::nullptr_t>;
-
 	// TODO: Use c++26 reflection for a simple lexer without pulling in a library
 	export class JSON
 	{
@@ -41,7 +38,9 @@ namespace synodic::honesty::utility
 		{
 		}
 
-		explicit(false) JSON(const is_null auto&) :
+		template<typename T>
+			requires std::is_same_v<std::remove_cvref_t<T>, std::nullptr_t>
+		explicit(false) JSON(const T&) :
 			data_(std::monostate())
 		{
 		}
@@ -59,8 +58,7 @@ namespace synodic::honesty::utility
 		// NOTE: Using Array::value_type causes a compile error
 		// Using std::from_range_t to avoid ambiguity with variant passing
 		template<typename R>
-			requires std::ranges::input_range<R> &&
-					 std::convertible_to<std::ranges::range_reference_t<R>, JSON>
+			requires std::ranges::input_range<R> && std::convertible_to<std::ranges::range_reference_t<R>, JSON>
 		JSON(std::from_range_t, R&& range) :
 			data_(std::in_place_type<Array>, std::from_range, std::forward<R>(range))
 		{
@@ -81,23 +79,9 @@ namespace synodic::honesty::utility
 		JSON& operator=(const JSON& other)	   = default;
 		JSON& operator=(JSON&& other) noexcept = default;
 
-		JSON& operator=(const is_null auto&) noexcept
-		{
-			data_.emplace<std::monostate>();
-			return *this;
-		}
-
 		template<typename T>
-			requires std::constructible_from<Value, T> and not is_null<T>
-														   auto operator=(const T& other)->JSON&
-		{
-			data_ = other;
-			return *this;
-		}
-
-		template<typename T>
-			requires std::constructible_from<Value, T> and not is_null<T>
-													   auto operator=(T&& other) noexcept -> JSON&
+			requires std::constructible_from<JSON, T> && std::assignable_from<JSON, T>
+		auto operator=(T&& other) noexcept -> JSON&
 		{
 			data_ = std::move(other);
 			return *this;
@@ -191,7 +175,27 @@ namespace synodic::honesty::utility
 			throw std::runtime_error("Invalid type found for '[]' operator access");
 		}
 
+		// NOTE: Using Array::value_type causes a compile error
+		// Using std::from_range_t to avoid ambiguity with variant passing
+		template<typename R>
+			requires std::ranges::input_range<R> && std::convertible_to<std::ranges::range_reference_t<R>, JSON>
+		void AssignRange(R&& range)
+		{
+			data_.emplace<Array>(std::from_range, std::forward<R>(range));
+		}
+
+		// NOTE: Using Object::value_type causes a compile error
+		// Using std::from_range_t to avoid ambiguity with variant passing
+		template<typename R>
+			requires std::ranges::input_range<R> &&
+					 std::convertible_to<std::ranges::range_reference_t<R>, std::pair<const std::string, JSON>>
+		void AssignRange(R&& range)
+		{
+			data_.emplace<Object>(std::from_range, std::forward<R>(range));
+		}
+
 		bool Null() const
+
 		{
 			return std::holds_alternative<std::monostate>(data_);
 		}

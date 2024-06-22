@@ -114,6 +114,43 @@ namespace
 					synodic::honesty::utility::JSON json;
 					json = "value";
 				}
+				{
+					// From value array
+					std::vector range {1, 2, 3, 4};
+					synodic::honesty::utility::JSON json;
+					json.AssignRange(range);
+				}
+
+				{
+					// From JSON array
+					std::vector<synodic::honesty::utility::JSON> range {1, 2, 3, 4};
+					synodic::honesty::utility::JSON json;
+					json = range;
+				}
+
+				{
+					// From map
+					std::map<std::string, int> range = {
+						{"1", 1},
+						{"2", 2},
+						{"3", 3},
+						{"4", 4}
+					};
+					synodic::honesty::utility::JSON json;
+					json.AssignRange(range);
+				}
+
+				{
+					// From JSON map
+					std::map<std::string, synodic::honesty::utility::JSON> range = {
+						{"1", 1},
+						{"2", 2},
+						{"3", 3},
+						{"4", 4}
+					};
+					synodic::honesty::utility::JSON json;
+					json = range;
+				}
 			};
 
 			using Data = std::tuple<synodic::honesty::utility::JSON, std::string>;

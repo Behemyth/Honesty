@@ -10,7 +10,8 @@ namespace
 {
 	Suite SUITE(
 		"instance",
-		[](Fixture& fixture) -> Generator
+		[](
+		const Fixture& fixture) -> Generator
 		{
 			// We generate a string from the path to the temporary file for comparison.
 			const std::filesystem::path temporaryPath = fixture.SuiteDirectory() / "passThrough.json";

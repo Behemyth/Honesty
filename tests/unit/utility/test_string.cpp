@@ -7,6 +7,8 @@ using namespace synodic::honesty::test::literals;
 
 namespace
 {
+	// DISABLED: Compiler bug with formatting custom types
+
 	/*Suite stringSuite(
 		"string",
 		[]() -> Generator

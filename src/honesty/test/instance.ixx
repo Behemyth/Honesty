@@ -283,7 +283,7 @@ namespace synodic::honesty::test
 									auto& suiteJSON = json[suiteDescription.name];
 									for (auto& testDescription: suiteDescription.tests)
 									{
-										suiteJSON[testDescription.name] = utility::JSON();
+										suiteJSON = testDescription.name;
 									}
 								}
 

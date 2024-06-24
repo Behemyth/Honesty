@@ -44,6 +44,11 @@ namespace synodic::honesty::test
 		Suite& operator=(const Suite& other)	 = delete;
 		Suite& operator=(Suite&& other) noexcept = delete;
 
+		consteval std::string_view Name() const
+		{
+			return name_;
+		}
+
 	private:
 		friend SuiteView;
 

@@ -7,5 +7,6 @@ PRIVATE
 	test_tag.cpp
 	test_instance.cpp
 	test_interface.cpp
+	test_suite.cpp
 	test_exception.cpp
 )

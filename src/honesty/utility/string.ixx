@@ -13,10 +13,20 @@ namespace synodic::honesty::utility
 	public:
 		using StringViewType = std::basic_string_view<CharT, Traits>;
 
-		explicit(false) constexpr BasicFixedString(const CharT (&str)[Size])
+		explicit(false) consteval BasicFixedString(const CharT (&str)[Size])
 		{
 			std::copy(std::begin(str), std::end(str), std::begin(data_));
 		}
+
+		explicit(false) constexpr BasicFixedString(std::span<const CharT, Size> str)
+		{
+			std::copy(std::begin(str), std::end(str), std::begin(data_));
+		}
+
+		// explicit(false) constexpr BasicFixedString(const CharT* str)
+		//{
+		//	std::copy(std::begin(str), std::begin(str) + Traits::length(str), std::begin(data_));
+		// }
 
 		BasicFixedString(const BasicFixedString& other)				   = default;
 		BasicFixedString(BasicFixedString&& other) noexcept			   = default;
@@ -31,9 +41,7 @@ namespace synodic::honesty::utility
 			return {data_.data(), VIEW_SIZE};
 		}
 
-		[[nodiscard]]
-
-		explicit constexpr operator std::basic_string_view<CharT>() const noexcept
+		[[nodiscard]] explicit constexpr operator std::basic_string_view<CharT>() const noexcept
 		{
 			return {data_.data(), VIEW_SIZE};
 		}
@@ -106,6 +114,8 @@ struct std::formatter<synodic::honesty::utility::BasicFixedString<CharT, Size, T
 		-> typename Context::iterator
 	{
 		using ViewType = typename synodic::honesty::utility::BasicFixedString<CharT, Size, Traits>::StringViewType;
-		return std::formatter<std::basic_string_view<CharT, Traits>, CharT>::format(static_cast<ViewType>(string), context);
+		return std::formatter<std::basic_string_view<CharT, Traits>, CharT>::format(
+			static_cast<ViewType>(string),
+			context);
 	}
 };

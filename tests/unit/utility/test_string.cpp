@@ -7,12 +7,42 @@ using namespace synodic::honesty::test::literals;
 
 namespace
 {
-	// DISABLED: Compiler bug with formatting custom types
-
-	/*Suite stringSuite(
+	Suite stringSuite(
 		"string",
 		[]() -> Generator
 		{
+			co_yield "construction"_test = [](const Requirements& requirements)
+			{
+				{
+					constexpr std::string_view name = "test";
+					constexpr synodic::honesty::utility::FixedString str(name);
+
+					requirements.Expect(str.View() == name);
+				}
+				{
+					// Direct pointer
+					constexpr const char* name = "test";
+					constexpr synodic::honesty::utility::FixedString str(name);
+
+					requirements.Expect(not str.View().empty());
+				}
+				{
+					// Pointer with terminating 0
+					const char (&name)[5] = "test";
+					constexpr synodic::honesty::utility::FixedString str(name);
+
+					requirements.Expect(not str.View().empty());
+				}
+				{
+					// Span with terminating 0
+					const char (&base)[5] = "test";
+					constexpr std::span name(base);
+					constexpr synodic::honesty::utility::FixedString str(name);
+
+					requirements.Expect(not str.View().empty());
+				}
+			};
+
 			co_yield "equality"_test = [](const Requirements& requirements)
 			{
 				constexpr synodic::honesty::utility::FixedString str("test");
@@ -25,30 +55,30 @@ namespace
 				constexpr synodic::honesty::utility::FixedStringU16 u16StrCopy(u"test");
 				constexpr synodic::honesty::utility::FixedStringU32 u32StrCopy(U"test");
 
-				requirements.ExpectEquals(str, str);
-				requirements.ExpectEquals(u8Str, u8Str);
-				requirements.ExpectEquals(u16Str, u16Str);
-				requirements.ExpectEquals(u32Str, u32Str);
+				requirements.Expect(str == str);
+				requirements.Expect(u8Str == u8Str);
+				requirements.Expect(u16Str == u16Str);
+				requirements.Expect(u32Str == u32Str);
 
-				requirements.ExpectEquals(str, strCopy);
-				requirements.ExpectEquals(u8Str, u8StrCopy);
-				requirements.ExpectEquals(u16Str, u16StrCopy);
-				requirements.ExpectEquals(u32Str, u32StrCopy);
+				requirements.Expect(str == strCopy);
+				requirements.Expect(u8Str == u8StrCopy);
+				requirements.Expect(u16Str == u16StrCopy);
+				requirements.Expect(u32Str == u32StrCopy);
 
-				requirements.ExpectEquals(str.View(), std::string_view("test"));
-				requirements.ExpectEquals(u8Str.View(), std::u8string_view(u8"test"));
-				requirements.ExpectEquals(u16Str.View(), std::u16string_view(u"test"));
-				requirements.ExpectEquals(u32Str.View(), std::u32string_view(U"test"));
+				requirements.Expect(str.View() == std::string_view("test"));
+				requirements.Expect(u8Str.View() == std::u8string_view(u8"test"));
+				requirements.Expect(u16Str.View() == std::u16string_view(u"test"));
+				requirements.Expect(u32Str.View() == std::u32string_view(U"test"));
 
-				requirements.ExpectEquals(str, "test");
-				requirements.ExpectEquals(u8Str, u8"test");
-				requirements.ExpectEquals(u16Str, u"test");
-				requirements.ExpectEquals(u32Str, U"test");
+				requirements.Expect(str == "test");
+				requirements.Expect(u8Str == u8"test");
+				requirements.Expect(u16Str == u"test");
+				requirements.Expect(u32Str == U"test");
 
-				requirements.ExpectEquals("test", str);
-				requirements.ExpectEquals(u8"test", u8Str);
-				requirements.ExpectEquals(u"test", u16Str);
-				requirements.ExpectEquals(U"test", u32Str);
+				requirements.Expect("test" == str);
+				requirements.Expect(u8"test" == u8Str);
+				requirements.Expect(u"test" == u16Str);
+				requirements.Expect(U"test" == u32Str);
 			};
 
 			co_yield "comparison"_test = [](const Requirements& requirements)
@@ -63,17 +93,17 @@ namespace
 				constexpr synodic::honesty::utility::FixedStringU16 u16StrB(u"b");
 				constexpr synodic::honesty::utility::FixedStringU32 u32StrB(U"b");
 
-				requirements.ExpectLess(strA, strB);
-				requirements.ExpectLess(u8StrA, u8StrB);
-				requirements.ExpectLess(u16StrA, u16StrB);
-				requirements.ExpectLess(u32StrA, u32StrB);
+				requirements.Expect(strA < strB);
+				requirements.Expect(u8StrA < u8StrB);
+				requirements.Expect(u16StrA < u16StrB);
+				requirements.Expect(u32StrA < u32StrB);
 
-				requirements.ExpectLess(strA, "b");
-				requirements.ExpectLess(u8StrA, u8"b");
-				requirements.ExpectLess(u16StrA, u"b");
-				requirements.ExpectLess(u32StrA, U"b");
+				requirements.Expect(strA < "b");
+				requirements.Expect(u8StrA < u8"b");
+				requirements.Expect(u16StrA < u"b");
+				requirements.Expect(u32StrA < U"b");
 			};
 		});
 
-	SuiteRegistrar _(stringSuite);*/
+	SuiteRegistrar _(stringSuite);
 }

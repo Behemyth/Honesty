@@ -51,14 +51,20 @@ namespace synodic::honesty::test
 
 		struct ExecuteContext
 		{
-			ExecuteContext(std::unique_ptr<Runner> runner, std::unique_ptr<Reporter> reporter) :
+			ExecuteContext(
+				std::unique_ptr<Runner> runner,
+				std::unique_ptr<Reporter> reporter,
+				const std::string& filter) :
 				runner(std::move(runner)),
-				reporter(std::move(reporter))
+				reporter(std::move(reporter)),
+				filter(filter)
 			{
 			}
 
 			std::unique_ptr<Runner> runner;
 			std::unique_ptr<Reporter> reporter;
+
+			std::string filter;
 		};
 
 		struct ListContext
@@ -152,7 +158,7 @@ namespace synodic::honesty::test
 			{
 				if (arguments.empty())
 				{
-					parameters_ = ExecuteContext(std::move(defaultRunner), std::move(defaultReporter));
+					parameters_ = ExecuteContext(std::move(defaultRunner), std::move(defaultReporter), "");
 					return;
 				}
 
@@ -187,7 +193,7 @@ namespace synodic::honesty::test
 					return;
 				}
 
-				parameters_ = ExecuteContext(std::move(defaultRunner), std::move(defaultReporter));
+				parameters_ = ExecuteContext(std::move(defaultRunner), std::move(defaultReporter), "");
 			}
 		}
 
@@ -223,7 +229,7 @@ namespace synodic::honesty::test
 
 					// Before start executing, we need to set up the current thread's context
 					Context commandContext = Context(*context.runner.get(), reporters);
-					ExecuteParameters parameters(commandContext);
+					ExecuteParameters parameters(commandContext, "");
 
 					const ExecuteResult result = interface.Execute(parameters);
 

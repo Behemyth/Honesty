@@ -34,12 +34,14 @@ namespace synodic::honesty::test
 
 	export struct ExecuteParameters
 	{
-		explicit ExecuteParameters(const Context& context) :
-			context(context)
+		explicit ExecuteParameters(const Context& context, const std::string& filter) :
+			context(context),
+			filter(filter)
 		{
 		}
 
 		Context context;
+		std::string filter;
 	};
 
 	export struct ListParameters
@@ -120,14 +122,39 @@ namespace synodic::honesty::test
 
 		[[nodiscard]] ExecuteResult Execute(const ExecuteParameters& parameters)
 		{
+			// Break down the filter into individual views
+			auto splitData = parameters.filter | std::ranges::views::split('.') |
+							 std::ranges::views::transform(
+								 [](auto&& str)
+								 {
+									 return std::string_view(str.data(), std::ranges::distance(str));
+								 });
+
+			std::vector<std::string_view> filterData = std::ranges::to<std::vector>(splitData);
+
+			std::span filter = filterData;
+
 			for (const SuiteView& suite: GetSuites())
 			{
+				// Before we start, check to see if we have a filter
+				if (not parameters.filter.empty())
+				{
+					// Check if the suite name matches the filter
+					if (suite.name != filter.front())
+					{
+						continue;
+					}
+
+					// Move to the next filter part
+					filter = filter | std::ranges::views::drop(1);
+				}
+
 				event::SuiteBegin suiteBegin;
 				suiteBegin.name = suite.name;
 
 				parameters.context.Signal(suiteBegin);
 
-				// Fixture lifetime should be for the whole suite	
+				// Fixture lifetime should be for the whole suite
 				Fixture fixture(applicationName_, suite.name);
 
 				auto executor = Overload {
@@ -145,6 +172,12 @@ namespace synodic::honesty::test
 				for (const Test& test: generator)
 				{
 					const TestView view(test);
+
+					// Filter the test by name
+					if (not filter.empty() and view.name != filter.front())
+					{
+						continue;
+					}
 
 					event::TestBegin testBegin;
 					testBegin.name = view.name;
@@ -188,7 +221,7 @@ namespace synodic::honesty::test
 
 			Context context(runner, reporters);
 
-			const ExecuteParameters executeParameters(context);
+			const ExecuteParameters executeParameters(context, "");
 			ExecuteResult executeResult = Execute(executeParameters);
 
 			ListResult result;

@@ -68,22 +68,16 @@ function(honesty_extract_tests)
 	# Get the number of tests
 	string(JSON test_count LENGTH ${json_buffer} "tests")
 
-	# Create a list of indices to iterate over
-	set(indices "")
-
-	foreach(index RANGE ${test_count})
-		list(APPEND indices ${index})
-	endforeach()
-
-	# Parse the top-level json string and get the tests array
-	string(JSON tests_buffer GET ${json_buffer} "tests")
+	math(EXPR test_count "${test_count}-1")
 
 	# Process each test name
-	foreach(test_name ${tests_buffer})
-		set(HONESTY_ARGS --filter ${test_name})
+	foreach(index RANGE ${test_count})
+		string(JSON test_name GET ${json_buffer} tests ${index})
+
+		set(HONESTY_ARGS "--filter \"${test_name}\"")
 
 		string(APPEND ctest_output
-			"add_test(NAME ${test_name}" "\n"
+			"add_test(NAME \"${test_name}\"" "\n"
 			"    COMMAND ${_EXECUTABLE} ${HONESTY_ARGS}" "\n"
 			")" "\n"
 		)

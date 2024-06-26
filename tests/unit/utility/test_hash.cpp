@@ -7,12 +7,12 @@ using namespace synodic::honesty::test::literals;
 
 namespace
 {
-	Suite hashSuite(
+	Suite SUITE(
 		"hash",
 		[]() -> Generator
 		{
 			co_return;
 		});
 
-	SuiteRegistrar _(hashSuite);
+	SuiteRegistrar _(SUITE);
 }

@@ -22,20 +22,24 @@ namespace synodic::honesty::test
 	 * registration is constrained. We don't want a suite wrapper to be a generic fixture that can contain expensive
 	 * calculations. All tests are known up-front and parameterized tests are expanded at run-time
 	 */
-	export template<size_t NameSize>
+	export template<size_t LiteralSize>
 	class Suite final
 	{
+		static_assert(LiteralSize > 0, "LiteralSize must be greater than 0");
+
+		static constexpr size_t NAME_SIZE = LiteralSize -1;
+
 	public:
-		consteval Suite(const char (&name)[NameSize], const std::function_ref<Generator()> generator) :
-			name_(name),
+		consteval Suite(const char (&name)[LiteralSize], const std::function_ref<Generator()> generator) :
 			testGenerator_(generator)
 		{
+			std::copy(std::begin(name), std::end(name) - 1, std::begin(name_));
 		}
 
-		consteval Suite(const char (&name)[NameSize], const std::function_ref<Generator(Fixture&)> generator) :
-			name_(name),
+		consteval Suite(const char (&name)[LiteralSize], const std::function_ref<Generator(Fixture&)> generator) :
 			testGenerator_(generator)
 		{
+			std::copy(std::begin(name), std::end(name) - 1, std::begin(name_));
 		}
 
 		Suite(const Suite& other)	  = delete;
@@ -44,15 +48,16 @@ namespace synodic::honesty::test
 		Suite& operator=(const Suite& other)	 = delete;
 		Suite& operator=(Suite&& other) noexcept = delete;
 
-		consteval std::string_view Name() const
+		// TODO: Make consteval when MSVC supports it
+		constexpr std::string_view Name() const
 		{
-			return name_;
+			return {name_.data(), name_.size()};
 		}
 
 	private:
 		friend SuiteView;
 
-		utility::FixedString<NameSize> name_;
+		std::array<char, NAME_SIZE> name_;
 		std::variant<std::function_ref<Generator()>, std::function_ref<Generator(Fixture&)>> testGenerator_;
 	};
 
@@ -102,7 +107,7 @@ namespace synodic::honesty::test
 	class SuiteRegistrar
 	{
 	public:
-		explicit SuiteRegistrar(Suite<NameSizes>&... suites)
+		explicit SuiteRegistrar(const Suite<NameSizes>&... suites)
 		{
 			(AddSuite(SuiteView(suites)), ...);
 		}

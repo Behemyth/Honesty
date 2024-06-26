@@ -1,42 +1,6 @@
 # Overwrite possibly existing ${_CTEST_FILE} with empty file
 set(flush_tests_MODE WRITE)
 
-# Flushes script to ${_CTEST_FILE}
-macro(flush_script)
-	file(${flush_tests_MODE} "${_CTEST_FILE}" "${script}")
-	message(FATAL_ERROR ${_CTEST_FILE} ${script})
-	set(flush_tests_MODE APPEND PARENT_SCOPE)
-
-	set(script "")
-endmacro()
-
-# Flushes tests_buffer to tests
-macro(flush_tests_buffer)
-	list(APPEND tests "${tests_buffer}")
-	set(tests_buffer "")
-endmacro()
-
-function(add_command NAME TEST_NAME)
-	set(args "")
-
-	foreach(arg ${ARGN})
-		if(arg MATCHES "[^-./:a-zA-Z0-9_]")
-			string(APPEND args " [==[${arg}]==]")
-		else()
-			string(APPEND args " ${arg}")
-		endif()
-	endforeach()
-
-	string(APPEND script "${NAME}(${TEST_NAME} ${args})\n")
-	string(LENGTH "${script}" script_len)
-
-	if(${script_len} GREATER "50000")
-		flush_script()
-	endif()
-
-	set(script "${script}" PARENT_SCOPE)
-endfunction()
-
 function(honesty_extract_tests)
 	cmake_parse_arguments(
 		""
@@ -47,41 +11,40 @@ function(honesty_extract_tests)
 	)
 
 	# Set function state variables
-	set(script)
-	set(tests)
-	set(tests_buffer)
+	set(ctest_output)
 
 	# Run test executable to get list of available tests
-	if(NOT EXISTS "${_EXECUTABLE}")
+	if(NOT EXISTS ${_EXECUTABLE})
 		message(FATAL_ERROR
 			"Specified test executable does not exist.\n"
 			"  Path: '${_EXECUTABLE}'"
 		)
 	endif()
 
-	set(HONESTY_ARGS "list --json --output honesty_test.json")
+	set(HONESTY_ARGS list --json --file honesty_test.json)
 
 	cmake_path(GET _EXECUTABLE PARENT_PATH EXECUTABLE_PARENT)
 
-	message("Running '${_EXECUTABLE} ${HONESTY_ARGS}' in directory '${EXECUTABLE_PARENT}'")
+	message("Running command:\n	'${HONESTY_ARGS}'")
 
 	# Extract the test list from the Honesty target
 	execute_process(
 		COMMAND ${_EXECUTABLE} ${HONESTY_ARGS}
-		WORKING_DIRECTORY ${EXECUTABLE_PARENT}
+		WORKING_DIRECTORY ${_WORKING_DIRECTORY}
 		TIMEOUT ${_DISCOVERY_TIMEOUT}
 		OUTPUT_VARIABLE output
+		ERROR_VARIABLE output
 		RESULT_VARIABLE result
 	)
 
+	# Indent the output for better logging readability
 	string(REPLACE "\n" "\n    " output "${output}")
-	set(path "${_EXECUTABLE}")
 
-	# Handle process errors
+	# Log the results of the process
 	if(NOT ${result} EQUAL 0)
 		message(FATAL_ERROR
 			"Error running test executable.\n"
-			"  Path: '${path}'\n"
+			"  Path: '${_EXECUTABLE}'\n"
 			"  Working directory: '${_WORKING_DIR}'\n"
 			"  Result: ${result}\n"
 			"  Output:\n"
@@ -90,16 +53,46 @@ function(honesty_extract_tests)
 	else()
 		message(
 			"Test executable result.\n"
-			"  Path: '${path}'\n"
+			"  Path: '${_EXECUTABLE}'\n"
 			"  Working directory: '${_WORKING_DIR}'\n"
-			"  Result: ${result}\n"
 			"  Output:\n"
 			"    ${output}\n"
 		)
 	endif()
 
-	flush_tests_buffer()
+	cmake_path(SET full_path "${_WORKING_DIR}/honesty_test.json")
 
-	# Write CTest script
-	flush_script()
+	# Parse the JSON output into a CMake string
+	file(READ ${full_path} json_buffer)
+
+	# Get the number of tests
+	string(JSON test_count LENGTH ${json_buffer} "tests")
+
+	# Create a list of indices to iterate over
+	set(indices "")
+
+	foreach(index RANGE ${test_count})
+		list(APPEND indices ${index})
+	endforeach()
+
+	# Parse the top-level json string and get the tests array
+	string(JSON tests_buffer GET ${json_buffer} "tests")
+
+	# Process each test name
+	foreach(test_name ${tests_buffer})
+		set(HONESTY_ARGS --filter ${test_name})
+
+		string(APPEND ctest_output
+			"add_test(NAME ${test_name}" "\n"
+			"    COMMAND ${_EXECUTABLE} ${HONESTY_ARGS}" "\n"
+			")" "\n"
+		)
+	endforeach()
+
+	if(NOT ctest_output)
+		message(WARNING "No tests have been discovered.")
+	endif()
+
+	# Write the generated ctest file
+	file(WRITE ${_CTEST_FILE} ${ctest_output})
 endfunction()

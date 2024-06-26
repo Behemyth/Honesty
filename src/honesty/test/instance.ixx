@@ -156,25 +156,7 @@ namespace synodic::honesty::test
 
 			// Handle the command setup
 			{
-				if (arguments.empty())
-				{
-					ExecuteContext parameters(std::move(defaultRunner), std::move(defaultReporter), "");
-
-					if (auto itr = std::ranges::find(arguments, "--filter"); itr != arguments.end())
-					{
-						if (++itr == arguments.end())
-						{
-							throw std::invalid_argument("You must give a filter when using the '--filter' option");
-						}
-
-						parameters.filter = *itr;
-					}
-
-					parameters_ = std::move(parameters);
-					return;
-				}
-
-				if (arguments[0] == "list")
+				if (arguments.size() >= 2 && arguments[1] == "list")
 				{
 					arguments = arguments.subspan(1);
 
@@ -192,7 +174,7 @@ namespace synodic::honesty::test
 							throw std::invalid_argument("You must give a file name when using the '--file' option");
 						}
 
-						parameters.file = *itr;
+						parameters.file = absolute(std::filesystem::current_path() / *itr);
 
 						if (not parameters.file->has_filename())
 						{
@@ -205,7 +187,20 @@ namespace synodic::honesty::test
 					return;
 				}
 
-				parameters_ = ExecuteContext(std::move(defaultRunner), std::move(defaultReporter), "");
+				ExecuteContext parameters(std::move(defaultRunner), std::move(defaultReporter), "");
+
+				if (auto itr = std::ranges::find(arguments, "--filter"); itr != arguments.end())
+				{
+					if (++itr == arguments.end())
+					{
+						throw std::invalid_argument("You must give a filter when using the '--filter' option");
+					}
+
+					parameters.filter = *itr;
+				}
+
+				parameters_ = std::move(parameters);
+				return;
 			}
 		}
 
@@ -226,97 +221,108 @@ namespace synodic::honesty::test
 
 		void Execute()
 		{
-			const Interface::Configuration configuration(applicationName_);
-			Interface interface(configuration);
+			try
+			{
+				const Interface::Configuration configuration(applicationName_);
+				Interface interface(configuration);
 
-			auto executor = Overload {
-				[&](const HelpContext& context)
-				{
-					constexpr HelpParameters parameters;
-					auto result = interface.Help(parameters);
-				},
-				[&](const ExecuteContext& context)
-				{
-					std::ranges::single_view reporters {context.reporter.get()};
-
-					// Before start executing, we need to set up the current thread's context
-					Context commandContext = Context(*context.runner.get(), reporters);
-					ExecuteParameters parameters(commandContext, "");
-
-					const ExecuteResult result = interface.Execute(parameters);
-
-					if (not result.success)
+				auto executor = Overload {
+					[&](const HelpContext& context)
 					{
-						// TODO: Replace with a return code
-						std::exit(134);
-					}
-				},
-				[&](const ListContext& context)
-				{
-					ListParameters parameters(logger_.CreateLogger("list"));
-
-					auto result = interface.List(parameters);
-
-					if (context.file)
+						constexpr HelpParameters parameters;
+						auto result = interface.Help(parameters);
+					},
+					[&](const ExecuteContext& context)
 					{
-						const std::filesystem::path& path = context.file.value();
+						std::ranges::single_view reporters {context.reporter.get()};
 
-						std::ofstream file(path);
+						// Before start executing, we need to set up the current thread's context
+						Context commandContext = Context(*context.runner.get(), reporters);
+						ExecuteParameters parameters(commandContext, "");
 
-						std::error_code code;
-						create_directories(path.parent_path(), code);
+						const ExecuteResult result = interface.Execute(parameters);
 
-						if (code)
+						if (not result.success)
 						{
-							throw std::runtime_error("Failed to create directory: " + path.parent_path().string());
+							// TODO: Replace with a return code
+							std::exit(134);
 						}
+					},
+					[&](const ListContext& context)
+					{
+						ListParameters parameters(logger_.CreateLogger("list"));
 
-						if (!file.is_open())
+						auto result = interface.List(parameters);
+
+						if (context.file)
 						{
-							throw std::runtime_error("Failed to open file: " + path.generic_string());
-						}
+							const std::filesystem::path& path = context.file.value();
 
-						// Clear the file
-						file.clear();
+							std::ofstream file(path);
 
-						switch (context.outputType)
-						{
-							case ListOutputType::LOG :
+							std::error_code code;
+							create_directories(path.parent_path(), code);
+
+							if (code)
 							{
-								for (auto& suiteDescription: result.suites)
-								{
-									for (auto& testDescription: suiteDescription.tests)
-									{
-										file << std::format("{}", testDescription.name);
-									}
-								}
-								break;
+								throw std::runtime_error("Failed to create directory: " + path.parent_path().string());
 							}
-							case ListOutputType::JSON :
+
+							if (!file.is_open())
 							{
-								utility::JSON json;
-
-								for (auto& suiteDescription: result.suites)
-								{
-									auto& suiteJSON = json[suiteDescription.name];
-									for (auto& testDescription: suiteDescription.tests)
-									{
-										suiteJSON = testDescription.name;
-									}
-								}
-
-								file << json;
-
-								break;
+								throw std::runtime_error("Failed to open file: " + path.generic_string());
 							}
+
+							// Clear the file
+							file.clear();
+
+							switch (context.outputType)
+							{
+								case ListOutputType::LOG :
+								{
+									for (auto& suiteDescription: result.suites)
+									{
+										for (auto& testDescription: suiteDescription.tests)
+										{
+											file << std::format("{}", testDescription.name);
+										}
+									}
+									break;
+								}
+								case ListOutputType::JSON :
+								{
+									utility::JSON json;
+
+									utility::JSON& tests = json["tests"];
+
+									size_t testIndex = 0;
+
+									for (auto& suiteDescription: result.suites)
+									{
+										for (auto& testDescription: suiteDescription.tests)
+										{
+											tests[testIndex++] =
+												std::format("{}.{}", suiteDescription.name, testDescription.name);
+										}
+									}
+
+									file << json;
+
+									break;
+								}
+							}
+
+							logger_.Info("Written file to {}", path.generic_string());
 						}
+					},
+				};
 
-						logger_.Info("Written file to {}", path.generic_string());
-					}
-				},
-			};
-
-			std::visit(executor, parameters_);
+				std::visit(executor, parameters_);
+			}
+			catch (std::exception& e)
+			{
+				logger_.Error("Exception: {}", e.what());
+			}
 		}
 
 	private:

@@ -61,8 +61,6 @@ function(honesty_discover_tests TARGET)
 
 	set(ctest_tests_helper "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../script/honestyAddTests.cmake")
 
-
-
 	# CMake functionality that will be injected prior to target execution.
 	# As a result, test discovery will happen in the same configured context as the executable
 	string(CONCAT ctest_include_content
@@ -97,6 +95,7 @@ function(honesty_discover_tests TARGET)
 
 	# Add discovered tests to directory TEST_INCLUDE_FILES
 	set_property(DIRECTORY
-		APPEND PROPERTY TEST_INCLUDE_FILES "${ctest_include_file}"
+		APPEND PROPERTY TEST_INCLUDE_FILES ${ctest_include_file}
 	)
+
 endfunction()

@@ -11,3 +11,4 @@ dist/
 .pdm-python
 __pypackages__/
 *.pdb
+/Testing

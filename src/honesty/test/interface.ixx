@@ -47,13 +47,11 @@ namespace synodic::honesty::test
 	export struct ListParameters
 	{
 		explicit ListParameters(log::Logger logger) :
-			logger(std::move(logger)),
-			outputType(ListOutputType::LOG)
+			logger(std::move(logger))
 		{
 		}
 
 		log::Logger logger;
-		ListOutputType outputType;
 	};
 
 	export struct HelpResult

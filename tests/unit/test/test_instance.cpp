@@ -19,7 +19,7 @@ namespace
 			co_yield "list parsing"_test = [&](const Requirements& requirements) -> void
 			{
 				const auto path = temporaryPath.generic_string();
-				std::array<std::string_view, 4> arguments{"list", "--json", "--file", path};
+				std::array<std::string_view, 5> arguments{"fakeEXE", "list", "--json", "--file", path};
 
 				synodic::honesty::log::RingBuffer<std::mutex> sink;
 

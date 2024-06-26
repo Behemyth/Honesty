@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.28 FATAL_ERROR)
+
 # Overwrite possibly existing ${_CTEST_FILE} with empty file
 set(flush_tests_MODE WRITE)
 
@@ -23,14 +25,12 @@ function(honesty_extract_tests)
 
 	set(HONESTY_ARGS list --json --file honesty_test.json)
 
-	cmake_path(GET _EXECUTABLE PARENT_PATH EXECUTABLE_PARENT)
-
 	message("Running command:\n	'${HONESTY_ARGS}'")
 
 	# Extract the test list from the Honesty target
 	execute_process(
 		COMMAND ${_EXECUTABLE} ${HONESTY_ARGS}
-		WORKING_DIRECTORY ${_WORKING_DIRECTORY}
+		WORKING_DIRECTORY ${_WORKING_DIR}
 		TIMEOUT ${_DISCOVERY_TIMEOUT}
 		OUTPUT_VARIABLE output
 		ERROR_VARIABLE output
@@ -77,7 +77,8 @@ function(honesty_extract_tests)
 		set(HONESTY_ARGS "--filter \"${test_name}\"")
 
 		string(APPEND ctest_output
-			"add_test(NAME \"${test_name}\"" "\n"
+			"add_test(" "\n"
+			"	\"${test_name}\"" "\n"
 			"    COMMAND ${_EXECUTABLE} ${HONESTY_ARGS}" "\n"
 			")" "\n"
 		)

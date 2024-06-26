@@ -91,6 +91,16 @@ namespace synodic::honesty::test
 			return filename;
 		}
 
+		std::string_view ApplicationName() const
+		{
+			return applicationName_;
+		}
+
+		std::string_view SuiteName() const
+		{
+			return suiteName_;
+		}
+
 	private:
 		std::string_view applicationName_;
 		std::string_view suiteName_;

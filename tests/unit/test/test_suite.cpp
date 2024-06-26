@@ -24,6 +24,8 @@ namespace
 					const auto name = testSuite.Name();
 					requirements.ExpectEquals(name, "test");
 				}
+
+				requirements.ExpectThrow<std::runtime_error>()
 			};
 		});
 

@@ -27,7 +27,7 @@ namespace synodic::honesty::test
 	{
 		static_assert(LiteralSize > 0, "LiteralSize must be greater than 0");
 
-		static constexpr size_t NAME_SIZE = LiteralSize -1;
+		static constexpr size_t NAME_SIZE = LiteralSize - 1;
 
 	public:
 		consteval Suite(const char (&name)[LiteralSize], const std::function_ref<Generator()> generator) :
@@ -100,6 +100,17 @@ namespace synodic::honesty::test
 	 */
 	void AddSuite(SuiteView suite)
 	{
+		if (std::ranges::contains(
+				SUITES,
+				suite.name,
+				[](const SuiteView& view)
+				{
+					return view.name;
+				}))
+		{
+			throw std::runtime_error("Duplicate suite name");
+		}
+
 		SUITES.push_back(std::move(suite));
 	}
 

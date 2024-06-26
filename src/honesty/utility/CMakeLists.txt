@@ -4,6 +4,5 @@ target_sources(honesty
 		FILES
 			"exception.ixx"
 			"hash.ixx"
-			"string.ixx"
 			"json.ixx"
 )

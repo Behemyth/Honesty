@@ -158,7 +158,19 @@ namespace synodic::honesty::test
 			{
 				if (arguments.empty())
 				{
-					parameters_ = ExecuteContext(std::move(defaultRunner), std::move(defaultReporter), "");
+					ExecuteContext parameters(std::move(defaultRunner), std::move(defaultReporter), "");
+
+					if (auto itr = std::ranges::find(arguments, "--filter"); itr != arguments.end())
+					{
+						if (++itr == arguments.end())
+						{
+							throw std::invalid_argument("You must give a filter when using the '--filter' option");
+						}
+
+						parameters.filter = *itr;
+					}
+
+					parameters_ = std::move(parameters);
 					return;
 				}
 

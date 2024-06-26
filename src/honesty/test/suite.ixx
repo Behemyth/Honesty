@@ -95,14 +95,18 @@ namespace synodic::honesty::test
 		return SUITES;
 	}
 
-	/**
-	 * @brief Don't export. Keeps the SUITES global variable internally linked to the test module
-	 */
-	void AddSuite(SuiteView suite)
+	export void VerifySuiteName(const std::string_view name)
 	{
+		// Empty check
+		if (name.empty())
+		{
+			throw std::runtime_error("Empty suite name");
+		}
+
+		// Duplicate check
 		if (std::ranges::contains(
 				SUITES,
-				suite.name,
+				name,
 				[](const SuiteView& view)
 				{
 					return view.name;
@@ -110,6 +114,38 @@ namespace synodic::honesty::test
 		{
 			throw std::runtime_error("Duplicate suite name");
 		}
+
+		// Uppercase check
+		std::ranges::for_each(
+			name,
+			[](const char character)
+			{
+				// Uppercase check
+				if (std::isupper(character))
+				{
+					throw std::runtime_error("Uppercase suite name");
+				}
+
+				// Space check
+				if (std::isspace(character))
+				{
+					throw std::runtime_error("Suite name contains spaces");
+				}
+
+				// Check for non-alphanumeric characters, excluding '.'
+				if (!std::isalnum(character) && character != '.')
+				{
+					throw std::runtime_error("Non-alphanumeric suite name");
+				}
+			});
+	}
+
+	/**
+	 * @brief Don't export. Keeps the SUITES global variable internally linked to the test module
+	 */
+	void AddSuite(SuiteView suite)
+	{
+		VerifySuiteName(suite.name);
 
 		SUITES.push_back(std::move(suite));
 	}

@@ -6,28 +6,66 @@ using namespace synodic::honesty::test::literals;
 
 namespace
 {
-	// Compilation of the test suite tests indirect name construction. Unfortunately, it's an implicit test.
 	constexpr Suite SUITE(
 		"suite",
-		[]() -> Generator
+		[](const Fixture& fixture) -> Generator
 		{
 			co_yield "name"_test = [&](const Requirements& requirements)
 			{
-				{
-					constexpr Suite testSuite(
-						"test",
-						[]() -> Generator
-						{
-							co_return;
-						});
+				requirements.ExpectEquals(fixture.SuiteName(), "suite");
 
-					const auto name = testSuite.Name();
-					requirements.ExpectEquals(name, "test");
-				}
+				requirements.ExpectThrow<std::runtime_error>(
+					[]
+					{
+						// Empty should fail
+						VerifySuiteName("");
+					});
 
-				requirements.ExpectThrow<std::runtime_error>()
+				requirements.ExpectThrow<std::runtime_error>(
+					[]
+					{
+						// Uppercase letters should fail
+						VerifySuiteName("ThisFails");
+					});
+
+				requirements.ExpectThrow<std::runtime_error>(
+					[]
+					{
+						// Spaces should fail
+						VerifySuiteName("this fails");
+					});
+
+				// Only alphanumeric characters should pass, excluding '.'
+				requirements.ExpectNotThrow(
+					[]
+					{
+						VerifySuiteName("this.passes");
+					});
+
+				requirements.ExpectThrow<std::runtime_error>(
+					[]
+					{
+						VerifySuiteName("this!fails");
+					});
 			};
 		});
 
-	SuiteRegistrar _(SUITE);
+	constexpr Suite TEST_SUITE(
+		"duplicate",
+		[](const Fixture& fixture) -> Generator
+		{
+			co_yield "name"_test = [&](const Requirements& requirements)
+			{
+				requirements.ExpectEquals(fixture.SuiteName(), "duplicate");
+
+				// Suites are registered in-order. This suite should fail due to duplicated name
+				requirements.ExpectThrow<std::runtime_error>(
+					[]
+					{
+						VerifySuiteName("suite");
+					});
+			};
+		});
+
+	SuiteRegistrar _(SUITE, TEST_SUITE);
 }

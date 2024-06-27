@@ -226,14 +226,15 @@ namespace synodic::honesty::test
 
 			const CumulativeAdapter::CumulativeData& data = listReporter.Data();
 
-			for (auto& suite: data.suites)
+			for (const auto& [name, tests]: data.suites)
 			{
 				auto& resultSuite = result.suites.emplace_back();
+				resultSuite.name  = name;
 
-				for (auto& test: suite.tests)
+				for (const auto& [name]: tests)
 				{
 					TestDescription description;
-					description.name = test.name;
+					description.name = name;
 
 					resultSuite.tests.push_back(description);
 				}

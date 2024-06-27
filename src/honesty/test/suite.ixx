@@ -132,8 +132,8 @@ namespace synodic::honesty::test
 					throw std::runtime_error("Suite name contains spaces");
 				}
 
-				// Check for non-alphanumeric characters, excluding '.'
-				if (!std::isalnum(character) && character != '.')
+				// Check for non-alphanumeric characters, excluding '_'
+				if (!std::isalnum(character) && character != '_')
 				{
 					throw std::runtime_error("Non-alphanumeric suite name");
 				}

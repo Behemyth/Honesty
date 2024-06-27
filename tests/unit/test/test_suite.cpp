@@ -39,7 +39,7 @@ namespace
 				requirements.ExpectNotThrow(
 					[]
 					{
-						VerifySuiteName("this.passes");
+						VerifySuiteName("this_passes");
 					});
 
 				requirements.ExpectThrow<std::runtime_error>(

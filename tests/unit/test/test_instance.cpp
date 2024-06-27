@@ -16,7 +16,7 @@ namespace
 			// We generate a string from the path to the temporary file for comparison.
 			const std::filesystem::path temporaryPath = fixture.SuiteDirectory() / "passThrough.json";
 
-			co_yield "list parsing"_test = [&](const Requirements& requirements) -> void
+			co_yield "list_parsing"_test = [&](const Requirements& requirements) -> void
 			{
 				const auto path = temporaryPath.generic_string();
 				std::array<std::string_view, 5> arguments{"fakeEXE", "list", "--json", "--file", path};

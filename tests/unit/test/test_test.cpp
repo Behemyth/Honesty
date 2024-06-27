@@ -20,7 +20,7 @@ namespace
 	 */
 	auto emptyLiteral = []() -> Generator
 	{
-		co_yield "emptyLiteral"_test = [](const Requirements& requirements)
+		co_yield "empty_literal"_test = [](const Requirements& requirements)
 		{
 		};
 	};

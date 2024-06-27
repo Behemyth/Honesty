@@ -8,7 +8,7 @@ namespace
 {
 	auto runnerGenerator = []() -> Generator
 	{
-		co_yield "declare default"_test = [](const Requirements& requirements)
+		co_yield "declare_default"_test = [](const Requirements& requirements)
 		{
 		};
 	};

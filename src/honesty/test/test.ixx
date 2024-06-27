@@ -16,6 +16,51 @@ namespace synodic::honesty::test
 
 	export using Generator = std::generator<Test>;
 
+	export constexpr void VerifyTestName(const std::string_view name)
+	{
+		// Empty check
+		if (name.empty())
+		{
+			throw std::runtime_error(std::format(
+				"Empty suite name - {}, {}",
+				std::source_location::current().file_name(),
+				std::source_location::current().line()));
+		}
+
+		// Uppercase check
+		std::ranges::for_each(
+			name,
+			[](const char character)
+			{
+				// Uppercase check
+				if (std::isupper(character))
+				{
+					throw std::runtime_error(std::format(
+						"Uppercase suite name - {}, {}",
+						std::source_location::current().file_name(),
+						std::source_location::current().line()));
+				}
+
+				// Space check
+				if (std::isspace(character))
+				{
+					throw std::runtime_error(std::format(
+						"Suite name contains spaces - {}, {}",
+						std::source_location::current().file_name(),
+						std::source_location::current().line()));
+				}
+
+				// Check for non-alphanumeric characters, excluding '_'
+				if (!std::isalnum(character) && character != '_')
+				{
+					throw std::runtime_error(std::format(
+						"Non-alphanumeric suite name - {}, {}",
+						std::source_location::current().file_name(),
+						std::source_location::current().line()));
+				}
+			});
+	}
+
 	class Test
 	{
 	public:
@@ -25,6 +70,7 @@ namespace synodic::honesty::test
 			name_(name),
 			test_(test)
 		{
+			VerifyTestName(name);
 		}
 
 		Test(const Test& other)				   = delete;

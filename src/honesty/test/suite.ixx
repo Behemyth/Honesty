@@ -100,7 +100,10 @@ namespace synodic::honesty::test
 		// Empty check
 		if (name.empty())
 		{
-			throw std::runtime_error("Empty suite name");
+			throw std::runtime_error(std::format(
+				"Empty suite name - {}, {}",
+				std::source_location::current().file_name(),
+				std::source_location::current().line()));
 		}
 
 		// Duplicate check
@@ -112,7 +115,10 @@ namespace synodic::honesty::test
 					return view.name;
 				}))
 		{
-			throw std::runtime_error("Duplicate suite name");
+			throw std::runtime_error(std::format(
+				"Duplicate suite name - {}, {}",
+				std::source_location::current().file_name(),
+				std::source_location::current().line()));
 		}
 
 		// Uppercase check
@@ -123,19 +129,28 @@ namespace synodic::honesty::test
 				// Uppercase check
 				if (std::isupper(character))
 				{
-					throw std::runtime_error("Uppercase suite name");
+					throw std::runtime_error(std::format(
+						"Uppercase suite name - {}, {}",
+						std::source_location::current().file_name(),
+						std::source_location::current().line()));
 				}
 
 				// Space check
 				if (std::isspace(character))
 				{
-					throw std::runtime_error("Suite name contains spaces");
+					throw std::runtime_error(std::format(
+						"Suite name contains spaces - {}, {}",
+						std::source_location::current().file_name(),
+						std::source_location::current().line()));
 				}
 
 				// Check for non-alphanumeric characters, excluding '_'
 				if (!std::isalnum(character) && character != '_')
 				{
-					throw std::runtime_error("Non-alphanumeric suite name");
+					throw std::runtime_error(std::format(
+						"Non-alphanumeric suite name - {}, {}",
+						std::source_location::current().file_name(),
+						std::source_location::current().line()));
 				}
 			});
 	}

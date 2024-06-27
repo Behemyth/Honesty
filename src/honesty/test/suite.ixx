@@ -95,6 +95,7 @@ namespace synodic::honesty::test
 		return SUITES;
 	}
 
+	// TODO: Make this a compile-time check
 	export void VerifySuiteName(const std::string_view name)
 	{
 		// Empty check

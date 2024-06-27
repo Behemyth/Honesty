@@ -16,6 +16,7 @@ namespace synodic::honesty::test
 
 	export using Generator = std::generator<Test>;
 
+	// TODO: Make this a compile-time check
 	export constexpr void VerifyTestName(const std::string_view name)
 	{
 		// Empty check

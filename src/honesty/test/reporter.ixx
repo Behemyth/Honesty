@@ -41,11 +41,11 @@ namespace synodic::honesty::test
 		virtual void Signal(const event::TestFail& event) = 0;
 		virtual void Signal(const event::TestPass& event) = 0;
 
-		virtual void Signal(const event::AssertionFail& event) = 0;
-		virtual void Signal(const event::EqualityFail& event) = 0;
+		virtual void Signal(const event::AssertionFail& event)	= 0;
+		virtual void Signal(const event::EqualityFail& event)	= 0;
 		virtual void Signal(const event::ComparisonFail& event) = 0;
-		virtual void Signal(const event::AssertionPass& event) = 0;
-		virtual void Signal(const event::AssertionSkip& event) = 0;
+		virtual void Signal(const event::AssertionPass& event)	= 0;
+		virtual void Signal(const event::AssertionSkip& event)	= 0;
 
 		virtual void Signal(const event::Summary& event) = 0;
 
@@ -169,17 +169,14 @@ namespace synodic::honesty::test
 	export class CumulativeAdapter : public Reporter
 	{
 	public:
-
 		struct TestData
 		{
-			event::TestBegin begin;
-			event::TestEnd end;
+			std::string name;
 		};
 
 		struct SuiteData
 		{
-			event::SuiteBegin begin;
-			event::SuiteEnd end;
+			std::string name;
 
 			std::vector<TestData> tests;
 		};
@@ -198,16 +195,16 @@ namespace synodic::honesty::test
 
 		void Signal(const event::SuiteBegin& event) final
 		{
-			auto& [begin, end, tests] = data_.suites.emplace_back();
+			auto& [name, tests] = data_.suites.emplace_back();
 
-			begin = event;
+			name = event.name;
 		}
 
 		void Signal(const event::SuiteEnd& event) final
 		{
-			auto& [begin, end, tests] = data_.suites.back();
+			auto& [name, tests] = data_.suites.back();
 
-			end = event;
+			name = event.name;
 		}
 
 		void Signal(const event::SuiteSkip& event) final
@@ -234,14 +231,14 @@ namespace synodic::honesty::test
 		{
 			SuiteData& suiteData = data_.suites.back();
 			TestData& testData	 = suiteData.tests.emplace_back();
-			testData.begin		 = event;
+			testData.name		 = event.name;
 		}
 
 		void Signal(const event::TestEnd& event) final
 		{
 			SuiteData& suiteData = data_.suites.back();
 			TestData& testData	 = suiteData.tests.back();
-			testData.end		 = event;
+			testData.name		 = event.name;
 		}
 
 		void Signal(const event::TestSkip& event) final
@@ -310,7 +307,7 @@ namespace synodic::honesty::test
 
 		virtual ~ReporterRegistry() = default;
 
-		virtual std::string_view Name() const						 = 0;
+		virtual std::string_view Name() const							   = 0;
 		virtual std::unique_ptr<Reporter> Create(log::Logger logger) const = 0;
 
 		static void Register(ReporterRegistry* registry)

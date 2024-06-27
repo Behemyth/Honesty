@@ -233,7 +233,7 @@ namespace synodic::honesty::test
 				for (auto& test: suite.tests)
 				{
 					TestDescription description;
-					description.name = test.begin.name;
+					description.name = test.name;
 
 					resultSuite.tests.push_back(description);
 				}

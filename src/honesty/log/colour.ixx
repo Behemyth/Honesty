@@ -4,12 +4,51 @@ module;
 
 #include <cstdio>
 
+#ifdef _WIN32
+#	include <windows.h>
+#endif
+
 export module synodic.honesty.log:colour;
 
 import std;
 
+namespace
+{
+	bool SUPPORTS_COLOUR = []() -> bool
+	{
+#ifdef _WIN32
+		{
+			const HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+
+			DWORD mode = 0;
+			if (consoleHandle == INVALID_HANDLE_VALUE || !GetConsoleMode(consoleHandle, &mode))
+			{
+				return false;
+			}
+			SetConsoleMode(consoleHandle, mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+
+			return true;
+		}
+#else
+		{
+			if (const char* term = std::getenv("TERM"))
+			{
+				return true;
+			}
+			return false;
+		}
+#endif
+	}();
+}
+
 namespace synodic::honesty::log
 {
+
+	export bool SupportsColour()
+	{
+		return SUPPORTS_COLOUR;
+	}
+
 	export struct Colour8
 	{
 		explicit constexpr Colour8(const std::uint8_t code) :
@@ -186,11 +225,11 @@ namespace synodic::honesty::log
 
 			std::visit(
 				Overloaded {
-					[&](Colour8 arg)
+					[&](const Colour8 arg)
 					{
 						next = std::format_to(next, "\x1b[{}m", arg.code);
 					},
-					[&](Colour24 arg)
+					[&](const Colour24 arg)
 					{
 						next = std::format_to(next, "\x1b[38;2;{:03};{:03};{:03}m", arg.red, arg.green, arg.blue);
 					}},
@@ -203,11 +242,11 @@ namespace synodic::honesty::log
 
 			std::visit(
 				Overloaded {
-					[&](Colour8 arg)
+					[&](const Colour8 arg)
 					{
 						next = std::format_to(next, "\x1b[{}m", arg.code + 10);
 					},
-					[&](Colour24 arg)
+					[&](const Colour24 arg)
 					{
 						next = std::format_to(next, "\x1b[48;2;{:03};{:03};{:03}m", arg.red, arg.green, arg.blue);
 					}},
@@ -234,7 +273,12 @@ namespace synodic::honesty::log
 	export template<std::output_iterator<const char&> OutputIt>
 	OutputIt vformat_to(OutputIt out, const TextStyle& style, std::string_view fmt, std::format_args args)
 	{
-		return vformat_to_impl(out, style, fmt, args);
+		if (SupportsColour())
+		{
+			return vformat_to_impl(out, style, fmt, args);
+		}
+
+		return std::vformat_to(out, fmt, args);
 	}
 
 	/**
@@ -243,7 +287,12 @@ namespace synodic::honesty::log
 	export template<typename... Args>
 	std::string format(const TextStyle& style, std::format_string<Args...> fmt, Args&&... args)
 	{
-		return vformat(style, fmt.get(), std::make_format_args(args...));
+		if (SupportsColour())
+		{
+			return vformat(style, fmt.get(), std::make_format_args(args...));
+		}
+
+		return std::format(fmt, std::forward<Args>(args)...);
 	}
 
 	/**
@@ -252,7 +301,12 @@ namespace synodic::honesty::log
 	export template<std::output_iterator<const char&> OutputIt, typename... Args>
 	OutputIt format_to(OutputIt out, const TextStyle& style, std::format_string<Args...> fmt, Args&&... args)
 	{
-		return vformat_to(std::move(out), style, fmt.get(), std::make_format_args(args...));
+		if (SupportsColour())
+		{
+			return vformat_to(std::move(out), style, fmt.get(), std::make_format_args(args...));
+		}
+
+		return std::format_to(std::move(out), fmt, std::forward<Args>(args)...);
 	}
 
 	/**
@@ -261,9 +315,16 @@ namespace synodic::honesty::log
 	export template<typename... Args>
 	void print(std::FILE* stream, const TextStyle& style, std::format_string<Args...> fmt, Args&&... args)
 	{
-		std::string data;
-		vformat_to_impl(std::back_inserter(data), style, fmt, args);
-		std::print(stream, "{}", data);
+		if (SupportsColour())
+		{
+			std::string data;
+			vformat_to_impl(std::back_inserter(data), style, fmt, args);
+			std::print(stream, "{}", data);
+		}
+		else
+		{
+			std::print(stream, fmt, std::forward<Args>(args)...);
+		}
 	}
 
 	/**
@@ -272,7 +333,12 @@ namespace synodic::honesty::log
 	export template<typename... Args>
 	void print(const TextStyle& style, std::format_string<Args...> fmt, Args&&... args)
 	{
-		return print(stdout, style, fmt, std::forward<Args>(args)...);
+		if (SupportsColour())
+		{
+			return print(stdout, style, fmt, std::forward<Args>(args)...);
+		}
+
+		return std::print(fmt, std::forward<Args>(args)...);
 	}
 
 	/**
@@ -281,7 +347,14 @@ namespace synodic::honesty::log
 	export template<class... Args>
 	void println(std::FILE* stream, const TextStyle& style, std::format_string<Args...> fmt, Args&&... args)
 	{
-		print(stream, style, "{}\n", std::format(fmt, args...));
+		if (SupportsColour())
+		{
+			print(stream, style, "{}\n", std::format(fmt, args...));
+		}
+		else
+		{
+			std::println(stream, fmt, std::forward<Args>(args...));
+		}
 	}
 
 	/**
@@ -290,9 +363,15 @@ namespace synodic::honesty::log
 	export template<class... Args>
 	void println(const TextStyle& style, std::format_string<Args...> fmt, Args&&... args)
 	{
-		println(stdout, style, fmt, args...);
+		if (SupportsColour())
+		{
+			println(stdout, style, fmt, args...);
+		}
+		else
+		{
+			std::println(fmt, std::forward<Args>(args)...);
+		}
 	}
-
 }
 
 export template<>

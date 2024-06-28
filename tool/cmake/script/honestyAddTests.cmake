@@ -79,7 +79,7 @@ function(honesty_extract_tests)
 		string(APPEND ctest_output
 			"add_test(" "\n"
 			"	\"${test_name}\"" "\n"
-			"    COMMAND ${_EXECUTABLE} ${HONESTY_ARGS}" "\n"
+			"	${_EXECUTABLE} ${HONESTY_ARGS}" "\n"
 			")" "\n"
 		)
 	endforeach()

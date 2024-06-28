@@ -49,11 +49,11 @@ namespace
 				constexpr log::TextStyle style(log::Colour24(58, 90, 64));
 				log::format_to(std::back_inserter(output), style, "{} = (58,90,64)", "Hunter Green");
 
+				std::string input("Hunter Green = (58,90,64)");
 				std::string expected;
-				std::format_to(
-					std::back_inserter(expected),
-					"\x1b[38;2;058;090;064m{}\x1b[0m",
-					"Hunter Green = (58,90,64)");
+				log::SupportsColour() ?
+					std::format_to(std::back_inserter(expected), "\x1b[38;2;058;090;064m{}\x1b[0m", input) :
+					std::format_to(std::back_inserter(expected), "{}", input);
 
 				requirements.ExpectEquals(output, expected);
 			};
@@ -61,11 +61,11 @@ namespace
 			co_yield "format"_test = [](const Requirements& requirements)
 			{
 				const std::string output =
-					log::format(log::TextStyle(log::Colour24(58, 90, 64)), "Hunter Green = (58,90,64)");
+					format(log::TextStyle(log::Colour24(58, 90, 64)), "Hunter Green = (58,90,64)");
 
-				const std::string expected = std::format(
-					"\x1b[38;2;058;090;064m{}\x1b[0m",
-					"Hunter Green = (58,90,64)");
+				std::string input("Hunter Green = (58,90,64)");
+				const std::string expected =
+					log::SupportsColour() ? std::format("\x1b[38;2;058;090;064m{}\x1b[0m", input) : input;
 
 				requirements.ExpectEquals(output, expected);
 			};

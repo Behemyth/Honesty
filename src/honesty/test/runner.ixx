@@ -38,7 +38,7 @@ namespace synodic::honesty::test
 		 * @param requirements Test specifications
 		 * @param function A function to execute on a scheduler
 		 */
-		virtual void Run(const Requirements& requirements, const std::function_ref<void(const Requirements&)> function) = 0;
+		virtual void Run(const Requirements& requirements, std::function_ref<void(const Requirements&)> function) = 0;
 
 		/**
 		 * @brief Get the logger associated with this reporter

@@ -132,6 +132,8 @@ namespace synodic::honesty::test
 
 			std::span filter = filterData;
 
+			bool success = true;
+
 			for (const SuiteView& suite: GetSuites())
 			{
 				// Before we start, check to see if we have a filter
@@ -182,8 +184,13 @@ namespace synodic::honesty::test
 
 					parameters.context.Signal(testBegin);
 
-					Requirements requirements(parameters.context.Reporters(), test.Name());
+					Requires requirements(parameters.context.Reporters(), test.Name());
 					parameters.context.Run(requirements, view.test);
+
+					if(not requirements.Context().success)
+					{
+						success = false;
+					}
 
 					event::TestEnd testEnd;
 					testEnd.name = view.name;
@@ -199,10 +206,6 @@ namespace synodic::honesty::test
 
 			event::Summary summary;
 			parameters.context.Signal(summary);
-
-			bool success = true;
-
-			// TODO: Extract test state
 
 			return ExecuteResult(success);
 		}

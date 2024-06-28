@@ -7,6 +7,15 @@ import synodic.honesty.log;
 
 namespace synodic::honesty::test
 {
+	struct RequirementContext
+	{
+		RequirementContext() :
+			success(true)
+		{
+		}
+
+		bool success;
+	};
 
 	export class Requirements
 	{
@@ -433,6 +442,9 @@ namespace synodic::honesty::test
 			return testName_;
 		}
 
+	protected:
+		mutable RequirementContext context_;
+
 	private:
 		/**
 		 * @brief Internal function to signal an assertion passed.
@@ -456,6 +468,8 @@ namespace synodic::honesty::test
 			{
 				reporter->Signal(failed);
 			}
+
+			context_.success = false;
 		}
 
 		/**
@@ -468,6 +482,8 @@ namespace synodic::honesty::test
 			{
 				reporter->Signal(failed);
 			}
+
+			context_.success = false;
 		}
 
 		/**
@@ -480,9 +496,25 @@ namespace synodic::honesty::test
 			{
 				reporter->Signal(failed);
 			}
+
+			context_.success = false;
 		}
 
 		std::span<Reporter*> reporters_;
 		std::string_view testName_;
+	};
+
+	class Requires : public Requirements
+	{
+	public:
+		Requires(const std::span<Reporter*> reporters, const std::string_view testName) :
+			Requirements(reporters, testName)
+		{
+		}
+
+		const RequirementContext& Context() const
+		{
+			return context_;
+		}
 	};
 }

@@ -22,10 +22,9 @@ namespace
 				//requirements.Expect(false) << [](){};
 			};
 
+			// TODO: Do we support error descriptions on tests?
 			co_yield "test"_test = [](const Requirements& requirements)
 			{
-				//requirements.Expect(false) << "This outputs only on error";
-				//requirements.Expect(true) << "This outputs only on error";
 			};
 		});
 	SuiteRegistrar _(SUITE);

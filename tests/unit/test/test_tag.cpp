@@ -10,6 +10,8 @@ namespace
 		"tag",
 		[]() -> Generator
 		{
+			// TODO: Do we support error descriptions on tags?
+
 			// Verify the count of tags for each test. The two tests each have two tags
 			co_yield "tag"_test = [](const Requirements& requirements)
 			{

@@ -11,10 +11,18 @@ namespace
 		"expectation",
 		[]() -> Generator
 		{
-			co_yield "expectation"_test = [](const Requirements& requirements)
+			co_yield "description"_test = [](const Requirements& requirements)
 			{
-				// TODO: except can fail and continue
-				// TODO: assert stops when it fails
+				//	requirements.Expect(false) << "This outputs only on error";
+				//	requirements.Expect(false).ErrorMessage = "";
+
+				//	requirements.Expect(true) << "This outputs only on error";
+				//	requirements.Expect(true).ErrorMessage = "";
+
+				//	// Tests callable for error message
+				//	requirements.Expect(false) << []()
+				//	{
+				//	};
 			};
 		});
 

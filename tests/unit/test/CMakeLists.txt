@@ -10,4 +10,5 @@ PRIVATE
 	test_suite.cpp
 	test_exception.cpp
 	test_log.cpp
+	test_fixture.cpp
 )

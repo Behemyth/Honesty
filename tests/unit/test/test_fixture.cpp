@@ -7,13 +7,10 @@ using namespace synodic::honesty::test::literals;
 namespace
 {
 	Suite SUITE(
-		"test_log",
+		"fixture",
 		[]() -> Generator
 		{
-			// Verify that you can capture the information going into the root logger
-
-			// TODO: Do we support error descriptions on tests?
-			co_yield "test"_test = [](const Requirements& requirements)
+			co_yield "log"_test = [](const Requirements& requirements)
 			{
 			};
 		});

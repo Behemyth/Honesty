@@ -9,4 +9,5 @@ PRIVATE
 	test_interface.cpp
 	test_suite.cpp
 	test_exception.cpp
+	test_log.cpp
 )

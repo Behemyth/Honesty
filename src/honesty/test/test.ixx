@@ -175,7 +175,7 @@ namespace synodic::honesty::test
 	class Tag
 	{
 	public:
-		explicit consteval Tag(
+		explicit constexpr Tag(
 			std::convertible_to<std::string_view> auto t,
 			std::convertible_to<std::string_view> auto... tags) :
 			tags_ {t, tags...}
@@ -183,7 +183,7 @@ namespace synodic::honesty::test
 		}
 
 		template<std::size_t RSize>
-		consteval Tag<Size + RSize> operator/(Tag<RSize> tag) const
+		constexpr Tag<Size + RSize> operator/(Tag<RSize> tag) const
 		{
 			Tag<Size + RSize> result(tags_[0]);
 
@@ -216,6 +216,7 @@ namespace synodic::honesty::test
 	export template<typename... T>
 	Tag(std::string_view, T...) -> Tag<1 + sizeof...(T)>;
 
+	export constexpr Tag RUN("run");
 	export constexpr Tag SKIP("skip");
 
 	export namespace literals

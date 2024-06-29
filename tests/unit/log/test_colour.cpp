@@ -43,7 +43,10 @@ namespace
 		"terminal",
 		[]() -> Generator
 		{
-			co_yield "format_to"_test = [](const Requirements& requirements)
+			// Only run these tests if the terminal supports colour
+			Tag tag = log::SupportsColour() ? RUN : SKIP;
+
+			co_yield tag / "format_to"_test = [](const Requirements& requirements)
 			{
 				std::string output;
 				constexpr log::TextStyle style(log::Colour24(58, 90, 64));
@@ -51,21 +54,18 @@ namespace
 
 				std::string input("Hunter Green = (58,90,64)");
 				std::string expected;
-				log::SupportsColour() ?
-					std::format_to(std::back_inserter(expected), "\x1b[38;2;058;090;064m{}\x1b[0m", input) :
-					std::format_to(std::back_inserter(expected), "{}", input);
+				std::format_to(std::back_inserter(expected), "\x1b[38;2;058;090;064m{}\x1b[0m", input);
 
 				requirements.ExpectEquals(output, expected);
 			};
 
-			co_yield "format"_test = [](const Requirements& requirements)
+			co_yield tag / "format"_test = [](const Requirements& requirements)
 			{
 				const std::string output =
 					format(log::TextStyle(log::Colour24(58, 90, 64)), "Hunter Green = (58,90,64)");
 
 				std::string input("Hunter Green = (58,90,64)");
-				const std::string expected =
-					log::SupportsColour() ? std::format("\x1b[38;2;058;090;064m{}\x1b[0m", input) : input;
+				const std::string expected = std::format("\x1b[38;2;058;090;064m{}\x1b[0m", input);
 
 				requirements.ExpectEquals(output, expected);
 			};

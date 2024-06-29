@@ -16,7 +16,7 @@ namespace synodic::honesty::log
 		{
 		}
 
-		void SynchronizedLogV(LevelType level, std::string_view fmt, std::format_args args) override
+		void SynchronizedLogV(LevelType level, const std::string_view fmt, std::format_args args) override
 		{
 			stream_ << std::format(fmt, args);
 		}

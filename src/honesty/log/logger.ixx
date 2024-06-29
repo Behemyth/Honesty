@@ -9,6 +9,19 @@ import synodic.honesty.utility;
 
 namespace synodic::honesty::log
 {
+
+	export struct Message
+	{
+		Message(const LevelType level, const std::string_view message) :
+			level(level),
+			message(message)
+		{
+		}
+
+		LevelType level;
+		std::string_view message;
+	};
+
 	export class Logger
 	{
 	public:
@@ -40,7 +53,7 @@ namespace synodic::honesty::log
 				sink_->LogV(level, fmt, args);
 			}
 
-			if(parent_)
+			if (parent_)
 			{
 				parent_->LogV(level, fmt, args);
 			}

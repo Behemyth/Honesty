@@ -12,7 +12,7 @@ namespace
 		{
 			// TODO: Do we support error descriptions on tags?
 
-			co_yield "construction"_test = [](const Requirements& requirements)
+			co_yield "equality"_test = [](const Requirements& requirements)
 			{
 				/*{
 					auto tag = SKIP;
@@ -55,10 +55,6 @@ namespace
 					requirements.ExpectEquals(tag, SKIP);
 					requirements.ExpectEquals(tag, SKIP);
 				}*/
-			};
-
-			co_yield "equality"_test = [](const Requirements& requirements)
-			{
 			};
 
 			co_yield "test"_test = [](const Requirements& requirements)

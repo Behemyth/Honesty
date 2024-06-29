@@ -7,3 +7,5 @@ export import :sink;
 export import :sink.synchronized;
 export import :sink.console;
 export import :sink.ringbuffer;
+export import :sink.ostream;
+export import :sink.callback;

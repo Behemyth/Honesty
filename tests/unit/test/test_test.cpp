@@ -26,7 +26,7 @@ namespace
 				 */
 				auto emptyLiteral = []() -> Generator
 				{
-					co_yield "empty_literal"_test = [](const Requirements& requirements)
+					co_yield "empty_literal"_test = [](const Requirements& _)
 					{
 					};
 				};
@@ -36,7 +36,7 @@ namespace
 				 */
 				auto tupleParameterization = []() -> Generator
 				{
-					co_yield "array"_test = [](const Requirements& requirements, const auto& parameter)
+					co_yield "array"_test = [](const Requirements& _, const auto& parameter)
 					{
 					} | std::tuple{3u, 4.0f};
 				};
@@ -46,7 +46,7 @@ namespace
 				 */
 				auto arrayParameterization = []() -> Generator
 				{
-					co_yield "array"_test = [](const Requirements& requirements, int parameter)
+					co_yield "array"_test = [](const Requirements& _, int parameter)
 					{
 					} | std::array{3, 4};
 				};

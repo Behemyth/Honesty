@@ -27,10 +27,6 @@ namespace
 				}
 			};
 
-			co_yield "fail"_test = [](const Requirements& requirements)
-			{
-			};
-
 			co_yield "equality"_test = [](const Requirements& requirements)
 			{
 				// TODO: Enable with 17.11 preview 3
@@ -87,6 +83,10 @@ namespace
 				//	{
 				//	};
 				//	requirements.ExpectEquals(test.Tags().size(), 2);
+			};
+
+			co_yield "fail"_test = [](const Requirements& requirements)
+			{
 			};
 		});
 	SuiteRegistrar _(SUITE);

@@ -16,6 +16,11 @@ namespace
 				const TempLogger logger = fixture.TempLog(stream);
 
 				requirements.Expect(logger.HasSink());
+
+				constexpr std::string_view message("test");
+				logger.Info(message);
+
+				requirements.ExpectEquals(stream.str(), message);
 			};
 		});
 	SuiteRegistrar _(SUITE);

@@ -55,7 +55,7 @@ namespace
 				auto counter = [](const std::function_ref<Generator()> function) -> int
 				{
 					int count = 0;
-					for (const auto& test: function())
+					for (const auto& _: function())
 					{
 						++count;
 					}

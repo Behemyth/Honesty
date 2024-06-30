@@ -87,13 +87,18 @@ namespace synodic::honesty::test
 
 		struct AssertionFail
 		{
-			explicit AssertionFail(std::source_location location, const bool exception = false) :
+			explicit AssertionFail(
+				std::source_location location,
+				const std::string_view message,
+				const bool exception = false) :
 				exception(exception),
+				message(message),
 				location(std::move(location))
 			{
 			}
 
 			bool exception;	 // True if the remainder of the test is skipped
+			std::string_view message;
 			std::source_location location;
 		};
 
@@ -104,8 +109,9 @@ namespace synodic::honesty::test
 				const bool equal,
 				const std::string_view a,
 				const std::string_view b,
+				const std::string_view message,
 				const bool exception = false) :
-				AssertionFail(std::move(location), exception),
+				AssertionFail(std::move(location), message, exception),
 				equal(equal),
 				a(a),
 				b(b)
@@ -114,8 +120,8 @@ namespace synodic::honesty::test
 
 			bool equal;
 
-			std::string a;	 // First value
-			std::string b;	 // Second value
+			std::string a;	// First value
+			std::string b;	// Second value
 		};
 
 		struct ComparisonFail : AssertionFail
@@ -125,8 +131,9 @@ namespace synodic::honesty::test
 				const std::strong_ordering ordering,
 				const std::string_view a,
 				const std::string_view b,
+				const std::string_view message,
 				const bool exception = false) :
-				AssertionFail(std::move(location), exception),
+				AssertionFail(std::move(location), message, exception),
 				ordering(ordering),
 				a(a),
 				b(b)
@@ -135,8 +142,8 @@ namespace synodic::honesty::test
 
 			std::strong_ordering ordering;	// The ordering that failed between the two values
 
-			std::string a;	 // First value
-			std::string b;	 // Second value
+			std::string a;	// First value
+			std::string b;	// Second value
 		};
 
 		struct AssertionPass

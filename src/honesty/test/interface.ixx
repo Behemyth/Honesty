@@ -187,7 +187,7 @@ namespace synodic::honesty::test
 
 					parameters.context.Signal(testBegin);
 
-					Requires requirements(parameters.context.Reporters(), test.Name());
+					RequirementsBackend requirements(parameters.context.Reporters(), test.Name(), parameters.logger);
 					parameters.context.Run(requirements, view.test);
 
 					if (not requirements.Context().success)

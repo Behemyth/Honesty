@@ -912,4 +912,7 @@ namespace synodic::honesty::test
 			return context_;
 		}
 	};
+
+	export using Req = Requirements;
+
 }

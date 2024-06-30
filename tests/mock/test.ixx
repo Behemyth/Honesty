@@ -7,8 +7,8 @@ import function_ref;
 export class MockReporter final : public synodic::honesty::test::StreamingAdapter
 {
 public:
-	explicit MockReporter(synodic::honesty::log::Logger logger) :
-		StreamingAdapter(std::move(logger))
+	explicit MockReporter(const synodic::honesty::log::Logger& logger) :
+		StreamingAdapter(logger)
 	{
 	}
 
@@ -21,8 +21,8 @@ public:
 export class MockRunner final : public synodic::honesty::test::Runner
 {
 public:
-	explicit MockRunner(synodic::honesty::log::Logger logger) :
-		Runner(std::move(logger))
+	explicit MockRunner(const synodic::honesty::log::Logger& logger) :
+		Runner(logger)
 	{
 	}
 

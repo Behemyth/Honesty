@@ -9,8 +9,8 @@ namespace synodic::honesty::test
 	export class CompactReporter final : public StreamingAdapter
 	{
 	public:
-		explicit CompactReporter(log::Logger logger) :
-			StreamingAdapter(std::move(logger))
+		explicit CompactReporter(const log::Logger& logger) :
+			StreamingAdapter(logger)
 		{
 		}
 

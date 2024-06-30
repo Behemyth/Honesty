@@ -2,10 +2,38 @@ export module synodic.honesty.test:fixture;
 
 import std;
 
+import synodic.honesty.log;
+
 // TODO: Implement user fixture extensions.
+
+/***
+ * @brief Generates a random name suitable for a temporary data.
+ * @param prefix The prefix to the name.
+ * @param length The length of the random part of the name.
+ * @return The generated name.
+ */
+std::string GenerateName(const std::string_view prefix, const std::size_t length = 32)
+{
+	std::string name(prefix);
+	name += "_";
+
+	// A distribution fitting 16 characters
+	std::uniform_int_distribution distribution(0, 15);
+	std::random_device device;
+
+	name.reserve(name.size() + length);
+
+	for (int iteration = 0; iteration < length; ++iteration)
+	{
+		name += "0123456789ABCDEF"[distribution(device)];
+	}
+
+	return name;
+}
 
 namespace synodic::honesty::test
 {
+	export using TempLogger = log::ScopedLogger<log::OStream<std::mutex>>;
 
 	/**
 	 * @brief A set of thread-safe, stateful utilities for testing. Data fixtures can be implemented by the user's tests
@@ -14,30 +42,15 @@ namespace synodic::honesty::test
 	export class Fixture
 	{
 	public:
-		Fixture(const std::string_view applicationName, const std::string_view suiteName) :
+		Fixture(const std::string_view applicationName, const std::string_view suiteName, const log::Logger& logger) :
 			applicationName_(applicationName),
-			suiteName_(suiteName)
+			suiteName_(suiteName),
+			logger_(logger)
 		{
-			// Generate a unique directory for the suite
-			{
-				std::string suiteDirectory(suiteName_);
-				suiteDirectory += "_";
+			const std::string suiteDirectory = GenerateName(suiteName_);
 
-				// A distribution fitting 16 characters
-				std::uniform_int_distribution distribution(0, 15);
-				std::random_device device;
-
-				constexpr std::size_t length = 32;
-				suiteDirectory.reserve(suiteDirectory.size() + length);
-
-				for (int iteration = 0; iteration < length; ++iteration)
-				{
-					suiteDirectory += "0123456789ABCDEF"[distribution(device)];
-				}
-
-				suiteTempDirectory_ =
-					std::filesystem::temp_directory_path() / "honesty" / applicationName_ / suiteDirectory;
-			}
+			suiteTempDirectory_ =
+				std::filesystem::temp_directory_path() / "honesty" / applicationName_ / suiteDirectory;
 		}
 
 		~Fixture() = default;
@@ -71,24 +84,13 @@ namespace synodic::honesty::test
 		 */
 		auto TempFileName() const -> std::string
 		{
-			std::string filename(applicationName_);
-			filename += "_";
+			return GenerateName(applicationName_) + ".tmp";
+		}
 
-			// A distribution fitting 16 characters
-			std::uniform_int_distribution distribution(0, 15);
-			std::random_device device;
-
-			constexpr std::size_t length = 32;
-			filename.reserve(filename.size() + length);
-
-			for (int iteration = 0; iteration < length; ++iteration)
-			{
-				filename += "0123456789ABCDEF"[distribution(device)];
-			}
-
-			filename += ".tmp";
-
-			return filename;
+		auto TempLog(std::ostream& stream) const -> TempLogger
+		{
+			log::Logger logger = logger_.get().CreateLogger(GenerateName(suiteName_));
+			return log::ScopedLogger<log::OStream<std::mutex>>(std::move(logger), stream);
 		}
 
 		std::string_view ApplicationName() const
@@ -105,6 +107,8 @@ namespace synodic::honesty::test
 		std::string_view applicationName_;
 		std::string_view suiteName_;
 		std::filesystem::path suiteTempDirectory_;
+
+		std::reference_wrapper<const log::Logger> logger_;
 	};
 
 }

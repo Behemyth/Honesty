@@ -184,7 +184,7 @@ namespace synodic::honesty::log
 		using Ts::operator()...;
 	};
 
-	std::uint8_t ConvertIndexToAnsiCode(std::uint8_t maskIndex)
+	std::uint8_t ConvertIndexToAnsiCode(const std::uint8_t maskIndex)
 	{
 		return ATTRIBUTE_ANSI_CODES[maskIndex];
 	}
@@ -260,7 +260,7 @@ namespace synodic::honesty::log
 	/**
 	 * @brief Overload (1) - https://en.cppreference.com/w/cpp/utility/format/vformat
 	 */
-	export std::string vformat(const TextStyle& style, std::string_view fmt, std::format_args args)
+	export std::string vformat(const TextStyle& style, const std::string_view fmt, const std::format_args args)
 	{
 		std::string data;
 		vformat_to_impl(std::back_inserter(data), style, fmt, args);
@@ -271,7 +271,7 @@ namespace synodic::honesty::log
 	 * @brief Overload (1) - https://en.cppreference.com/w/cpp/utility/format/vformat_to
 	 */
 	export template<std::output_iterator<const char&> OutputIt>
-	OutputIt vformat_to(OutputIt out, const TextStyle& style, std::string_view fmt, std::format_args args)
+	OutputIt vformat_to(OutputIt out, const TextStyle& style, const std::string_view fmt, const std::format_args args)
 	{
 		if (SupportsColour())
 		{

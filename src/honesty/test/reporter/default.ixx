@@ -40,8 +40,8 @@ namespace synodic::honesty::test
 	export class DefaultReporter final : public StreamingAdapter
 	{
 	public:
-		explicit DefaultReporter(log::Logger logger) :
-			StreamingAdapter(std::move(logger))
+		explicit DefaultReporter(const log::Logger& logger) :
+			StreamingAdapter(logger)
 		{
 		}
 

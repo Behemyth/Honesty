@@ -8,10 +8,14 @@ namespace
 {
 	Suite SUITE(
 		"fixture",
-		[]() -> Generator
+		[](const Fixture& fixture) -> Generator
 		{
-			co_yield "log"_test = [](const Requirements& requirements)
+			co_yield "log"_test = [&](const Requirements& requirements)
 			{
+				std::stringstream stream;
+				const TempLogger logger = fixture.TempLog(stream);
+
+				requirements.Expect(logger.HasSink());
 			};
 		});
 	SuiteRegistrar _(SUITE);

@@ -8,8 +8,8 @@ namespace synodic::honesty::test
 	export class DefaultRunner final : public Runner
 	{
 	public:
-		explicit DefaultRunner(log::Logger logger)
-			: Runner(std::move(logger))
+		explicit DefaultRunner(const log::Logger& logger)
+			: Runner(logger)
 		{
 		}
 

@@ -31,10 +31,11 @@ namespace synodic::honesty::test
 	public:
 		struct Configuration
 		{
-			explicit Configuration(log::Sink* sink) :
+			explicit Configuration(std::string_view name, log::Sink* sink) :
 				defaultRunner("default"),
 				defaultReporter("default"),
-				sink(sink)
+				sink(sink),
+				name(name)
 			{
 			}
 
@@ -42,6 +43,7 @@ namespace synodic::honesty::test
 			std::string_view defaultReporter;  // The default reporter to use
 
 			log::Sink* sink;
+			std::string_view name;
 		};
 
 		struct HelpContext
@@ -69,15 +71,15 @@ namespace synodic::honesty::test
 
 		struct ListContext
 		{
-			ListContext(std::unique_ptr<Runner> runner, log::Logger logger) :
+			ListContext(std::unique_ptr<Runner> runner, const log::Logger& logger) :
 				runner(std::move(runner)),
-				logger(std::move(logger)),
+				logger(logger),
 				outputType(ListOutputType::LOG)
 			{
 			}
 
 			std::unique_ptr<Runner> runner;
-			log::Logger logger;
+			std::reference_wrapper<const log::Logger> logger;
 
 			ListOutputType outputType;
 			std::optional<std::filesystem::path> file;
@@ -86,7 +88,7 @@ namespace synodic::honesty::test
 		// Resolve all input into immediately executable state ready for the 'Execute' function
 		Instance(const Configuration& configuration, std::span<std::string_view> arguments) :
 			sink_(configuration.sink),
-			logger_(log::RootLogger().CreateLogger("instance")),
+			logger_(log::RootLogger().CreateLogger(configuration.name)),
 			parameters_(HelpContext()),
 			applicationName_(std::filesystem::path(arguments.front()).stem().generic_string())
 
@@ -126,7 +128,7 @@ namespace synodic::honesty::test
 				if (iterator != runnerRegistrars.end())
 				{
 					const RunnerRegistry* registry = *iterator;
-					defaultRunner				   = registry->Create(logger_.CreateLogger(registry->Name()));
+					defaultRunner				   = registry->Create(logger_);
 				}
 				else
 				{
@@ -146,7 +148,7 @@ namespace synodic::honesty::test
 				if (iterator != reporterRegistrars.end())
 				{
 					const ReporterRegistry* registry = *iterator;
-					defaultReporter					 = registry->Create(logger_.CreateLogger(registry->Name()));
+					defaultReporter					 = registry->Create(logger_);
 				}
 				else
 				{
@@ -238,7 +240,7 @@ namespace synodic::honesty::test
 
 						// Before start executing, we need to set up the current thread's context
 						Context commandContext = Context(*context.runner.get(), reporters);
-						ExecuteParameters parameters(commandContext, "");
+						ExecuteParameters parameters(commandContext, "", logger_);
 
 						const ExecuteResult result = interface.Execute(parameters);
 

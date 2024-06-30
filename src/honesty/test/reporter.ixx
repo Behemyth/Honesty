@@ -16,8 +16,8 @@ namespace synodic::honesty::test
 		 * @brief Constructs a Reporter object
 		 * @param logger The logger to associate with this reporter
 		 */
-		explicit constexpr Reporter(log::Logger logger) :
-			logger_(std::move(logger))
+		explicit constexpr Reporter(const log::Logger& logger) :
+			logger_(logger)
 		{
 		}
 
@@ -49,24 +49,14 @@ namespace synodic::honesty::test
 
 		virtual void Signal(const event::Summary& event) = 0;
 
-		/**
-		 * @brief Get the logger associated with this reporter
-		 * @return The logger given at construction, or the root logger if one wasn't specified
-		 */
 		const log::Logger& Logger() const
 		{
-			// We don't use value_or here because the const reference is not convertible to a value
-			if (logger_)
-			{
-				return logger_.value();
-			}
-
-			return log::RootLogger();
+			return logger_;
 		}
 
 	private:
 		std::string_view name_;
-		std::optional<log::Logger> logger_;
+		std::reference_wrapper<const log::Logger> logger_;
 	};
 
 	/**
@@ -75,8 +65,8 @@ namespace synodic::honesty::test
 	export class StreamingAdapter : public Reporter
 	{
 	public:
-		explicit(false) constexpr StreamingAdapter(log::Logger logger) :
-			Reporter(std::move(logger))
+		explicit(false) constexpr StreamingAdapter(const log::Logger& logger) :
+			Reporter(logger)
 		{
 		}
 
@@ -186,8 +176,8 @@ namespace synodic::honesty::test
 			std::vector<SuiteData> suites;
 		};
 
-		explicit(false) CumulativeAdapter(log::Logger logger) :
-			Reporter(std::move(logger))
+		explicit(false) CumulativeAdapter(const log::Logger& logger) :
+			Reporter(logger)
 		{
 		}
 
@@ -307,8 +297,8 @@ namespace synodic::honesty::test
 
 		virtual ~ReporterRegistry() = default;
 
-		virtual std::string_view Name() const							   = 0;
-		virtual std::unique_ptr<Reporter> Create(log::Logger logger) const = 0;
+		virtual std::string_view Name() const									  = 0;
+		virtual std::unique_ptr<Reporter> Create(const log::Logger& logger) const = 0;
 
 		static void Register(ReporterRegistry* registry)
 		{
@@ -334,9 +324,9 @@ namespace synodic::honesty::test
 		{
 		}
 
-		std::unique_ptr<Reporter> Create(log::Logger logger) const override
+		std::unique_ptr<Reporter> Create(const log::Logger& logger) const override
 		{
-			return std::make_unique<T>(std::move(logger));
+			return std::make_unique<T>(logger);
 		}
 
 		std::string_view Name() const override

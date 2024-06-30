@@ -10,9 +10,6 @@ import :assert;
 namespace synodic::honesty::test
 {
 
-
-
-
 	/**
 	 * @brief The type of runner can be selected by the user when invoking tests, for example, via the command line
 	 * interface. Additionally, the user can specify a specific runner for a specific test suite. Test suites must be
@@ -26,8 +23,8 @@ namespace synodic::honesty::test
 		/**
 		 * @brief
 		 */
-		explicit constexpr Runner(log::Logger logger) :
-			logger_(std::move(logger))
+		explicit constexpr Runner(const log::Logger& logger) :
+			logger_(logger)
 		{
 		}
 
@@ -40,23 +37,13 @@ namespace synodic::honesty::test
 		 */
 		virtual void Run(const Requirements& requirements, std::function_ref<void(const Requirements&)> function) = 0;
 
-		/**
-		 * @brief Get the logger associated with this reporter
-		 * @return The logger given at construction, or the root logger if one wasn't specified
-		 */
 		const log::Logger& Logger() const
 		{
-			// We don't use value_or here because the const reference is not convertible to a value
-			if (logger_)
-			{
-				return logger_.value();
-			}
-
-			return log::RootLogger();
+			return logger_;
 		}
 
 	private:
-		std::optional<log::Logger> logger_;
+		std::reference_wrapper<const log::Logger> logger_;
 	};
 
 	template<typename T>
@@ -78,8 +65,8 @@ namespace synodic::honesty::test
 
 		virtual ~RunnerRegistry() = default;
 
-		virtual std::string_view Name() const							 = 0;
-		virtual std::unique_ptr<Runner> Create(log::Logger logger) const = 0;
+		virtual std::string_view Name() const									= 0;
+		virtual std::unique_ptr<Runner> Create(const log::Logger& logger) const = 0;
 
 		static std::span<RunnerRegistry*> Registrars()
 		{
@@ -100,9 +87,9 @@ namespace synodic::honesty::test
 		{
 		}
 
-		std::unique_ptr<Runner> Create(log::Logger logger) const override
+		std::unique_ptr<Runner> Create(const log::Logger& logger) const override
 		{
-			return std::make_unique<T>(std::move(logger));
+			return std::make_unique<T>(logger);
 		}
 
 		std::string_view Name() const override

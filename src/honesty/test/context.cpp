@@ -172,8 +172,8 @@ namespace synodic::honesty::test
 	class EmptyRunner final : public Runner
 	{
 	public:
-		explicit(false) EmptyRunner(log::Logger logger) :
-			Runner(std::move(logger))
+		explicit(false) EmptyRunner(const log::Logger& logger) :
+			Runner(logger)
 		{
 		}
 

@@ -17,7 +17,7 @@ namespace synodic::honesty::log
 
 		~SynchronizedSink() override = default;
 
-		void LogV(LevelType level, std::string_view fmt, std::format_args args) final
+		void LogV(const LevelType level, const std::string_view fmt, const std::format_args args) final
 		{
 			std::lock_guard<Mutex> lock(mutex_);
 			SynchronizedLogV(level, fmt, args);

@@ -34,24 +34,27 @@ namespace synodic::honesty::test
 
 	export struct ExecuteParameters
 	{
-		explicit ExecuteParameters(const Context& context, const std::string& filter) :
+		explicit ExecuteParameters(const Context& context, const std::string& filter, const log::Logger& logger) :
 			context(context),
-			filter(filter)
+			filter(filter),
+			logger(logger)
 		{
 		}
 
 		Context context;
 		std::string filter;
+
+		std::reference_wrapper<const log::Logger> logger;
 	};
 
 	export struct ListParameters
 	{
-		explicit ListParameters(log::Logger logger) :
-			logger(std::move(logger))
+		explicit ListParameters(const log::Logger& logger) :
+			logger(logger)
 		{
 		}
 
-		log::Logger logger;
+		std::reference_wrapper<const log::Logger> logger;
 	};
 
 	export struct HelpResult
@@ -155,7 +158,7 @@ namespace synodic::honesty::test
 				parameters.context.Signal(suiteBegin);
 
 				// Fixture lifetime should be for the whole suite
-				Fixture fixture(applicationName_, suite.name);
+				Fixture fixture(applicationName_, suite.name, parameters.logger);
 
 				auto executor = Overload {
 					[&](const std::function_ref<Generator()> generator) -> Generator
@@ -187,7 +190,7 @@ namespace synodic::honesty::test
 					Requires requirements(parameters.context.Reporters(), test.Name());
 					parameters.context.Run(requirements, view.test);
 
-					if(not requirements.Context().success)
+					if (not requirements.Context().success)
 					{
 						success = false;
 					}
@@ -213,7 +216,7 @@ namespace synodic::honesty::test
 		ListResult List(const ListParameters& parameters)
 		{
 			ListReporterParameters listReporterParameters;
-			ListReporter listReporter(listReporterParameters, parameters.logger.CreateLogger("reporter"));
+			ListReporter listReporter(listReporterParameters, parameters.logger);
 
 			EmptyRunner runner(log::RootLogger().CreateLogger("empty_runner"));
 
@@ -222,7 +225,7 @@ namespace synodic::honesty::test
 
 			Context context(runner, reporters);
 
-			const ExecuteParameters executeParameters(context, "");
+			const ExecuteParameters executeParameters(context, "", parameters.logger);
 			ExecuteResult executeResult = Execute(executeParameters);
 
 			ListResult result;

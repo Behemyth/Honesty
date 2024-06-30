@@ -217,7 +217,7 @@ namespace synodic::honesty::log
 		 */
 		constexpr Logger CreateLogger(const std::string_view name) const
 		{
-			return Logger(name, this);
+			return {name, this};
 		}
 
 		[[nodiscard]] bool operator==(const Logger& rhs) const
@@ -230,7 +230,7 @@ namespace synodic::honesty::log
 			return name_ <=> rhs.name_;
 		}
 
-	private:
+	protected:
 		friend class LoggerRegistry;
 
 		/***
@@ -257,6 +257,23 @@ namespace synodic::honesty::log
 		const Logger* parent_;
 
 		log::Sink* sink_;
+	};
+
+	export template<typename T>
+		requires std::is_base_of_v<Sink, T>
+	class ScopedLogger : public Logger
+	{
+	public:
+		template<typename... Args>
+		explicit ScopedLogger(Logger logger, Args&&... args) :
+			Logger(std::move(logger)),
+			sink_(std::forward<Args>(args)...)
+		{
+			SetSink(&sink_);
+		}
+
+	private:
+		T sink_;
 	};
 
 	class LoggerRegistry
@@ -293,10 +310,8 @@ constinit synodic::honesty::log::LoggerRegistry LOGGER_REGISTRY;
 
 namespace synodic::honesty::log
 {
-
 	export constexpr const Logger& RootLogger()
 	{
 		return LOGGER_REGISTRY.RootLogger();
 	}
-
 }

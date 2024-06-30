@@ -11,22 +11,22 @@ namespace synodic::honesty::log
 	class OStream final : public SynchronizedSink<Mutex>
 	{
 	public:
-		explicit OStream(std::ostream& stream) :
+		explicit(false) OStream(std::ostream& stream) :
 			stream_(stream)
 		{
 		}
 
-		void SynchronizedLogV(LevelType level, const std::string_view fmt, std::format_args args) override
+		void SynchronizedLogV(LevelType level, const std::string_view fmt, const std::format_args args) override
 		{
-			stream_ << std::format(fmt, args);
+			stream_.get() << std::vformat(fmt, args);
 		}
 
 		void SynchronizedFlush() override
 		{
-			stream_.flush();
+			stream_.get().flush();
 		}
 
 	private:
-		std::ostream& stream_;
+		std::reference_wrapper<std::ostream> stream_;
 	};
 }

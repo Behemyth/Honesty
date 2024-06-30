@@ -16,8 +16,8 @@ namespace synodic::honesty::test
 	class ListReporter final : public CumulativeAdapter
 	{
 	public:
-		explicit(false) ListReporter(const ListReporterParameters& parameters, log::Logger logger) :
-			CumulativeAdapter(std::move(logger)),
+		explicit(false) ListReporter(const ListReporterParameters& parameters, const log::Logger& logger) :
+			CumulativeAdapter(logger),
 			parameters_(parameters)
 		{
 		}

@@ -23,7 +23,7 @@ namespace
 
 				synodic::honesty::log::RingBuffer<std::mutex> sink;
 
-				Instance::Configuration configuration(&sink);
+				Instance::Configuration configuration("instance_test", &sink);
 				Instance instance(configuration, arguments);
 
 				const Instance::ListContext* context = instance.GetListContext();

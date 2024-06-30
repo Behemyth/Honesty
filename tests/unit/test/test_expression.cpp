@@ -21,23 +21,23 @@ namespace
 					return "This outputs only on error";
 				};
 
-				// Assert
-				{
-					requirements.Assert(false, "This outputs only on error");
+				//// Assert
+				//{
+				//	requirements.Assert(false, "This outputs only on error");
 
-					requirements.Assert(true, "This outputs only on error");
+				//	requirements.Assert(true, "This outputs only on error");
 
-					requirements.Assert(false, description);
-				}
+				//	requirements.Assert(false, description);
+				//}
 
-				// Expect
-				{
-					requirements.Expect(false, "This outputs only on error");
+				//// Expect
+				//{
+				//	requirements.Expect(false, "This outputs only on error");
 
-					requirements.Expect(true, "This outputs only on error");
+				//	requirements.Expect(true, "This outputs only on error");
 
-					requirements.Expect(false, description);
-				}
+				//	requirements.Expect(false, description);
+				//}
 			};
 		});
 

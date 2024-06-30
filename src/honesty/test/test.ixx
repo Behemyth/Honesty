@@ -171,9 +171,13 @@ namespace synodic::honesty::test
 			std::forward<std::tuple<Types...>>(tuple)));
 	}
 
-	export template<std::size_t Size>
+	export template<std::size_t N>
 	class Tag
 	{
+		static_assert(N > 0);
+
+		using const_iterator = typename std::array<std::string_view, N>::const_iterator;
+
 	public:
 		explicit constexpr Tag(
 			std::convertible_to<std::string_view> auto t,
@@ -183,9 +187,9 @@ namespace synodic::honesty::test
 		}
 
 		template<std::size_t RSize>
-		constexpr Tag<Size + RSize> operator/(Tag<RSize> tag) const
+		constexpr Tag<N + RSize> operator/(Tag<RSize> tag) const
 		{
-			Tag<Size + RSize> result(tags_[0]);
+			Tag<N + RSize> result(tags_[0]);
 
 			// Concat
 			std::size_t index = 0;
@@ -204,11 +208,37 @@ namespace synodic::honesty::test
 			return result;
 		}
 
+		constexpr std::size_t Size() const noexcept
+		{
+			return tags_.size();
+		}
+
+		constexpr const_iterator begin() const noexcept
+		{
+			return tags_.begin();
+		}
+
+		constexpr const_iterator end() const noexcept
+		{
+			return tags_.end();
+		}
+
+		template<std::size_t OtherSize>
+		friend bool operator==(const Tag& a, const Tag<OtherSize>& b)
+		{
+			return std::ranges::any_of(a.tags_, b.tags_);
+		}
+
+		friend bool operator==(const Tag& a, std::string_view b)
+		{
+			return std::ranges::any_of(a.tags_, b);
+		}
+
 	private:
 		template<std::size_t>
 		friend class Tag;
 
-		std::array<std::string_view, Size> tags_;
+		std::array<std::string_view, N> tags_;
 	};
 
 	export Tag(std::string_view) -> Tag<1>;
@@ -218,6 +248,7 @@ namespace synodic::honesty::test
 
 	export constexpr Tag RUN("run");
 	export constexpr Tag SKIP("skip");
+	export constexpr Tag FAIL("fail");
 
 	export namespace literals
 	{

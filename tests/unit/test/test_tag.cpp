@@ -12,49 +12,66 @@ namespace
 		{
 			// TODO: Do we support error descriptions on tags?
 
+			co_yield "construction"_test = [](const Requirements& requirements)
+			{
+				const Tag tag("one", "two", "three");
+
+				requirements.Expect(tag.Size());
+			};
+
+			co_yield "range"_test = [](const Requirements& requirements)
+			{
+			};
+
+			co_yield "fail"_test = [](const Requirements& requirements)
+			{
+			};
+
 			co_yield "equality"_test = [](const Requirements& requirements)
 			{
-				/*{
-					auto tag = SKIP;
+				// TODO: Enable with 17.11 preview 3
 
-					requirements.ExpectEquals(tag, SKIP);
-					requirements.ExpectEquals(tag, "skip");
-				}
+				//{
+				//	auto tag = SKIP;
 
-				{
-					auto tag = Tag("test", "skip");
+				//	requirements.ExpectEquals(tag, SKIP);
+				//	requirements.ExpectEquals(tag, "skip");
+				//}
 
-					requirements.ExpectEquals(tag, "skip");
-					requirements.ExpectEquals(tag, "test");
-				}
+				//{
+				//	auto tag = Tag("test", "skip");
 
-				{
-					auto tag = Tag("test") / Tag("skip");
+				//	requirements.ExpectEquals(tag, "skip");
+				//	requirements.ExpectEquals(tag, "test");
+				//}
 
-					requirements.ExpectEquals(tag, SKIP);
-					requirements.ExpectEquals(tag, SKIP);
-				}
+				//{
+				//	auto tag = Tag("test") / Tag("skip");
 
-				{
-					auto tag = Tag("test") / SKIP;
+				//	requirements.ExpectEquals(tag, SKIP);
+				//	requirements.ExpectEquals(tag, SKIP);
+				//}
 
-					requirements.ExpectEquals(tag, SKIP);
-					requirements.ExpectEquals(tag, SKIP);
-				}
+				//{
+				//	auto tag = Tag("test") / SKIP;
 
-				{
-					auto tag = SKIP / Tag("test");
+				//	requirements.ExpectEquals(tag, SKIP);
+				//	requirements.ExpectEquals(tag, SKIP);
+				//}
 
-					requirements.ExpectEquals(tag, SKIP);
-					requirements.ExpectEquals(tag, SKIP);
-				}
+				//{
+				//	auto tag = SKIP / Tag("test");
 
-				{
-					auto tag = SKIP / SKIP;
+				//	requirements.ExpectEquals(tag, SKIP);
+				//	requirements.ExpectEquals(tag, SKIP);
+				//}
 
-					requirements.ExpectEquals(tag, SKIP);
-					requirements.ExpectEquals(tag, SKIP);
-				}*/
+				//{
+				//	auto tag = SKIP / SKIP;
+
+				//	requirements.ExpectEquals(tag, SKIP);
+				//	requirements.ExpectEquals(tag, SKIP);
+				//}
 			};
 
 			co_yield "test"_test = [](const Requirements& requirements)

@@ -89,7 +89,10 @@ namespace synodic::honesty::test
 
 		auto TempLog(std::ostream& stream) const -> TempLogger
 		{
-			log::Logger logger = logger_.get().CreateLogger(GenerateName(suiteName_));
+			const std::string name = GenerateName(suiteName_);
+
+			// The temporary logger is added to the root logger and not the application's logger
+			log::Logger logger = log::RootLogger().CreateLogger(name);
 			return log::ScopedLogger<log::OStream<std::mutex>>(std::move(logger), stream);
 		}
 

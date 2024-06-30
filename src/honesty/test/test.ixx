@@ -179,7 +179,7 @@ namespace synodic::honesty::test
 		using const_iterator = typename std::array<std::string_view, N>::const_iterator;
 
 	public:
-		explicit constexpr Tag(
+		explicit consteval Tag(
 			std::convertible_to<std::string_view> auto t,
 			std::convertible_to<std::string_view> auto... tags) :
 			tags_ {t, tags...}
@@ -187,7 +187,7 @@ namespace synodic::honesty::test
 		}
 
 		template<std::size_t RSize>
-		constexpr Tag<N + RSize> operator/(Tag<RSize> tag) const
+		consteval Tag<N + RSize> operator/(Tag<RSize> tag) const
 		{
 			Tag<N + RSize> result(tags_[0]);
 
@@ -208,7 +208,7 @@ namespace synodic::honesty::test
 			return result;
 		}
 
-		constexpr std::size_t Size() const noexcept
+		consteval std::size_t Size() const noexcept
 		{
 			return tags_.size();
 		}
@@ -224,12 +224,12 @@ namespace synodic::honesty::test
 		}
 
 		template<std::size_t OtherSize>
-		friend bool operator==(const Tag& a, const Tag<OtherSize>& b)
+		friend constexpr bool operator==(const Tag& a, const Tag<OtherSize>& b)
 		{
 			return std::ranges::any_of(a.tags_, b.tags_);
 		}
 
-		friend bool operator==(const Tag& a, std::string_view b)
+		friend constexpr bool operator==(const Tag& a, std::string_view b)
 		{
 			return std::ranges::any_of(a.tags_, b);
 		}

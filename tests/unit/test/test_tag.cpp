@@ -14,13 +14,17 @@ namespace
 
 			co_yield "construction"_test = [](const Requirements& requirements)
 			{
-				const Tag tag("one", "two", "three");
+				constexpr Tag tag("one", "two", "three");
 
 				requirements.Expect(tag.Size());
 			};
 
 			co_yield "range"_test = [](const Requirements& requirements)
 			{
+				for (constexpr Tag tags("one", "two", "three"); std::string_view tag: tags)
+				{
+					requirements.Expect(not tag.empty());
+				}
 			};
 
 			co_yield "fail"_test = [](const Requirements& requirements)

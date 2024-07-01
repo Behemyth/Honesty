@@ -6,12 +6,13 @@ using namespace synodic::honesty::test::literals;
 
 namespace
 {
-	auto runnerGenerator = []() -> Generator
-	{
-		co_yield "declare_default"_test = [](const Requirements& requirements)
+	Suite SUITE(
+		"runner",
+		[]() -> Generator
 		{
-		};
-	};
-	Suite suite("runner", runnerGenerator);
-	SuiteRegistrar _(suite);
+			co_yield "declare_default"_test = [](const Requirements& requirements)
+			{
+			};
+		});
+	SuiteRegistrar _(SUITE);
 }

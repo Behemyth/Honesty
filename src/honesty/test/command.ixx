@@ -51,15 +51,15 @@ namespace synodic::honesty::test
 		struct Configuration
 		{
 			explicit Configuration(std::string_view name, log::Sink* sink) :
-				defaultRunner("default"),
-				defaultReporter("default"),
+				defaultRunnerName("default"),
+				defaultReporterName("default"),
 				sink(sink),
 				name(name)
 			{
 			}
 
-			std::string_view defaultRunner;	 // The default runner to use
-			std::string_view defaultReporter;  // The default reporter to use
+			std::string_view defaultRunnerName;
+			std::string_view defaultReporterName;
 
 			log::Sink* sink;
 			std::string_view name;
@@ -75,66 +75,7 @@ namespace synodic::honesty::test
 		{
 			logger_.SetSink(sink_);
 
-			// Register our default runners and reporters
-			{
-				static ReporterRegistrar<DefaultReporter> defaultReporterRegistrar;
-				static ReporterRegistrar<CompactReporter> compactReporterRegistrar;
-
-				static RunnerRegistrar<DefaultRunner> defaultRunnerRegistrar;
-			}
-
-			// Gather our user defined runners and reporters
-			std::span<RunnerRegistry*> runnerRegistrars		= RunnerRegistry::Registrars();
-			std::span<ReporterRegistry*> reporterRegistrars = ReporterRegistry::Registrars();
-
-			// TODO: Allocate memory
-			std::unique_ptr<Runner> defaultRunner;
-			std::unique_ptr<Reporter> defaultReporter;
-
-			std::string_view defaultRunnerName =
-				configuration.defaultRunner.empty() ? "default" : configuration.defaultRunner;
-			std::string_view defaultReporterName =
-				configuration.defaultReporter.empty() ? "default" : configuration.defaultReporter;
-
-			// Find the runner
-			{
-				const auto iterator = std::ranges::find_if(
-					runnerRegistrars,
-					[&](const RunnerRegistry* registry) -> bool
-					{
-						return registry->Name() == defaultRunnerName;
-					});
-
-				if (iterator != runnerRegistrars.end())
-				{
-					const RunnerRegistry* registry = *iterator;
-					defaultRunner				   = registry->Create(logger_);
-				}
-				else
-				{
-					throw std::invalid_argument("The runner specified does not exist");
-				}
-			}
-
-			// Find the reporter
-			{
-				const auto iterator = std::ranges::find_if(
-					reporterRegistrars,
-					[&](const ReporterRegistry* registry) -> bool
-					{
-						return registry->Name() == defaultReporterName;
-					});
-
-				if (iterator != reporterRegistrars.end())
-				{
-					const ReporterRegistry* registry = *iterator;
-					defaultReporter					 = registry->Create(logger_);
-				}
-				else
-				{
-					throw std::invalid_argument("The reporter specified does not exist");
-				}
-			}
+			command::Configuration commandConfiguration = ResolveConfiguration(configuration);
 
 			// If the executable and at least one argument is given we can look for subcommands
 			if (arguments.size() >= 2)
@@ -143,9 +84,8 @@ namespace synodic::honesty::test
 				if (std::string_view possibleSubCommand = arguments[1];
 					not possibleSubCommand.starts_with("-") and not possibleSubCommand.starts_with("--"))
 				{
-
 					// Look for a matching subcommand
-					auto apply = [this, possibleSubCommand](auto index) consteval -> void
+					auto apply = [this, &commandConfiguration, possibleSubCommand](auto index) consteval -> void
 					{
 						using CommandType = std::variant_alternative_t<index, SubType>;
 
@@ -153,7 +93,7 @@ namespace synodic::honesty::test
 
 						if (const std::string_view commandName = CommandType::NAME; commandName == possibleSubCommand)
 						{
-							command_.emplace<CommandType>();
+							command_.emplace<SubType>(CommandType(commandConfiguration));
 						}
 					};
 
@@ -161,10 +101,10 @@ namespace synodic::honesty::test
 				}
 			}
 
-			// If we have mono-state we know there is no subcommand and use the execute command
+			// If we have mono-state we know there is no subcommand and initialize the execute command
 			if (std::holds_alternative<std::monostate>(command_))
 			{
-				command_.emplace<command::Execute>();
+				command_.emplace<command::Execute>(commandConfiguration);
 
 				arguments = arguments.subspan(1);
 			}
@@ -207,6 +147,79 @@ namespace synodic::honesty::test
 		}
 
 	private:
+		/**
+		 * @brief Resolve the configuration into a command configuration.
+		 * @return The resolved command configuration.
+		 */
+		[[nodiscard]] command::Configuration ResolveConfiguration(const Configuration& configuration) const
+		{
+			// Register our default runners and reporters
+			{
+				static ReporterRegistrar<DefaultReporter> defaultReporterRegistrar;
+				static ReporterRegistrar<CompactReporter> compactReporterRegistrar;
+
+				static RunnerRegistrar<DefaultRunner> defaultRunnerRegistrar;
+			}
+
+			// Gather our user defined runners and reporters
+			const std::span<RunnerRegistry*> runnerRegistrars	  = RunnerRegistry::Registrars();
+			const std::span<ReporterRegistry*> reporterRegistrars = ReporterRegistry::Registrars();
+
+			// TODO: Allocate memory
+			const RunnerRegistry* selectedRunner;
+			const ReporterRegistry* selectedReporter;
+
+			const std::string_view defaultRunnerName =
+				configuration.defaultRunnerName.empty() ? "default" : configuration.defaultRunnerName;
+			const std::string_view defaultReporterName =
+				configuration.defaultReporterName.empty() ? "default" : configuration.defaultReporterName;
+
+			// Find the runner
+			{
+				const auto iterator = std::ranges::find_if(
+					runnerRegistrars,
+					[&](const RunnerRegistry* registry) -> bool
+					{
+						return registry->Name() == defaultRunnerName;
+					});
+
+				if (iterator != runnerRegistrars.end())
+				{
+					selectedRunner = *iterator;
+				}
+				else
+				{
+					throw std::invalid_argument("The runner specified does not exist");
+				}
+			}
+
+			// Find the reporter
+			{
+				const auto iterator = std::ranges::find_if(
+					reporterRegistrars,
+					[&](const ReporterRegistry* registry) -> bool
+					{
+						return registry->Name() == defaultReporterName;
+					});
+
+				if (iterator != reporterRegistrars.end())
+				{
+					selectedReporter = *iterator;
+				}
+				else
+				{
+					throw std::invalid_argument("The reporter specified does not exist");
+				}
+			}
+
+			return command::Configuration(
+				*selectedRunner,
+				*selectedReporter,
+				runnerRegistrars,
+				reporterRegistrars,
+				logger_);
+		}
+
 		log::Sink* sink_;
 		log::Logger logger_;
 

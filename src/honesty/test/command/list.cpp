@@ -7,38 +7,26 @@ import :command.types;
 
 namespace synodic::honesty::test::command
 {
-	struct Context
+	class List final : public Command
 	{
-		Context(std::unique_ptr<Runner> runner, const log::Logger& logger) :
-			runner(std::move(runner)),
-			logger(logger),
-			outputType(ListOutputType::LOG)
+	public:
+		explicit List(const Configuration& configuration) :
+			logger_(configuration.logger),
+			outputType_(ListOutputType::LOG)
 		{
 		}
 
-		std::unique_ptr<Runner> runner;
-		std::reference_wrapper<const log::Logger> logger;
-
-		ListOutputType outputType;
-		std::optional<std::filesystem::path> file;
-	};
-
-	class List : public Command
-	{
-	public:
 		~List() override = default;
 
 		static constexpr std::string_view NAME = "list";
 
-		void Parse(std::span<std::string_view> arguments) override
+		void Parse(, std::span<std::string_view> arguments) override
 		{
 			arguments = arguments.subspan(1);
 
-			ListContext parameters((std::move(defaultRunner)), logger_.CreateLogger("list"));
-
 			if (std::ranges::contains(arguments, "--json"))
 			{
-				parameters.outputType = ListOutputType::JSON;
+				outputType_ = ListOutputType::JSON;
 			}
 
 			if (auto itr = std::ranges::find(arguments, "--file"); itr != arguments.end())
@@ -48,21 +36,82 @@ namespace synodic::honesty::test::command
 					throw std::invalid_argument("You must give a file name when using the '--file' option");
 				}
 
-				parameters.file = absolute(std::filesystem::current_path() / *itr);
+				file_ = absolute(std::filesystem::current_path() / *itr);
 
-				if (not parameters.file->has_filename())
+				if (not file_->has_filename())
 				{
-					throw std::invalid_argument(
-						"You must give a valid file name when using the '--file' option");
+					throw std::invalid_argument("You must give a valid file name when using the '--file' option");
 				}
 			}
-
-			parameters_ = std::move(parameters);
-			return;
 		}
 
 		void Process() override
 		{
+			api::ListParameters parameters();
+
+			api::ListResult result = api::List(parameters);
+
+			ListParameters parameters(logger_.CreateLogger("list"));
+
+			auto result = interface.List(parameters);
+
+			if (file_)
+			{
+				const std::filesystem::path& path = file_.value();
+
+				std::ofstream file(path);
+
+				std::error_code code;
+				create_directories(path.parent_path(), code);
+
+				if (code)
+				{
+					throw std::runtime_error("Failed to create directory: " + path.parent_path().string());
+				}
+
+				if (!file.is_open())
+				{
+					throw std::runtime_error("Failed to open file: " + path.generic_string());
+				}
+
+				// Clear the file
+				file.clear();
+
+				switch (outputType_)
+				{
+					case ListOutputType::LOG :
+					{
+						for (auto& suiteDescription: result.suites)
+						{
+							for (auto& testDescription: suiteDescription.tests)
+							{
+								file << std::format("{}", testDescription.name);
+							}
+						}
+						break;
+					}
+					case ListOutputType::JSON :
+					{
+						utility::JSON json;
+
+						utility::JSON& tests = json["tests"];
+
+						size_t testIndex = 0;
+
+						for (auto& suiteDescription: result.suites)
+						{
+							for (auto& testDescription: suiteDescription.tests)
+							{
+								tests[testIndex++] = std::format("{}.{}", suiteDescription.name, testDescription.name);
+							}
+						}
+
+						file << json;
+
+						break;
+					}
+				}
+			}
 		}
 
 	private:

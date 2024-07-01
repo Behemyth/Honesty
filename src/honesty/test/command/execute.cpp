@@ -7,31 +7,20 @@ import :command.types;
 
 namespace synodic::honesty::test::command
 {
-	struct Context
+	class Execute final : public Command
 	{
-		Context(std::unique_ptr<Runner> runner, std::unique_ptr<Reporter> reporter, const std::string& filter) :
-			runner(std::move(runner)),
-			reporter(std::move(reporter)),
-			filter(filter)
+	public:
+		explicit Execute(const Configuration& configuration) :
+			configuredRunnerRegistry_(configuration.configuredRunnerRegistry),
+			configuredReporterRegistry_(configuration.configuredReporterRegistry),
+			logger_(configuration.logger)
 		{
 		}
 
-		std::unique_ptr<Runner> runner;
-		std::unique_ptr<Reporter> reporter;
-
-		std::string filter;
-	};
-
-	class Execute : public Command
-	{
-	public:
-		Execute();
 		~Execute() override = default;
 
 		void Parse(std::span<std::string_view> arguments) override
 		{
-			ExecuteContext parameters(std::move(defaultRunner), std::move(defaultReporter), "");
-
 			if (auto itr = std::ranges::find(arguments, "--filter"); itr != arguments.end())
 			{
 				if (++itr == arguments.end())
@@ -39,21 +28,30 @@ namespace synodic::honesty::test::command
 					throw std::invalid_argument("You must give a filter when using the '--filter' option");
 				}
 
-				parameters.filter = *itr;
+				filter_ = *itr;
 			}
-
-			commands_ = std::move(parameters);
-			return;
 		}
 
 		void Process() override
 		{
+			const api::ExecuteParameters
+				parameters(applicationName_, filter_, configuredRunnerRegistry_, configuredReporterRegistry_, logger_);
+			const api::ExecuteResult result = api::Execute(parameters);
+
+			if (not result.success)
+			{
+				// TODO: Replace with a return code
+				std::exit(134);
+			}
 		}
 
 	private:
-		std::unique_ptr<Runner> runner_;
-		std::unique_ptr<Reporter> reporter_;
-
+		std::string applicationName_;
 		std::string filter_;
+
+		std::reference_wrapper<const RunnerRegistry> configuredRunnerRegistry_;
+		std::reference_wrapper<const ReporterRegistry> configuredReporterRegistry_;
+
+		std::reference_wrapper<const log::Logger> logger_;
 	};
 }

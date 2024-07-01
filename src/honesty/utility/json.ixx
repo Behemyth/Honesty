@@ -1,5 +1,5 @@
 /*
- *	This module provides a simple interface for reading and writing JSON files. The implementation is not meant to
+ *	This module provides a simple api for reading and writing JSON files. The implementation is not meant to
  *		compete with the ergonomics or the efficiency of other libraries. Instead, it is meant to provide the small
  *		utility that are need for JSON interfaces while not depending on other libraries.
  */

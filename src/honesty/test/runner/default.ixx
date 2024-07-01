@@ -8,8 +8,8 @@ namespace synodic::honesty::test
 	export class DefaultRunner final : public Runner
 	{
 	public:
-		explicit DefaultRunner(const log::Logger& logger)
-			: Runner(logger)
+		explicit DefaultRunner(const log::Logger& logger) :
+			Runner(logger)
 		{
 		}
 
@@ -27,6 +27,21 @@ namespace synodic::honesty::test
 			catch (AssertException)
 			{
 			}
+		}
+
+		Generator
+			Run(const Requirements& requirements,
+				const std::function_ref<Generator(const Requirements&)> function) override
+		{
+			try
+			{
+				return function(requirements);
+			}
+			catch (AssertException)
+			{
+			}
+
+			return;
 		}
 	};
 }

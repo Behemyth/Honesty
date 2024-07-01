@@ -69,8 +69,9 @@ namespace
 				requirements.ExpectEquals(counter(arrayParameterization), 2);
 			};
 
-			co_yield "run"_test = [](const Requirements& requirements)
+			co_yield "nested"_test = [](const Requirements& requirements) -> Generator
 			{
+				co_return;
 			};
 		});
 

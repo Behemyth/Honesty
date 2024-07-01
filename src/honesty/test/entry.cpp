@@ -18,9 +18,9 @@ auto main(const int argc, const char* argv[]) -> int
 	synodic::honesty::log::Console sink;
 
 	synodic::honesty::test::Instance::Configuration configuration("honesty", &sink);
-	synodic::honesty::test::Instance instance(configuration, arguments);
+	synodic::honesty::test::Instance command(configuration, arguments);
 
-	instance.Execute();
+	command.Execute();
 
 	return 0;
 }

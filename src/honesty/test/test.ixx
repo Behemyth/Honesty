@@ -4,7 +4,6 @@ export module synodic.honesty.test:test;
 import std;
 import function_ref;
 import :types;
-import :context;
 import generator;
 import :assert;
 
@@ -74,6 +73,15 @@ namespace synodic::honesty::test
 			VerifyTestName(name);
 		}
 
+		explicit(false) constexpr Test(
+			const std::string_view name,
+			const std::function_ref<Generator(const Requirements&)> test) :
+			name_(name),
+			test_(test)
+		{
+			VerifyTestName(name);
+		}
+
 		Test(const Test& other)				   = delete;
 		Test(Test&& other) noexcept			   = delete;
 		Test& operator=(const Test& other)	   = delete;
@@ -88,7 +96,8 @@ namespace synodic::honesty::test
 		friend TestView;
 
 		std::string_view name_;
-		std::function_ref<void(const Requirements&)> test_;
+		std::variant<std::function_ref<void(const Requirements&)>, std::function_ref<Generator(const Requirements&)>>
+			test_;
 	};
 
 	class TestView
@@ -106,7 +115,8 @@ namespace synodic::honesty::test
 		TestView& operator=(TestView&& other) noexcept = delete;
 
 		std::string_view name;
-		std::function_ref<void(const Requirements&)> test;
+		std::variant<std::function_ref<void(const Requirements&)>, std::function_ref<Generator(const Requirements&)>>
+			test;
 	};
 
 	class TestLiteral
@@ -122,9 +132,20 @@ namespace synodic::honesty::test
 		TestLiteral& operator=(const TestLiteral& other)	 = delete;
 		TestLiteral& operator=(TestLiteral&& other) noexcept = delete;
 
-		Test operator=(const std::function_ref<void(const Requirements&)> test) const
+		template<typename Fn>
+			requires std::invocable<Fn, const Requirements&> &&
+					 std::same_as<void, std::invoke_result_t<Fn, const Requirements&>>
+		inline Test operator=(const Fn& test) const
 		{
-			return Test(name_, test);
+			return Test(name_, std::function_ref<void(const Requirements&)>(test));
+		}
+
+		template<typename Fn>
+			requires std::invocable<Fn, const Requirements&> &&
+					 std::same_as<Generator, std::invoke_result_t<Fn, const Requirements&>>
+		inline Test operator=(const Fn& test) const
+		{
+			return Test(name_, std::function_ref<Generator(const Requirements&)>(test));
 		}
 
 		auto operator=(Generator&& generator) const

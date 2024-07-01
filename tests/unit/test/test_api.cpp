@@ -9,7 +9,7 @@ using namespace synodic::honesty::test::literals;
 namespace
 {
 	Suite SUITE(
-		"interface",
+		"api",
 		[]() -> Generator
 		{
 			/**
@@ -25,10 +25,10 @@ namespace
 
 				const Interface::Configuration configuration("interfaceTest");
 
-				Interface interface(configuration);
+				Interface api(configuration);
 
 				ListParameters parameters(root.CreateLogger("test"));
-				const auto result = interface.List(parameters);
+				const auto result = api.List(parameters);
 
 				requirements.ExpectGreater(result.suites.size(), static_cast<std::size_t>(0));
 			};

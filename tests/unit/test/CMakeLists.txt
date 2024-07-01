@@ -5,8 +5,8 @@ PRIVATE
 	test_runner.cpp
 	test_reporter.cpp
 	test_tag.cpp
-	test_instance.cpp
-	test_interface.cpp
+	test_command.cpp
+	test_api.cpp
 	test_suite.cpp
 	test_exception.cpp
 	test_log.cpp

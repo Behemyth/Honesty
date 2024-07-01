@@ -5,6 +5,7 @@ import std;
 import synodic.honesty.utility;
 import :runner;
 import :reporter;
+import :test;
 
 namespace synodic::honesty::test
 {
@@ -159,6 +160,14 @@ namespace synodic::honesty::test
 			runner_->Run(requirements, function);
 		}
 
+		inline void
+			Run(
+				const Requirements& requirements,
+				const std::function_ref<Generator(const Requirements&)> function) const
+		{
+			runner_->Run(requirements, function);
+		}
+
 		[[nodiscard]] auto Reporters() const -> std::span<Reporter*>
 		{
 			return reporters_;
@@ -178,6 +187,13 @@ namespace synodic::honesty::test
 		}
 
 		void Run(const Requirements& requirements, const std::function_ref<void(const Requirements&)> function) override
+		{
+		}
+
+		void
+			Run(
+				const Requirements& requirements,
+				const std::function_ref<Generator(const Requirements&)> function) override
 		{
 		}
 	};

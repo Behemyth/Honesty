@@ -11,8 +11,8 @@ target_sources(honesty
 	function_ref.ixx
 	inplace_vector.ixx
 	generator.ixx
-	instance.ixx
-	interface.ixx
+	command.ixx
+	api.ixx
 	suite.ixx
 	PRIVATE
 	FILE_SET implementations
@@ -23,6 +23,14 @@ target_sources(honesty
 target_sources(honesty_main
 PRIVATE
 	entry.cpp
+)
+
+add_subdirectory(
+	api
+)
+
+add_subdirectory(
+	command
 )
 
 add_subdirectory(

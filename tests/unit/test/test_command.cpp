@@ -9,7 +9,7 @@ using namespace synodic::honesty::test::literals;
 namespace
 {
 	Suite SUITE(
-		"instance",
+		"command",
 		[](
 		const Fixture& fixture) -> Generator
 		{
@@ -24,16 +24,16 @@ namespace
 				synodic::honesty::log::RingBuffer<std::mutex> sink;
 
 				Instance::Configuration configuration("instance_test", &sink);
-				Instance instance(configuration, arguments);
+				Instance command(configuration, arguments);
 
-				const Instance::ListContext* context = instance.GetListContext();
+				const Instance::ListContext* context = command.GetListContext();
 
 				requirements.Assert(context);
 				requirements.Expect(context->outputType == ListOutputType::JSON);
 				requirements.Assert(context->file.has_value());
 				requirements.Expect(context->file.value() == temporaryPath);
 
-				instance.Execute();
+				command.Execute();
 
 				requirements.Expect(exists(temporaryPath));
 			};

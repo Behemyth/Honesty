@@ -67,8 +67,8 @@ namespace synodic::honesty::test
 		explicit(false) constexpr Test(
 			const std::string_view name,
 			const std::function_ref<void(const Requirements&)> test) :
-			name_(name),
-			test_(test)
+			name_(name)
+		//	test_(test)
 		{
 			VerifyTestName(name);
 		}
@@ -76,8 +76,8 @@ namespace synodic::honesty::test
 		explicit(false) constexpr Test(
 			const std::string_view name,
 			const std::function_ref<Generator(const Requirements&)> test) :
-			name_(name),
-			test_(test)
+			name_(name)
+			//test_(test)
 		{
 			VerifyTestName(name);
 		}
@@ -96,16 +96,16 @@ namespace synodic::honesty::test
 		friend TestView;
 
 		std::string_view name_;
-		std::variant<std::function_ref<void(const Requirements&)>, std::function_ref<Generator(const Requirements&)>>
-			test_;
+		/*std::variant<std::function_ref<void(const Requirements&)>, std::function_ref<Generator(const Requirements&)>>
+			test_;*/
 	};
 
 	class TestView
 	{
 	public:
 		explicit(false) constexpr TestView(const Test& test) :
-			name(test.name_),
-			test(test.test_)
+			name(test.name_)
+			//test(test.test_)
 		{
 		}
 
@@ -115,8 +115,8 @@ namespace synodic::honesty::test
 		TestView& operator=(TestView&& other) noexcept = delete;
 
 		std::string_view name;
-		std::variant<std::function_ref<void(const Requirements&)>, std::function_ref<Generator(const Requirements&)>>
-			test;
+		/*std::variant<std::function_ref<void(const Requirements&)>, std::function_ref<Generator(const Requirements&)>>
+			test;*/
 	};
 
 	class TestLiteral

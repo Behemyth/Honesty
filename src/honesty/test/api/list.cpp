@@ -13,19 +13,16 @@ namespace synodic::honesty::test::api
 {
 	struct ListParameters
 	{
-		explicit ListParameters(
-			const std::string_view applicationName,
-			const RunnerRegistry& configuredRunnerRegistry,
-			const log::Logger& logger) :
+		explicit ListParameters(const std::string_view applicationName, Runner& runner, const log::Logger& logger) :
 			applicationName(applicationName),
-			configuredRunnerRegistry(configuredRunnerRegistry),
+			runner(runner),
 			logger(logger)
 		{
 		}
 
 		std::string_view applicationName;
 
-		std::reference_wrapper<const RunnerRegistry> configuredRunnerRegistry;
+		std::reference_wrapper<Runner> runner;
 
 		std::reference_wrapper<const log::Logger> logger;
 	};
@@ -44,13 +41,12 @@ namespace synodic::honesty::test::api
 			static ReporterRegistrar<ListReporter> listReporterRegistrar;
 		}
 
-		// TODO: Filter with list command
-		const ExecuteParameters executeParameters(
-			parameters.applicationName,
-			"",
-			parameters.configuredRunnerRegistry,
-			*ReporterRegistry::Registrars().back(),
-			parameters.logger);
+		std::span<std::unique_ptr<Reporter>> reporters = ReporterRegistry::Registrars();
+		*ReporterRegistry::Registrars().back()
+
+		 // TODO: Filter with list command
+		 const ExecuteParameters
+			 executeParameters(parameters.applicationName, "", parameters.runner, reporters, parameters.logger);
 		ExecuteResult executeResult = Execute(executeParameters);
 
 		ListResult result;
@@ -60,7 +56,7 @@ namespace synodic::honesty::test::api
 		for (const auto& [name, tests]: data.suites)
 		{
 			auto& resultSuite = result.suites.emplace_back();
-			resultSuite.name = name;
+			resultSuite.name  = name;
 
 			for (const auto& [name]: tests)
 			{

@@ -131,7 +131,7 @@ namespace synodic::honesty::test::api
 					{
 					}};
 
-				Generator generator = std::visit(testExecutor, view.test);
+				//Generator generator = std::visit(testExecutor, view.test);
 
 				// TODO: Run nested tests
 				// context.Run(requirements, view.test);

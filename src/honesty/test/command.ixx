@@ -67,10 +67,10 @@ namespace synodic::honesty::test
 
 		// Resolve all input into immediately executable state ready for the 'Execute' function
 		Instance(const Configuration& configuration, std::span<std::string_view> arguments) :
+			applicationName_(std::filesystem::path(arguments.front()).stem().generic_string()),
 			sink_(configuration.sink),
 			logger_(log::RootLogger().CreateLogger(configuration.name)),
-			command_(std::monostate {}),
-			applicationName_(std::filesystem::path(arguments.front()).stem().generic_string())
+			command_(std::monostate {})
 
 		{
 			logger_.SetSink(sink_);
@@ -114,11 +114,10 @@ namespace synodic::honesty::test
 			}
 
 			// Overload the visitor and make use of the pure-virtual interface for deduction
-			auto executor = Overload {[&arguments](auto& command)
+			auto executor = Overload {[this, &configuration, &arguments](auto& command)
 									  {
-										  command::ParseResult result = command.Parse(arguments);
-
-										  // TODO: Write the results to the instance
+										  const command::ParseResult result = command.Parse(arguments);
+										  ResolveParseResult(configuration, result);
 									  }};
 
 			std::visit(executor, command_);
@@ -131,8 +130,7 @@ namespace synodic::honesty::test
 				// Overload the visitor and make use of the pure-virtual interface for deduction
 				auto executor = Overload {[&](auto& command)
 										  {
-											  command::ProcessConfiguration configuration();
-
+											  command::ProcessConfiguration configuration(*runner_, reporters_);
 											  command.Process(configuration);
 										  }};
 
@@ -149,10 +147,20 @@ namespace synodic::honesty::test
 
 	private:
 		/**
-		 * @brief Resolve the configuration into a command configuration.
+		 * @brief Resolve the configuration into a command configuration to be passed to the instantiated command.
 		 * @return The resolved command configuration.
 		 */
 		[[nodiscard]] command::Configuration ResolveConfiguration(const Configuration& configuration) const
+		{
+			return command::Configuration(applicationName_, logger_);
+		}
+
+		/***
+		 * @brief Resolve the parse result into the selected runner and reporters and set the instance up for execution.
+		 * @param configuration The configuration to use.
+		 * @param parseResult The parsing result.
+		 */
+		void ResolveParseResult(const Configuration& configuration, const command::ParseResult& parseResult)
 		{
 			// Register our default runners and reporters
 			{
@@ -166,27 +174,36 @@ namespace synodic::honesty::test
 			const std::span<RunnerRegistry*> runnerRegistrars	  = RunnerRegistry::Registrars();
 			const std::span<ReporterRegistry*> reporterRegistrars = ReporterRegistry::Registrars();
 
-			// TODO: Allocate memory
-			const RunnerRegistry* selectedRunner;
-			const ReporterRegistry* selectedReporter;
+			std::string_view selectedRunner = parseResult.runnerOverride;
+			std::span selectedReporters		= parseResult.reporterOverrides;
 
-			const std::string_view defaultRunnerName =
-				configuration.defaultRunnerName.empty() ? "default" : configuration.defaultRunnerName;
-			const std::string_view defaultReporterName =
-				configuration.defaultReporterName.empty() ? "default" : configuration.defaultReporterName;
+			constexpr std::string_view defaultName = "default";
+
+			if (selectedRunner.empty())
+			{
+				selectedRunner =
+					configuration.defaultRunnerName.empty() ? defaultName : configuration.defaultRunnerName;
+			}
+
+			if (selectedReporters.empty())
+			{
+				selectedReporters = configuration.defaultReporterName.empty() ?
+										std::span(&defaultName, 1) :
+										std::span(configuration.defaultReporterName.data(), 1);
+			}
 
 			// Find the runner
 			{
-				const auto iterator = std::ranges::find_if(
+				auto iterator = std::ranges::find_if(
 					runnerRegistrars,
 					[&](const RunnerRegistry* registry) -> bool
 					{
-						return registry->Name() == defaultRunnerName;
+						return registry->Name() == selectedRunner;
 					});
 
 				if (iterator != runnerRegistrars.end())
 				{
-					selectedRunner = *iterator;
+					runner_ = *iterator.Create(logger_);
 				}
 				else
 				{
@@ -194,9 +211,9 @@ namespace synodic::honesty::test
 				}
 			}
 
-			// Find the reporter
+			// Find the reporters
 			{
-				const auto iterator = std::ranges::find_if(
+				auto iterator = std::ranges::find_if(
 					reporterRegistrars,
 					[&](const ReporterRegistry* registry) -> bool
 					{
@@ -212,16 +229,17 @@ namespace synodic::honesty::test
 					throw std::invalid_argument("The reporter specified does not exist");
 				}
 			}
-
-			return command::Configuration(applicationName_, logger_);
 		}
+
+		std::string applicationName_;
 
 		log::Sink* sink_;
 		log::Logger logger_;
 
 		TopType command_;
 
-		std::string applicationName_;
+		std::unique_ptr<Runner> runner_;
+		std::vector<std::unique_ptr<Reporter>> reporters_;
 	};
 
 }

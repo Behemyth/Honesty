@@ -12,15 +12,15 @@ namespace synodic::honesty::test
 	class Context
 	{
 	public:
-		constexpr Context(Runner& runner, const std::span<Reporter*> reporters) :
+		constexpr Context(Runner* runner, const std::span<std::unique_ptr<Reporter>> reporters) :
 			reporters_(reporters),
-			runner_(&runner)
+			runner_(runner)
 		{
 		}
 
 		void Signal(const event::SuiteBegin& event) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(event);
 			}
@@ -28,7 +28,7 @@ namespace synodic::honesty::test
 
 		void Signal(const event::SuiteEnd& event) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(event);
 			}
@@ -36,7 +36,7 @@ namespace synodic::honesty::test
 
 		void Signal(const event::SuiteSkip& event) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(event);
 			}
@@ -44,7 +44,7 @@ namespace synodic::honesty::test
 
 		void Signal(const event::SuiteRun& event) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(event);
 			}
@@ -52,7 +52,7 @@ namespace synodic::honesty::test
 
 		void Signal(const event::SuiteFail& event) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(event);
 			}
@@ -60,7 +60,7 @@ namespace synodic::honesty::test
 
 		void Signal(const event::SuitePass& event) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(event);
 			}
@@ -68,7 +68,7 @@ namespace synodic::honesty::test
 
 		void Signal(const event::SuiteSummary& event) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(event);
 			}
@@ -76,7 +76,7 @@ namespace synodic::honesty::test
 
 		void Signal(const event::TestBegin& event) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(event);
 			}
@@ -84,7 +84,7 @@ namespace synodic::honesty::test
 
 		void Signal(const event::TestEnd& event) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(event);
 			}
@@ -92,7 +92,7 @@ namespace synodic::honesty::test
 
 		void Signal(const event::TestSkip& event) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(event);
 			}
@@ -100,7 +100,7 @@ namespace synodic::honesty::test
 
 		void Signal(const event::TestRun& event) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(event);
 			}
@@ -108,7 +108,7 @@ namespace synodic::honesty::test
 
 		void Signal(const event::TestFail& event) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(event);
 			}
@@ -116,7 +116,7 @@ namespace synodic::honesty::test
 
 		void Signal(const event::TestPass& event) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(event);
 			}
@@ -124,7 +124,7 @@ namespace synodic::honesty::test
 
 		void Signal(const event::AssertionFail& event) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(event);
 			}
@@ -132,7 +132,7 @@ namespace synodic::honesty::test
 
 		void Signal(const event::AssertionPass& event) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(event);
 			}
@@ -140,7 +140,7 @@ namespace synodic::honesty::test
 
 		void Signal(const event::AssertionSkip& event) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(event);
 			}
@@ -148,7 +148,7 @@ namespace synodic::honesty::test
 
 		void Signal(const event::Summary& event) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(event);
 			}
@@ -168,13 +168,13 @@ namespace synodic::honesty::test
 			runner_->Run(requirements, function);
 		}
 
-		[[nodiscard]] auto Reporters() const -> std::span<Reporter*>
+		[[nodiscard]] auto Reporters() const -> std::span<std::unique_ptr<Reporter>>
 		{
 			return reporters_;
 		}
 
 	private:
-		std::span<Reporter*> reporters_;
+		std::span<std::unique_ptr<Reporter>> reporters_;
 		Runner* runner_;
 	};
 

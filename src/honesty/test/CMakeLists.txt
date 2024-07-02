@@ -12,7 +12,6 @@ target_sources(honesty
 	inplace_vector.ixx
 	generator.ixx
 	command.ixx
-	api.ixx
 	suite.ixx
 	PRIVATE
 	FILE_SET implementations
@@ -21,7 +20,7 @@ target_sources(honesty
 )
 
 target_sources(honesty_main
-PRIVATE
+	PRIVATE
 	entry.cpp
 )
 

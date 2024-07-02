@@ -33,7 +33,7 @@ namespace synodic::honesty::test
 
 		virtual void Run(const Requirements& requirements, std::function_ref<void(const Requirements&)> function) = 0;
 
-		virtual Generator
+		virtual void
 			Run(const Requirements& requirements, std::function_ref<Generator(const Requirements&)> function) = 0;
 
 		const log::Logger& Logger() const

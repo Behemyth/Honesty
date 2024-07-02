@@ -7,18 +7,11 @@ import :types;
 
 namespace synodic::honesty::test
 {
-
-	struct ListReporterParameters
-	{
-		ListReporterParameters() = default;
-	};
-
 	class ListReporter final : public CumulativeAdapter
 	{
 	public:
-		explicit(false) ListReporter(const ListReporterParameters& parameters, const log::Logger& logger) :
-			CumulativeAdapter(logger),
-			parameters_(parameters)
+		explicit(false) ListReporter(const log::Logger& logger) :
+			CumulativeAdapter(logger)
 		{
 		}
 
@@ -40,8 +33,6 @@ namespace synodic::honesty::test
 		}
 
 	private:
-		ListReporterParameters parameters_;
 		CumulativeData data_;
 	};
 }
-

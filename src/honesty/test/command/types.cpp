@@ -2,46 +2,54 @@ module synodic.honesty.test:command.types;
 
 import std;
 
+namespace synodic::honesty::test
+{
+	class Reporter;
+	class Runner;
+}
+
 namespace synodic::honesty::log
 {
 	class Logger;
-}
-
-namespace synodic::honesty::test
-{
-	class ReporterRegistry;
-	class RunnerRegistry;
 }
 
 namespace synodic::honesty::test::command
 {
 	struct Configuration
 	{
-		Configuration(
-			std::string_view applicationName,
-			const RunnerRegistry& configuredRunnerRegistry,
-			const ReporterRegistry& configuredReporterRegistry,
-			const std::span<RunnerRegistry*> runnerRegistrars,
-			const std::span<ReporterRegistry*> reporterRegistrars,
-			const log::Logger& logger) :
+		Configuration(const std::string_view applicationName, const log::Logger& logger) :
 			applicationName(applicationName),
-			configuredRunnerRegistry(configuredRunnerRegistry),
-			configuredReporterRegistry(configuredReporterRegistry),
-			runnerRegistrars(runnerRegistrars),
-			reporterRegistrars(reporterRegistrars),
 			logger(logger)
 		{
 		}
 
 		std::string_view applicationName;
 
-		std::reference_wrapper<const RunnerRegistry> configuredRunnerRegistry;
-		std::reference_wrapper<const ReporterRegistry> configuredReporterRegistry;
-
-		std::span<RunnerRegistry*> runnerRegistrars;
-		std::span<ReporterRegistry*> reporterRegistrars;
-
 		std::reference_wrapper<const log::Logger> logger;
+	};
+
+	struct ParseResult
+	{
+		ParseResult(std::string runnerOverride, std::vector<std::string> reporterOverride) :
+			runnerOverride(std::move(runnerOverride)),
+			reporterOverrides(std::move(reporterOverride))
+		{
+		}
+
+		std::string runnerOverride;
+		std::vector<std::string> reporterOverrides;
+	};
+
+	struct ProcessConfiguration
+	{
+		ProcessConfiguration(const Runner& runner, const std::span<std::unique_ptr<Reporter>> reporter) :
+			runner(runner),
+			reporter(reporter)
+		{
+		}
+
+		std::reference_wrapper<const Runner> runner;
+		std::span<std::unique_ptr<Reporter>> reporter;
 	};
 
 	class Command
@@ -55,8 +63,8 @@ namespace synodic::honesty::test::command
 		auto operator=(const Command& other) -> Command& = delete;
 		auto operator=(Command&& other) noexcept -> Command& = delete;
 
-		virtual void Parse(std::span<std::string_view> arguments) = 0;
-		virtual void Process() = 0;
+		virtual auto Parse(std::span<std::string_view> arguments) -> ParseResult = 0;
+		virtual void Process(const ProcessConfiguration& configuration) = 0;
 
 	private:
 	};

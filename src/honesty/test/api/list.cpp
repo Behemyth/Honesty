@@ -3,16 +3,29 @@ module synodic.honesty.test:api.list;
 import std;
 import synodic.honesty.log;
 
+import :api.types;
+import :api.execute;
+
 import :reporter.list;
+import :suite;
 
 namespace synodic::honesty::test::api
 {
 	struct ListParameters
 	{
-		explicit ListParameters(const log::Logger& logger) :
+		explicit ListParameters(
+			const std::string_view applicationName,
+			const RunnerRegistry& configuredRunnerRegistry,
+			const log::Logger& logger) :
+			applicationName(applicationName),
+			configuredRunnerRegistry(configuredRunnerRegistry),
 			logger(logger)
 		{
 		}
+
+		std::string_view applicationName;
+
+		std::reference_wrapper<const RunnerRegistry> configuredRunnerRegistry;
 
 		std::reference_wrapper<const log::Logger> logger;
 	};
@@ -24,19 +37,20 @@ namespace synodic::honesty::test::api
 		std::vector<SuiteDescription> suites;
 	};
 
-	ListResult List(const ListParameters& parameters)
+	auto List(const ListParameters& parameters) -> ListResult
 	{
-		ListReporterParameters listReporterParameters;
-		ListReporter listReporter(listReporterParameters, parameters.logger);
+		// Register the list reporter and immediately grab it from the registration list
+		{
+			static ReporterRegistrar<ListReporter> listReporterRegistrar;
+		}
 
-		EmptyRunner runner(log::RootLogger().CreateLogger("empty_runner"));
-
-		Reporter* reporter = &listReporter;
-		std::ranges::single_view reporters{reporter};
-
-		Context context(runner, reporters);
-
-		const ExecuteParameters executeParameters(context, "", parameters.logger);
+		// TODO: Filter with list command
+		const ExecuteParameters executeParameters(
+			parameters.applicationName,
+			"",
+			parameters.configuredRunnerRegistry,
+			*ReporterRegistry::Registrars().back(),
+			parameters.logger);
 		ExecuteResult executeResult = Execute(executeParameters);
 
 		ListResult result;

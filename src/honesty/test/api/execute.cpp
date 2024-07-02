@@ -22,13 +22,13 @@ namespace synodic::honesty::test::api
 		explicit ExecuteParameters(
 			const std::string_view applicationName,
 			const std::string_view filter,
-			const RunnerRegistry& configuredRunnerRegistry,
-			const ReporterRegistry& configuredReporterRegistry,
+			Runner& runner,
+			const std::span<std::unique_ptr<Reporter>> reporters,
 			const log::Logger& logger) :
 			applicationName(applicationName),
 			filter(filter),
-			configuredRunnerRegistry(configuredRunnerRegistry),
-			configuredReporterRegistry(configuredReporterRegistry),
+			runner(runner),
+			reporters(reporters),
 			logger(logger)
 		{
 		}
@@ -36,8 +36,8 @@ namespace synodic::honesty::test::api
 		std::string_view applicationName;
 		std::string_view filter;
 
-		std::reference_wrapper<const RunnerRegistry> configuredRunnerRegistry;
-		std::reference_wrapper<const ReporterRegistry> configuredReporterRegistry;
+		std::reference_wrapper<Runner> runner;
+		std::span<std::unique_ptr<Reporter>> reporters;
 
 		std::reference_wrapper<const log::Logger> logger;
 	};
@@ -54,21 +54,16 @@ namespace synodic::honesty::test::api
 
 	auto Execute(const ExecuteParameters& parameters) -> ExecuteResult
 	{
-		std::unique_ptr<Runner> runner	   = parameters.configuredRunnerRegistry.get().Create(parameters.logger);
-		std::unique_ptr<Reporter> reporter = parameters.configuredReporterRegistry.get().Create(parameters.logger);
-
-		std::ranges::single_view reporters {reporter.get()};
-
 		// Before start executing, we need to set up the current thread's context
-		Context context(*runner, reporters);
+		Context context(&parameters.runner.get(), parameters.reporters);
 
 		// Break down the filter into individual views
 		auto splitData = parameters.filter | std::ranges::views::split('.') |
-						 std::ranges::views::transform(
-							 [](auto&& str)
-							 {
-								 return std::string_view(str.data(), std::ranges::distance(str));
-							 });
+		                 std::ranges::views::transform(
+			                 [](auto&& str)
+			                 {
+				                 return std::string_view(str.data(), std::ranges::distance(str));
+			                 });
 
 		std::vector<std::string_view> filterData = std::ranges::to<std::vector>(splitData);
 
@@ -99,7 +94,7 @@ namespace synodic::honesty::test::api
 			// Fixture lifetime should be for the whole suite
 			Fixture fixture(parameters.applicationName, suite.name, parameters.logger);
 
-			auto executor = Overload {
+			auto executor = Overload{
 				[&](const std::function_ref<Generator()> generator) -> Generator
 				{
 					return generator();
@@ -126,9 +121,9 @@ namespace synodic::honesty::test::api
 
 				context.Signal(testBegin);
 
-				RequirementsBackend requirements(.context.Reporters(), test.Name(), parameters.logger);
+				RequirementsBackend requirements(parameters.reporters, test.Name(), parameters.logger);
 
-				auto testExecutor = Overload {
+				auto testExecutor = Overload{
 					[&](const std::function_ref<void(Requirements&)> testCallback) -> Generator
 					{
 					},
@@ -138,7 +133,8 @@ namespace synodic::honesty::test::api
 
 				Generator generator = std::visit(testExecutor, view.test);
 
-				context.Run(requirements, view.test);
+				// TODO: Run nested tests
+				// context.Run(requirements, view.test);
 
 				if (not requirements.Context().success)
 				{

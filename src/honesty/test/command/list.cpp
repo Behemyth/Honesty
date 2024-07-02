@@ -2,7 +2,7 @@ module synodic.honesty.test:command.list;
 
 import std;
 
-import :api;
+import :api.list;
 import :command.types;
 
 namespace synodic::honesty::test::command
@@ -20,8 +20,10 @@ namespace synodic::honesty::test::command
 
 		static constexpr std::string_view NAME = "list";
 
-		void Parse(, std::span<std::string_view> arguments) override
+		auto Parse(std::span<std::string_view> arguments) -> ParseResult override
 		{
+			ParseResult result;
+
 			arguments = arguments.subspan(1);
 
 			if (std::ranges::contains(arguments, "--json"))
@@ -43,17 +45,14 @@ namespace synodic::honesty::test::command
 					throw std::invalid_argument("You must give a valid file name when using the '--file' option");
 				}
 			}
+
+			return result;
 		}
 
-		void Process() override
+		void Process(const ProcessConfiguration& configuration) override
 		{
-			api::ListParameters parameters();
-
+			api::ListParameters parameters(logger_);
 			api::ListResult result = api::List(parameters);
-
-			ListParameters parameters(logger_.CreateLogger("list"));
-
-			auto result = interface.List(parameters);
 
 			if (file_)
 			{
@@ -79,7 +78,7 @@ namespace synodic::honesty::test::command
 
 				switch (outputType_)
 				{
-					case ListOutputType::LOG :
+					case ListOutputType::LOG:
 					{
 						for (auto& suiteDescription: result.suites)
 						{
@@ -90,7 +89,7 @@ namespace synodic::honesty::test::command
 						}
 						break;
 					}
-					case ListOutputType::JSON :
+					case ListOutputType::JSON:
 					{
 						utility::JSON json;
 

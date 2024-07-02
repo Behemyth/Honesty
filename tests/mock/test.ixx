@@ -37,6 +37,18 @@ public:
 	{
 		function(requirements);
 	}
+
+	void
+		Run(const synodic::honesty::test::Requirements& requirements,
+			const std::function_ref<synodic::honesty::test::Generator(const synodic::honesty::test::Requirements&)> function) override
+	{
+		synodic::honesty::test::Generator generator = function(requirements);
+
+		for(const auto& test : generator)
+		{
+			// TODO: Implement
+		}
+	}
 };
 
 namespace

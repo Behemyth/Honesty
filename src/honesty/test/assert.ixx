@@ -20,7 +20,10 @@ namespace synodic::honesty::test
 	export class Requirements
 	{
 	public:
-		Requirements(const std::span<Reporter*> reporters, const std::string_view testName, const log::Logger& logger) :
+		Requirements(
+			const std::span<std::unique_ptr<Reporter>> reporters,
+			const std::string_view testName,
+			const log::Logger& logger) :
 			reporters_(reporters),
 			testName_(testName),
 			logger_(logger)
@@ -843,7 +846,7 @@ namespace synodic::honesty::test
 		 */
 		void Signal(const event::AssertionPass& passed) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(passed);
 			}
@@ -855,7 +858,7 @@ namespace synodic::honesty::test
 		 */
 		void Signal(const event::AssertionFail& failed) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(failed);
 			}
@@ -869,7 +872,7 @@ namespace synodic::honesty::test
 		 */
 		void Signal(const event::EqualityFail& failed) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(failed);
 			}
@@ -883,7 +886,7 @@ namespace synodic::honesty::test
 		 */
 		void Signal(const event::ComparisonFail& failed) const
 		{
-			for (Reporter* reporter: reporters_)
+			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(failed);
 			}
@@ -891,7 +894,7 @@ namespace synodic::honesty::test
 			context_.success = false;
 		}
 
-		std::span<Reporter*> reporters_;
+		std::span<std::unique_ptr<Reporter>> reporters_;
 		std::string_view testName_;
 		std::reference_wrapper<const log::Logger> logger_;
 	};
@@ -900,7 +903,7 @@ namespace synodic::honesty::test
 	{
 	public:
 		RequirementsBackend(
-			const std::span<Reporter*> reporters,
+			std::span<std::unique_ptr<Reporter>> reporters,
 			const std::string_view testName,
 			const log::Logger& logger) :
 			Requirements(reporters, testName, logger)

@@ -4,4 +4,5 @@ target_sources(honesty
 	FILES
 	execute.cpp
 	list.cpp
+	types.cpp
 )

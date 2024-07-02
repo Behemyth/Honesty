@@ -114,9 +114,11 @@ namespace synodic::honesty::test
 			}
 
 			// Overload the visitor and make use of the pure-virtual interface for deduction
-			auto executor = Overload {[&](auto& command)
+			auto executor = Overload {[&arguments](auto& command)
 									  {
-										  command.Parse(arguments);
+										  command::ParseResult result = command.Parse(arguments);
+
+										  // TODO: Write the results to the instance
 									  }};
 
 			std::visit(executor, command_);
@@ -126,13 +128,12 @@ namespace synodic::honesty::test
 		{
 			try
 			{
-				const Interface::Configuration configuration(applicationName_);
-				Interface api(configuration);
-
 				// Overload the visitor and make use of the pure-virtual interface for deduction
 				auto executor = Overload {[&](auto& command)
 										  {
-											  command.Process();
+											  command::ProcessConfiguration configuration();
+
+											  command.Process(configuration);
 										  }};
 
 				std::visit(executor, command_);
@@ -212,12 +213,7 @@ namespace synodic::honesty::test
 				}
 			}
 
-			return command::Configuration(
-				*selectedRunner,
-				*selectedReporter,
-				runnerRegistrars,
-				reporterRegistrars,
-				logger_);
+			return command::Configuration(applicationName_, logger_);
 		}
 
 		log::Sink* sink_;

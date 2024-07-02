@@ -42,14 +42,14 @@ namespace synodic::honesty::test::command
 
 	struct ProcessConfiguration
 	{
-		ProcessConfiguration(const Runner& runner, const std::span<std::unique_ptr<Reporter>> reporter) :
+		ProcessConfiguration(Runner& runner, const std::span<std::unique_ptr<Reporter>> reporter) :
 			runner(runner),
-			reporter(reporter)
+			reporters(reporter)
 		{
 		}
 
-		std::reference_wrapper<const Runner> runner;
-		std::span<std::unique_ptr<Reporter>> reporter;
+		std::reference_wrapper<Runner> runner;
+		std::span<std::unique_ptr<Reporter>> reporters;
 	};
 
 	class Command

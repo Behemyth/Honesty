@@ -23,6 +23,7 @@ namespace synodic::honesty::test::api
 		std::string_view applicationName;
 
 		std::reference_wrapper<Runner> runner;
+		std::span<std::unique_ptr<Reporter>> reporters;
 
 		std::reference_wrapper<const log::Logger> logger;
 	};
@@ -36,36 +37,41 @@ namespace synodic::honesty::test::api
 
 	auto List(const ListParameters& parameters) -> ListResult
 	{
-		// Register the list reporter and immediately grab it from the registration list
+		// Register the list reporters and immediately grab it from the registration list
 		{
 			static ReporterRegistrar<ListReporter> listReporterRegistrar;
 		}
 
-		std::span<std::unique_ptr<Reporter>> reporters = ReporterRegistry::Registrars();
-		*ReporterRegistry::Registrars().back()
+		// TODO: Filter with list command
+		const ExecuteParameters executeParameters(
+			parameters.applicationName,
+			"",
+			parameters.runner,
+			parameters.reporters,
+			parameters.logger);
 
-		 // TODO: Filter with list command
-		 const ExecuteParameters
-			 executeParameters(parameters.applicationName, "", parameters.runner, reporters, parameters.logger);
 		ExecuteResult executeResult = Execute(executeParameters);
 
 		ListResult result;
 
-		const CumulativeAdapter::CumulativeData& data = listReporter.Data();
+		// Grab the list reporters and extract the data
+		//ListReporter reporters = parameters.reporters.front();
 
-		for (const auto& [name, tests]: data.suites)
-		{
-			auto& resultSuite = result.suites.emplace_back();
-			resultSuite.name  = name;
+		//const CumulativeAdapter::CumulativeData& data = listReporter.Data();
 
-			for (const auto& [name]: tests)
-			{
-				TestDescription description;
-				description.name = name;
+		//for (const auto& [name, tests]: data.suites)
+		//{
+		//	auto& resultSuite = result.suites.emplace_back();
+		//	resultSuite.name = name;
 
-				resultSuite.tests.push_back(description);
-			}
-		}
+		//	for (const auto& [name]: tests)
+		//	{
+		//		TestDescription description;
+		//		description.name = name;
+
+		//		resultSuite.tests.push_back(description);
+		//	}
+		//}
 
 		return result;
 	}

@@ -11,8 +11,6 @@ namespace synodic::honesty::test::command
 	{
 	public:
 		explicit Execute(const Configuration& configuration) :
-			configuredRunnerRegistry_(configuration.configuredRunnerRegistry),
-			configuredReporterRegistry_(configuration.configuredReporterRegistry),
 			logger_(configuration.logger)
 		{
 		}
@@ -39,7 +37,7 @@ namespace synodic::honesty::test::command
 		void Process(const ProcessConfiguration& configuration) override
 		{
 			const api::ExecuteParameters
-				parameters(applicationName_, filter_, configuredRunnerRegistry_, configuredReporterRegistry_, logger_);
+				parameters(applicationName_, filter_, configuration.runner, configuration.reporters, logger_);
 			const api::ExecuteResult result = api::Execute(parameters);
 
 			if (not result.success)
@@ -52,9 +50,6 @@ namespace synodic::honesty::test::command
 	private:
 		std::string applicationName_;
 		std::string filter_;
-
-		std::reference_wrapper<const RunnerRegistry> configuredRunnerRegistry_;
-		std::reference_wrapper<const ReporterRegistry> configuredReporterRegistry_;
 
 		std::reference_wrapper<const log::Logger> logger_;
 	};

@@ -226,7 +226,7 @@ namespace synodic::honesty::test
 				}
 				else
 				{
-					throw std::invalid_argument("The reporter specified does not exist");
+					throw std::invalid_argument("The reporters specified does not exist");
 				}
 			}
 		}

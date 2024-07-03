@@ -4,6 +4,8 @@ import std;
 import synodic.honesty.log;
 import :suite;
 import :context;
+import :runner;
+import :reporter;
 
 namespace
 {
@@ -19,7 +21,7 @@ namespace synodic::honesty::test::api
 {
 	struct ExecuteParameters
 	{
-		explicit ExecuteParameters(
+		ExecuteParameters(
 			const std::string_view applicationName,
 			const std::string_view filter,
 			Runner& runner,
@@ -131,7 +133,7 @@ namespace synodic::honesty::test::api
 					{
 					}};
 
-				//Generator generator = std::visit(testExecutor, view.test);
+				// Generator generator = std::visit(testExecutor, view.test);
 
 				// TODO: Run nested tests
 				// context.Run(requirements, view.test);

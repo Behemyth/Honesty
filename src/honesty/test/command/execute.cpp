@@ -19,8 +19,6 @@ namespace synodic::honesty::test::command
 
 		auto Parse(std::span<std::string_view> arguments) -> ParseResult override
 		{
-			ParseResult result;
-
 			if (auto itr = std::ranges::find(arguments, "--filter"); itr != arguments.end())
 			{
 				if (++itr == arguments.end())
@@ -31,10 +29,12 @@ namespace synodic::honesty::test::command
 				filter_ = *itr;
 			}
 
+			ParseResult result("", {});
+
 			return result;
 		}
 
-		void Process(const ProcessConfiguration& configuration) override
+		void Process(ProcessConfiguration& configuration) override
 		{
 			const api::ExecuteParameters
 				parameters(applicationName_, filter_, configuration.runner, configuration.reporters, logger_);

@@ -1,17 +1,9 @@
 module synodic.honesty.test:command.types;
 
 import std;
-
-namespace synodic::honesty::test
-{
-	class Reporter;
-	class Runner;
-}
-
-namespace synodic::honesty::log
-{
-	class Logger;
-}
+import synodic.honesty.log;
+import :runner;
+import :reporter;
 
 namespace synodic::honesty::test::command
 {
@@ -64,7 +56,7 @@ namespace synodic::honesty::test::command
 		auto operator=(Command&& other) noexcept -> Command& = delete;
 
 		virtual auto Parse(std::span<std::string_view> arguments) -> ParseResult = 0;
-		virtual void Process(const ProcessConfiguration& configuration) = 0;
+		virtual void Process(ProcessConfiguration& configuration) = 0;
 
 	private:
 	};

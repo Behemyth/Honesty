@@ -55,11 +55,11 @@ namespace synodic::honesty::test::api
 		ListResult result;
 
 		// Grab the list reporters and extract the data
-		//ListReporter reporters = parameters.reporters.front();
+		// ListReporter reporters = parameters.reporters.front();
 
-		//const CumulativeAdapter::CumulativeData& data = listReporter.Data();
+		// const CumulativeAdapter::CumulativeData& data = listReporter.Data();
 
-		//for (const auto& [name, tests]: data.suites)
+		// for (const auto& [name, tests]: data.suites)
 		//{
 		//	auto& resultSuite = result.suites.emplace_back();
 		//	resultSuite.name = name;

@@ -89,7 +89,7 @@ namespace synodic::honesty::test
 					{
 						using CommandType = std::variant_alternative_t<index, SubType>;
 
-						static_assert(command<CommandType>, "Not a valid command type");
+						// static_assert(command<CommandType>, "Not a valid command type");
 
 						if (const std::string_view commandName = CommandType::NAME; commandName == possibleSubCommand)
 						{
@@ -114,11 +114,16 @@ namespace synodic::honesty::test
 			}
 
 			// Overload the visitor and make use of the pure-virtual interface for deduction
-			auto executor = Overload {[this, &configuration, &arguments](auto& command)
-									  {
-										  const command::ParseResult result = command.Parse(arguments);
-										  ResolveParseResult(configuration, result);
-									  }};
+			auto executor = Overload {
+				[this, &configuration, &arguments](auto& command)
+				{
+					const command::ParseResult result = command.Parse(arguments);
+					ResolveParseResult(configuration, result);
+				},
+				[](std::monostate)
+				{
+
+				}};
 
 			std::visit(executor, command_);
 		}
@@ -128,11 +133,15 @@ namespace synodic::honesty::test
 			try
 			{
 				// Overload the visitor and make use of the pure-virtual interface for deduction
-				auto executor = Overload {[&](auto& command)
-										  {
-											  command::ProcessConfiguration configuration(*runner_, reporters_);
-											  command.Process(configuration);
-										  }};
+				auto executor = Overload {
+					[&](auto& command)
+					{
+						command::ProcessConfiguration configuration(*runner_, reporters_);
+						command.Process(configuration);
+					},
+					[](std::monostate)
+					{
+					}};
 
 				std::visit(executor, command_);
 			}

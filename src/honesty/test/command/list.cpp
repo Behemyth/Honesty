@@ -11,6 +11,7 @@ namespace synodic::honesty::test::command
 	{
 	public:
 		explicit List(const Configuration& configuration) :
+			applicationName_(configuration.applicationName),
 			logger_(configuration.logger),
 			outputType_(ListOutputType::LOG)
 		{
@@ -22,8 +23,6 @@ namespace synodic::honesty::test::command
 
 		auto Parse(std::span<std::string_view> arguments) -> ParseResult override
 		{
-			ParseResult result;
-
 			arguments = arguments.subspan(1);
 
 			if (std::ranges::contains(arguments, "--json"))
@@ -46,12 +45,14 @@ namespace synodic::honesty::test::command
 				}
 			}
 
+			ParseResult result("", {});
+
 			return result;
 		}
 
-		void Process(const ProcessConfiguration& configuration) override
+		void Process(ProcessConfiguration& configuration) override
 		{
-			api::ListParameters parameters(logger_);
+			api::ListParameters parameters(applicationName_, configuration.runner.get(), logger_);
 			api::ListResult result = api::List(parameters);
 
 			if (file_)
@@ -114,6 +115,8 @@ namespace synodic::honesty::test::command
 		}
 
 	private:
+		std::string_view applicationName_;
+
 		std::unique_ptr<Runner> runner_;
 		std::reference_wrapper<const log::Logger> logger_;
 

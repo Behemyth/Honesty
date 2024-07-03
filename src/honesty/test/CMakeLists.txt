@@ -13,6 +13,7 @@ target_sources(honesty
 	generator.ixx
 	command.ixx
 	suite.ixx
+	api.ixx
 	PRIVATE
 	FILE_SET implementations
 	FILES

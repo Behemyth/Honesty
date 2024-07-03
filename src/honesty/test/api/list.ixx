@@ -1,4 +1,4 @@
-module synodic.honesty.test:api.list;
+export module synodic.honesty.test:api.list;
 
 import std;
 import synodic.honesty.log;
@@ -8,10 +8,11 @@ import :api.execute;
 
 import :reporter.list;
 import :suite;
+import :api.types;
 
 namespace synodic::honesty::test::api
 {
-	struct ListParameters
+	export struct ListParameters
 	{
 		explicit ListParameters(const std::string_view applicationName, Runner& runner, const log::Logger& logger) :
 			applicationName(applicationName),
@@ -28,14 +29,14 @@ namespace synodic::honesty::test::api
 		std::reference_wrapper<const log::Logger> logger;
 	};
 
-	struct ListResult
+	export struct ListResult
 	{
 		ListResult() = default;
 
 		std::vector<SuiteDescription> suites;
 	};
 
-	auto List(const ListParameters& parameters) -> ListResult
+	export auto List(const ListParameters& parameters) -> ListResult
 	{
 		// Register the list reporters and immediately grab it from the registration list
 		{

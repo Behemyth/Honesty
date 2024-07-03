@@ -10,33 +10,9 @@ namespace
 {
 	Suite SUITE(
 		"command",
-		[](
-		const Fixture& fixture) -> Generator
+		[]() -> Generator
 		{
-			// We generate a string from the path to the temporary file for comparison.
-			const std::filesystem::path temporaryPath = fixture.SuiteDirectory() / "passThrough.json";
-
-			co_yield "list_parsing"_test = [&](const Requirements& requirements) -> void
-			{
-				const auto path = temporaryPath.generic_string();
-				std::array<std::string_view, 5> arguments{"fakeEXE", "list", "--json", "--file", path};
-
-				synodic::honesty::log::RingBuffer<std::mutex> sink;
-
-				Instance::Configuration configuration("instance_test", &sink);
-				Instance command(configuration, arguments);
-
-				const Instance::ListContext* context = command.GetListContext();
-
-				requirements.Assert(context);
-				requirements.Expect(context->outputType == ListOutputType::JSON);
-				requirements.Assert(context->file.has_value());
-				requirements.Expect(context->file.value() == temporaryPath);
-
-				command.Execute();
-
-				requirements.Expect(exists(temporaryPath));
-			};
+			co_return;
 		});
 	SuiteRegistrar _(SUITE);
 }

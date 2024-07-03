@@ -1,4 +1,4 @@
-module synodic.honesty.test:api.execute;
+export module synodic.honesty.test:api.execute;
 
 import std;
 import synodic.honesty.log;
@@ -19,7 +19,7 @@ namespace
 
 namespace synodic::honesty::test::api
 {
-	struct ExecuteParameters
+	export struct ExecuteParameters
 	{
 		ExecuteParameters(
 			const std::string_view applicationName,
@@ -44,7 +44,7 @@ namespace synodic::honesty::test::api
 		std::reference_wrapper<const log::Logger> logger;
 	};
 
-	struct ExecuteResult
+	export struct ExecuteResult
 	{
 		explicit ExecuteResult(const bool success) :
 			success(success)
@@ -54,7 +54,7 @@ namespace synodic::honesty::test::api
 		bool success;
 	};
 
-	auto Execute(const ExecuteParameters& parameters) -> ExecuteResult
+	export auto Execute(const ExecuteParameters& parameters) -> ExecuteResult
 	{
 		// Before start executing, we need to set up the current thread's context
 		Context context(&parameters.runner.get(), parameters.reporters);

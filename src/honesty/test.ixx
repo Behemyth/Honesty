@@ -8,3 +8,4 @@ export import :reporter;
 export import :runner;
 export import :command;
 export import :suite;
+export import :api;

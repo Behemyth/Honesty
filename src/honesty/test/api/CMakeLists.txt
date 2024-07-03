@@ -1,8 +1,8 @@
 target_sources(honesty
-	PRIVATE
-	FILE_SET implementations
+	PUBLIC
+	FILE_SET interfaces
 	FILES
-	execute.cpp
-	list.cpp
-	types.cpp
+	execute.ixx
+	list.ixx
+	types.ixx
 )

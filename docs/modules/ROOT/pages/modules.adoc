@@ -1,19 +1,25 @@
 = Modules
 
-== `Test` Public Modules
+== `Test` Modules
 
-=== synodic.honesty.test
+=== Public `Test` Modules
+
+---
+
+==== synodic.honesty.test
 
 For defining and implementing tests.
 
-=== synodic.honesty.test.api
+==== synodic.honesty.test.api
 
 Direct access to the test API
 
-=== synodic.honesty.test.commands
+==== synodic.honesty.test.commands
 
 Frontend for running tests from the command line. Includes an Instance entrypoint for all commands and wrappers for each individual command and subcommand.
 
-== `Test` Private Modules
+=== Private `Test` Modules
 
-=== synodic.honesty.test.backend
+---
+
+==== synodic.honesty.test.backend

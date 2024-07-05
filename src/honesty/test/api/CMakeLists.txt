@@ -1,6 +1,6 @@
 # Provide the library definition
 add_library(honesty_test_api STATIC)
-add_library(synodic::honesty_test_api ALIAS honesty_test)
+add_library(synodic::honesty_test_api ALIAS honesty_test_api)
 
 set_target_properties(honesty_test_api
 	PROPERTIES

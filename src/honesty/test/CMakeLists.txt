@@ -38,7 +38,7 @@ target_sources(honesty_test
 	function_ref.ixx
 	inplace_vector.ixx
 	generator.ixx
-	command.ixx
+	commands.ixx
 	suite.ixx
 	api.ixx
 	PRIVATE

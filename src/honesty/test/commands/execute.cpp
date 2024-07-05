@@ -1,4 +1,4 @@
-module synodic.honesty.test:command.execute;
+module synodic.honesty.test:commands.execute;
 
 import std;
 

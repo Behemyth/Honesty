@@ -1,3 +1,17 @@
+# Define file sets for HONESTY
+target_sources(honesty
+	PUBLIC
+	FILE_SET interfaces
+	TYPE CXX_MODULES
+)
+
+target_sources(honesty
+	PRIVATE
+	FILE_SET implementations
+	TYPE CXX_MODULES
+)
+
+# Define the file sets for the library
 target_sources(honesty
 	PUBLIC
 		FILE_SET interfaces

@@ -6,6 +6,6 @@ export import :fixture;
 export import :test;
 export import :reporter;
 export import :runner;
-export import :command;
+export import :commands;
 export import :suite;
 export import :api;

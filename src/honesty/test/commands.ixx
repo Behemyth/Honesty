@@ -1,5 +1,5 @@
 
-export module synodic.honesty.test:command;
+export module synodic.honesty.test:commands;
 
 import std;
 import synodic.honesty.utility;

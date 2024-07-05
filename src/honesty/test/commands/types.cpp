@@ -1,4 +1,4 @@
-module synodic.honesty.test:command.types;
+module synodic.honesty.test:commands.types;
 
 import std;
 import synodic.honesty.log;

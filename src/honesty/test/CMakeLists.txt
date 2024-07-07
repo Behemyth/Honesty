@@ -1,6 +1,6 @@
 # Provide the library definition
 add_library(honesty_test STATIC)
-add_library(synodic::honesty_test ALIAS honesty_test)
+add_library(synodic::honesty::test ALIAS honesty_test)
 
 set_target_properties(honesty_test
 	PROPERTIES
@@ -11,6 +11,11 @@ set_target_properties(honesty_test
 		FOLDER "honesty"
 )
 
+# Link the library to library
+target_link_libraries(honesty_test
+PUBLIC
+	synodic::honesty::test::api
+)
 
 # Define file sets for the test library
 target_sources(honesty_test
@@ -38,9 +43,7 @@ target_sources(honesty_test
 	function_ref.ixx
 	inplace_vector.ixx
 	generator.ixx
-	commands.ixx
 	suite.ixx
-	api.ixx
 	PRIVATE
 	FILE_SET implementations
 	FILES
@@ -57,6 +60,10 @@ add_subdirectory(
 )
 
 add_subdirectory(
+	backend
+)
+
+add_subdirectory(
 	commands
 )
 
@@ -66,10 +73,4 @@ add_subdirectory(
 
 add_subdirectory(
 	reporter
-)
-
-# Link the library to library
-target_link_libraries(honesty_test
-PUBLIC
-	synodic::honesty_test_api
 )

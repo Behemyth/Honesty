@@ -1,6 +1,6 @@
 # Provide the library definition
 add_library(honesty_test_api STATIC)
-add_library(synodic::honesty_test_api ALIAS honesty_test_api)
+add_library(synodic::honesty::test::api ALIAS honesty_test_api)
 
 set_target_properties(honesty_test_api
 	PROPERTIES
@@ -10,6 +10,12 @@ set_target_properties(honesty_test_api
 		CXX_EXTENSIONS NO
 		FOLDER "honesty"
 )
+
+target_link_libraries(honesty_test_api
+	PRIVATE
+	synodic::honesty::test::backend
+)
+
 
 # Define file sets for the test library
 target_sources(honesty_test_api
@@ -32,4 +38,5 @@ target_sources(honesty_test_api
 	execute.ixx
 	list.ixx
 	types.ixx
+	api.ixx
 )

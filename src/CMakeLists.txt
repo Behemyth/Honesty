@@ -15,19 +15,15 @@ set_target_properties(honesty honesty_main
 		FOLDER "honesty"
 )
 
-# Create the file sets that will be found in this directory and subdirectories
+target_link_libraries(honesty
+PUBLIC
+	synodic::honesty::test
+)
 
 # Link the library to the convenience variant
 target_link_libraries(honesty_main
 PUBLIC
 	synodic::honesty
-)
-
-
-target_sources(honesty_main
-	PUBLIC
-		FILE_SET interfaces
-		TYPE CXX_MODULES
 )
 
 add_subdirectory(

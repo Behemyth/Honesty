@@ -15,7 +15,6 @@ set_target_properties(honesty honesty_main
 		FOLDER "honesty"
 )
 
-
 # Create the file sets that will be found in this directory and subdirectories
 
 # Link the library to the convenience variant

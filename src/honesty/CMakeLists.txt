@@ -16,11 +16,7 @@ target_sources(honesty
 	PUBLIC
 		FILE_SET interfaces
 		FILES
-			"benchmark.ixx"
-			"profile.ixx"
-			"test.ixx"
-			"log.ixx"
-			"utility.ixx"
+			"honesty.ixx"
 )
 
 add_subdirectory(

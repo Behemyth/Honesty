@@ -1,5 +1,14 @@
+export module synodic.honesty.test;
 
-export module synodic.honesty.test:test;
+export import :assert;
+export import :types;
+export import :fixture;
+export import :test;
+export import :reporter;
+export import :runner;
+export import :commands;
+export import :suite;
+export import :api;
 
 import std;
 import function_ref;

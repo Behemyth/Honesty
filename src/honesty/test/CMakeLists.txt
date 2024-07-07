@@ -1,38 +1,7 @@
-# Provide the library definition
-add_library(honesty_test STATIC)
-add_library(synodic::honesty::test ALIAS honesty_test)
-
-set_target_properties(honesty_test
-	PROPERTIES
-		LINKER_LANGUAGE CXX
-		CXX_STANDARD 23
-		CXX_STANDARD_REQUIRED ON
-		CXX_EXTENSIONS NO
-		FOLDER "honesty"
-)
-
-# Link the library to library
-target_link_libraries(honesty_test
-PUBLIC
-	synodic::honesty::test::api
-)
-
-# Define file sets for the test library
 target_sources(honesty_test
 	PUBLIC
 	FILE_SET interfaces
 	TYPE CXX_MODULES
-)
-
-target_sources(honesty_test
-	PRIVATE
-	FILE_SET implementations
-	TYPE CXX_MODULES
-)
-
-target_sources(honesty_test
-	PUBLIC
-	FILE_SET interfaces
 	FILES
 	assert.ixx
 	fixture.ixx
@@ -46,6 +15,7 @@ target_sources(honesty_test
 	suite.ixx
 	PRIVATE
 	FILE_SET implementations
+	TYPE CXX_MODULES
 	FILES
 	context.cpp
 )

@@ -1,11 +1,11 @@
 
-export module synodic.honesty.test:commands;
+export module synodic.honesty.test.commands;
 
 import std;
 import synodic.honesty.utility;
 
-import :command.execute;
-import :command.list;
+import :execute;
+import :list;
 
 import :reporter.default;
 import :reporter.compact;

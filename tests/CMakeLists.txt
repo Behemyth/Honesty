@@ -24,8 +24,8 @@ target_link_libraries(tests
 
 target_sources(tests
 	PUBLIC
-		FILE_SET mock
-		TYPE CXX_MODULES
+	FILE_SET mock
+	TYPE CXX_MODULES
 )
 
 add_subdirectory(

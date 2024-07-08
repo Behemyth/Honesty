@@ -1,4 +1,4 @@
-target_sources(honesty_test
+target_sources(honesty
 	PUBLIC
 	FILE_SET interfaces
 	TYPE CXX_MODULES

@@ -12,9 +12,6 @@ option(BUILD_TESTING "Build the tests verifying Honesty functionality" ON)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/tool/cmake/modules")
 
 # Provide the library definitions
-add_library(honesty_test STATIC)
-add_library(synodic::honesty::test ALIAS honesty_test)
-
 add_library(honesty STATIC)
 add_library(synodic::honesty ALIAS honesty)
 
@@ -22,18 +19,13 @@ add_library(synodic::honesty ALIAS honesty)
 add_library(honesty_main STATIC)
 add_library(synodic::honesty::main ALIAS honesty_main)
 
-set_target_properties(honesty honesty_main honesty_test
+set_target_properties(honesty honesty_main
 	PROPERTIES
 		LINKER_LANGUAGE CXX
 		CXX_STANDARD 23
 		CXX_STANDARD_REQUIRED ON
 		CXX_EXTENSIONS NO
 		FOLDER "honesty"
-)
-
-target_link_libraries(honesty
-PUBLIC
-	synodic::honesty::test
 )
 
 # Link the library to the convenience variant

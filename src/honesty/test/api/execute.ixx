@@ -2,10 +2,8 @@ export module synodic.honesty.test.api:execute;
 
 import std;
 import synodic.honesty.log;
-import :suite;
-import :context;
-import :runner;
-import :reporter;
+import synodic.honesty.test;
+import synodic.honesty.test.context;
 
 namespace
 {

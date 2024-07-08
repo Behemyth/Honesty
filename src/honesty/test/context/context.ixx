@@ -1,11 +1,9 @@
-module synodic.honesty.test:context;
+module synodic.honesty.test.context;
 
-import synodic.honesty.log;
 import std;
 import synodic.honesty.utility;
-import :runner;
-import :reporter;
-import :test;
+import synodic.honesty.log;
+import synodic.honesty.test;
 
 namespace synodic::honesty::test
 {

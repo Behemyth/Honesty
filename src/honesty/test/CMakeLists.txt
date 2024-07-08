@@ -13,16 +13,6 @@ target_sources(honesty
 	inplace_vector.ixx
 	generator.ixx
 	suite.ixx
-	PRIVATE
-	FILE_SET implementations
-	TYPE CXX_MODULES
-	FILES
-	context.cpp
-)
-
-target_sources(honesty_main
-	PRIVATE
-	entry.cpp
 )
 
 add_subdirectory(
@@ -30,7 +20,11 @@ add_subdirectory(
 )
 
 add_subdirectory(
-	backend
+	entry
+)
+
+add_subdirectory(
+	context
 )
 
 add_subdirectory(

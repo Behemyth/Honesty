@@ -1,4 +1,4 @@
-export module synodic.honesty.test:api.execute;
+export module synodic.honesty.test.api:execute;
 
 import std;
 import synodic.honesty.log;

@@ -1,4 +1,4 @@
-export module synodic.honesty.test:api;
+export module synodic.honesty.test.api;
 
-export import :api.execute;
-export import :api.list;
+export import :execute;
+export import :list;

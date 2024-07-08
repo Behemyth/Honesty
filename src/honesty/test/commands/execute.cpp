@@ -2,8 +2,8 @@ module synodic.honesty.test.commands:execute;
 
 import std;
 
-import :api.execute;
-import :command.types;
+import synodic.honesty.test.api;
+import :types;
 
 namespace synodic::honesty::test::command
 {

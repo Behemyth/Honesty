@@ -2,8 +2,8 @@ module synodic.honesty.test.commands:list;
 
 import std;
 
-import :api.list;
-import :command.types;
+import synodic.honesty.test.api;
+import :types;
 
 namespace synodic::honesty::test::command
 {

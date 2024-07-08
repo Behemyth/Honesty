@@ -1,13 +1,14 @@
-module synodic.honesty.test.context;
+export module synodic.honesty.test.context;
 
 import std;
 import synodic.honesty.utility;
 import synodic.honesty.log;
 import synodic.honesty.test;
+import function_ref;
 
 namespace synodic::honesty::test
 {
-	class Context
+	export class Context
 	{
 	public:
 		constexpr Context(Runner* runner, const std::span<std::unique_ptr<Reporter>> reporters) :

@@ -8,7 +8,34 @@ import synodic.honesty.test;
 import :types;
 import :execute;
 
-import :reporter.list;
+class ListReporter final : public synodic::honesty::test::CumulativeAdapter
+{
+public:
+	explicit(false) ListReporter(const synodic::honesty::log::Logger& logger) :
+		CumulativeAdapter(logger)
+	{
+	}
+
+	~ListReporter() override = default;
+
+	static consteval std::string_view Name()
+	{
+		return "list";
+	}
+
+	void Finalize(CumulativeData data) override
+	{
+		data_ = std::move(data);
+	}
+
+	const CumulativeData& Data() const
+	{
+		return data_;
+	}
+
+private:
+	CumulativeData data_;
+};
 
 namespace synodic::honesty::test::api
 {

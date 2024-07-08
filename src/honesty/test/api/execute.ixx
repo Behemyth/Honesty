@@ -5,6 +5,8 @@ import synodic.honesty.log;
 import synodic.honesty.test;
 import synodic.honesty.test.context;
 
+import function_ref;
+
 namespace
 {
 	// A helper for variant overload deduction

@@ -2,8 +2,7 @@ module synodic.honesty.test.commands:types;
 
 import std;
 import synodic.honesty.log;
-import :runner;
-import :reporter;
+import synodic.honesty.test;
 
 namespace synodic::honesty::test::command
 {

@@ -10,6 +10,7 @@ target_sources(honesty
 	reporter.ixx
 	runner.ixx
 	function_ref.ixx
+	frontend.ixx
 	inplace_vector.ixx
 	generator.ixx
 	suite.ixx

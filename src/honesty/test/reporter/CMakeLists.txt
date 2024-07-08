@@ -4,5 +4,4 @@ target_sources(honesty
 	FILES
 	compact.ixx
 	default.ixx
-	list.ixx
 )

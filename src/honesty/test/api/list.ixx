@@ -1,14 +1,14 @@
 export module synodic.honesty.test.api:list;
 
 import std;
-import synodic.honesty.log;
 
-import :api.types;
-import :api.execute;
+import synodic.honesty.log;
+import synodic.honesty.test;
+
+import :types;
+import :execute;
 
 import :reporter.list;
-import :suite;
-import :api.types;
 
 namespace synodic::honesty::test::api
 {

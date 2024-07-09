@@ -1,9 +1,9 @@
 {
-    "version": 6,
+    "version": 8,
     "cmakeMinimumRequired": {
         "major": 3,
-        "minor": 28,
-        "patch": 3
+        "minor": 29,
+        "patch": 5
     },
 	"include": [
 		"tool/cmake/platform/linux/CMakePresets.json",

@@ -22,21 +22,6 @@ namespace std
 	using std::initializer_list;
 	using std::nullptr_t;
 
-	template<class R, class F, class... Args>
-		requires std::is_invocable_r_v<R, F, Args...>
-	constexpr R invoke_r(F&& f, Args&&... args)	 // freestanding
-		noexcept(std::is_nothrow_invocable_r_v<R, F, Args...>)
-	{
-		if constexpr (std::is_void_v<R>)
-		{
-			std::invoke(std::forward<F>(f), std::forward<Args>(args)...);
-		}
-		else
-		{
-			return std::invoke(std::forward<F>(f), std::forward<Args>(args)...);
-		}
-	}
-
 	// See also: https://www.agner.org/optimize/calling_conventions.pdf
 	template<class T>
 	inline constexpr auto _select_param_type = []

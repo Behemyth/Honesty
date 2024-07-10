@@ -1,17 +1,20 @@
 export module synodic.honesty.test:test;
 
 import std;
-import function_ref;
+
+import synodic.honesty.test.context;
+
 import :types;
+
 import generator;
-import :assert;
+import function_ref;
 
 namespace synodic::honesty::test
 {
+	// Forward declarations that will be defined elsewhere in the `synodic.honesty.test` module
+	class Requirements;
 
 	export class Test;
-	class TestView;
-
 	export using Generator = std::generator<Test>;
 
 	// TODO: Make this a compile-time check
@@ -60,23 +63,17 @@ namespace synodic::honesty::test
 			});
 	}
 
-	class Test
+	class Test : TestData
 	{
 	public:
-		explicit(false) constexpr Test(
-			const std::string_view name,
-			const std::function_ref<void(const Requirements&)> test) :
-			name_(name)
-		//	test_(test)
+		constexpr Test(const std::string_view name, const std::function_ref<void(const Requirements&)> test) :
+			TestData(name, test)
 		{
 			VerifyTestName(name);
 		}
 
-		explicit(false) constexpr Test(
-			const std::string_view name,
-			const std::function_ref<Generator(const Requirements&)> test) :
-			name_(name)
-			//test_(test)
+		constexpr Test(const std::string_view name, const std::function_ref<Generator(const Requirements&)> test) :
+			TestData(name, test)
 		{
 			VerifyTestName(name);
 		}
@@ -90,32 +87,6 @@ namespace synodic::honesty::test
 		{
 			return name_;
 		}
-
-	private:
-		friend TestView;
-
-		std::string_view name_;
-		/*std::variant<std::function_ref<void(const Requirements&)>, std::function_ref<Generator(const Requirements&)>>
-			test_;*/
-	};
-
-	class TestView
-	{
-	public:
-		explicit(false) constexpr TestView(const Test& test) :
-			name(test.name_)
-			//test(test.test_)
-		{
-		}
-
-		TestView(const TestView& other)				   = delete;
-		TestView(TestView&& other) noexcept			   = delete;
-		TestView& operator=(const TestView& other)	   = delete;
-		TestView& operator=(TestView&& other) noexcept = delete;
-
-		std::string_view name;
-		/*std::variant<std::function_ref<void(const Requirements&)>, std::function_ref<Generator(const Requirements&)>>
-			test;*/
 	};
 
 	class TestLiteral

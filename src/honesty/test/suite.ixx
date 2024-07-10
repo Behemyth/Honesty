@@ -1,13 +1,17 @@
 export module synodic.honesty.test:suite;
 
 import synodic.honesty.utility;
+import synodic.honesty.test.context;
+
 import :types;
 import :test;
 import :fixture;
-import inplace_vector;
 
 namespace synodic::honesty::test
 {
+	// Forward declarations that will be defined elsewhere in the `synodic.honesty.test` module
+	class Fixture;
+
 	template<typename T, typename R, typename... Args>
 	concept invocable_r = std::invocable<T, Args...> && requires(Args&&... args) {
 		{
@@ -15,7 +19,19 @@ namespace synodic::honesty::test
 		} -> std::convertible_to<R>;
 	};
 
-	struct SuiteView;
+	struct SuiteData
+	{
+		consteval SuiteData(
+			const std::string_view name,
+			std::variant<std::function_ref<Generator()>, std::function_ref<Generator(Fixture&)>> testGenerator) :
+			name(name),
+			testGenerator(testGenerator)
+		{
+		}
+
+		std::string_view name;
+		std::variant<std::function_ref<Generator()>, std::function_ref<Generator(Fixture&)>> testGenerator;
+	};
 
 	/**
 	 * @brief Allows the static registration of tests in the global scope. Constructed at compile-time so that test
@@ -23,7 +39,7 @@ namespace synodic::honesty::test
 	 * calculations. All tests are known up-front and parameterized tests are expanded at run-time
 	 */
 	export template<size_t LiteralSize>
-	class Suite final
+	class Suite final : SuiteData
 	{
 		static_assert(LiteralSize > 0, "LiteralSize must be greater than 0");
 
@@ -31,13 +47,13 @@ namespace synodic::honesty::test
 
 	public:
 		consteval Suite(const char (&name)[LiteralSize], const std::function_ref<Generator()> generator) :
-			testGenerator_(generator)
+			SuiteData({name_.data(), name_.size()}, generator)
 		{
 			std::copy(std::begin(name), std::end(name) - 1, std::begin(name_));
 		}
 
 		consteval Suite(const char (&name)[LiteralSize], const std::function_ref<Generator(Fixture&)> generator) :
-			testGenerator_(generator)
+			SuiteData({name_.data(), name_.size()}, generator)
 		{
 			std::copy(std::begin(name), std::end(name) - 1, std::begin(name_));
 		}
@@ -51,49 +67,12 @@ namespace synodic::honesty::test
 		// TODO: Make consteval when MSVC supports it
 		constexpr std::string_view Name() const
 		{
-			return {name_.data(), name_.size()};
+			return name;
 		}
 
 	private:
-		friend SuiteView;
-
 		std::array<char, NAME_SIZE> name_;
-		std::variant<std::function_ref<Generator()>, std::function_ref<Generator(Fixture&)>> testGenerator_;
 	};
-
-	struct SuiteView
-	{
-		constexpr SuiteView() :
-			testGenerator(
-				[]() -> Generator
-				{
-					co_return;
-				}) {};
-
-		template<size_t NameSize>
-		explicit(false) constexpr SuiteView(const Suite<NameSize>& suite) :
-			name(suite.name_),
-			testGenerator(suite.testGenerator_)
-		{
-		}
-
-		std::string_view name;
-		std::variant<std::function_ref<Generator()>, std::function_ref<Generator(Fixture&)>> testGenerator;
-	};
-}
-
-namespace
-{
-	constinit std::inplace_vector<synodic::honesty::test::SuiteView, 50> SUITES;
-}
-
-namespace synodic::honesty::test
-{
-
-	std::span<SuiteView> GetSuites()
-	{
-		return SUITES;
-	}
 
 	// TODO: Make this a compile-time check
 	export void VerifySuiteName(const std::string_view name)
@@ -109,9 +88,9 @@ namespace synodic::honesty::test
 
 		// Duplicate check
 		if (std::ranges::contains(
-				SUITES,
+				GetSuites(),
 				name,
-				[](const SuiteView& view)
+				[](const SuiteData& view)
 				{
 					return view.name;
 				}))
@@ -156,23 +135,14 @@ namespace synodic::honesty::test
 			});
 	}
 
-	/**
-	 * @brief Don't export. Keeps the SUITES global variable internally linked to the test module
-	 */
-	void AddSuite(SuiteView suite)
-	{
-		VerifySuiteName(suite.name);
-
-		SUITES.push_back(std::move(suite));
-	}
-
 	export template<size_t... NameSizes>
 	class SuiteRegistrar
 	{
 	public:
 		explicit SuiteRegistrar(const Suite<NameSizes>&... suites)
 		{
-			(AddSuite(SuiteView(suites)), ...);
+			(VerifySuiteName(suites.Name()), ...);
+			(AddSuite(suites), ...);
 		}
 	};
 }

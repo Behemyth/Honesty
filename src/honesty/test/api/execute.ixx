@@ -1,6 +1,7 @@
 export module synodic.honesty.test.api:execute;
 
 import std;
+
 import synodic.honesty.log;
 import synodic.honesty.test;
 import synodic.honesty.test.context;
@@ -56,16 +57,13 @@ namespace synodic::honesty::test::api
 
 	export auto Execute(const ExecuteParameters& parameters) -> ExecuteResult
 	{
-		// Before start executing, we need to set up the current thread's context
-		Context context(&parameters.runner.get(), parameters.reporters);
-
 		// Break down the filter into individual views
 		auto splitData = parameters.filter | std::ranges::views::split('.') |
-		                 std::ranges::views::transform(
-			                 [](auto&& str)
-			                 {
-				                 return std::string_view(str.data(), std::ranges::distance(str));
-			                 });
+						 std::ranges::views::transform(
+							 [](auto&& str)
+							 {
+								 return std::string_view(str.data(), std::ranges::distance(str));
+							 });
 
 		std::vector<std::string_view> filterData = std::ranges::to<std::vector>(splitData);
 
@@ -73,7 +71,7 @@ namespace synodic::honesty::test::api
 
 		bool success = true;
 
-		for (const SuiteView& suite: GetSuites())
+		for (const SuiteData& suite: GetSuites())
 		{
 			// Before we start, check to see if we have a filter
 			if (not parameters.filter.empty())
@@ -91,12 +89,15 @@ namespace synodic::honesty::test::api
 			event::SuiteBegin suiteBegin;
 			suiteBegin.name = suite.name;
 
-			context.Signal(suiteBegin);
+			for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
+			{
+				reporter->Signal(suiteBegin);
+			}
 
 			// Fixture lifetime should be for the whole suite
 			Fixture fixture(parameters.applicationName, suite.name, parameters.logger);
 
-			auto executor = Overload{
+			auto executor = Overload {
 				[&](const std::function_ref<Generator()> generator) -> Generator
 				{
 					return generator();
@@ -121,11 +122,14 @@ namespace synodic::honesty::test::api
 				event::TestBegin testBegin;
 				testBegin.name = view.name;
 
-				context.Signal(testBegin);
+				for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
+				{
+					reporter->Signal(testBegin);
+				}
 
 				RequirementsBackend requirements(parameters.reporters, test.Name(), parameters.logger);
 
-				auto testExecutor = Overload{
+				auto testExecutor = Overload {
 					[&](const std::function_ref<void(Requirements&)> testCallback) -> Generator
 					{
 					},
@@ -146,17 +150,26 @@ namespace synodic::honesty::test::api
 				event::TestEnd testEnd;
 				testEnd.name = view.name;
 
-				context.Signal(testEnd);
+				for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
+				{
+					reporter->Signal(testEnd);
+				}
 			}
 
 			event::SuiteEnd end;
 			end.name = suite.name;
 
-			context.Signal(end);
+			for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
+			{
+				reporter->Signal(end);
+			}
 		}
 
 		event::Summary summary;
-		context.Signal(summary);
+		for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
+		{
+			reporter->Signal(summary);
+		}
 
 		return ExecuteResult(success);
 	}

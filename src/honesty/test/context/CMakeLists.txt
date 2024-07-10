@@ -4,4 +4,6 @@ target_sources(honesty
 	TYPE CXX_MODULES
 	FILES
 	context.ixx
+	data.ixx
+	types.ixx
 )

@@ -1,11 +1,10 @@
 export module synodic.honesty.test:suite;
 
 import synodic.honesty.utility;
-import synodic.honesty.test.context;
+import synodic.honesty.test.backend;
 
 import :types;
 import :test;
-import :fixture;
 
 namespace synodic::honesty::test
 {
@@ -17,20 +16,6 @@ namespace synodic::honesty::test
 		{
 			invoke(forward<Args>(args...))
 		} -> std::convertible_to<R>;
-	};
-
-	struct SuiteData
-	{
-		consteval SuiteData(
-			const std::string_view name,
-			std::variant<std::function_ref<Generator()>, std::function_ref<Generator(Fixture&)>> testGenerator) :
-			name(name),
-			testGenerator(testGenerator)
-		{
-		}
-
-		std::string_view name;
-		std::variant<std::function_ref<Generator()>, std::function_ref<Generator(Fixture&)>> testGenerator;
 	};
 
 	/**

@@ -3,8 +3,7 @@ export module synodic.honesty.test.api:execute;
 import std;
 
 import synodic.honesty.log;
-import synodic.honesty.test;
-import synodic.honesty.test.context;
+import synodic.honesty.test.backend;
 
 import function_ref;
 
@@ -111,7 +110,7 @@ namespace synodic::honesty::test::api
 
 			for (const Test& test: generator)
 			{
-				const TestView view(test);
+				const TestData view(test);
 
 				// Filter the test by name
 				if (not filter.empty() and view.name != filter.front())

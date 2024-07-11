@@ -1,8 +1,8 @@
-export module synodic.honesty.test.context:data;
+export module synodic.honesty.test.backend:storage;
 
 import std;
 
-import :types;
+import :data;
 
 import inplace_vector;
 

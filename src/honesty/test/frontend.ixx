@@ -2,93 +2,14 @@ export module synodic.honesty.test:test;
 
 import std;
 
-import synodic.honesty.test.context;
+import synodic.honesty.test.backend;
 
 import :types;
 
-import generator;
 import function_ref;
 
 namespace synodic::honesty::test
 {
-	// Forward declarations that will be defined elsewhere in the `synodic.honesty.test` module
-	class Requirements;
-
-	export class Test;
-	export using Generator = std::generator<Test>;
-
-	// TODO: Make this a compile-time check
-	export constexpr void VerifyTestName(const std::string_view name)
-	{
-		// Empty check
-		if (name.empty())
-		{
-			throw std::runtime_error(std::format(
-				"Empty suite name - {}, {}",
-				std::source_location::current().file_name(),
-				std::source_location::current().line()));
-		}
-
-		// Uppercase check
-		std::ranges::for_each(
-			name,
-			[](const char character)
-			{
-				// Uppercase check
-				if (std::isupper(character))
-				{
-					throw std::runtime_error(std::format(
-						"Uppercase suite name - {}, {}",
-						std::source_location::current().file_name(),
-						std::source_location::current().line()));
-				}
-
-				// Space check
-				if (std::isspace(character))
-				{
-					throw std::runtime_error(std::format(
-						"Suite name contains spaces - {}, {}",
-						std::source_location::current().file_name(),
-						std::source_location::current().line()));
-				}
-
-				// Check for non-alphanumeric characters, excluding '_'
-				if (!std::isalnum(character) && character != '_')
-				{
-					throw std::runtime_error(std::format(
-						"Non-alphanumeric suite name - {}, {}",
-						std::source_location::current().file_name(),
-						std::source_location::current().line()));
-				}
-			});
-	}
-
-	class Test : TestData
-	{
-	public:
-		constexpr Test(const std::string_view name, const std::function_ref<void(const Requirements&)> test) :
-			TestData(name, test)
-		{
-			VerifyTestName(name);
-		}
-
-		constexpr Test(const std::string_view name, const std::function_ref<Generator(const Requirements&)> test) :
-			TestData(name, test)
-		{
-			VerifyTestName(name);
-		}
-
-		Test(const Test& other)				   = delete;
-		Test(Test&& other) noexcept			   = delete;
-		Test& operator=(const Test& other)	   = delete;
-		Test& operator=(Test&& other) noexcept = delete;
-
-		std::string_view Name() const
-		{
-			return name_;
-		}
-	};
-
 	class TestLiteral
 	{
 	public:

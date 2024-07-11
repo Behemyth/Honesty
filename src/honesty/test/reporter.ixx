@@ -1,7 +1,8 @@
 export module synodic.honesty.test:reporter;
 
 import synodic.honesty.log;
-
+import synodic.honesty.test.backend;
+;
 import std;
 import function_ref;
 import :types;
@@ -9,55 +10,7 @@ import inplace_vector;
 
 namespace synodic::honesty::test
 {
-	export class Reporter
-	{
-	public:
-		/**
-		 * @brief Constructs a Reporter object
-		 * @param logger The logger to associate with this reporter
-		 */
-		explicit constexpr Reporter(const log::Logger& logger) :
-			logger_(logger)
-		{
-		}
-
-		virtual ~Reporter() = default;
-
-		virtual void Signal(const event::SuiteBegin& event) = 0;
-		virtual void Signal(const event::SuiteEnd& event)	= 0;
-		virtual void Signal(const event::SuiteSkip& event)	= 0;
-
-		virtual void Signal(const event::SuiteRun& event)  = 0;
-		virtual void Signal(const event::SuiteFail& event) = 0;
-		virtual void Signal(const event::SuitePass& event) = 0;
-
-		virtual void Signal(const event::SuiteSummary& event) = 0;
-
-		virtual void Signal(const event::TestBegin& event) = 0;
-		virtual void Signal(const event::TestEnd& event)   = 0;
-		virtual void Signal(const event::TestSkip& event)  = 0;
-
-		virtual void Signal(const event::TestRun& event)  = 0;
-		virtual void Signal(const event::TestFail& event) = 0;
-		virtual void Signal(const event::TestPass& event) = 0;
-
-		virtual void Signal(const event::AssertionFail& event)	= 0;
-		virtual void Signal(const event::EqualityFail& event)	= 0;
-		virtual void Signal(const event::ComparisonFail& event) = 0;
-		virtual void Signal(const event::AssertionPass& event)	= 0;
-		virtual void Signal(const event::AssertionSkip& event)	= 0;
-
-		virtual void Signal(const event::Summary& event) = 0;
-
-		const log::Logger& Logger() const
-		{
-			return logger_;
-		}
-
-	private:
-		std::string_view name_;
-		std::reference_wrapper<const log::Logger> logger_;
-	};
+	export using class synodic::honesty::test::Reporter;
 
 	/**
 	 * @brief TODO: Comment

@@ -1,7 +1,9 @@
-export module synodic.honesty.test:assert;
+export module synodic.honesty.test.backend:assert;
 
 import std;
+
 import :reporter;
+import :types;
 
 import synodic.honesty.log;
 

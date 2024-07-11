@@ -1,8 +1,10 @@
 export module synodic.honesty.test.mock;
 
-import synodic.honesty.test;
 import std;
+
 import function_ref;
+
+import synodic.honesty.test;
 
 export class MockReporter final : public synodic::honesty::test::StreamingAdapter
 {
@@ -40,11 +42,12 @@ public:
 
 	void
 		Run(const synodic::honesty::test::Requirements& requirements,
-			const std::function_ref<synodic::honesty::test::Generator(const synodic::honesty::test::Requirements&)> function) override
+			const std::function_ref<synodic::honesty::test::Generator(const synodic::honesty::test::Requirements&)>
+				function) override
 	{
 		synodic::honesty::test::Generator generator = function(requirements);
 
-		for(const auto& test : generator)
+		for (const auto& test: generator)
 		{
 			// TODO: Implement
 		}

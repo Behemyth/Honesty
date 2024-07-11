@@ -3,8 +3,6 @@ target_sources(honesty
 	FILE_SET interfaces
 	TYPE CXX_MODULES
 	FILES
-	assert.ixx
-	fixture.ixx
 	test.ixx
 	types.ixx
 	reporter.ixx
@@ -25,7 +23,7 @@ add_subdirectory(
 )
 
 add_subdirectory(
-	context
+	backend
 )
 
 add_subdirectory(

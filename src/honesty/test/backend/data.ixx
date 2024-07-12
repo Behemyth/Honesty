@@ -10,6 +10,7 @@ import :fixture;
 
 namespace synodic::honesty::test
 {
+
 	export class Test;
 	export using Generator = std::generator<Test>;
 
@@ -59,32 +60,22 @@ namespace synodic::honesty::test
 			});
 	}
 
-	export struct TestData
+	class Test
 	{
 		using VariantType = std::
 			variant<std::function_ref<void(const Requirements&)>, std::function_ref<Generator(const Requirements&)>>;
 
-		constexpr TestData(const std::string_view name, const VariantType& test) :
-			name_(name),
-			test_(test)
-		{
-		}
-
-		std::string_view name_;
-		VariantType test_;
-	};
-
-	class Test : TestData
-	{
 	public:
 		constexpr Test(const std::string_view name, const std::function_ref<void(const Requirements&)> test) :
-			TestData(name, test)
+			name_(name),
+			test_(test)
 		{
 			VerifyTestName(name);
 		}
 
 		constexpr Test(const std::string_view name, const std::function_ref<Generator(const Requirements&)> test) :
-			TestData(name, test)
+			name_(name),
+			test_(test)
 		{
 			VerifyTestName(name);
 		}
@@ -98,6 +89,34 @@ namespace synodic::honesty::test
 		{
 			return name_;
 		}
+
+	private:
+		friend class TestData;
+
+		std::string_view name_;
+		VariantType test_;
+	};
+
+	export class TestData
+	{
+	public:
+		constexpr TestData(const Test& test) :
+			test_(test)
+		{
+		}
+
+		std::string_view Name() const
+		{
+			return test_.name_;
+		}
+
+		Test::VariantType Variant() const
+		{
+			return test_.test_;
+		}
+
+	private:
+		const Test& test_;
 	};
 
 	export struct SuiteData

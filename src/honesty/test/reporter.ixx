@@ -5,7 +5,6 @@ import synodic.honesty.test.backend;
 ;
 import std;
 import function_ref;
-import :types;
 import inplace_vector;
 
 namespace synodic::honesty::test

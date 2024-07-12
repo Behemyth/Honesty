@@ -3,7 +3,6 @@ export module synodic.honesty.test:runner;
 
 import synodic.honesty.test.backend;
 
-import :types;
 import :reporter;
 import std;
 import inplace_vector;

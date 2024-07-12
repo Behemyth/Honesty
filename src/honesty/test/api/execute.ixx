@@ -110,16 +110,16 @@ namespace synodic::honesty::test::api
 
 			for (const Test& test: generator)
 			{
-				const TestData view(test);
+				const TestData& view = static_cast<TestData>(test);
 
 				// Filter the test by name
-				if (not filter.empty() and view.name != filter.front())
+				if (not filter.empty() and view.Name() != filter.front())
 				{
 					continue;
 				}
 
 				event::TestBegin testBegin;
-				testBegin.name = view.name;
+				testBegin.name = view.Name();
 
 				for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
 				{
@@ -147,7 +147,7 @@ namespace synodic::honesty::test::api
 				}
 
 				event::TestEnd testEnd;
-				testEnd.name = view.name;
+				testEnd.name = view.Name();
 
 				for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
 				{

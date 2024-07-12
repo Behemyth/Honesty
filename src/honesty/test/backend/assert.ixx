@@ -9,7 +9,7 @@ import synodic.honesty.log;
 
 namespace synodic::honesty::test
 {
-	struct RequirementsContext
+	export struct RequirementsContext
 	{
 		RequirementsContext() :
 			success(true)
@@ -901,7 +901,7 @@ namespace synodic::honesty::test
 		std::reference_wrapper<const log::Logger> logger_;
 	};
 
-	class RequirementsBackend : public Requirements
+	export class RequirementsBackend : public Requirements
 	{
 	public:
 		RequirementsBackend(

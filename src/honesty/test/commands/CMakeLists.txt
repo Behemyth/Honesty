@@ -13,3 +13,11 @@ target_sources(honesty
 	list.cpp
 	types.cpp
 )
+
+add_subdirectory(
+	runner
+)
+
+add_subdirectory(
+	reporter
+)

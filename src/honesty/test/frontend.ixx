@@ -4,8 +4,6 @@ import std;
 
 import synodic.honesty.test.backend;
 
-import :types;
-
 import function_ref;
 
 namespace synodic::honesty::test

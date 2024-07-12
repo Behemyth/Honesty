@@ -1,7 +1,7 @@
-export module synodic.honesty.test:reporter.default;
+export module synodic.honesty.test.commands:reporter.default;
 
 import synodic.honesty.log;
-import :reporter;
+import synodic.honesty.test;
 import std;
 
 namespace synodic::honesty::test

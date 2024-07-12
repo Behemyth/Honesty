@@ -1,7 +1,7 @@
-export module synodic.honesty.test:runner.default;
+export module synodic.honesty.test.commands:runner.default;
 
 import std;
-import :runner;
+import synodic.honesty.test;
 
 namespace synodic::honesty::test
 {

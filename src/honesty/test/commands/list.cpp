@@ -1,12 +1,18 @@
 module synodic.honesty.test.commands:list;
 
 import std;
-
+import synodic.honesty.utility;
 import synodic.honesty.test.api;
 import :types;
 
 namespace synodic::honesty::test::command
 {
+	enum class ListOutputType : std::uint8_t
+	{
+		LOG,
+		JSON
+	};
+
 	class List final : public Command
 	{
 	public:
@@ -79,7 +85,7 @@ namespace synodic::honesty::test::command
 
 				switch (outputType_)
 				{
-					case ListOutputType::LOG:
+					case ListOutputType::LOG :
 					{
 						for (auto& suiteDescription: result.suites)
 						{
@@ -90,7 +96,7 @@ namespace synodic::honesty::test::command
 						}
 						break;
 					}
-					case ListOutputType::JSON:
+					case ListOutputType::JSON :
 					{
 						utility::JSON json;
 

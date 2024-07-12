@@ -3,7 +3,6 @@ export module synodic.honesty.test:suite;
 import synodic.honesty.utility;
 import synodic.honesty.test.backend;
 
-import :types;
 import :test;
 
 namespace synodic::honesty::test

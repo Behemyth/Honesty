@@ -4,7 +4,6 @@ target_sources(honesty
 	TYPE CXX_MODULES
 	FILES
 	test.ixx
-	types.ixx
 	reporter.ixx
 	runner.ixx
 	function_ref.ixx
@@ -28,12 +27,4 @@ add_subdirectory(
 
 add_subdirectory(
 	commands
-)
-
-add_subdirectory(
-	runner
-)
-
-add_subdirectory(
-	reporter
 )

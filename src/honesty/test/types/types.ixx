@@ -6,10 +6,8 @@ import function_ref;
 import generator;
 
 export import :assert;
-export import :data;
 export import :reporter;
 export import :runner;
-export import :storage;
 
 
 namespace synodic::honesty::test

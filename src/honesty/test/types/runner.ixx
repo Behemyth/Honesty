@@ -1,5 +1,5 @@
 
-export module synodic.honesty.test.backend:runner;
+export module synodic.honesty.test.types:runner;
 
 import :data;
 import :reporter;

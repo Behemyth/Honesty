@@ -4,4 +4,8 @@ target_sources(honesty
 	FILE_SET interfaces
 	TYPE CXX_MODULES
 	FILES
-	types.ixx)
+	assert.ixx
+	types.ixx
+	reporter.ixx
+	runner.ixx
+	fixture.ixx)

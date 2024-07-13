@@ -6,6 +6,7 @@
 
 ---
 
+
 ==== synodic.honesty.test
 
 For defining and implementing tests.
@@ -17,6 +18,10 @@ Direct access to the test API
 ==== synodic.honesty.test.commands
 
 Frontend for running tests from the command line. Includes an Instance entrypoint for all commands and wrappers for each individual command and subcommand.
+
+==== synodic.honesty.test.types
+
+Defines the types used in the test, commands, and backend modules.
 
 === Private `Test` Modules
 

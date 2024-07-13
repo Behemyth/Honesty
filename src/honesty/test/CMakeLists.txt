@@ -28,3 +28,7 @@ add_subdirectory(
 add_subdirectory(
 	commands
 )
+
+add_subdirectory(
+	types
+)

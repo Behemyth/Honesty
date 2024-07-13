@@ -1,6 +1,7 @@
 
 import std;
 
+import synodic.honesty.log;
 import synodic.honesty.test.commands;
 
 auto main(const int argc, const char* argv[]) -> int

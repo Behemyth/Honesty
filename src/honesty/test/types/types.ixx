@@ -1,4 +1,4 @@
-export module synodic.honesty.test.backend:types;
+export module synodic.honesty.test.types;
 
 import std;
 

@@ -5,4 +5,3 @@ export import :data;
 export import :reporter;
 export import :runner;
 export import :storage;
-export import :types;

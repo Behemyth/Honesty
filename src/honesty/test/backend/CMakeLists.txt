@@ -10,5 +10,4 @@ target_sources(honesty
 	reporter.ixx
 	runner.ixx
 	storage.ixx
-	types.ixx
 )

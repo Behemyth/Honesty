@@ -3,9 +3,9 @@ export module synodic.honesty.test.backend:assert;
 import std;
 
 import :reporter;
-import :types;
 
 import synodic.honesty.log;
+import synodic.honesty.test.types;
 
 namespace synodic::honesty::test
 {

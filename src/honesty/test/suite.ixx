@@ -10,13 +10,6 @@ namespace synodic::honesty::test
 	// Forward declarations that will be defined elsewhere in the `synodic.honesty.test` module
 	class Fixture;
 
-	template<typename T, typename R, typename... Args>
-	concept invocable_r = std::invocable<T, Args...> && requires(Args&&... args) {
-		{
-			invoke(forward<Args>(args...))
-		} -> std::convertible_to<R>;
-	};
-
 	/**
 	 * @brief Allows the static registration of tests in the global scope. Constructed at compile-time so that test
 	 * registration is constrained. We don't want a suite wrapper to be a generic fixture that can contain expensive

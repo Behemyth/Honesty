@@ -37,25 +37,25 @@ namespace synodic::honesty::test
 	public:
 		consteval SuiteData(
 			const std::string_view name,
-			std::variant<std::function_ref<Generator()>, std::function_ref<Generator(Fixture&)>> testGenerator) :
-			nameView(name),
-			testGenerator(testGenerator)
+			std::variant<std::function_ref<Generator()>, std::function_ref<Generator(Fixture&)>> generator) :
+			nameView_(name),
+			generator_(generator)
 		{
 		}
 
 		// TODO: Make consteval when MSVC supports it
 		constexpr std::string_view Name() const
 		{
-			return nameView;
+			return nameView_;
 		}
 
 		constexpr VariantType Variant() const
 		{
-			return testGenerator;
+			return generator_;
 		}
 
 	private:
-		std::string_view nameView;
-		VariantType testGenerator;
+		std::string_view nameView_;
+		VariantType generator_;
 	};
 }

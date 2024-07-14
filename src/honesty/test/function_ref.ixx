@@ -24,7 +24,7 @@ namespace std
 
 	// See also: https://www.agner.org/optimize/calling_conventions.pdf
 	template<class T>
-	inline constexpr auto _select_param_type = []
+	inline constexpr auto _select_param_type()
 	{
 		if constexpr (std::is_trivially_copyable_v<T>)
 		{

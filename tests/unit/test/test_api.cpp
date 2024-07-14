@@ -1,8 +1,12 @@
 import std;
+
 import synodic.honesty.test;
 import synodic.honesty.test.mock;
+
 import synodic.honesty.log;
-;
+import synodic.honesty.test.commands;
+import synodic.honesty.test.api;
+
 using namespace synodic::honesty::test;
 using namespace synodic::honesty::test::literals;
 

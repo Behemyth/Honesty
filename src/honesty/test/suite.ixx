@@ -48,12 +48,6 @@ namespace synodic::honesty::test
 		Suite& operator=(const Suite& other)	 = delete;
 		Suite& operator=(Suite&& other) noexcept = delete;
 
-		// TODO: Make consteval when MSVC supports it
-		constexpr std::string_view Name() const
-		{
-			return name;
-		}
-
 	private:
 		std::array<char, NAME_SIZE> name_;
 	};
@@ -76,7 +70,7 @@ namespace synodic::honesty::test
 				name,
 				[](const SuiteData& view)
 				{
-					return view.name;
+					return view.Name();
 				}))
 		{
 			throw std::runtime_error(std::format(

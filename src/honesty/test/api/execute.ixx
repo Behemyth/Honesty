@@ -77,7 +77,7 @@ namespace synodic::honesty::test::api
 			if (not parameters.filter.empty())
 			{
 				// Check if the suite name matches the filter
-				if (suite.name != filter.front())
+				if (suite.Name() != filter.front())
 				{
 					continue;
 				}
@@ -87,7 +87,7 @@ namespace synodic::honesty::test::api
 			}
 
 			event::SuiteBegin suiteBegin;
-			suiteBegin.name = suite.name;
+			suiteBegin.name = suite.Name();
 
 			for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
 			{
@@ -95,7 +95,7 @@ namespace synodic::honesty::test::api
 			}
 
 			// Fixture lifetime should be for the whole suite
-			Fixture fixture(parameters.applicationName, suite.name, parameters.logger);
+			Fixture fixture(parameters.applicationName, suite.Name(), parameters.logger);
 
 			auto executor = Overload {
 				[&](const std::function_ref<Generator()> generator) -> Generator
@@ -107,7 +107,7 @@ namespace synodic::honesty::test::api
 					return generator(fixture);
 				}};
 
-			Generator generator = std::visit(executor, suite.testGenerator);
+			Generator generator = std::visit(executor, suite.Variant());
 
 			for (const Test& test: generator)
 			{
@@ -157,7 +157,7 @@ namespace synodic::honesty::test::api
 			}
 
 			event::SuiteEnd end;
-			end.name = suite.name;
+			end.name = suite.Name();
 
 			for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
 			{

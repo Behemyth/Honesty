@@ -30,17 +30,32 @@ namespace synodic::honesty::test
 		const Test& test_;
 	};
 
-	export struct SuiteData
+	export class SuiteData
 	{
+		using VariantType = std::variant<std::function_ref<Generator()>, std::function_ref<Generator(Fixture&)>>;
+
+	public:
 		consteval SuiteData(
 			const std::string_view name,
 			std::variant<std::function_ref<Generator()>, std::function_ref<Generator(Fixture&)>> testGenerator) :
-			name(name),
+			nameView(name),
 			testGenerator(testGenerator)
 		{
 		}
 
-		std::string_view name;
-		std::variant<std::function_ref<Generator()>, std::function_ref<Generator(Fixture&)>> testGenerator;
+		// TODO: Make consteval when MSVC supports it
+		constexpr std::string_view Name() const
+		{
+			return nameView;
+		}
+
+		constexpr VariantType Variant() const
+		{
+			return testGenerator;
+		}
+
+	private:
+		std::string_view nameView;
+		VariantType testGenerator;
 	};
 }

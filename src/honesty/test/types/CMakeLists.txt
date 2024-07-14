@@ -5,6 +5,8 @@ target_sources(honesty
 	TYPE CXX_MODULES
 	FILES
 	assert.ixx
+	exception.ixx
+	test.ixx
 	types.ixx
 	reporter.ixx
 	runner.ixx

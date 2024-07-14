@@ -2,7 +2,7 @@ export module synodic.honesty.test:test;
 
 import std;
 
-import synodic.honesty.test.backend;
+import synodic.honesty.test.types;
 
 import function_ref;
 

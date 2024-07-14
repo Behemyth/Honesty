@@ -5,7 +5,8 @@ import std;
 import :reporter;
 
 import synodic.honesty.log;
-import synodic.honesty.test.types;
+
+import :exception;
 
 namespace synodic::honesty::test
 {

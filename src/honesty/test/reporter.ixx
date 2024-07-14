@@ -1,7 +1,7 @@
 export module synodic.honesty.test:reporter;
 
 import synodic.honesty.log;
-import synodic.honesty.test.backend;
+import synodic.honesty.test.types;
 ;
 import std;
 import function_ref;
@@ -9,7 +9,7 @@ import inplace_vector;
 
 namespace synodic::honesty::test
 {
-	export using class synodic::honesty::test::Reporter;
+	export using Reporter = synodic::honesty::test::Reporter;
 
 	/**
 	 * @brief TODO: Comment

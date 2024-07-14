@@ -4,9 +4,6 @@ import std;
 
 import function_ref;
 
-import :assert;
-import :fixture;
-
 import synodic.honesty.test.types;
 
 namespace synodic::honesty::test

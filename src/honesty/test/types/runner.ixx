@@ -1,11 +1,14 @@
 
 export module synodic.honesty.test.types:runner;
 
-import :data;
-import :reporter;
 import std;
+
 import inplace_vector;
+import function_ref;
+
 import :assert;
+import :reporter;
+import :test;
 
 namespace synodic::honesty::test
 {

@@ -91,10 +91,11 @@ namespace synodic::honesty::test
 					not possibleSubCommand.starts_with("-") and not possibleSubCommand.starts_with("--"))
 				{
 					// Look for a matching subcommand
-					auto apply = []<std::unsigned_integral T>(T) consteval -> void
+					auto apply = [this]<std::unsigned_integral T>(T) consteval -> void
 					{
-						constexpr std::size_t index = T;
+						/*constexpr std::size_t index = T;
 
+						logger_.Info("Checking for subcommand: {}", index);*/
 						//using CommandType = std::variant_alternative_t<index, SubType>;
 
 						// static_assert(command<CommandType>, "Not a valid command type");

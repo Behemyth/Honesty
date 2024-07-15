@@ -5,6 +5,8 @@ import std;
 
 import synodic.honesty.test.types;
 import synodic.honesty.test.backend;
+
+import synodic.honesty.log;
 import synodic.honesty.utility;
 
 import :types;
@@ -77,33 +79,33 @@ namespace synodic::honesty::test
 			command_(std::monostate {})
 
 		{
-			//logger_.SetSink(sink_);
+			logger_.SetSink(sink_);
 
-			//command::Configuration commandConfiguration = ResolveConfiguration(configuration);
+			command::Configuration commandConfiguration = ResolveConfiguration(configuration);
 
-			//// If the executable and at least one argument is given we can look for subcommands
-			//if (arguments.size() >= 2)
-			//{
-			//	// Check for an option or flag
-			//	if (std::string_view possibleSubCommand = arguments[1];
-			//		not possibleSubCommand.starts_with("-") and not possibleSubCommand.starts_with("--"))
-			//	{
-			//		// Look for a matching subcommand
-			//		auto apply = [this, &commandConfiguration, possibleSubCommand](auto index) consteval -> void
-			//		{
-			//			using CommandType = std::variant_alternative_t<index, SubType>;
+			// If the executable and at least one argument is given we can look for subcommands
+			if (arguments.size() >= 2)
+			{
+				// Check for an option or flag
+				if (std::string_view possibleSubCommand = arguments[1];
+					not possibleSubCommand.starts_with("-") and not possibleSubCommand.starts_with("--"))
+				{
+					// Look for a matching subcommand
+					//auto apply = [this, &commandConfiguration, possibleSubCommand](auto index) consteval -> void
+					//{
+					//	using CommandType = std::variant_alternative_t<index, SubType>;
 
-			//			// static_assert(command<CommandType>, "Not a valid command type");
+					//	// static_assert(command<CommandType>, "Not a valid command type");
 
-			//			if (const std::string_view commandName = CommandType::NAME; commandName == possibleSubCommand)
-			//			{
-			//				command_.emplace<SubType>(CommandType(commandConfiguration));
-			//			}
-			//		};
+					//	if (const std::string_view commandName = CommandType::NAME; commandName == possibleSubCommand)
+					//	{
+					//		command_.emplace<SubType>(CommandType(commandConfiguration));
+					//	}
+					//};
 
-			//		//ConstantFor<2, std::variant_size_v<SubType>, 1>(apply);
-			//	}
-			//}
+					//ConstantFor<2, std::variant_size_v<SubType>, 1>(apply);
+				}
+			}
 
 			//// If we have mono-state we know there is no subcommand and initialize the execute command
 			//if (std::holds_alternative<std::monostate>(command_))

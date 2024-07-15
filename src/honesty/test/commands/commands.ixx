@@ -91,7 +91,8 @@ namespace synodic::honesty::test
 					not possibleSubCommand.starts_with("-") and not possibleSubCommand.starts_with("--"))
 				{
 					// Look for a matching subcommand
-					//auto apply = [this, &commandConfiguration, possibleSubCommand](auto index) consteval -> void
+					// auto apply =
+					//	[this, &commandConfiguration, possibleSubCommand]<typename T>(T index) consteval -> void
 					//{
 					//	using CommandType = std::variant_alternative_t<index, SubType>;
 
@@ -99,84 +100,84 @@ namespace synodic::honesty::test
 
 					//	if (const std::string_view commandName = CommandType::NAME; commandName == possibleSubCommand)
 					//	{
-					//		command_.emplace<SubType>(CommandType(commandConfiguration));
+					//		// command_.emplace<SubType>(CommandType(commandConfiguration));
 					//	}
 					//};
 
-					//ConstantFor<2, std::variant_size_v<SubType>, 1>(apply);
+					// ConstantFor<2, std::variant_size_v<SubType>, 1>(apply);
 				}
 			}
 
-			//// If we have mono-state we know there is no subcommand and initialize the execute command
-			//if (std::holds_alternative<std::monostate>(command_))
-			//{
-			//	command_.emplace<command::Execute>(commandConfiguration);
+			// If we have mono-state we know there is no subcommand and initialize the execute command
+			if (std::holds_alternative<std::monostate>(command_))
+			{
+				command_.emplace<command::Execute>(commandConfiguration);
 
-			//	arguments = arguments.subspan(1);
-			//}
-			//else
-			//{
-			//	arguments = arguments.subspan(2);
-			//}
+				arguments = arguments.subspan(1);
+			}
+			else
+			{
+				arguments = arguments.subspan(2);
+			}
 
-			//// Overload the visitor and make use of the pure-virtual interface for deduction
-			//auto executor = Overload {
-			//	[this, &configuration, &arguments](command::Execute& command)
-			//	{
-			//		const command::ParseResult result = command.Parse(arguments);
-			//		ResolveParseResult(configuration, result);
-			//	},
-			//	[this, &configuration, &arguments](SubType& command)
-			//	{
-			//		auto subExecutor = Overload {[this, &configuration, &arguments](command::List& subCommand)
-			//									 {
-			//										 const command::ParseResult result = subCommand.Parse(arguments);
-			//										 ResolveParseResult(configuration, result);
-			//									 }};
-			//		std::visit(subExecutor, command);
-			//	},
-			//	[](std::monostate)
-			//	{
+			// Overload the visitor and make use of the pure-virtual interface for deduction
+			auto executor = Overload {
+				[this, &configuration, &arguments](command::Execute& command)
+				{
+					const command::ParseResult result = command.Parse(arguments);
+					ResolveParseResult(configuration, result);
+				},
+				[this, &configuration, &arguments](SubType& command)
+				{
+					auto subExecutor = Overload {[this, &configuration, &arguments](command::List& subCommand)
+												 {
+													 const command::ParseResult result = subCommand.Parse(arguments);
+													 ResolveParseResult(configuration, result);
+												 }};
+					std::visit(subExecutor, command);
+				},
+				[](std::monostate)
+				{
 
-			//	}};
+				}};
 
-			//std::visit(executor, command_);
+			std::visit(executor, command_);
 		}
 
 		void Execute()
 		{
-			//try
-			//{
-			//	// Overload the visitor and make use of the pure-virtual interface for deduction
-			//	auto executor = Overload {
-			//		[this](command::Execute& command)
-			//		{
-			//			command::ProcessConfiguration configuration(*runner_, reporters_);
-			//			command.Process(configuration);
-			//		},
-			//		[this](SubType& command)
-			//		{
-			//			auto subExecutor =
-			//				Overload {[this](auto& subCommand)
-			//						  {
-			//							  command::ProcessConfiguration configuration(*runner_, reporters_);
-			//							  subCommand.Process(configuration);
-			//						  }};
-			//			std::visit(subExecutor, command);
-			//		},
-			//		[](std::monostate)
-			//		{
-			//		}};
+			try
+			{
+				// Overload the visitor and make use of the pure-virtual interface for deduction
+				auto executor = Overload {
+					[this](command::Execute& command)
+					{
+						command::ProcessConfiguration configuration(*runner_, reporters_);
+						command.Process(configuration);
+					},
+					[this](SubType& command)
+					{
+						auto subExecutor =
+							Overload {[this](auto& subCommand)
+									  {
+										  command::ProcessConfiguration configuration(*runner_, reporters_);
+										  subCommand.Process(configuration);
+									  }};
+						std::visit(subExecutor, command);
+					},
+					[](std::monostate)
+					{
+					}};
 
-			//	std::visit(executor, command_);
-			//}
-			//catch (std::exception& e)
-			//{
-			//	logger_.Error("Internal Exception: {}", e.what());
+				std::visit(executor, command_);
+			}
+			catch (std::exception& e)
+			{
+				logger_.Error("Internal Exception: {}", e.what());
 
-			//	// TODO: Replace with a return code
-			//	std::exit(134);
-			//}
+				// TODO: Replace with a return code
+				std::exit(134);
+			}
 		}
 
 	private:
@@ -196,82 +197,82 @@ namespace synodic::honesty::test
 		 */
 		void ResolveParseResult(const Configuration& configuration, const command::ParseResult& parseResult)
 		{
-			//// Register our default runners and reporters
-			//{
-			//	static ReporterRegistrar<DefaultReporter> defaultReporterRegistrar;
-			//	static ReporterRegistrar<CompactReporter> compactReporterRegistrar;
+			// Register our default runners and reporters
+			{
+				static ReporterRegistrar<DefaultReporter> defaultReporterRegistrar;
+				static ReporterRegistrar<CompactReporter> compactReporterRegistrar;
 
-			//	static RunnerRegistrar<DefaultRunner> defaultRunnerRegistrar;
-			//}
+				static RunnerRegistrar<DefaultRunner> defaultRunnerRegistrar;
+			}
 
-			//// Gather our user defined runners and reporters
-			//const std::span<RunnerRegistry*> runnerRegistrars	  = RunnerRegistry::Registrars();
-			//const std::span<ReporterRegistry*> reporterRegistrars = ReporterRegistry::Registrars();
+			// Gather our user defined runners and reporters
+			const std::span<RunnerRegistry*> runnerRegistrars	  = RunnerRegistry::Registrars();
+			const std::span<ReporterRegistry*> reporterRegistrars = ReporterRegistry::Registrars();
 
-			//std::string_view selectedRunner			   = parseResult.runnerOverride;
-			//std::vector<std::string> selectedReporters = parseResult.reporterOverrides;
+			std::string_view selectedRunner			   = parseResult.runnerOverride;
+			std::vector<std::string> selectedReporters = parseResult.reporterOverrides;
 
-			//constexpr std::string_view defaultName = "default";
+			constexpr std::string_view defaultName = "default";
 
-			//if (selectedRunner.empty())
-			//{
-			//	selectedRunner =
-			//		configuration.defaultRunnerName.empty() ? defaultName : configuration.defaultRunnerName;
-			//}
+			if (selectedRunner.empty())
+			{
+				selectedRunner =
+					configuration.defaultRunnerName.empty() ? defaultName : configuration.defaultRunnerName;
+			}
 
-			//if (selectedReporters.empty())
-			//{
-			//	if (configuration.defaultReporterName.empty())
-			//	{
-			//		selectedReporters.emplace_back(defaultName);
-			//	}
-			//	else
-			//	{
-			//		selectedReporters.emplace_back(configuration.defaultReporterName);
-			//	}
-			//}
+			if (selectedReporters.empty())
+			{
+				if (configuration.defaultReporterName.empty())
+				{
+					selectedReporters.emplace_back(defaultName);
+				}
+				else
+				{
+					selectedReporters.emplace_back(configuration.defaultReporterName);
+				}
+			}
 
-			//// Find the runner
-			//{
-			//	auto iterator = std::ranges::find_if(
-			//		runnerRegistrars,
-			//		[&](const RunnerRegistry* registry) -> bool
-			//		{
-			//			return registry->Name() == selectedRunner;
-			//		});
+			// Find the runner
+			{
+				auto iterator = std::ranges::find_if(
+					runnerRegistrars,
+					[&](const RunnerRegistry* registry) -> bool
+					{
+						return registry->Name() == selectedRunner;
+					});
 
-			//	if (iterator != runnerRegistrars.end())
-			//	{
-			//		const RunnerRegistry* registry = *iterator;
+				if (iterator != runnerRegistrars.end())
+				{
+					const RunnerRegistry* registry = *iterator;
 
-			//		runner_ = registry->Create(logger_);
-			//	}
-			//	else
-			//	{
-			//		throw std::invalid_argument("The runner specified does not exist");
-			//	}
-			//}
+					runner_ = registry->Create(logger_);
+				}
+				else
+				{
+					throw std::invalid_argument("The runner specified does not exist");
+				}
+			}
 
-			//// Find the reporters
-			//for (const std::string& reporterName: selectedReporters)
-			//{
-			//	auto iterator = std::ranges::find_if(
-			//		reporterRegistrars,
-			//		[&](const ReporterRegistry* registry) -> bool
-			//		{
-			//			return registry->Name() == reporterName;
-			//		});
+			// Find the reporters
+			for (const std::string& reporterName: selectedReporters)
+			{
+				auto iterator = std::ranges::find_if(
+					reporterRegistrars,
+					[&](const ReporterRegistry* registry) -> bool
+					{
+						return registry->Name() == reporterName;
+					});
 
-			//	if (iterator != reporterRegistrars.end())
-			//	{
-			//		const ReporterRegistry* registry = *iterator;
-			//		reporters_.push_back(registry->Create(logger_));
-			//	}
-			//	else
-			//	{
-			//		throw std::invalid_argument("The reporters specified does not exist");
-			//	}
-			//}
+				if (iterator != reporterRegistrars.end())
+				{
+					const ReporterRegistry* registry = *iterator;
+					reporters_.push_back(registry->Create(logger_));
+				}
+				else
+				{
+					throw std::invalid_argument("The reporters specified does not exist");
+				}
+			}
 		}
 
 		std::string applicationName_;

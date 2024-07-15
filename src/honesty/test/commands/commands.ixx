@@ -28,12 +28,12 @@ namespace
 
 	// Helper for iterating over a range of indices at compile-time
 	template<std::size_t Start, std::size_t End, std::size_t Inc, class Fn>
-	constexpr void ConstantFor(Fn&& function)
+	consteval void ConstantFor(Fn&& function)
 	{
 		if constexpr (Start < End)
 		{
-			function(std::integral_constant<decltype(Start), Start>());
-			constexpr_for<Start + Inc, End, Inc>(function);
+			function(std::integral_constant<std::size_t, Start>());
+			ConstantFor<Start + Inc, End, Inc>(function);
 		}
 	}
 }
@@ -91,20 +91,22 @@ namespace synodic::honesty::test
 					not possibleSubCommand.starts_with("-") and not possibleSubCommand.starts_with("--"))
 				{
 					// Look for a matching subcommand
-					// auto apply =
-					//	[this, &commandConfiguration, possibleSubCommand]<typename T>(T index) consteval -> void
-					//{
-					//	using CommandType = std::variant_alternative_t<index, SubType>;
+					auto apply = []<std::unsigned_integral T>(T) consteval -> void
+					{
+						constexpr std::size_t index = T;
 
-					//	// static_assert(command<CommandType>, "Not a valid command type");
+						//using CommandType = std::variant_alternative_t<index, SubType>;
 
-					//	if (const std::string_view commandName = CommandType::NAME; commandName == possibleSubCommand)
-					//	{
-					//		// command_.emplace<SubType>(CommandType(commandConfiguration));
-					//	}
-					//};
+						// static_assert(command<CommandType>, "Not a valid command type");
 
-					// ConstantFor<2, std::variant_size_v<SubType>, 1>(apply);
+						// if (const std::string_view commandName = CommandType::NAME; commandName ==
+						// possibleSubCommand)
+						//{
+						//	// command_.emplace<SubType>(CommandType(commandConfiguration));
+						// }
+					};
+
+					ConstantFor<2, std::variant_size_v<SubType>, 1>(apply);
 				}
 			}
 

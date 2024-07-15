@@ -10,4 +10,5 @@ target_sources(honesty
 	types.ixx
 	reporter.ixx
 	runner.ixx
+	suite.ixx
 	fixture.ixx)

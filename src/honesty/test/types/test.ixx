@@ -58,7 +58,7 @@ namespace synodic::honesty::test
 			});
 	}
 
-	class Test
+	class Test final
 	{
 		using VariantType = std::
 			variant<std::function_ref<void(const Requirements&)>, std::function_ref<Generator(const Requirements&)>>;
@@ -94,4 +94,27 @@ namespace synodic::honesty::test
 		std::string_view name_;
 		VariantType test_;
 	};
+
+	export class TestData
+	{
+	public:
+		constexpr TestData(const Test& test) :
+			test_(test)
+		{
+		}
+
+		std::string_view Name() const
+		{
+			return test_.name_;
+		}
+
+		Test::VariantType Variant() const
+		{
+			return test_.test_;
+		}
+
+	private:
+		const Test& test_;
+	};
+
 }

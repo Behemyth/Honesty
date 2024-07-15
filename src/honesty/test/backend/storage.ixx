@@ -2,7 +2,7 @@ export module synodic.honesty.test.backend:storage;
 
 import std;
 
-import :data;
+import synodic.honesty.test.types;
 
 import inplace_vector;
 

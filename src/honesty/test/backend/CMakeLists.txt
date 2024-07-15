@@ -4,6 +4,5 @@ target_sources(honesty
 	TYPE CXX_MODULES
 	FILES
 	backend.ixx
-	data.ixx
 	storage.ixx
 )

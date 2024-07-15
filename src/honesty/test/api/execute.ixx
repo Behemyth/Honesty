@@ -129,18 +129,23 @@ namespace synodic::honesty::test::api
 
 				RequirementsBackend requirements(parameters.reporters, test.Name(), parameters.logger);
 
+				Runner& runner = parameters.runner.get();
+
 				auto testExecutor = Overload {
-					[&](const std::function_ref<void(Requirements&)> testCallback) -> Generator
+					[&](const std::function_ref<void(const Requirements&)> testCallback) -> Generator
 					{
+						runner.Run(requirements, testCallback);
+
+						co_return;
 					},
-					[&](const std::function_ref<Generator(Requirements&)> testCallback) -> Generator
+					[&](const std::function_ref<Generator(const Requirements&)> testCallback) -> Generator
 					{
+						runner.Run(requirements, testCallback);
+
+						co_return;
 					}};
 
-				// Generator generator = std::visit(testExecutor, view.test);
-
-				// TODO: Run nested tests
-				// context.Run(requirements, view.test);
+				Generator generator = std::visit(testExecutor, view.Variant());
 
 				if (not requirements.Context().success)
 				{

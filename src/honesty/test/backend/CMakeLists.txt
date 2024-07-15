@@ -5,4 +5,6 @@ target_sources(honesty
 	FILES
 	backend.ixx
 	storage.ixx
+	reporter.ixx
+	runner.ixx
 )

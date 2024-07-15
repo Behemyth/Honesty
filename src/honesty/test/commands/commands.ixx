@@ -2,8 +2,12 @@
 export module synodic.honesty.test.commands;
 
 import std;
+
+import synodic.honesty.test.types;
+import synodic.honesty.test.backend;
 import synodic.honesty.utility;
 
+import :types;
 import :execute;
 import :list;
 
@@ -73,9 +77,9 @@ namespace synodic::honesty::test
 			command_(std::monostate {})
 
 		{
-			logger_.SetSink(sink_);
+			//logger_.SetSink(sink_);
 
-			command::Configuration commandConfiguration = ResolveConfiguration(configuration);
+			//command::Configuration commandConfiguration = ResolveConfiguration(configuration);
 
 			//// If the executable and at least one argument is given we can look for subcommands
 			//if (arguments.size() >= 2)
@@ -139,38 +143,38 @@ namespace synodic::honesty::test
 
 		void Execute()
 		{
-			try
-			{
-				//// Overload the visitor and make use of the pure-virtual interface for deduction
-				//auto executor = Overload {
-				//	[this](command::Execute& command)
-				//	{
-				//		command::ProcessConfiguration configuration(*runner_, reporters_);
-				//		command.Process(configuration);
-				//	},
-				//	[this](SubType& command)
-				//	{
-				//		auto subExecutor =
-				//			Overload {[this](auto& subCommand)
-				//					  {
-				//						  command::ProcessConfiguration configuration(*runner_, reporters_);
-				//						  subCommand.Process(configuration);
-				//					  }};
-				//		std::visit(subExecutor, command);
-				//	},
-				//	[](std::monostate)
-				//	{
-				//	}};
+			//try
+			//{
+			//	// Overload the visitor and make use of the pure-virtual interface for deduction
+			//	auto executor = Overload {
+			//		[this](command::Execute& command)
+			//		{
+			//			command::ProcessConfiguration configuration(*runner_, reporters_);
+			//			command.Process(configuration);
+			//		},
+			//		[this](SubType& command)
+			//		{
+			//			auto subExecutor =
+			//				Overload {[this](auto& subCommand)
+			//						  {
+			//							  command::ProcessConfiguration configuration(*runner_, reporters_);
+			//							  subCommand.Process(configuration);
+			//						  }};
+			//			std::visit(subExecutor, command);
+			//		},
+			//		[](std::monostate)
+			//		{
+			//		}};
 
-				//std::visit(executor, command_);
-			}
-			catch (std::exception& e)
-			{
-				logger_.Error("Internal Exception: {}", e.what());
+			//	std::visit(executor, command_);
+			//}
+			//catch (std::exception& e)
+			//{
+			//	logger_.Error("Internal Exception: {}", e.what());
 
-				// TODO: Replace with a return code
-				std::exit(134);
-			}
+			//	// TODO: Replace with a return code
+			//	std::exit(134);
+			//}
 		}
 
 	private:

@@ -15,7 +15,7 @@ namespace
 				requirements.ExpectThrow<std::runtime_error>(
 					[]()
 					{
-						throw std::runtime_error{"Test exception"};
+						throw std::runtime_error("Test exception");
 					});
 
 				requirements.ExpectNotThrow(

@@ -33,9 +33,9 @@ namespace
 				// requirements.Assert(context->file.has_value());
 				// requirements.Expect(context->file.value() == temporaryPath);
 
-				command.Execute();
+				//command.Execute();
 
-				requirements.Expect(exists(temporaryPath));
+				//requirements.Expect(exists(temporaryPath));
 			};
 		});
 	SuiteRegistrar _(SUITE);

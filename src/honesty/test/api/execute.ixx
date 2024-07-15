@@ -132,20 +132,16 @@ namespace synodic::honesty::test::api
 				Runner& runner = parameters.runner.get();
 
 				auto testExecutor = Overload {
-					[&](const std::function_ref<void(const Requirements&)> testCallback) -> Generator
+					[&](const std::function_ref<void(const Requirements&)> testCallback)
 					{
 						runner.Run(requirements, testCallback);
-
-						co_return;
 					},
-					[&](const std::function_ref<Generator(const Requirements&)> testCallback) -> Generator
+					[&](const std::function_ref<Generator(const Requirements&)> testCallback)
 					{
 						runner.Run(requirements, testCallback);
-
-						co_return;
 					}};
 
-				Generator generator = std::visit(testExecutor, view.Variant());
+				std::visit(testExecutor, view.Variant());
 
 				if (not requirements.Context().success)
 				{

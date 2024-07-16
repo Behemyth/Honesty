@@ -116,7 +116,7 @@ namespace synodic::honesty::log
 	/**
 	 * @brief ANSI color escape codes
 	 */
-	enum class TerminalColor : std::uint8_t
+	export enum class TerminalColor : std::uint8_t
 	{
 		BLACK = 30,
 		RED,
@@ -143,6 +143,12 @@ namespace synodic::honesty::log
 	export class TextStyle
 	{
 	public:
+		constexpr explicit TextStyle(TerminalColor color, const Attribute attribute = Attribute::NONE) :
+			foreground_(Colour8(std::to_underlying(color))),
+			attributeMask_(std::to_underlying(attribute))
+		{
+		}
+
 		constexpr explicit TextStyle(Colour8 color, const Attribute attribute = Attribute::NONE) :
 			foreground_(color),
 			attributeMask_(std::to_underlying(attribute))

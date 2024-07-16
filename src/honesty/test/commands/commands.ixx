@@ -96,7 +96,7 @@ namespace synodic::honesty::test
 						/*constexpr std::size_t index = T;
 
 						logger_.Info("Checking for subcommand: {}", index);*/
-						//using CommandType = std::variant_alternative_t<index, SubType>;
+						// using CommandType = std::variant_alternative_t<index, SubType>;
 
 						// static_assert(command<CommandType>, "Not a valid command type");
 
@@ -176,6 +176,8 @@ namespace synodic::honesty::test
 			}
 			catch (std::exception& e)
 			{
+				std::string message = log::format(log::TextStyle(log::TerminalColor::RED), "Internal Exception: {}", e.what());
+
 				logger_.Error("Internal Exception: {}", e.what());
 
 				// TODO: Replace with a return code

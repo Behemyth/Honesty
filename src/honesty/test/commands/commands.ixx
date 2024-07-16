@@ -176,9 +176,10 @@ namespace synodic::honesty::test
 			}
 			catch (std::exception& e)
 			{
-				std::string message = log::format(log::TextStyle(log::TerminalColor::RED), "Internal Exception: {}", e.what());
+				const log::TextStyle style(log::TerminalColor::RED);
+				std::string message = log::format(style, "Internal Exception: {}", e.what());
 
-				logger_.Error("Internal Exception: {}", e.what());
+				logger_.Error("{}", message);
 
 				// TODO: Replace with a return code
 				std::exit(134);

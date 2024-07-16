@@ -49,10 +49,38 @@ namespace synodic::honesty::log
 		return SUPPORTS_COLOUR;
 	}
 
+	/**
+	 * @brief ANSI color escape codes
+	 */
+	export enum class TerminalColor : std::uint8_t
+	{
+		BLACK = 30,
+		RED,
+		GREEN,
+		YELLOW,
+		BLUE,
+		MAGENTA,
+		CYAN,
+		WHITE,
+		BRIGHT_BLACK = 90,
+		BRIGHT_RED,
+		BRIGHT_GREEN,
+		BRIGHT_YELLOW,
+		BRIGHT_BLUE,
+		BRIGHT_MAGENTA,
+		BRIGHT_CYAN,
+		BRIGHT_WHITE
+	};
+
 	export struct Colour8
 	{
 		explicit constexpr Colour8(const std::uint8_t code) :
 			code(code)
+		{
+		}
+
+		explicit constexpr Colour8(const TerminalColor code) :
+			code(std::to_underlying(code))
 		{
 		}
 
@@ -113,29 +141,6 @@ namespace synodic::honesty::log
 		9,	// strike
 	};
 
-	/**
-	 * @brief ANSI color escape codes
-	 */
-	export enum class TerminalColor : std::uint8_t
-	{
-		BLACK = 30,
-		RED,
-		GREEN,
-		YELLOW,
-		BLUE,
-		MAGENTA,
-		CYAN,
-		WHITE,
-		BRIGHT_BLACK = 90,
-		BRIGHT_RED,
-		BRIGHT_GREEN,
-		BRIGHT_YELLOW,
-		BRIGHT_BLUE,
-		BRIGHT_MAGENTA,
-		BRIGHT_CYAN,
-		BRIGHT_WHITE
-	};
-
 	export using ColorType = std::variant<Colour8, Colour24>;
 
 	// TODO: Support multiple attributes
@@ -143,19 +148,19 @@ namespace synodic::honesty::log
 	export class TextStyle
 	{
 	public:
-		constexpr explicit TextStyle(TerminalColor color, const Attribute attribute = Attribute::NONE) :
-			foreground_(Colour8(std::to_underlying(color))),
+		explicit constexpr TextStyle(TerminalColor color, const Attribute attribute = Attribute::NONE) :
+			foreground_(Colour8(color)),
 			attributeMask_(std::to_underlying(attribute))
 		{
 		}
 
-		constexpr explicit TextStyle(Colour8 color, const Attribute attribute = Attribute::NONE) :
+		explicit constexpr TextStyle(Colour8 color, const Attribute attribute = Attribute::NONE) :
 			foreground_(color),
 			attributeMask_(std::to_underlying(attribute))
 		{
 		}
 
-		constexpr explicit TextStyle(Colour24 color, const Attribute attribute = Attribute::NONE) :
+		explicit constexpr TextStyle(Colour24 color, const Attribute attribute = Attribute::NONE) :
 			foreground_(color),
 			attributeMask_(std::to_underlying(attribute))
 		{

@@ -76,30 +76,32 @@ namespace synodic::honesty::test::api
 			"",
 			parameters.runner,
 			parameters.reporters,
+			true,
 			parameters.logger);
 
 		ExecuteResult executeResult = Execute(executeParameters);
 
 		ListResult result;
 
-		// Grab the list reporters and extract the data
-		// ListReporter reporters = parameters.reporters.front();
+		// Grab the list reporter and extract the data
+		std::unique_ptr<Reporter>& abstractReporter	  = parameters.reporters.front();
+		ListReporter& listReporter					  = dynamic_cast<ListReporter&>(*abstractReporter);
 
-		// const CumulativeAdapter::CumulativeData& data = listReporter.Data();
+		const CumulativeAdapter::CumulativeData& data = listReporter.Data();
 
-		// for (const auto& [name, tests]: data.suites)
-		//{
-		//	auto& resultSuite = result.suites.emplace_back();
-		//	resultSuite.name = name;
+		for (const auto& [name, tests]: data.suites)
+		{
+			auto& resultSuite = result.suites.emplace_back();
+			resultSuite.name  = name;
 
-		//	for (const auto& [name]: tests)
-		//	{
-		//		TestDescription description;
-		//		description.name = name;
+			for (const auto& [name]: tests)
+			{
+				TestDescription description;
+				description.name = name;
 
-		//		resultSuite.tests.push_back(description);
-		//	}
-		//}
+				resultSuite.tests.push_back(description);
+			}
+		}
 
 		return result;
 	}

@@ -28,11 +28,11 @@ namespace
 
 	// Helper for iterating over a range of indices at compile-time
 	template<std::size_t Start, std::size_t End, std::size_t Inc, class Fn>
-	consteval void ConstantFor(Fn&& function)
+	constexpr void ConstantFor(Fn&& function)
 	{
 		if constexpr (Start < End)
 		{
-			function(std::integral_constant<std::size_t, Start>());
+			std::invoke(function);
 			ConstantFor<Start + Inc, End, Inc>(function);
 		}
 	}
@@ -91,11 +91,11 @@ namespace synodic::honesty::test
 					not possibleSubCommand.starts_with("-") and not possibleSubCommand.starts_with("--"))
 				{
 					// Look for a matching subcommand
-					auto apply = [this]<std::unsigned_integral T>(T) consteval -> void
+					auto apply = [this]<std::unsigned_integral T>(T) -> void
 					{
-						/*constexpr std::size_t index = T;
+						constexpr std::size_t index = T;
 
-						logger_.Info("Checking for subcommand: {}", index);*/
+						logger_.Info("Checking for subcommand: {}", index);
 						// using CommandType = std::variant_alternative_t<index, SubType>;
 
 						// static_assert(command<CommandType>, "Not a valid command type");
@@ -107,7 +107,8 @@ namespace synodic::honesty::test
 						// }
 					};
 
-					ConstantFor<2, std::variant_size_v<SubType>, 1>(apply);
+					constexpr std::size_t size = std::variant_size_v<SubType>;
+					ConstantFor<2, size, 1>(apply);
 				}
 			}
 

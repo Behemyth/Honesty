@@ -37,7 +37,7 @@ namespace synodic::honesty::test::command
 		void Process(ProcessConfiguration& configuration) override
 		{
 			const api::ExecuteParameters
-				parameters(applicationName_, filter_, configuration.runner, configuration.reporters, logger_);
+				parameters(applicationName_, filter_, configuration.runner, configuration.reporters, false, logger_);
 			const api::ExecuteResult result = api::Execute(parameters);
 
 			if (not result.success)

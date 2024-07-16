@@ -27,11 +27,13 @@ namespace synodic::honesty::test::api
 			const std::string_view filter,
 			Runner& runner,
 			const std::span<std::unique_ptr<Reporter>> reporters,
+			bool dryRun,
 			const log::Logger& logger) :
 			applicationName(applicationName),
 			filter(filter),
 			runner(runner),
 			reporters(reporters),
+			dryRun(dryRun),
 			logger(logger)
 		{
 		}
@@ -42,6 +44,7 @@ namespace synodic::honesty::test::api
 		std::reference_wrapper<Runner> runner;
 		std::span<std::unique_ptr<Reporter>> reporters;
 
+		bool dryRun; 
 		std::reference_wrapper<const log::Logger> logger;
 	};
 

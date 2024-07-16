@@ -15,6 +15,26 @@ namespace
 		"api",
 		[](const Fixture& fixture) -> Generator
 		{
+			const synodic::honesty::log::Logger& root = synodic::honesty::log::RootLogger();
+			synodic::honesty::log::Logger logger	  = root.CreateLogger("test");
+
+			MockRunner runner(logger);
+
+			std::vector<std::unique_ptr<Reporter>> reporters;
+			reporters.push_back(std::make_unique<MockReporter>(logger));
+
+			co_yield "execute"_test = [&](const Requirements& requirements) -> Generator
+			{
+				const api::ExecuteParameters baseParameters("execute_test", "", runner, reporters, false, logger);
+
+				co_yield "dry_run"_test = [&](const Requirements& requirements)
+				{
+					const api::ExecuteParameters parameters = baseParameters;
+
+					const auto result = Execute(parameters);
+				};
+			};
+
 			/**
 			 *	@brief For the 'list' test we need to add a few things to the context. The runner that runs all the
 			 *		honesty tests will be reused, but the reporters has two additional considerations:
@@ -22,14 +42,8 @@ namespace
 			 *		2. We don't want to have the results duplicated with our normal reporters, the one running this test
 			 *		As a result, the context is unique to the test, and cannot be managed by the Interface class.
 			 */
-			co_yield "list"_test = [](const Requirements& requirements)
+			co_yield "list"_test = [&](const Requirements& requirements)
 			{
-				const synodic::honesty::log::Logger& root = synodic::honesty::log::RootLogger();
-
-				synodic::honesty::log::Logger logger = root.CreateLogger("test");
-
-				MockRunner runner(logger);
-
 				const api::ListParameters parameters("list_test", runner, logger);
 
 				// TODO: Adds another reporter to the list and throws bad_alloc

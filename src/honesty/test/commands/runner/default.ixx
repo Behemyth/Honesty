@@ -20,28 +20,14 @@ namespace synodic::honesty::test
 
 		void Run(const Requirements& requirements, const std::function_ref<void(const Requirements&)> function) override
 		{
-			try
-			{
-				function(requirements);
-			}
-			catch (AssertException)
-			{
-			}
+			function(requirements);
 		}
 
-		void
+		Generator
 			Run(const Requirements& requirements,
 				const std::function_ref<Generator(const Requirements&)> function) override
 		{
-			try
-			{
-				Generator generator = function(requirements);
-
-				// TODO: Use the generator
-			}
-			catch (AssertException)
-			{
-			}
+			return function(requirements);
 		}
 	};
 }

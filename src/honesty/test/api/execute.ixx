@@ -16,10 +16,12 @@ namespace
 	{
 		using Ts::operator()...;
 	};
+
 }
 
 namespace synodic::honesty::test::api
 {
+
 	export struct ExecuteParameters
 	{
 		ExecuteParameters(
@@ -44,7 +46,7 @@ namespace synodic::honesty::test::api
 		std::reference_wrapper<Runner> runner;
 		std::span<std::unique_ptr<Reporter>> reporters;
 
-		bool dryRun; 
+		bool dryRun;
 		std::reference_wrapper<const log::Logger> logger;
 	};
 
@@ -57,6 +59,74 @@ namespace synodic::honesty::test::api
 
 		bool success;
 	};
+
+	bool ProcessTest(const TestData& view, std::span<std::string_view> filter, const ExecuteParameters& parameters)
+	{
+		bool success = true;
+
+		// Filter the test by name
+		if (not filter.empty() and view.Name() != filter.front())
+		{
+			return success;
+		}
+
+		event::TestBegin testBegin;
+		testBegin.name = view.Name();
+
+		for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
+		{
+			reporter->Signal(testBegin);
+		}
+
+		RequirementsBackend requirements(parameters.reporters, view.Name(), parameters.logger);
+
+		Runner& runner = parameters.runner.get();
+
+		auto testExecutor = Overload {
+			[&](const std::function_ref<void(const Requirements&)> testCallback)
+			{
+				runner.Run(requirements, testCallback);
+			},
+			[&](const std::function_ref<Generator(const Requirements&)> testCallback)
+			{
+				Generator generator = runner.Run(requirements, testCallback);
+
+				for (const Test& test: generator)
+				{
+					const TestData& view = static_cast<TestData>(test);
+
+					bool testSucess = ProcessTest(view, filter, parameters);
+
+					if (not testSucess)
+					{
+						success = false;
+					}
+				}
+			}};
+
+		try
+		{
+			std::visit(testExecutor, view.Variant());
+		}
+		catch (AssertException)
+		{
+		}
+
+		if (not requirements.Context().success)
+		{
+			success = false;
+		}
+
+		event::TestEnd testEnd;
+		testEnd.name = view.Name();
+
+		for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
+		{
+			reporter->Signal(testEnd);
+		}
+
+		return success;
+	}
 
 	export auto Execute(const ExecuteParameters& parameters) -> ExecuteResult
 	{
@@ -116,47 +186,11 @@ namespace synodic::honesty::test::api
 			{
 				const TestData& view = static_cast<TestData>(test);
 
-				// Filter the test by name
-				if (not filter.empty() and view.Name() != filter.front())
-				{
-					continue;
-				}
+				bool testSucess = ProcessTest(view, filter, parameters);
 
-				event::TestBegin testBegin;
-				testBegin.name = view.Name();
-
-				for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
-				{
-					reporter->Signal(testBegin);
-				}
-
-				RequirementsBackend requirements(parameters.reporters, test.Name(), parameters.logger);
-
-				Runner& runner = parameters.runner.get();
-
-				auto testExecutor = Overload {
-					[&](const std::function_ref<void(const Requirements&)> testCallback)
-					{
-						runner.Run(requirements, testCallback);
-					},
-					[&](const std::function_ref<Generator(const Requirements&)> testCallback)
-					{
-						runner.Run(requirements, testCallback);
-					}};
-
-				std::visit(testExecutor, view.Variant());
-
-				if (not requirements.Context().success)
+				if (not testSucess)
 				{
 					success = false;
-				}
-
-				event::TestEnd testEnd;
-				testEnd.name = view.Name();
-
-				for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
-				{
-					reporter->Signal(testEnd);
 				}
 			}
 

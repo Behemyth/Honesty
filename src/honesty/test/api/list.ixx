@@ -71,6 +71,7 @@ namespace synodic::honesty::test::api
 
 		std::vector<std::unique_ptr<Reporter>> reporters;
 
+		// TODO: Create a path for direct initialization
 		{
 			const std::span<ReporterRegistry*> reporterRegistrars = ReporterRegistry::Registrars();
 			auto iterator										  = std::ranges::find_if(

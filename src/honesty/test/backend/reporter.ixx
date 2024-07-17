@@ -9,6 +9,8 @@ import synodic.honesty.test.types;
 
 namespace synodic::honesty::test
 {
+	constexpr std::size_t DefaultReporterCapacity = 4;
+
 	export class ReporterRegistry
 	{
 	public:
@@ -33,10 +35,8 @@ namespace synodic::honesty::test
 		}
 
 	private:
-		constinit static std::inplace_vector<ReporterRegistry*, 3> registrars_;
+		constinit static std::inplace_vector<ReporterRegistry*, DefaultReporterCapacity> registrars_;
 	};
 
-	constinit std::inplace_vector<ReporterRegistry*, 3> ReporterRegistry::registrars_;
+	constinit std::inplace_vector<ReporterRegistry*, DefaultReporterCapacity> ReporterRegistry::registrars_;
 }
-
-

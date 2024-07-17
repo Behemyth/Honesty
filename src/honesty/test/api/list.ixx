@@ -51,7 +51,6 @@ namespace synodic::honesty::test::api
 		std::string_view applicationName;
 
 		std::reference_wrapper<Runner> runner;
-		std::span<std::unique_ptr<Reporter>> reporters;
 
 		std::reference_wrapper<const log::Logger> logger;
 	};
@@ -70,22 +69,33 @@ namespace synodic::honesty::test::api
 			static ReporterRegistrar<ListReporter> listReporterRegistrar;
 		}
 
+		std::vector<std::unique_ptr<Reporter>> reporters;
+
+		{
+			const std::span<ReporterRegistry*> reporterRegistrars = ReporterRegistry::Registrars();
+			auto iterator										  = std::ranges::find_if(
+				reporterRegistrars,
+				[&](const ReporterRegistry* registry) -> bool
+				{
+					return registry->Name() == "list";
+				});
+
+			const ReporterRegistry* registry = *iterator;
+
+			reporters.push_back(registry->Create(parameters.logger));
+		}
+
 		// TODO: Filter with list command
-		const ExecuteParameters executeParameters(
-			parameters.applicationName,
-			"",
-			parameters.runner,
-			parameters.reporters,
-			true,
-			parameters.logger);
+		const ExecuteParameters
+			executeParameters(parameters.applicationName, "", parameters.runner, reporters, true, parameters.logger);
 
 		ExecuteResult executeResult = Execute(executeParameters);
 
 		ListResult result;
 
 		// Grab the list reporter and extract the data
-		std::unique_ptr<Reporter>& abstractReporter	  = parameters.reporters.front();
-		ListReporter& listReporter					  = dynamic_cast<ListReporter&>(*abstractReporter);
+		std::unique_ptr<Reporter>& abstractReporter = reporters.front();
+		ListReporter& listReporter					= dynamic_cast<ListReporter&>(*abstractReporter);
 
 		const CumulativeAdapter::CumulativeData& data = listReporter.Data();
 

@@ -28,16 +28,16 @@ namespace
 				Instance::Configuration configuration("instance_test", &sink);
 				Instance command(configuration, arguments);
 
-				// requirements.Assert(context);
-				// requirements.Expect(context->outputType == ListOutputType::JSON);
-				// requirements.Assert(context->file.has_value());
-				// requirements.Expect(context->file.value() == temporaryPath);
+				 requirements.Assert(context);
+				 requirements.Expect(context->outputType == ListOutputType::JSON);
+				 requirements.Assert(context->file.has_value());
+				 requirements.Expect(context->file.value() == temporaryPath);
 
 
 				// TODO: Recursively executes
-				//command.Execute();
+				command.Execute();
 
-				//requirements.Expect(exists(temporaryPath));
+				requirements.Expect(exists(temporaryPath));
 			};
 		});
 	SuiteRegistrar _(SUITE);

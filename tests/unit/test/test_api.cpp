@@ -47,7 +47,6 @@ namespace
 			{
 				const api::ListParameters parameters("list_test", runner, logger);
 
-				// TODO: Adds another reporter to the list and throws bad_alloc
 				const auto result = List(parameters);
 
 				requirements.ExpectGreater(result.suites.size(), static_cast<std::size_t>(0));

@@ -186,9 +186,14 @@ namespace synodic::honesty::test::api
 			{
 				const TestData& view = static_cast<TestData>(test);
 
-				bool testSucess = ProcessTest(view, filter, parameters);
+				bool testSuccess = true;
 
-				if (not testSucess)
+				if (not parameters.dryRun)
+				{
+					testSuccess = ProcessTest(view, filter, parameters);
+				}
+
+				if (not testSuccess)
 				{
 					success = false;
 				}

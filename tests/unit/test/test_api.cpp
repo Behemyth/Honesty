@@ -29,9 +29,9 @@ namespace
 
 				co_yield "dry_run"_test = [&](const Requirements& requirements)
 				{
-					const api::ExecuteParameters parameters = baseParameters;
+					api::ExecuteParameters parameters = baseParameters;
+					parameters.dryRun = true;
 
-					// TODO: Recursively fails
 					const auto result = Execute(parameters);
 				};
 			};

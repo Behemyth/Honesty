@@ -28,13 +28,10 @@ namespace
 				Instance::Configuration configuration("instance_test", &sink);
 				Instance command(configuration, arguments);
 
-				 requirements.Assert(context);
-				 requirements.Expect(context->outputType == ListOutputType::JSON);
-				 requirements.Assert(context->file.has_value());
-				 requirements.Expect(context->file.value() == temporaryPath);
+				requirements.Expect(context->outputType == ListOutputType::JSON);
+				requirements.Assert(context->file.has_value());
+				requirements.Expect(context->file.value() == temporaryPath);
 
-
-				// TODO: Recursively executes
 				command.Execute();
 
 				requirements.Expect(exists(temporaryPath));

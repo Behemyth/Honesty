@@ -23,11 +23,11 @@ namespace
 				const auto path = temporaryPath.generic_string();
 				std::array<std::string_view, 5> arguments {"fakeEXE", "list", "--json", "--file", path};
 
-				synodic::honesty::log::RingBuffer<std::mutex> sink;
+				std::stringstream stringStream;
+				synodic::honesty::log::OStream<std::mutex> stream(stringStream);
 
-				Instance::Configuration configuration("instance_test", &sink);
+				Instance::Configuration configuration("instance_test", &stream);
 				Instance command(configuration, arguments);
-
 				std::optional<command::ListData> data = command.CommandData<command::List>();
 
 				requirements.Assert(data.has_value());

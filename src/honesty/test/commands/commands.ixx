@@ -36,17 +36,6 @@ namespace
 
 	template<typename T, typename V>
 	concept type_in_variant = TypeInVariant<T, V>::value;
-
-	// Helper for iterating over a range of indices at compile-time
-	template<std::size_t Start, std::size_t End, std::size_t Inc, class Fn>
-	constexpr void ConstantFor(Fn&& function)
-	{
-		if constexpr (Start < End)
-		{
-			std::invoke(function);
-			ConstantFor<Start + Inc, End, Inc>(function);
-		}
-	}
 }
 
 namespace synodic::honesty::test
@@ -93,6 +82,7 @@ namespace synodic::honesty::test
 			logger_.SetSink(sink_);
 
 			command::Configuration commandConfiguration = ResolveConfiguration(configuration);
+			logger_.Debug("Creating commands for `{}` application", commandConfiguration.applicationName);
 
 			// If the executable and at least one argument is given we can look for subcommands
 			if (arguments.size() >= 2)
@@ -101,25 +91,9 @@ namespace synodic::honesty::test
 				if (std::string_view possibleSubCommand = arguments[1];
 					not possibleSubCommand.starts_with("-") and not possibleSubCommand.starts_with("--"))
 				{
-					// Look for a matching subcommand
-					auto apply = [this]<std::unsigned_integral T>(T) -> void
-					{
-						constexpr std::size_t index = T;
-
-						logger_.Info("Checking for subcommand: {}", index);
-						// using CommandType = std::variant_alternative_t<index, SubType>;
-
-						// static_assert(command<CommandType>, "Not a valid command type");
-
-						// if (const std::string_view commandName = CommandType::NAME; commandName ==
-						// possibleSubCommand)
-						//{
-						//	// command_.emplace<SubType>(CommandType(commandConfiguration));
-						// }
-					};
-
 					constexpr std::size_t size = std::variant_size_v<SubType>;
-					ConstantFor<2, size, 1>(apply);
+
+					SearchSubCommand(possibleSubCommand, commandConfiguration);
 				}
 			}
 
@@ -205,6 +179,28 @@ namespace synodic::honesty::test
 		}
 
 	private:
+		template<std::size_t Index = 0>
+		void SearchSubCommand(
+			const std::string_view possibleSubCommand,
+			const command::Configuration& commandConfiguration)
+		{
+			constexpr std::size_t size = std::variant_size_v<SubType>;
+
+			if constexpr (Index < size)
+			{
+				using CommandType = std::variant_alternative_t<Index, SubType>;
+
+				if (const std::string_view commandName = CommandType::NAME; commandName == possibleSubCommand)
+				{
+					command_.emplace<SubType>( std::in_place_type<CommandType>, commandConfiguration);
+				}
+				else
+				{
+					SearchSubCommand<Index + 1>(possibleSubCommand, commandConfiguration);
+				}
+			}
+		}
+
 		/**
 		 * @brief Resolve the configuration into a command configuration to be passed to the instantiated command.
 		 * @return The resolved command configuration.
@@ -215,7 +211,8 @@ namespace synodic::honesty::test
 		}
 
 		/***
-		 * @brief Resolve the parse result into the selected runner and reporters and set the instance up for execution.
+		 * @brief Resolve the parse result into the selected runner and reporters and set the instance up for
+		 * execution.
 		 * @param configuration The configuration to use.
 		 * @param parseResult The parsing result.
 		 */
@@ -309,5 +306,4 @@ namespace synodic::honesty::test
 		std::unique_ptr<Runner> runner_;
 		std::vector<std::unique_ptr<Reporter>> reporters_;
 	};
-
 }

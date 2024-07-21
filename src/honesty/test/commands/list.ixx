@@ -1,4 +1,4 @@
-module synodic.honesty.test.commands:list;
+export module synodic.honesty.test.commands:list;
 
 import std;
 import synodic.honesty.utility;
@@ -7,19 +7,24 @@ import :types;
 
 namespace synodic::honesty::test::command
 {
-	enum class ListOutputType : std::uint8_t
+	export enum class ListOutputType : std::uint8_t
 	{
 		LOG,
 		JSON
 	};
 
-	class List final : public Command
+	export struct ListData
+	{
+		ListOutputType outputType = ListOutputType::LOG;
+		std::optional<std::filesystem::path> file;
+	};
+
+	export class List final : public Command
 	{
 	public:
 		explicit List(const Configuration& configuration) :
 			applicationName_(configuration.applicationName),
-			logger_(configuration.logger),
-			outputType_(ListOutputType::LOG)
+			logger_(configuration.logger)
 		{
 		}
 
@@ -27,13 +32,15 @@ namespace synodic::honesty::test::command
 
 		static constexpr std::string_view NAME = "list";
 
+		using Data = ListData;
+
 		auto Parse(std::span<std::string_view> arguments) -> ParseResult override
 		{
 			arguments = arguments.subspan(1);
 
 			if (std::ranges::contains(arguments, "--json"))
 			{
-				outputType_ = ListOutputType::JSON;
+				data.outputType = ListOutputType::JSON;
 			}
 
 			if (auto itr = std::ranges::find(arguments, "--file"); itr != arguments.end())
@@ -43,9 +50,9 @@ namespace synodic::honesty::test::command
 					throw std::invalid_argument("You must give a file name when using the '--file' option");
 				}
 
-				file_ = absolute(std::filesystem::current_path() / *itr);
+				data.file = absolute(std::filesystem::current_path() / *itr);
 
-				if (not file_->has_filename())
+				if (not data.file->has_filename())
 				{
 					throw std::invalid_argument("You must give a valid file name when using the '--file' option");
 				}
@@ -61,9 +68,9 @@ namespace synodic::honesty::test::command
 			api::ListParameters parameters(applicationName_, configuration.runner.get(), logger_);
 			api::ListResult result = api::List(parameters);
 
-			if (file_)
+			if (data.file)
 			{
-				const std::filesystem::path& path = file_.value();
+				const std::filesystem::path& path = data.file.value();
 
 				std::ofstream file(path);
 
@@ -83,7 +90,7 @@ namespace synodic::honesty::test::command
 				// Clear the file
 				file.clear();
 
-				switch (outputType_)
+				switch (data.outputType)
 				{
 					case ListOutputType::LOG :
 					{
@@ -126,7 +133,6 @@ namespace synodic::honesty::test::command
 		std::unique_ptr<Runner> runner_;
 		std::reference_wrapper<const log::Logger> logger_;
 
-		ListOutputType outputType_;
-		std::optional<std::filesystem::path> file_;
+		ListData data;
 	};
 }

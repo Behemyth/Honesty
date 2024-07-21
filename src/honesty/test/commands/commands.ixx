@@ -11,7 +11,7 @@ import synodic.honesty.utility;
 
 import :types;
 import :execute;
-import :list;
+export import :list;
 
 import :reporter.default;
 import :reporter.compact;
@@ -25,6 +25,17 @@ namespace
 	{
 		using Ts::operator()...;
 	};
+
+	template<class T, typename U>
+	struct TypeInVariant;
+
+	template<class T, typename... Ts>
+	struct TypeInVariant<T, std::variant<Ts...>> : std::bool_constant<(std::is_same_v<T, Ts> || ...)>
+	{
+	};
+
+	template<typename T, typename V>
+	concept type_in_variant = TypeInVariant<T, V>::value;
 
 	// Helper for iterating over a range of indices at compile-time
 	template<std::size_t Start, std::size_t End, std::size_t Inc, class Fn>
@@ -146,6 +157,12 @@ namespace synodic::honesty::test
 				}};
 
 			std::visit(executor, command_);
+		}
+
+		template<type_in_variant<SubType> Cmd>
+		[[no_discard]] std::optional<typename Cmd::Data> CommandData()
+		{
+			return {};
 		}
 
 		void Execute()

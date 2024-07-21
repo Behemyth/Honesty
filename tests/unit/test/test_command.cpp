@@ -5,7 +5,7 @@ import synodic.honesty.test.mock;
 import synodic.honesty.test.commands;
 
 import synodic.honesty.log;
-;
+
 using namespace synodic::honesty::test;
 using namespace synodic::honesty::test::literals;
 
@@ -28,9 +28,12 @@ namespace
 				Instance::Configuration configuration("instance_test", &sink);
 				Instance command(configuration, arguments);
 
-				requirements.Expect(context->outputType == ListOutputType::JSON);
-				requirements.Assert(context->file.has_value());
-				requirements.Expect(context->file.value() == temporaryPath);
+				std::optional<command::ListData> data = command.CommandData<command::List>();
+
+				requirements.Assert(data.has_value());
+				requirements.Expect(data->outputType == command::ListOutputType::JSON);
+				requirements.Assert(data->file.has_value());
+				requirements.Expect(data->file.value() == temporaryPath);
 
 				command.Execute();
 

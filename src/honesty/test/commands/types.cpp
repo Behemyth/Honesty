@@ -77,6 +77,10 @@ namespace synodic::honesty::test::command
 			std::bool_constant<T::NAME>()
 		} -> std::same_as<std::true_type>;
 
+		// The command must have a type defined as Data	
+		T::Data;
+		
+
 		// Must be derived from the Command class
 		std::derived_from<T, Command>;
 	};

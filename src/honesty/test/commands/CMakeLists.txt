@@ -5,12 +5,12 @@ target_sources(honesty
 	TYPE CXX_MODULES
 	FILES
 	commands.ixx
+	list.ixx
 	PRIVATE
 	FILE_SET implementations
 	TYPE CXX_MODULES
 	FILES
 	execute.cpp
-	list.cpp
 	types.cpp
 )
 

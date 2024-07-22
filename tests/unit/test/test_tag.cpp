@@ -34,6 +34,7 @@ namespace
 
 					requirements.Expect(tag == SKIP);
 					requirements.Expect(tag == "skip");
+					requirements.Expect(tag != "run");
 				}
 
 				{
@@ -41,34 +42,39 @@ namespace
 
 					requirements.Expect(tag == "skip");
 					requirements.Expect(tag == "test");
+					requirements.Expect(tag != "run");
 				}
 
 				{
 					auto tag = Tag("test") / Tag("skip");
 
 					requirements.Expect(tag == SKIP);
-					requirements.Expect(tag == SKIP);
+					requirements.Expect(tag == "test");
+					requirements.Expect(tag != "run");
 				}
 
 				{
 					auto tag = Tag("test") / SKIP;
 
 					requirements.Expect(tag == SKIP);
-					requirements.Expect(tag == SKIP);
+					requirements.Expect(tag == "test");
+					requirements.Expect(tag != "run");
 				}
 
 				{
 					auto tag = SKIP / Tag("test");
 
 					requirements.Expect(tag == SKIP);
-					requirements.Expect(tag == SKIP);
+					requirements.Expect(tag == "test");
+					requirements.Expect(tag != "run");
 				}
 
 				{
 					auto tag = SKIP / SKIP;
 
 					requirements.Expect(tag == SKIP);
-					requirements.Expect(tag == SKIP);
+					requirements.Expect(tag != "test");
+					requirements.Expect(tag != "run");
 				}
 			};
 

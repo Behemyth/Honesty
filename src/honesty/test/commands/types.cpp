@@ -48,22 +48,21 @@ namespace synodic::honesty::test::command
 	{
 	public:
 		constexpr Command() = default;
-		virtual ~Command() = default;
+		virtual ~Command()	= default;
 
-		Command(const Command& other) = delete;
-		Command(Command&& other) noexcept = delete;
-		auto operator=(const Command& other) -> Command& = delete;
+		Command(const Command& other)						 = delete;
+		Command(Command&& other) noexcept					 = delete;
+		auto operator=(const Command& other) -> Command&	 = delete;
 		auto operator=(Command&& other) noexcept -> Command& = delete;
 
 		virtual auto Parse(std::span<std::string_view> arguments) -> ParseResult = 0;
-		virtual void Process(ProcessConfiguration& configuration) = 0;
+		virtual void Process(ProcessConfiguration& configuration)				 = 0;
 
 	private:
 	};
 
 	template<typename T>
-	concept command = requires(const Configuration& config)
-	{
+	concept command = requires(const T constValue, const Configuration& config) {
 		// Constructable from a Configuration
 		T(config);
 
@@ -77,9 +76,13 @@ namespace synodic::honesty::test::command
 			std::bool_constant<T::NAME>()
 		} -> std::same_as<std::true_type>;
 
-		// The command must have a type defined as Data	
+		// The command must have a type defined as Data
 		T::Data;
-		
+
+		// The command must have a GetData() method that returns a const reference to the Data type
+		{
+			constValue.GetData()
+		} -> std::same_as<const T::Data&>;
 
 		// Must be derived from the Command class
 		std::derived_from<T, Command>;

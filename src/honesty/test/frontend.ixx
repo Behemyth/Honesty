@@ -8,79 +8,6 @@ import function_ref;
 
 namespace synodic::honesty::test
 {
-	class TestLiteral
-	{
-	public:
-		explicit(false) consteval TestLiteral(const std::string_view name) :
-			name_(name)
-		{
-		}
-
-		TestLiteral(const TestLiteral& other)				 = delete;
-		TestLiteral(TestLiteral&& other) noexcept			 = delete;
-		TestLiteral& operator=(const TestLiteral& other)	 = delete;
-		TestLiteral& operator=(TestLiteral&& other) noexcept = delete;
-
-		template<typename Fn>
-			requires std::invocable<Fn, const Requirements&> &&
-					 std::same_as<void, std::invoke_result_t<Fn, const Requirements&>>
-		inline Test operator=(const Fn& test) const
-		{
-			return Test(name_, std::function_ref<void(const Requirements&)>(test));
-		}
-
-		template<typename Fn>
-			requires std::invocable<Fn, const Requirements&> &&
-					 std::same_as<Generator, std::invoke_result_t<Fn, const Requirements&>>
-		inline Test operator=(const Fn& test) const
-		{
-			return Test(name_, std::function_ref<Generator(const Requirements&)>(test));
-		}
-
-		auto operator=(Generator&& generator) const
-		{
-			return std::ranges::elements_of(std::forward<Generator>(generator));
-		}
-
-	private:
-		std::string_view name_;
-	};
-
-	export template<typename Fn, std::ranges::input_range R>
-		requires std::regular_invocable<Fn&, const Requirements&, std::ranges::range_reference_t<R>>
-	Generator operator|(Fn&& function, R&& range)
-	{
-		int index = 0;
-		for (auto&& element: range)
-		{
-			co_yield Test(
-				std::format("{}", index++),
-				[&function, &element](const Requirements& requirements)
-				{
-					function(requirements, element);
-				});
-		}
-	}
-
-	export template<typename Fn, typename... Types>
-		requires(std::regular_invocable<Fn&, const Requirements&, Types &&> && ...)
-	Generator operator|(Fn&& function, std::tuple<Types...>&& tuple)
-	{
-		co_yield std::ranges::elements_of(std::apply(
-			[&function](auto&&... args) -> Generator
-			{
-				int index = 0;
-				(co_yield Test(
-					 std::format("{}", index++),
-					 [&function, &args](const Requirements& requirements)
-					 {
-						 function(requirements, args);
-					 }),
-				 ...);
-			},
-			std::forward<std::tuple<Types...>>(tuple)));
-	}
-
 	export template<std::size_t N>
 	class Tag
 	{
@@ -167,6 +94,91 @@ namespace synodic::honesty::test
 	export constexpr Tag RUN("run");
 	export constexpr Tag SKIP("skip");
 	export constexpr Tag FAIL("fail");
+
+	class TestLiteral
+	{
+	public:
+		explicit(false) consteval TestLiteral(const std::string_view name) :
+			name_(name)
+		{
+		}
+
+		template<std::size_t N>
+		consteval TestLiteral(const std::string_view name, Tag<N> tag) :
+			name_(name)
+		{
+		}
+
+		TestLiteral(const TestLiteral& other)				 = delete;
+		TestLiteral(TestLiteral&& other) noexcept			 = delete;
+		TestLiteral& operator=(const TestLiteral& other)	 = delete;
+		TestLiteral& operator=(TestLiteral&& other) noexcept = delete;
+
+		template<typename Fn>
+			requires std::invocable<Fn, const Requirements&> &&
+					 std::same_as<void, std::invoke_result_t<Fn, const Requirements&>>
+		inline Test operator=(const Fn& test) const
+		{
+			return Test(name_, std::function_ref<void(const Requirements&)>(test));
+		}
+
+		template<typename Fn>
+			requires std::invocable<Fn, const Requirements&> &&
+					 std::same_as<Generator, std::invoke_result_t<Fn, const Requirements&>>
+		inline Test operator=(const Fn& test) const
+		{
+			return Test(name_, std::function_ref<Generator(const Requirements&)>(test));
+		}
+
+		auto operator=(Generator&& generator) const
+		{
+			return std::ranges::elements_of(std::forward<Generator>(generator));
+		}
+
+	private:
+		std::string_view name_;
+	};
+
+	export template<typename Fn, std::ranges::input_range R>
+		requires std::regular_invocable<Fn&, const Requirements&, std::ranges::range_reference_t<R>>
+	Generator operator|(Fn&& function, R&& range)
+	{
+		int index = 0;
+		for (auto&& element: range)
+		{
+			co_yield Test(
+				std::format("{}", index++),
+				[&function, &element](const Requirements& requirements)
+				{
+					function(requirements, element);
+				});
+		}
+	}
+
+	export template<typename Fn, typename... Types>
+		requires(std::regular_invocable<Fn&, const Requirements&, Types &&> && ...)
+	Generator operator|(Fn&& function, std::tuple<Types...>&& tuple)
+	{
+		co_yield std::ranges::elements_of(std::apply(
+			[&function](auto&&... args) -> Generator
+			{
+				int index = 0;
+				(co_yield Test(
+					 std::format("{}", index++),
+					 [&function, &args](const Requirements& requirements)
+					 {
+						 function(requirements, args);
+					 }),
+				 ...);
+			},
+			std::forward<std::tuple<Types...>>(tuple)));
+	}
+
+	export template<std::size_t N>
+	TestLiteral operator/(Tag<N> tag, TestLiteral test)
+	{
+		return TestLiteral(test.name_, tag);
+	}
 
 	export namespace literals
 	{

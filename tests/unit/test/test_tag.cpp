@@ -80,13 +80,19 @@ namespace
 
 			co_yield "test"_test = [](const Requirements& requirements)
 			{
-				Tag("test", "skip") / "inner"_test = [](const Requirements&)
 				{
-				};
-				SKIP / "test"_tag / "inner"_test = [](const Requirements&)
+					Test test = Tag("test", "skip") / "inner"_test = [](const Requirements&)
+					{
+					};
+					requirements.ExpectEquals(test.Tags().size(), 2);
+				}
+
 				{
-				};
-				requirements.ExpectEquals(test.Tags().size(), 2);
+					Test test = SKIP / "test"_tag / "inner"_test = [](const Requirements&)
+					{
+					};
+					requirements.ExpectEquals(test.Tags().size(), 2);
+				}
 			};
 
 			co_yield "fail"_test = [](const Requirements& requirements)

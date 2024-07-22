@@ -29,49 +29,47 @@ namespace
 
 			co_yield "equality"_test = [](const Requirements& requirements)
 			{
-				// TODO: Enable with 17.11 preview 3
+				{
+					auto tag = SKIP;
 
-				//{
-				//	auto tag = SKIP;
+					requirements.Expect(tag == SKIP);
+					requirements.Expect(tag == "skip");
+				}
 
-				//	requirements.ExpectEquals(tag, SKIP);
-				//	requirements.ExpectEquals(tag, "skip");
-				//}
+				{
+					auto tag = Tag("test", "skip");
 
-				//{
-				//	auto tag = Tag("test", "skip");
+					requirements.Expect(tag == "skip");
+					requirements.Expect(tag == "test");
+				}
 
-				//	requirements.ExpectEquals(tag, "skip");
-				//	requirements.ExpectEquals(tag, "test");
-				//}
+				{
+					auto tag = Tag("test") / Tag("skip");
 
-				//{
-				//	auto tag = Tag("test") / Tag("skip");
+					requirements.Expect(tag == SKIP);
+					requirements.Expect(tag == SKIP);
+				}
 
-				//	requirements.ExpectEquals(tag, SKIP);
-				//	requirements.ExpectEquals(tag, SKIP);
-				//}
+				{
+					auto tag = Tag("test") / SKIP;
 
-				//{
-				//	auto tag = Tag("test") / SKIP;
+					requirements.Expect(tag == SKIP);
+					requirements.Expect(tag == SKIP);
+				}
 
-				//	requirements.ExpectEquals(tag, SKIP);
-				//	requirements.ExpectEquals(tag, SKIP);
-				//}
+				{
+					auto tag = SKIP / Tag("test");
 
-				//{
-				//	auto tag = SKIP / Tag("test");
+					requirements.Expect(tag == SKIP);
+					requirements.Expect(tag == SKIP);
+				}
 
-				//	requirements.ExpectEquals(tag, SKIP);
-				//	requirements.ExpectEquals(tag, SKIP);
-				//}
+				{
+					auto tag = SKIP / SKIP;
 
-				//{
-				//	auto tag = SKIP / SKIP;
-
-				//	requirements.ExpectEquals(tag, SKIP);
-				//	requirements.ExpectEquals(tag, SKIP);
-				//}
+					requirements.Expect(tag == SKIP);
+					requirements.Expect(tag == SKIP);
+				}
 			};
 
 			co_yield "test"_test = [](const Requirements& requirements)

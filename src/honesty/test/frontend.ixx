@@ -136,12 +136,20 @@ namespace synodic::honesty::test
 		template<std::size_t OtherSize>
 		friend constexpr bool operator==(const Tag& a, const Tag<OtherSize>& b)
 		{
-			return std::ranges::any_of(a.tags_, b.tags_);
+			// TODO: Replace with range algorithm
+			for (auto& tag: b)
+			{
+				if (std::ranges::contains(a.tags_, tag))
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 
 		friend constexpr bool operator==(const Tag& a, std::string_view b)
 		{
-			return std::ranges::any_of(a.tags_, b);
+			return std::ranges::contains(a.tags_, b);
 		}
 
 	private:

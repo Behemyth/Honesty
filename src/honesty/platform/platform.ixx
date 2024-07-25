@@ -7,113 +7,106 @@ export namespace synodic::honesty::platform
 
 	enum class PlatformID
 	{
-		Windows,
+		WINDOWS,
 		OSX,
-		Linux,
-		Android,
-		Unknown
+		LINUX,
+		ANDROID,
+		UNKNOWN
 	};
 
 	class Platform
 	{
 	public:
-		constexpr static PlatformID GetPlatform();
-		constexpr static bool IsDesktop();
+		constexpr static PlatformID GetPlatform()
+		{
+			return PLATFORM;
+		}
+
+		constexpr static bool IsDesktop()
+		{
+			return PLATFORM == PlatformID::LINUX || PLATFORM == PlatformID::WINDOWS || PLATFORM == PlatformID::OSX;
+		}
 
 	private:
 #if defined(__linux__) && !defined(__ANDROID__)
 
-		constexpr static PlatformID platform_ = PlatformID::Linux;
+		constexpr static PlatformID PLATFORM = PlatformID::Linux;
 
 #elif defined(_WIN64)
 
-		constexpr static PlatformID platform_ = PlatformID::Windows;
+		constexpr static auto PLATFORM = PlatformID::WINDOWS;
 
 #elif defined(__APPLE__)
 
-		constexpr static PlatformID platform_ = PlatformID::OSX;
+		constexpr static PlatformID PLATFORM = PlatformID::OSX;
 
 #elif defined(__ANDROID__)
 
-		constexpr static PlatformID platform_ = PlatformID::Android;
+		constexpr static PlatformID PLATFORM = PlatformID::Android;
 
 #else
 
-		constexpr static PlatformID platform_ = PlatformID::Unknown;
+		constexpr static PlatformID PLATFORM = PlatformID::Unknown;
 
 #endif
 	};
 
-	constexpr PlatformID Platform::GetPlatform()
-	{
-		return platform_;
-	}
-
-	constexpr bool Platform::IsDesktop()
-	{
-		return platform_ == PlatformID::Linux || platform_ == PlatformID::Windows || platform_ == PlatformID::OSX;
-	}
-
 	enum class CompilerID
 	{
-		VisualStudio,
+		VISUAL_STUDIO,
 		GCC,
-		Clang,
-		Emscripten,
-		Unknown
+		CLANG,
+		EMSCRIPTEN,
+		UNKNOWN
 	};
 
 	class Compiler
 	{
 	public:
-		constexpr static CompilerID GetCompiler();
-		constexpr static bool Debug();
+		constexpr static CompilerID GetCompiler()
+		{
+			return COMPILER;
+		}
+
+		constexpr static bool Debug()
+		{
+			return DEBUG;
+		}
 
 	private:
 #if defined(_MSC_VER)
 
-		constexpr static CompilerID compiler_ = CompilerID::VisualStudio;
+		constexpr static auto COMPILER = CompilerID::VISUAL_STUDIO;
 
 #elif defined(__GNUC__)
 
-		constexpr static CompilerID compiler_ = CompilerID::GCC;
+		constexpr static auto COMPILER = CompilerID::GCC;
 
 #elif defined(__clang__)
 
-		constexpr static CompilerID compiler_ = CompilerID::Clang;
+		constexpr static auto COMPILER = CompilerID::Clang;
 
 #elif defined(__EMSCRIPTEN__)
 
-		constexpr static CompilerID compiler_ = CompilerID::Emscripten;
+		constexpr static auto COMPILER = CompilerID::Emscripten;
 
 #else
 
-		constexpr static CompilerID compiler_ = CompilerID::Unknown;
+		constexpr static auto COMPILER = CompilerID::Unknown;
 
 #endif
 
-// TODO: Update debug macro
+// TODO: Update debug macro. C++23/26?
 #if defined(NDEBUG)
 
-		constexpr static bool debug_ = false;
+		constexpr static bool DEBUG = false;
 
 #else
 
-		constexpr static bool debug_ = true;
+		constexpr static bool DEBUG = true;
 
 #endif
 	};
-
-	constexpr CompilerID Compiler::GetCompiler()
-	{
-		return compiler_;
-	}
-
-	constexpr bool Compiler::Debug()
-	{
-		return debug_;
-	}
-
 }
 
 module :private;

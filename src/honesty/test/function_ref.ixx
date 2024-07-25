@@ -8,13 +8,13 @@ import std;
 namespace std
 {
 
-	template<auto V>
+	export template<auto V>
 	struct nontype_t  // freestanding
 	{
 		explicit nontype_t() = default;
 	};
 
-	template<auto V>
+	export template<auto V>
 	inline constexpr nontype_t<V> nontype {};  // freestanding
 
 	using std::in_place_type;

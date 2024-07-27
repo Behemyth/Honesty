@@ -88,6 +88,11 @@ namespace synodic::honesty::test
 			return name_;
 		}
 
+		std::span<std::string_view> Tags() const
+		{
+			return tags_;
+		}
+
 	private:
 		friend class TestData;
 

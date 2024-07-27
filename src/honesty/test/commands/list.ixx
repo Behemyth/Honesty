@@ -34,10 +34,13 @@ namespace synodic::honesty::test::command
 
 		using Data = ListData;
 
+		const Data& GetData() const
+		{
+			return data;
+		}
+
 		auto Parse(std::span<std::string_view> arguments) -> ParseResult override
 		{
-			arguments = arguments.subspan(1);
-
 			if (std::ranges::contains(arguments, "--json"))
 			{
 				data.outputType = ListOutputType::JSON;

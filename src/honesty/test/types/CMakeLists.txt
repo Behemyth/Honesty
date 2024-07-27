@@ -11,4 +11,5 @@ target_sources(honesty
 	reporter.ixx
 	runner.ixx
 	suite.ixx
-	fixture.ixx)
+	fixture.ixx
+	tag.ixx)

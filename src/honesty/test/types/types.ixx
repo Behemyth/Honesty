@@ -7,3 +7,4 @@ export import :test;
 export import :suite;
 export import :exception;
 export import :fixture;
+export import :tag;

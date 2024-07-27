@@ -82,7 +82,7 @@ namespace synodic::honesty::test
 			logger_.SetSink(sink_);
 
 			command::Configuration commandConfiguration = ResolveConfiguration(configuration);
-			logger_.Debug("Creating commands for `{}` application", commandConfiguration.applicationName);
+			logger_.Debug("Finding command for `{}` application", commandConfiguration.applicationName);
 
 			// If the executable and at least one argument is given we can look for subcommands
 			if (arguments.size() >= 2)
@@ -91,8 +91,6 @@ namespace synodic::honesty::test
 				if (std::string_view possibleSubCommand = arguments[1];
 					not possibleSubCommand.starts_with("-") and not possibleSubCommand.starts_with("--"))
 				{
-					constexpr std::size_t size = std::variant_size_v<SubType>;
-
 					SearchSubCommand(possibleSubCommand, commandConfiguration);
 				}
 			}
@@ -118,7 +116,7 @@ namespace synodic::honesty::test
 				},
 				[this, &configuration, &arguments](SubType& command)
 				{
-					auto subExecutor = Overload {[this, &configuration, &arguments](command::List& subCommand)
+					auto subExecutor = Overload {[this, &configuration, &arguments](auto& subCommand)
 												 {
 													 const command::ParseResult result = subCommand.Parse(arguments);
 													 ResolveParseResult(configuration, result);
@@ -134,8 +132,15 @@ namespace synodic::honesty::test
 		}
 
 		template<type_in_variant<SubType> Cmd>
-		[[no_discard]] std::optional<typename Cmd::Data> CommandData()
+		[[no_discard]] std::optional<const typename Cmd::Data> CommandData()
 		{
+			if (const auto* subtype = std::get_if<SubType>(&command_))
+			{
+				if (const Cmd* command = std::get_if<Cmd>(subtype))
+				{
+					return command->GetData();
+				}
+			}
 			return {};
 		}
 
@@ -192,7 +197,7 @@ namespace synodic::honesty::test
 
 				if (const std::string_view commandName = CommandType::NAME; commandName == possibleSubCommand)
 				{
-					command_.emplace<SubType>( std::in_place_type<CommandType>, commandConfiguration);
+					command_.emplace<SubType>(std::in_place_type<CommandType>, commandConfiguration);
 				}
 				else
 				{

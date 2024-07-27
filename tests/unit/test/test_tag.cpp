@@ -29,60 +29,70 @@ namespace
 
 			co_yield "equality"_test = [](const Requirements& requirements)
 			{
-				// TODO: Enable with 17.11 preview 3
+				{
+					auto tag = SKIP;
 
-				//{
-				//	auto tag = SKIP;
+					requirements.Expect(tag == SKIP);
+					requirements.Expect(tag == "skip");
+					requirements.Expect(tag != "run");
+				}
 
-				//	requirements.ExpectEquals(tag, SKIP);
-				//	requirements.ExpectEquals(tag, "skip");
-				//}
+				{
+					auto tag = Tag("test", "skip");
 
-				//{
-				//	auto tag = Tag("test", "skip");
+					requirements.Expect(tag == "skip");
+					requirements.Expect(tag == "test");
+					requirements.Expect(tag != "run");
+				}
 
-				//	requirements.ExpectEquals(tag, "skip");
-				//	requirements.ExpectEquals(tag, "test");
-				//}
+				{
+					auto tag = Tag("test") / Tag("skip");
 
-				//{
-				//	auto tag = Tag("test") / Tag("skip");
+					requirements.Expect(tag == SKIP);
+					requirements.Expect(tag == "test");
+					requirements.Expect(tag != "run");
+				}
 
-				//	requirements.ExpectEquals(tag, SKIP);
-				//	requirements.ExpectEquals(tag, SKIP);
-				//}
+				{
+					auto tag = Tag("test") / SKIP;
 
-				//{
-				//	auto tag = Tag("test") / SKIP;
+					requirements.Expect(tag == SKIP);
+					requirements.Expect(tag == "test");
+					requirements.Expect(tag != "run");
+				}
 
-				//	requirements.ExpectEquals(tag, SKIP);
-				//	requirements.ExpectEquals(tag, SKIP);
-				//}
+				{
+					auto tag = SKIP / Tag("test");
 
-				//{
-				//	auto tag = SKIP / Tag("test");
+					requirements.Expect(tag == SKIP);
+					requirements.Expect(tag == "test");
+					requirements.Expect(tag != "run");
+				}
 
-				//	requirements.ExpectEquals(tag, SKIP);
-				//	requirements.ExpectEquals(tag, SKIP);
-				//}
+				{
+					auto tag = SKIP / SKIP;
 
-				//{
-				//	auto tag = SKIP / SKIP;
-
-				//	requirements.ExpectEquals(tag, SKIP);
-				//	requirements.ExpectEquals(tag, SKIP);
-				//}
+					requirements.Expect(tag == SKIP);
+					requirements.Expect(tag != "test");
+					requirements.Expect(tag != "run");
+				}
 			};
 
 			co_yield "test"_test = [](const Requirements& requirements)
 			{
-				//	Tag("test", "skip") / "inner"_test = [](const Requirements&)
-				//	{
-				//	};
-				//	SKIP / "test"_tag / "inner"_test = [](const Requirements&)
-				//	{
-				//	};
-				//	requirements.ExpectEquals(test.Tags().size(), 2);
+				{
+					Test test = Tag("test", "skip") / "inner"_test = [](const Requirements&)
+					{
+					};
+					requirements.ExpectEquals(test.Tags().size(), 2);
+				}
+
+				{
+					Test test = SKIP / "test"_tag / "inner"_test = [](const Requirements&)
+					{
+					};
+					requirements.ExpectEquals(test.Tags().size(), 2);
+				}
 			};
 
 			co_yield "fail"_test = [](const Requirements& requirements)

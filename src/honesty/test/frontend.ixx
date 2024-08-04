@@ -60,6 +60,8 @@ namespace synodic::honesty::test
 
 	private:
 		std::string_view name_;
+
+		// TODO Add tags
 	};
 
 	export template<typename Fn, std::ranges::input_range R>

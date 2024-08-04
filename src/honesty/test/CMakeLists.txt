@@ -6,10 +6,7 @@ target_sources(honesty
 	test.ixx
 	reporter.ixx
 	runner.ixx
-	function_ref.ixx
 	frontend.ixx
-	inplace_vector.ixx
-	generator.ixx
 	suite.ixx
 )
 

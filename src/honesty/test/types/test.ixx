@@ -4,8 +4,10 @@ import std;
 
 import generator;
 import function_ref;
+import inplace_vector;
 
 import :assert;
+import :tag;
 
 namespace synodic::honesty::test
 {
@@ -88,7 +90,7 @@ namespace synodic::honesty::test
 			return name_;
 		}
 
-		std::span<std::string_view> Tags() const
+		std::span<const FixedTag> Tags() const
 		{
 			return tags_;
 		}
@@ -98,6 +100,8 @@ namespace synodic::honesty::test
 
 		std::string_view name_;
 		VariantType test_;
+
+		std::inplace_vector<FixedTag, 8> tags_;
 	};
 
 	export class TestData

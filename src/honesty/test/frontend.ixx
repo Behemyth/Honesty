@@ -26,10 +26,10 @@ namespace synodic::honesty::test
 		{
 		}
 
-		TestLiteral(const TestLiteral& other)				 = delete;
-		TestLiteral(TestLiteral&& other) noexcept			 = delete;
-		TestLiteral& operator=(const TestLiteral& other)	 = delete;
-		TestLiteral& operator=(TestLiteral&& other) noexcept = delete;
+		TestLiteral(const TestLiteral& other)						   = delete;
+		consteval TestLiteral(TestLiteral&& other) noexcept			   = default;
+		TestLiteral& operator=(const TestLiteral& other)			   = delete;
+		consteval TestLiteral& operator=(TestLiteral&& other) noexcept = default;
 
 		template<typename Fn>
 			requires std::invocable<Fn, const Requirements&> &&
@@ -50,6 +50,12 @@ namespace synodic::honesty::test
 		auto operator=(Generator&& generator) const
 		{
 			return std::ranges::elements_of(std::forward<Generator>(generator));
+		}
+
+		template<std::size_t N>
+		friend consteval TestLiteral operator/(Tag<N> tag, TestLiteral test)
+		{
+			return TestLiteral(test.name_, tag);
 		}
 
 	private:
@@ -89,12 +95,6 @@ namespace synodic::honesty::test
 				 ...);
 			},
 			std::forward<std::tuple<Types...>>(tuple)));
-	}
-
-	export template<std::size_t N>
-	TestLiteral operator/(Tag<N> tag, TestLiteral test)
-	{
-		return TestLiteral(test.name_, tag);
 	}
 
 	export namespace literals

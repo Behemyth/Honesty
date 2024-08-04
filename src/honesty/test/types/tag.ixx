@@ -1,9 +1,13 @@
 export module synodic.honesty.test.types:tag;
 
 import std;
+import fixed_string;
 
 namespace synodic::honesty::test
 {
+	// All tags will have fixed storage
+	export using FixedTag = std::fixed_string<32>;
+
 	export template<std::size_t N>
 	class Tag
 	{

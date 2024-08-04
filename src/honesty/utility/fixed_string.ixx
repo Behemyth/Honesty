@@ -330,36 +330,36 @@ namespace std
 
 // hash support
 export template<std::size_t N>
-struct std::hash<fixed_string<N>> : std::hash<std::string_view>
+struct std::hash<std::fixed_string<N>> : std::hash<std::string_view>
 {
 };
 
 export template<std::size_t N>
-struct std::hash<fixed_u8string<N>> : std::hash<std::u8string_view>
+struct std::hash<std::fixed_u8string<N>> : std::hash<std::u8string_view>
 {
 };
 
 export template<std::size_t N>
-struct std::hash<fixed_u16string<N>> : std::hash<std::u16string_view>
+struct std::hash<std::fixed_u16string<N>> : std::hash<std::u16string_view>
 {
 };
 
 export template<std::size_t N>
-struct std::hash<fixed_u32string<N>> : std::hash<std::u32string_view>
+struct std::hash<std::fixed_u32string<N>> : std::hash<std::u32string_view>
 {
 };
 
 export template<std::size_t N>
-struct std::hash<fixed_wstring<N>> : std::hash<std::wstring_view>
+struct std::hash<std::fixed_wstring<N>> : std::hash<std::wstring_view>
 {
 };
 
 // formatting support
 export template<typename CharT, std::size_t N>
-struct std::formatter<basic_fixed_string<CharT, N>> : formatter<std::basic_string_view<CharT>>
+struct std::formatter<std::basic_fixed_string<CharT, N>> : formatter<std::basic_string_view<CharT>>
 {
 	template<typename FormatContext>
-	auto format(const basic_fixed_string<CharT, N>& str, FormatContext& ctx) const -> decltype(ctx.out())
+	auto format(const std::basic_fixed_string<CharT, N>& str, FormatContext& ctx) const -> decltype(ctx.out())
 	{
 		return formatter<std::basic_string_view<CharT>>::format(std::basic_string_view<CharT>(str), ctx);
 	}

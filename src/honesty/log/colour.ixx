@@ -386,13 +386,14 @@ namespace synodic::honesty::log
 }
 
 export template<>
-struct std::formatter<synodic::honesty::log::Colour24> : std::formatter<std::string_view>
+struct std::formatter<synodic::honesty::log::Colour24> :
+	std::formatter<std::tuple<std::uint8_t, std::uint8_t, std::uint8_t>>
 {
 	template<typename Context>
-	auto format(const synodic::honesty::log::Colour24& colour, Context& context) const -> typename Context::iterator
+	auto format(synodic::honesty::log::Colour24 colour, Context& context) const
 	{
-		return std::formatter<string_view>::format(
-			std::format("({}, {}, {})", colour.red, colour.green, colour.blue),
+		return std::formatter<std::tuple<std::uint8_t, std::uint8_t, std::uint8_t>>::format(
+			std::make_tuple(colour.red, colour.green, colour.blue),
 			context);
 	}
 };

@@ -16,26 +16,30 @@ namespace synodic::honesty::test
 		explicit consteval Tag(
 			std::convertible_to<std::string_view> auto tag,
 			std::convertible_to<std::string_view> auto... tags) :
-			tags_ {static_cast<std::string_view>(tag), static_cast<std::string_view>(tags)...}
-		{
-		}
-
-		template<typename... Args>
-			requires(std::convertible_to<Args, std::string_view> && ...)
-		explicit consteval Tag(std::tuple<Args...> tags) :
-			tags_ {std::apply(
-				[](auto... tags)
-				{
-					return std::array<std::string_view, N> {tags...};
-				},
-				tags)}
+			tags_ {tag, tags...}
 		{
 		}
 
 		template<std::size_t RSize>
 		consteval Tag<N + RSize> operator/(Tag<RSize> tag) const
 		{
-			return Tag<(N + RSize)>(std::tuple_cat(tags_, tag.tags_));
+			Tag<N + RSize> result(tags_[0]);
+
+			// Concat
+			std::size_t index = 0;
+
+			for (auto& element: tag.tags_)
+			{
+				result.tags_[index] = std::move(element);
+				++index;
+			}
+			for (auto& element: tags_)
+			{
+				result.tags_[index] = std::move(element);
+				++index;
+			}
+
+			return result;
 		}
 
 		consteval std::size_t Size() const noexcept

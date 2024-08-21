@@ -23,6 +23,7 @@ namespace synodic::honesty::test
 		template<std::size_t RSize>
 		consteval Tag<N + RSize> operator/(Tag<RSize> tag) const
 		{
+			// Create the tag with at least one value to that we initialize the underlying array
 			Tag<N + RSize> result(tags_[0]);
 
 			// Concat

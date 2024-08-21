@@ -90,7 +90,7 @@ namespace synodic::honesty::test
 			return name_;
 		}
 
-		std::span<const FixedTag> Tags() const
+		std::span<const std::string_view> Tags() const
 		{
 			return tags_;
 		}
@@ -101,7 +101,7 @@ namespace synodic::honesty::test
 		std::string_view name_;
 		VariantType test_;
 
-		std::inplace_vector<FixedTag, 8> tags_;
+		std::inplace_vector<std::string_view, 8> tags_;
 	};
 
 	export class TestData

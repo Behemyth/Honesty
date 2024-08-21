@@ -5,23 +5,18 @@ import fixed_string;
 
 namespace synodic::honesty::test
 {
-	// All tags will have fixed storage
-	export using FixedTag = std::fixed_string<32>;
-
 	export template<std::size_t N>
 	class Tag
 	{
 		static_assert(N > 0);
 
-		using const_iterator = typename std::array<FixedTag, N>::const_iterator;
+		using const_iterator = typename std::array<std::string_view, N>::const_iterator;
 
 	public:
 		explicit consteval Tag(
 			std::convertible_to<std::string_view> auto tag,
 			std::convertible_to<std::string_view> auto... tags) :
-			tags_ {
-				FixedTag(std::from_range, static_cast<std::string_view>(tag)),
-				FixedTag(std::from_range, static_cast<std::string_view>(tags))...}
+			tags_ {static_cast<std::string_view>(tag), static_cast<std::string_view>(tags)...}
 		{
 		}
 
@@ -31,7 +26,7 @@ namespace synodic::honesty::test
 			tags_ {std::apply(
 				[](auto... tags)
 				{
-					return std::array<FixedTag, N> {FixedTag(tags)...};
+					return std::array<std::string_view, N> {tags...};
 				},
 				tags)}
 		{
@@ -82,7 +77,7 @@ namespace synodic::honesty::test
 		template<std::size_t>
 		friend class Tag;
 
-		std::array<FixedTag, N> tags_;
+		std::array<std::string_view, N> tags_;
 	};
 
 	export Tag(std::string_view) -> Tag<1>;

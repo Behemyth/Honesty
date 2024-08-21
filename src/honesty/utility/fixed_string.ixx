@@ -45,7 +45,6 @@ namespace std
 		// NOLINTNEXTLINE(google-explicit-constructor, hicpp-explicit-conversions)
 		consteval explicit(false) basic_fixed_string(const CharT (&txt)[N + 1]) noexcept
 		{
-			gsl_Expects(txt[N] == CharT {});
 			for (std::size_t i = 0; i < N; ++i)
 			{
 				data_[i] = txt[i];
@@ -56,7 +55,6 @@ namespace std
 			requires std::convertible_to<std::iter_value_t<It>, CharT>
 		constexpr basic_fixed_string(It begin, S end)
 		{
-			gsl_Expects(std::distance(begin, end) == N);
 			for (auto it = data_; begin != end; ++begin, ++it)
 			{
 				*it = *begin;
@@ -67,7 +65,6 @@ namespace std
 			requires std::convertible_to<std::ranges::range_reference_t<R>, CharT>
 		constexpr basic_fixed_string(std::from_range_t, R&& r)
 		{
-			gsl_Expects(std::ranges::size(r) == N);
 			for (auto it = data_; auto&& v: std::forward<R>(r))
 			{
 				*it++ = std::forward<decltype(v)>(v);
@@ -127,7 +124,6 @@ namespace std
 		// element access
 		[[nodiscard]] constexpr const_reference operator[](size_type pos) const
 		{
-			gsl_Expects(pos < N);
 			return data()[pos];
 		}
 
@@ -142,13 +138,11 @@ namespace std
 
 		[[nodiscard]] constexpr const_reference front() const
 		{
-			gsl_Expects(!empty());
 			return (*this)[0];
 		}
 
 		[[nodiscard]] constexpr const_reference back() const
 		{
-			gsl_Expects(!empty());
 			return (*this)[N - 1];
 		}
 
@@ -227,7 +221,6 @@ namespace std
 		[[nodiscard]] consteval friend basic_fixed_string<CharT, N + N2 - 1, Traits>
 			operator+(const basic_fixed_string& lhs, const CharT (&rhs)[N2]) noexcept
 		{
-			gsl_Expects(rhs[N2 - 1] == CharT {});
 			CharT txt[N + N2];
 			CharT* it = txt;
 			for (CharT c: lhs)
@@ -245,7 +238,6 @@ namespace std
 		[[nodiscard]] consteval friend basic_fixed_string<CharT, N1 + N - 1, Traits>
 			operator+(const CharT (&lhs)[N1], const basic_fixed_string& rhs) noexcept
 		{
-			gsl_Expects(lhs[N1 - 1] == CharT {});
 			CharT txt[N1 + N];
 			CharT* it = txt;
 			for (size_t i = 0; i != N1 - 1; ++i)
@@ -271,7 +263,6 @@ namespace std
 		template<size_t N2>
 		[[nodiscard]] friend consteval bool operator==(const basic_fixed_string& lhs, const CharT (&rhs)[N2])
 		{
-			gsl_Expects(rhs[N2 - 1] == CharT {});
 			return lhs.view() == std::basic_string_view<CharT, Traits>(rhs, rhs + N2 - 1);
 		}
 
@@ -285,7 +276,6 @@ namespace std
 		template<size_t N2>
 		[[nodiscard]] friend consteval auto operator<=>(const basic_fixed_string& lhs, const CharT (&rhs)[N2])
 		{
-			gsl_Expects(rhs[N2 - 1] == CharT {});
 			return lhs.view() <=> std::basic_string_view<CharT, Traits>(rhs, rhs + N2 - 1);
 		}
 

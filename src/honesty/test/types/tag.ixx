@@ -2,45 +2,66 @@ export module synodic.honesty.test.types:tag;
 
 import std;
 import fixed_string;
+import inplace_vector;
+import synodic.honesty.utility;
 
 namespace synodic::honesty::test
 {
-	export template<std::size_t N>
-	class Tag
+	/**
+	 * @brief TODO: Add description
+	 */
+	export class Tag
 	{
-		static_assert(N > 0);
+		// NOTE: Tags must not be templated. The type must be shared between all instances such that conditional
+		//	logic can be applied to all tags regardless of their stored internal tag
 
-		using const_iterator = typename std::array<std::string_view, N>::const_iterator;
+		static constexpr int MaxTags	 = 8;
+		static constexpr int MaxNameSize = 14;
 
 	public:
-		explicit consteval Tag(
-			std::convertible_to<std::string_view> auto tag,
-			std::convertible_to<std::string_view> auto... tags) :
-			tags_ {tag, tags...}
+		using value_type			 = std::inplace_string<MaxNameSize>;
+		using pointer				 = value_type*;
+		using const_pointer			 = const value_type*;
+		using reference				 = value_type&;
+		using const_reference		 = const value_type&;
+		using const_iterator		 = const value_type*;
+		using iterator				 = const_iterator;
+		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+		using reverse_iterator		 = const_reverse_iterator;
+		using size_type				 = std::size_t;
+		using difference_type		 = std::ptrdiff_t;
+
+
+		template<std::convertible_to<char>... Chars>
+			requires(... && !std::is_pointer_v<Chars>)
+		consteval explicit Tag(Chars... chars) noexcept
 		{
+			
 		}
 
-		template<std::size_t RSize>
-		consteval Tag<N + RSize> operator/(Tag<RSize> tag) const
+		template<std::size_t N>
+		explicit consteval Tag(const char (&tag)[N])
 		{
-			// Create the tag with at least one value to that we initialize the underlying array
-			Tag<N + RSize> result(tags_[0]);
+			
+		}
 
-			// Concat
-			std::size_t index = 0;
+		template<std::input_iterator It, std::sentinel_for<It> S>
+			requires std::convertible_to<std::iter_value_t<It>, char>
+		constexpr Tag(It begin, S end)
+		{
+			
+		}
 
-			for (auto& element: tag.tags_)
-			{
-				result.tags_[index] = std::move(element);
-				++index;
-			}
-			for (auto& element: tags_)
-			{
-				result.tags_[index] = std::move(element);
-				++index;
-			}
+		template<std::ranges::input_range R>
+			requires std::convertible_to<std::ranges::range_reference_t<R>, CharT>
+		constexpr Tag(std::from_range_t, R&& r)
+		{
+		
+		}
 
-			return result;
+		consteval Tag operator/(Tag tag) const
+		{
+			return Tag();
 		}
 
 		consteval std::size_t Size() const noexcept
@@ -58,13 +79,11 @@ namespace synodic::honesty::test
 			return tags_.end();
 		}
 
-		template<std::size_t OtherSize>
-		friend constexpr bool operator==(const Tag& a, const Tag<OtherSize>& b)
+		friend constexpr bool operator==(const Tag& first, const Tag& second)
 		{
-			// TODO: Replace with range algorithm
-			for (auto& tag: b)
+			for (auto& tag: second.tags_)
 			{
-				if (std::ranges::contains(a.tags_, tag))
+				if (std::ranges::contains(first.tags_, tag))
 				{
 					return true;
 				}
@@ -72,21 +91,14 @@ namespace synodic::honesty::test
 			return false;
 		}
 
-		friend constexpr bool operator==(const Tag& a, std::string_view b)
+		friend constexpr bool operator==(const Tag& first, std::string_view second)
 		{
-			bool result = std::ranges::contains(a.tags_, b);
+			bool result = std::ranges::contains(first.tags_, second);
 			return result;
 		}
 
 	private:
-		template<std::size_t>
-		friend class Tag;
-
-		std::array<std::string_view, N> tags_;
+		std::inplace_vector<value_type, MaxTags> tags_{};
 	};
 
-	export Tag(std::string_view) -> Tag<1>;
-
-	export template<typename... T>
-	Tag(std::string_view, T...) -> Tag<1 + sizeof...(T)>;
 }

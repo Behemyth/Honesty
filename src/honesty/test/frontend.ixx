@@ -20,8 +20,7 @@ namespace synodic::honesty::test
 		{
 		}
 
-		template<std::size_t N>
-		consteval TestLiteral(const std::string_view name, Tag<N> tag) :
+		consteval TestLiteral(const std::string_view name, Tag tag) :
 			name_(name)
 		{
 		}
@@ -52,8 +51,7 @@ namespace synodic::honesty::test
 			return std::ranges::elements_of(std::forward<Generator>(generator));
 		}
 
-		template<std::size_t N>
-		friend consteval TestLiteral operator/(Tag<N> tag, TestLiteral test)
+		friend consteval TestLiteral operator/(Tag tag, TestLiteral test)
 		{
 			return TestLiteral(test.name_, tag);
 		}
@@ -61,7 +59,7 @@ namespace synodic::honesty::test
 	private:
 		std::string_view name_;
 
-		// TODO Add tags
+		// std::inplace_vector<std::string_view, 8> tags_;
 	};
 
 	export template<typename Fn, std::ranges::input_range R>
@@ -101,14 +99,15 @@ namespace synodic::honesty::test
 
 	export namespace literals
 	{
-		[[nodiscard]] consteval auto operator""_test(const char* const name, const std::size_t size)
+		[[nodiscard]] consteval auto operator""_test(const char* const name, const std::size_t size) -> TestLiteral
 		{
 			return TestLiteral(std::string_view(name, size));
 		}
 
-		[[nodiscard]] consteval auto operator""_tag(const char* const name, const std::size_t size)
+		[[nodiscard]] consteval auto operator""_tag(const char* const name, const std::size_t size) -> Tag
 		{
-			return Tag(std::string_view(name, size));
+			std::string_view tag(name, size);
+			return Tag(tag.cbegin(), tag.cend());
 		}
 	}
 }

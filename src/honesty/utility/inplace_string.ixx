@@ -15,11 +15,11 @@ namespace std
 	public:
 		using traits_type			 = Traits;
 		using value_type			 = CharT;
-		using pointer				 = CharT*;
-		using const_pointer			 = const CharT*;
-		using reference				 = CharT&;
-		using const_reference		 = const CharT&;
-		using const_iterator		 = const CharT*;
+		using pointer				 = value_type*;
+		using const_pointer			 = const value_type*;
+		using reference				 = value_type&;
+		using const_reference		 = const value_type&;
+		using const_iterator		 = const value_type*;
 		using iterator				 = const_iterator;
 		using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 		using reverse_iterator		 = const_reverse_iterator;
@@ -41,6 +41,19 @@ namespace std
 		{
 			std::copy_n(data, Size, data_.begin());
 			std::fill(data_.begin() + Size, data_.end(), CharT());	// Will always fill at least the built-in terminator
+		}
+
+		template<std::input_iterator It, std::sentinel_for<It> S>
+			requires std::convertible_to<std::iter_value_t<It>, char>
+		constexpr basic_inplace_string(It begin, S end)
+		{
+		}
+
+		template<std::ranges::input_range R>
+			requires std::convertible_to<std::ranges::range_reference_t<R>, CharT>
+		constexpr basic_inplace_string(std::from_range_t, R&& r)
+		{
+			
 		}
 
 		constexpr basic_inplace_string(const basic_inplace_string&) noexcept			= default;
@@ -174,6 +187,19 @@ namespace std
 	private:
 		std::inplace_vector<CharT, N + 1> data_;
 	};
+
+	template<typename T, typename... Ts>
+	concept one_of = (false || ... || std::same_as<T, Ts>);
+
+	// deduction guides
+	export template<one_of<char, char8_t, char16_t, char32_t, wchar_t> CharT, std::convertible_to<CharT>... Rest>
+	basic_inplace_string(CharT, Rest...) -> basic_inplace_string<CharT, 1 + sizeof...(Rest)>;
+
+	//export template<typename CharT, std::size_t N>
+	//basic_inplace_string(const CharT (&str)[N]) -> basic_fixedbasic_inplace_string_string<CharT, N - 1>;
+
+	export template<one_of<char, char8_t, char16_t, char32_t, wchar_t> CharT, std::size_t N>
+	basic_inplace_string(std::from_range_t, std::array<CharT, N>) -> basic_inplace_string<CharT, N>;
 
 	export template<std::size_t N>
 	using inplace_string = basic_inplace_string<char, N>;

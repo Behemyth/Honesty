@@ -14,7 +14,7 @@ namespace
 			{
 				constexpr Tag tag("one");
 
-				int size = sizeof(Tag);
+				const int size = sizeof(Tag);
 				requirements.ExpectLessEqual(size, 128);
 			};
 
@@ -38,7 +38,7 @@ namespace
 			co_yield "equality"_test = [](const Requirements& requirements)
 			{
 				{
-					auto tag = SKIP;
+					const auto tag = SKIP;
 
 					requirements.Expect(tag == SKIP);
 					requirements.Expect(tag == "skip");
@@ -46,7 +46,7 @@ namespace
 				}
 
 				{
-					auto tag = Tag("test") / Tag("skip");
+					const auto tag = Tag("test") / Tag("skip");
 
 					requirements.Expect(tag == SKIP);
 					requirements.Expect(tag == "test");
@@ -54,7 +54,7 @@ namespace
 				}
 
 				{
-					auto tag = Tag("test") / SKIP;
+					const auto tag = Tag("test") / SKIP;
 
 					requirements.Expect(tag == SKIP);
 					requirements.Expect(tag == "test");
@@ -62,7 +62,7 @@ namespace
 				}
 
 				{
-					auto tag = SKIP / Tag("test");
+					const auto tag = SKIP / Tag("test");
 
 					requirements.Expect(tag == SKIP);
 					requirements.Expect(tag == "test");
@@ -70,7 +70,7 @@ namespace
 				}
 
 				{
-					auto tag = SKIP / SKIP;
+					const auto tag = SKIP / SKIP;
 
 					requirements.Expect(tag == SKIP);
 					requirements.Expect(tag != "test");
@@ -81,7 +81,7 @@ namespace
 			co_yield "test"_test = [](const Requirements& requirements)
 			{
 				{
-					Test test = SKIP / "test"_tag / "inner"_test = [](const Requirements&)
+					const Test test = SKIP / "test"_tag / "inner"_test = [](const Requirements&)
 					{
 					};
 					requirements.ExpectEquals(test.Tags().size(), 2);

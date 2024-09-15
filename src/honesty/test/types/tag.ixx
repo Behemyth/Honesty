@@ -53,7 +53,7 @@ namespace synodic::honesty::test
 		}
 
 		template<std::ranges::input_range R>
-			requires std::convertible_to<std::ranges::range_reference_t<R>, CharT>
+			requires std::convertible_to<std::ranges::range_reference_t<R>, char>
 		constexpr Tag(std::from_range_t, R&& r)
 		{
 		

@@ -51,7 +51,7 @@ namespace synodic::honesty::test
 			return std::ranges::elements_of(std::forward<Generator>(generator));
 		}
 
-		friend consteval TestLiteral operator/(Tag tag, TestLiteral test)
+		friend consteval TestLiteral operator/(const Tag& tag, const TestLiteral test)
 		{
 			return TestLiteral(test.name_, tag);
 		}

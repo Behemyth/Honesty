@@ -20,7 +20,7 @@ namespace synodic::honesty::test
 		{
 		}
 
-		consteval TestLiteral(const std::string_view name, Tag tag) :
+		consteval TestLiteral(const std::string_view name, const Tag& tag) :
 			name_(name)
 		{
 		}
@@ -51,7 +51,7 @@ namespace synodic::honesty::test
 			return std::ranges::elements_of(std::forward<Generator>(generator));
 		}
 
-		friend consteval TestLiteral operator/(const Tag& tag, const TestLiteral test)
+		friend consteval TestLiteral operator/(const Tag& tag, const TestLiteral& test)
 		{
 			return TestLiteral(test.name_, tag);
 		}

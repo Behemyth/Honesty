@@ -59,7 +59,7 @@ namespace synodic::honesty::test
 		
 		}
 
-		consteval Tag operator/(Tag tag) const
+		consteval Tag operator/(const Tag& tag) const
 		{
 			return Tag();
 		}

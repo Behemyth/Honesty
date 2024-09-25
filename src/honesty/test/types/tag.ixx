@@ -93,7 +93,7 @@ namespace synodic::honesty::test
 
 		friend constexpr bool operator==(const Tag& first, std::string_view second)
 		{
-			bool result = std::ranges::contains(first.tags_, second);
+			const bool result = std::ranges::contains(first.tags_, second);
 			return result;
 		}
 

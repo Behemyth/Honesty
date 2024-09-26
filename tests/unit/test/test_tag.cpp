@@ -12,9 +12,8 @@ namespace
 		{
 			co_yield "traits"_test = [](const Requirements& requirements)
 			{
-				constexpr Tag tag("one");
-
-				const int size = sizeof(Tag);
+				// We want the tag size to fit within a nice, small size
+				constexpr int size = sizeof(Tag);
 				requirements.ExpectLessEqual(size, 128);
 			};
 

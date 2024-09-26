@@ -13,13 +13,13 @@ namespace synodic::honesty::test
 	export class Tag
 	{
 		// NOTE: Tags must not be templated. The type must be shared between all instances such that conditional
-		//	logic can be applied to all tags regardless of their stored internal tag
+		//	logic can be applied to all tags regardless of their stored internal state.
 
-		static constexpr int MaxTags	 = 8;
-		static constexpr int MaxNameSize = 14;
+		static constexpr int MAX_TAGS	 = 8;
+		static constexpr int MAX_NAME_SIZE = 13;
 
 	public:
-		using value_type			 = std::inplace_string<MaxNameSize>;
+		using value_type			 = std::inplace_string<MAX_NAME_SIZE>;
 		using pointer				 = value_type*;
 		using const_pointer			 = const value_type*;
 		using reference				 = value_type&;
@@ -47,16 +47,14 @@ namespace synodic::honesty::test
 
 		template<std::input_iterator It, std::sentinel_for<It> S>
 			requires std::convertible_to<std::iter_value_t<It>, char>
-		constexpr Tag(It begin, S end)
+		consteval Tag(It begin, S end)
 		{
-			
 		}
 
 		template<std::ranges::input_range R>
 			requires std::convertible_to<std::ranges::range_reference_t<R>, char>
-		constexpr Tag(std::from_range_t, R&& r)
+		consteval Tag(std::from_range_t, R&& r)
 		{
-		
 		}
 
 		consteval Tag operator/(const Tag& tag) const
@@ -64,7 +62,7 @@ namespace synodic::honesty::test
 			return Tag();
 		}
 
-		consteval std::size_t Size() const noexcept
+		constexpr std::size_t Size() const noexcept
 		{
 			return tags_.size();
 		}
@@ -98,7 +96,7 @@ namespace synodic::honesty::test
 		}
 
 	private:
-		std::inplace_vector<value_type, MaxTags> tags_{};
+		std::inplace_vector<value_type, MAX_TAGS> tags_{};
 	};
 
 }

@@ -21,23 +21,27 @@ namespace
 					return "This outputs only on error";
 				};
 
-				//// Assert
-				//{
-				//	requirements.Assert(false, "This outputs only on error");
+				// Assert
+				{
+					// TODO: Enable when the "Fail" tag works
+					//requirements.Assert(false, "This outputs only on error");
 
-				//	requirements.Assert(true, "This outputs only on error");
+					requirements.Assert(true, "This outputs only on error");
 
-				//	requirements.Assert(false, description);
-				//}
+					// TODO: Enable when the "Fail" tag works
+					//requirements.Assert(false, description);
+				}
 
-				//// Expect
-				//{
-				//	requirements.Expect(false, "This outputs only on error");
+				// Expect
+				{
+					// TODO: Enable when the "Fail" tag works
+					//requirements.Expect(false, "This outputs only on error");
 
-				//	requirements.Expect(true, "This outputs only on error");
+					requirements.Expect(true, "This outputs only on error");
 
-				//	requirements.Expect(false, description);
-				//}
+					// TODO: Enable when the "Fail" tag works
+					//requirements.Expect(false, description);
+				}
 			};
 		});
 

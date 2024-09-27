@@ -1,7 +1,7 @@
 export module synodic.honesty.utility:inplace_string;
 
 import std;
-import inplace_vector;
+import :traits;
 
 namespace std
 {
@@ -185,7 +185,8 @@ namespace std
 		}
 
 	private:
-		std::inplace_vector<CharT, N + 1> data_;
+		std::array<CharT, N + 1> data_;
+		synodic::honesty::utility::MinimalIntegerType<N> size_;
 	};
 
 	template<typename T, typename... Ts>

@@ -40,6 +40,7 @@ namespace synodic::honesty::test
 		}
 
 		template<std::size_t N>
+			requires(N <= MAX_NAME_SIZE)
 		explicit consteval Tag(const char (&tag)[N])
 		{
 			
@@ -67,15 +68,11 @@ namespace synodic::honesty::test
 			return tags_.size();
 		}
 
-		constexpr const_iterator begin() const noexcept
+		constexpr std::span<const value_type> View() const noexcept
 		{
-			return tags_.begin();
+			return tags_;
 		}
 
-		constexpr const_iterator end() const noexcept
-		{
-			return tags_.end();
-		}
 
 		friend constexpr bool operator==(const Tag& first, const Tag& second)
 		{
@@ -89,7 +86,7 @@ namespace synodic::honesty::test
 			return false;
 		}
 
-		friend constexpr bool operator==(const Tag& first, std::string_view second)
+		friend constexpr bool operator==(const Tag& first, const std::string_view second)
 		{
 			const bool result = std::ranges::contains(first.tags_, second);
 			return result;

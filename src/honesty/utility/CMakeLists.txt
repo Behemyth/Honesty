@@ -11,4 +11,5 @@ target_sources(honesty
 			generator.ixx
 			function_ref.ixx
 			fixed_string.ixx
+			traits.ixx
 )

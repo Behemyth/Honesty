@@ -50,6 +50,14 @@ namespace synodic::honesty::utility
 			std::fill(data_.begin() + Size, data_.end(), CharT());	// Will always fill at least the built-in terminator
 		}
 
+		constexpr explicit BasicInplaceString(std::basic_string_view<CharT, Traits> data) noexcept :
+			data_(),
+			size_(data.size())
+		{
+			std::copy_n(data.data(), size_, data_.begin());
+			std::fill(data_.begin() + size_, data_.end(), CharT());	// Will always fill at least the built-in terminator
+		}
+
 		constexpr BasicInplaceString(const BasicInplaceString&) noexcept			= default;
 		constexpr BasicInplaceString& operator=(const BasicInplaceString&) noexcept = default;
 

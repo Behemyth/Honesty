@@ -107,7 +107,7 @@ namespace synodic::honesty::test
 		[[nodiscard]] consteval auto operator""_tag(const char* const name, const std::size_t size) -> Tag
 		{
 			std::string_view tag(name, size);
-			return Tag(tag.cbegin(), tag.cend());
+			return Tag(std::string_view(name, size));
 		}
 	}
 }

@@ -24,6 +24,11 @@ namespace
 					requirements.ExpectEquals(str.size(), 4);
 					requirements.ExpectEquals(str.view(), "test");
 				}
+				{
+					synodic::honesty::utility::InplaceString<5> str(std::string_view("test"));
+					requirements.ExpectEquals(str.size(), 4);
+					requirements.ExpectEquals(str.view(), "test");
+				}
 			};
 		});
 	SuiteRegistrar _(SUITE);

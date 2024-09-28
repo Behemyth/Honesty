@@ -38,20 +38,12 @@ namespace synodic::honesty::test
 		}
 
 		template<std::size_t N>
-			requires(N <= MAX_NAME_SIZE)
+			requires(N - 1 <= MAX_NAME_SIZE)
 		explicit consteval Tag(const char (&tag)[N])
 		{
 		}
 
-		template<std::input_iterator It, std::sentinel_for<It> S>
-			requires std::convertible_to<std::iter_value_t<It>, char>
-		consteval Tag(It begin, S end)
-		{
-		}
-
-		template<std::ranges::input_range R>
-			requires std::convertible_to<std::ranges::range_reference_t<R>, char>
-		consteval Tag(std::from_range_t, R&& r)
+		constexpr explicit Tag(std::string_view view) noexcept
 		{
 		}
 

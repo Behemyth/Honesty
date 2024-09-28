@@ -15,11 +15,11 @@ namespace synodic::honesty::test
 		// NOTE: Tags must not be templated. The type must be shared between all instances such that conditional
 		//	logic can be applied to all tags regardless of their stored internal state.
 
-		static constexpr int MAX_TAGS	 = 8;
+		static constexpr int MAX_TAGS	   = 8;
 		static constexpr int MAX_NAME_SIZE = 13;
 
 	public:
-		using value_type			 = std::inplace_string<MAX_NAME_SIZE>;
+		using value_type			 = utility::InplaceString<MAX_NAME_SIZE>;
 		using pointer				 = value_type*;
 		using const_pointer			 = const value_type*;
 		using reference				 = value_type&;
@@ -31,19 +31,16 @@ namespace synodic::honesty::test
 		using size_type				 = std::size_t;
 		using difference_type		 = std::ptrdiff_t;
 
-
 		template<std::convertible_to<char>... Chars>
 			requires(... && !std::is_pointer_v<Chars>)
 		consteval explicit Tag(Chars... chars) noexcept
 		{
-			
 		}
 
 		template<std::size_t N>
 			requires(N <= MAX_NAME_SIZE)
 		explicit consteval Tag(const char (&tag)[N])
 		{
-			
 		}
 
 		template<std::input_iterator It, std::sentinel_for<It> S>
@@ -73,7 +70,6 @@ namespace synodic::honesty::test
 			return tags_;
 		}
 
-
 		friend constexpr bool operator==(const Tag& first, const Tag& second)
 		{
 			for (auto& tag: second.tags_)
@@ -93,7 +89,7 @@ namespace synodic::honesty::test
 		}
 
 	private:
-		std::inplace_vector<value_type, MAX_TAGS> tags_{};
+		std::inplace_vector<value_type, MAX_TAGS> tags_ {};
 	};
 
 }

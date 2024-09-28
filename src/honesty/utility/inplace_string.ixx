@@ -3,7 +3,7 @@ export module synodic.honesty.utility:inplace_string;
 import std;
 import :traits;
 
-namespace std
+namespace synodic::honesty::utility
 {
 
 	/**
@@ -12,7 +12,7 @@ namespace std
 	 *	footprint.
 	 */
 	export template<typename CharT, std::size_t N, typename Traits = std::char_traits<CharT>>
-	class basic_inplace_string
+	class BasicInplaceString
 	{
 	public:
 		using traits_type			 = Traits;
@@ -28,37 +28,30 @@ namespace std
 		using size_type				 = std::size_t;
 		using difference_type		 = std::ptrdiff_t;
 
-		constexpr basic_inplace_string() noexcept = default;
+		constexpr BasicInplaceString() noexcept :
+			data_ {},
+			size_(0) {};
 
 		template<std::convertible_to<CharT>... Chars>
 			requires(sizeof...(Chars) <= N) && (... && !std::is_pointer_v<Chars>)
-		constexpr explicit basic_inplace_string(Chars... chars) noexcept :
-			data_ {chars..., CharT {}}
+		constexpr explicit BasicInplaceString(Chars... chars) noexcept :
+			data_ {chars..., CharT {}},	 // Ends the string with a null terminator
+			size_(sizeof...(Chars))
 		{
 		}
 
 		template<std::size_t Size>
-			requires(Size <= N)
-		consteval explicit(false) basic_inplace_string(const CharT (&data)[Size + 1]) noexcept
+			requires(Size - 1 <= N)
+		consteval explicit(false) BasicInplaceString(const CharT (&data)[Size]) noexcept :
+			data_(),
+			size_(Size - 1)
 		{
-			std::copy_n(data, Size, data_.begin());
+			std::copy_n(data, Size - 1, data_.begin());
 			std::fill(data_.begin() + Size, data_.end(), CharT());	// Will always fill at least the built-in terminator
 		}
 
-		template<std::input_iterator It, std::sentinel_for<It> S>
-			requires std::convertible_to<std::iter_value_t<It>, char>
-		constexpr basic_inplace_string(It begin, S end)
-		{
-		}
-
-		template<std::ranges::input_range R>
-			requires std::convertible_to<std::ranges::range_reference_t<R>, CharT>
-		constexpr basic_inplace_string(std::from_range_t, R&& r)
-		{
-		}
-
-		constexpr basic_inplace_string(const basic_inplace_string&) noexcept			= default;
-		constexpr basic_inplace_string& operator=(const basic_inplace_string&) noexcept = default;
+		constexpr BasicInplaceString(const BasicInplaceString&) noexcept			= default;
+		constexpr BasicInplaceString& operator=(const BasicInplaceString&) noexcept = default;
 
 		[[nodiscard]] constexpr const_iterator begin() const noexcept
 		{
@@ -67,7 +60,7 @@ namespace std
 
 		[[nodiscard]] constexpr const_iterator end() const noexcept
 		{
-			return data() + data_.size();
+			return data() + size_;
 		}
 
 		[[nodiscard]] constexpr const_iterator cbegin() const noexcept
@@ -102,12 +95,12 @@ namespace std
 
 		constexpr size_type size()
 		{
-			return data_.size();
+			return size_;
 		}
 
 		constexpr size_type length()
 		{
-			return data_.size();
+			return size_;
 		}
 
 		static constexpr std::integral_constant<size_type, N> max_size {};
@@ -120,7 +113,7 @@ namespace std
 
 		[[nodiscard]] constexpr const_reference at(size_type pos) const
 		{
-			data_.at(pos);
+			return data_.at(pos);
 		}
 
 		[[nodiscard]] constexpr const_reference front() const
@@ -155,97 +148,97 @@ namespace std
 
 		template<size_t N2>
 		[[nodiscard]] friend constexpr bool
-			operator==(const basic_inplace_string& lhs, const basic_inplace_string<CharT, N2, Traits>& rhs)
+			operator==(const BasicInplaceString& lhs, const BasicInplaceString<CharT, N2, Traits>& rhs)
 		{
 			return lhs.view() == rhs.view();
 		}
 
 		template<size_t N2>
-		[[nodiscard]] friend consteval bool operator==(const basic_inplace_string& lhs, const CharT (&rhs)[N2])
+		[[nodiscard]] friend consteval bool operator==(const BasicInplaceString& lhs, const CharT (&rhs)[N2])
 		{
 			return lhs.view() == std::basic_string_view<CharT, Traits>(rhs, rhs + N2 - 1);
 		}
 
 		template<size_t N2>
 		[[nodiscard]] friend constexpr auto
-			operator<=>(const basic_inplace_string& lhs, const basic_inplace_string<CharT, N2, Traits>& rhs)
+			operator<=>(const BasicInplaceString& lhs, const BasicInplaceString<CharT, N2, Traits>& rhs)
 		{
 			return lhs.view() <=> rhs.view();
 		}
 
 		template<size_t N2>
-		[[nodiscard]] friend constexpr auto operator<=>(const basic_inplace_string& lhs, const CharT (&rhs)[N2])
+		[[nodiscard]] friend constexpr auto operator<=>(const BasicInplaceString& lhs, const CharT (&rhs)[N2])
 		{
 			return lhs.view() <=> std::basic_string_view<CharT, Traits>(rhs, rhs + N2 - 1);
 		}
 
 		friend std::basic_ostream<CharT, Traits>&
-			operator<<(std::basic_ostream<CharT, Traits>& os, const basic_inplace_string& str)
+			operator<<(std::basic_ostream<CharT, Traits>& os, const BasicInplaceString& str)
 		{
 			return os << str.c_str();
 		}
 
 	private:
 		std::array<CharT, N + 1> data_;
-		synodic::honesty::utility::MinimalIntegerType<N> size_;
+		MinimalIntegerType<N> size_;
 	};
 
 	template<typename T, typename... Ts>
 	concept one_of = (false || ... || std::same_as<T, Ts>);
 
-	// deduction guides
-	export template<one_of<char, char8_t, char16_t, char32_t, wchar_t> CharT, std::convertible_to<CharT>... Rest>
-	basic_inplace_string(CharT, Rest...) -> basic_inplace_string<CharT, 1 + sizeof...(Rest)>;
+	// Deduction Guides
 
-	// export template<typename CharT, std::size_t N>
-	// basic_inplace_string(const CharT (&str)[N]) -> basic_fixedbasic_inplace_string_string<CharT, N - 1>;
+	export template<one_of<char, char8_t, char16_t, char32_t, wchar_t> CharT, typename... Rest>
+	BasicInplaceString(CharT, Rest...) -> BasicInplaceString<CharT, 1 + sizeof...(Rest)>;
 
-	export template<one_of<char, char8_t, char16_t, char32_t, wchar_t> CharT, std::size_t N>
-	basic_inplace_string(std::from_range_t, std::array<CharT, N>) -> basic_inplace_string<CharT, N>;
+	export template<typename CharT, std::size_t N>
+	BasicInplaceString(const CharT (&str)[N]) -> BasicInplaceString<CharT, N - 1>;
 
 	export template<std::size_t N>
-	using inplace_string = basic_inplace_string<char, N>;
+	using InplaceString = BasicInplaceString<char, N>;
 	export template<std::size_t N>
-	using inplace_u8string = basic_inplace_string<char8_t, N>;
+	using InplaceU8String = BasicInplaceString<char8_t, N>;
 	export template<std::size_t N>
-	using inplace_u16string = basic_inplace_string<char16_t, N>;
+	using InplaceU16String = BasicInplaceString<char16_t, N>;
 	export template<std::size_t N>
-	using inplace_u32string = basic_inplace_string<char32_t, N>;
+	using InplaceU32String = BasicInplaceString<char32_t, N>;
 	export template<std::size_t N>
-	using inplace_wstring = basic_inplace_string<wchar_t, N>;
+	using InplaceWString = BasicInplaceString<wchar_t, N>;
 
 }
 
 export template<std::size_t N>
-struct std::hash<std::inplace_string<N>> : std::hash<std::string_view>
+struct std::hash<synodic::honesty::utility::InplaceString<N>> : std::hash<std::string_view>
 {
 };
 
 export template<std::size_t N>
-struct std::hash<std::inplace_u8string<N>> : std::hash<std::u8string_view>
+struct std::hash<synodic::honesty::utility::InplaceU8String<N>> : std::hash<std::u8string_view>
 {
 };
 
 export template<std::size_t N>
-struct std::hash<std::inplace_u16string<N>> : std::hash<std::u16string_view>
+struct std::hash<synodic::honesty::utility::InplaceU16String<N>> : std::hash<std::u16string_view>
 {
 };
 
 export template<std::size_t N>
-struct std::hash<std::inplace_u32string<N>> : std::hash<std::u32string_view>
+struct std::hash<synodic::honesty::utility::InplaceU32String<N>> : std::hash<std::u32string_view>
 {
 };
 
 export template<std::size_t N>
-struct std::hash<std::inplace_wstring<N>> : std::hash<std::wstring_view>
+struct std::hash<synodic::honesty::utility::InplaceWString<N>> : std::hash<std::wstring_view>
 {
 };
 
 export template<typename CharT, std::size_t N>
-struct std::formatter<std::basic_inplace_string<CharT, N>> : formatter<std::basic_string_view<CharT>>
+struct std::formatter<synodic::honesty::utility::BasicInplaceString<CharT, N>> :
+	formatter<std::basic_string_view<CharT>>
 {
 	template<typename FormatContext>
-	auto format(const std::basic_inplace_string<CharT, N>& str, FormatContext& ctx) const -> decltype(ctx.out())
+	auto format(const synodic::honesty::utility::BasicInplaceString<CharT, N>& str, FormatContext& ctx) const
+		-> decltype(ctx.out())
 	{
 		return formatter<std::basic_string_view<CharT>>::format(std::basic_string_view<CharT>(str), ctx);
 	}

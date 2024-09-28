@@ -32,9 +32,9 @@ namespace synodic::honesty::test
 
 		return std::format(
 			"{}\n{}\n{}",
-			format(highlight, "{}{}", indent, indentedA),
+			format(highlight, "{}'{}'", indent, indentedA),
 			relation,
-			format(highlight, "{}{}", indent, indentedB));
+			format(highlight, "{}'{}'", indent, indentedB));
 	}
 
 	export class DefaultReporter final : public StreamingAdapter

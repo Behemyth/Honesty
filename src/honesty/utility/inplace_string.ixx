@@ -7,7 +7,9 @@ namespace std
 {
 
 	/**
-	 * @brief A string with an internal buffer. Mimics the api of std::basic_string while supporting modifications
+	 * @brief A string with an internal buffer. Mimics the api of std::basic_string while supporting modifications.
+	 *	Implements the interface of std::fixed_string (p3094) while allowing for modifications and a smaller storage
+	 *	footprint.
 	 */
 	export template<typename CharT, std::size_t N, typename Traits = std::char_traits<CharT>>
 	class basic_inplace_string
@@ -53,7 +55,6 @@ namespace std
 			requires std::convertible_to<std::ranges::range_reference_t<R>, CharT>
 		constexpr basic_inplace_string(std::from_range_t, R&& r)
 		{
-			
 		}
 
 		constexpr basic_inplace_string(const basic_inplace_string&) noexcept			= default;
@@ -173,7 +174,7 @@ namespace std
 		}
 
 		template<size_t N2>
-		[[nodiscard]] friend consteval auto operator<=>(const basic_inplace_string& lhs, const CharT (&rhs)[N2])
+		[[nodiscard]] friend constexpr auto operator<=>(const basic_inplace_string& lhs, const CharT (&rhs)[N2])
 		{
 			return lhs.view() <=> std::basic_string_view<CharT, Traits>(rhs, rhs + N2 - 1);
 		}
@@ -196,8 +197,8 @@ namespace std
 	export template<one_of<char, char8_t, char16_t, char32_t, wchar_t> CharT, std::convertible_to<CharT>... Rest>
 	basic_inplace_string(CharT, Rest...) -> basic_inplace_string<CharT, 1 + sizeof...(Rest)>;
 
-	//export template<typename CharT, std::size_t N>
-	//basic_inplace_string(const CharT (&str)[N]) -> basic_fixedbasic_inplace_string_string<CharT, N - 1>;
+	// export template<typename CharT, std::size_t N>
+	// basic_inplace_string(const CharT (&str)[N]) -> basic_fixedbasic_inplace_string_string<CharT, N - 1>;
 
 	export template<one_of<char, char8_t, char16_t, char32_t, wchar_t> CharT, std::size_t N>
 	basic_inplace_string(std::from_range_t, std::array<CharT, N>) -> basic_inplace_string<CharT, N>;

@@ -24,6 +24,9 @@ namespace
 			//	constexpr Tag tag("one");
 
 			//	requirements.Expect(tag.Size());
+
+			//	//const auto view = tag.View();
+			//	//requirements.Expect(view[0] == "one");
 			//};
 
 			//co_yield "range"_test = [](const Requirements& requirements)

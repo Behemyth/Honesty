@@ -111,11 +111,6 @@ namespace synodic::honesty::utility
 			return data_[pos];
 		}
 
-		[[nodiscard]] constexpr const_reference at(size_type pos) const
-		{
-			return data_.at(pos);
-		}
-
 		[[nodiscard]] constexpr const_reference front() const
 		{
 			return data_.front();

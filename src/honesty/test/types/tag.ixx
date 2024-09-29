@@ -39,15 +39,18 @@ namespace synodic::honesty::test
 
 		template<std::size_t N>
 			requires(N - 1 <= MAX_NAME_SIZE)
-		explicit consteval Tag(const char (&tag)[N])
+		explicit consteval Tag(const char (&tag)[N]) noexcept
 		{
 		}
 
-		constexpr explicit Tag(std::string_view view) noexcept
+		constexpr explicit Tag(const std::string_view view) noexcept 
 		{
 		}
 
-		consteval Tag operator/(const Tag& tag) const
+		constexpr Tag(const Tag&) noexcept			  = default;
+		constexpr Tag& operator=(const Tag&) noexcept = default;
+
+		constexpr Tag operator/(const Tag& tag) const
 		{
 			return Tag();
 		}
@@ -81,7 +84,7 @@ namespace synodic::honesty::test
 		}
 
 	private:
-		std::inplace_vector<value_type, MAX_TAGS> tags_ {};
+		std::inplace_vector<value_type, MAX_TAGS> tags_;
 	};
 
 }

@@ -30,6 +30,11 @@ namespace
 					requirements.ExpectEquals(str.view(), "test");
 				}
 			};
+
+			co_yield "assignment"_test = [](const Requirements& requirements)
+			{
+				synodic::honesty::utility::InplaceString str("test");
+			};
 		});
 	SuiteRegistrar _(SUITE);
 }

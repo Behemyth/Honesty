@@ -33,7 +33,12 @@ namespace
 
 			co_yield "assignment"_test = [](const Requirements& requirements)
 			{
-				synodic::honesty::utility::InplaceString str("test");
+				synodic::honesty::utility::InplaceString<4> str("bad");
+
+				str = "test";
+
+				requirements.ExpectEquals(str.size(), 4);
+				requirements.ExpectEquals(str.view(), "test");
 			};
 		});
 	SuiteRegistrar _(SUITE);

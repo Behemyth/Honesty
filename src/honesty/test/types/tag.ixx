@@ -39,7 +39,8 @@ namespace synodic::honesty::test
 
 		template<std::size_t N>
 			requires(N - 1 <= MAX_NAME_SIZE)
-		explicit consteval Tag(const char (&tag)[N]) noexcept
+		explicit consteval Tag(const char (&tag)[N]) noexcept :
+		tags_({value_type(tag)})
 		{
 		}
 

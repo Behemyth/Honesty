@@ -10,24 +10,24 @@ namespace
 		"tag",
 		[]() -> Generator
 		{
-			//co_yield "traits"_test = [](const Requirements& requirements)
-			//{
-			//	// We want the tag size to fit within a nice, small size
-			//	constexpr int size = sizeof(Tag);
-			//	requirements.ExpectLessEqual(size, 128);
-			//};
+			co_yield "traits"_test = [](const Requirements& requirements)
+			{
+				// We want the tag size to fit within a nice, small size
+				constexpr int size = sizeof(Tag);
+				requirements.ExpectLessEqual(size, 128);
+			};
 
-			//// TODO: Do we support error descriptions on tags?
+			// TODO: Do we support error descriptions on tags?
 
-			//co_yield "construction"_test = [](const Requirements& requirements)
-			//{
-			//	constexpr Tag tag("one");
+			co_yield "construction"_test = [](const Requirements& requirements)
+			{
+				constexpr Tag tag("one");
 
-			//	requirements.Expect(tag.Size());
+				requirements.Expect(tag.Size());
 
-			//	//const auto view = tag.View();
-			//	//requirements.Expect(view[0] == "one");
-			//};
+				const auto view = tag.View();
+				requirements.Expect(view[0] == "one");
+			};
 
 			//co_yield "range"_test = [](const Requirements& requirements)
 			//{

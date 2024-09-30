@@ -21,24 +21,46 @@ namespace
 
 			co_yield "construction"_test = [](const Requirements& requirements)
 			{
-				constexpr Tag tag("one");
+				{
+					constexpr Tag tag('t', 'e', 's', 't');
 
-				requirements.Expect(tag.Size());
+					requirements.Expect(tag.Size());
 
-				constexpr auto data = tag.View()[0];
+					constexpr auto data = tag.View()[0];
 
-				requirements.Expect(data == "one");
+					requirements.Expect(data == "test");
+				}
+
+				{
+					constexpr Tag tag("test");
+
+					requirements.Expect(tag.Size());
+
+					constexpr auto data = tag.View()[0];
+
+					requirements.Expect(data == "test");
+				}
+
+				{
+					constexpr Tag tag(std::string_view("test"));
+
+					requirements.Expect(tag.Size());
+
+					constexpr auto data = tag.View()[0];
+
+					requirements.Expect(data == "test");
+				}
 			};
 
-			//co_yield "range"_test = [](const Requirements& requirements)
+			// co_yield "range"_test = [](const Requirements& requirements)
 			//{
 			//	for (constexpr Tag tags("one"); std::string_view tag: tags.View())
 			//	{
 			//		requirements.Expect(not tag.empty());
 			//	}
-			//};
+			// };
 
-			//co_yield "equality"_test = [](const Requirements& requirements)
+			// co_yield "equality"_test = [](const Requirements& requirements)
 			//{
 			//	{
 			//		constexpr auto tag = SKIP;
@@ -81,7 +103,7 @@ namespace
 			//	}
 			//};
 
-			//co_yield "test"_test = [](const Requirements& requirements)
+			// co_yield "test"_test = [](const Requirements& requirements)
 			//{
 			//	{
 			//		const Test test = SKIP / "test"_tag / "inner"_test = [](const Requirements&)
@@ -89,7 +111,7 @@ namespace
 			//		};
 			//		requirements.ExpectEquals(test.Tags().size(), 2);
 			//	}
-			//};
+			// };
 
 			co_yield "fail"_test = [](const Requirements& requirements)
 			{

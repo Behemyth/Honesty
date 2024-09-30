@@ -34,6 +34,7 @@ namespace synodic::honesty::test
 		template<std::convertible_to<char>... Chars>
 			requires(... && !std::is_pointer_v<Chars>)
 		consteval explicit Tag(Chars... chars) noexcept :
+			tags_({value_type(chars...)}),
 			size_(0)
 		{
 		}
@@ -46,7 +47,8 @@ namespace synodic::honesty::test
 		{
 		}
 
-		constexpr explicit Tag(const std::string_view view) noexcept :
+		consteval explicit Tag(const std::string_view view) noexcept :
+			tags_({value_type(view)}),
 			size_(0)
 		{
 		}

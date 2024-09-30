@@ -111,9 +111,6 @@ namespace synodic::honesty::utility
 			return size_;
 		}
 
-		static constexpr std::integral_constant<size_type, N> max_size {};
-		static constexpr std::bool_constant<N == 0> empty {};
-
 		[[nodiscard]] constexpr const_reference operator[](size_type pos) const
 		{
 			return data_[pos];

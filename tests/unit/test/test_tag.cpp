@@ -25,8 +25,9 @@ namespace
 
 				requirements.Expect(tag.Size());
 
-				const auto view = tag.View();
-				requirements.Expect(view[0] == "one");
+				constexpr auto data = tag.View()[0];
+
+				requirements.Expect(data == "one");
 			};
 
 			//co_yield "range"_test = [](const Requirements& requirements)

@@ -33,18 +33,21 @@ namespace synodic::honesty::test
 
 		template<std::convertible_to<char>... Chars>
 			requires(... && !std::is_pointer_v<Chars>)
-		consteval explicit Tag(Chars... chars) noexcept
+		consteval explicit Tag(Chars... chars) noexcept :
+			size_(0)
 		{
 		}
 
 		template<std::size_t N>
 			requires(N - 1 <= MAX_NAME_SIZE)
 		explicit consteval Tag(const char (&tag)[N]) noexcept :
-		tags_({value_type(tag)})
+			tags_({value_type(tag)}),
+			size_(0)
 		{
 		}
 
-		constexpr explicit Tag(const std::string_view view) noexcept 
+		constexpr explicit Tag(const std::string_view view) noexcept :
+			size_(0)
 		{
 		}
 
@@ -85,7 +88,8 @@ namespace synodic::honesty::test
 		}
 
 	private:
-		std::inplace_vector<value_type, MAX_TAGS> tags_;
+		std::array<value_type, MAX_TAGS> tags_;
+		utility::MinimalIntegerType<MAX_TAGS> size_;
 	};
 
 }

@@ -60,48 +60,48 @@ namespace
 				}
 			};
 
-			// co_yield "equality"_test = [](const Requirements& requirements)
-			//{
-			//	{
-			//		constexpr auto tag = SKIP;
+			co_yield "equality"_test = [](const Requirements& requirements)
+			{
+				{
+					constexpr auto tag = SKIP;
 
-			//		requirements.Expect(tag == SKIP);
-			//		requirements.Expect(tag == "skip");
-			//		requirements.Expect(tag != "run");
-			//	}
+					requirements.Expect(tag == SKIP);
+					requirements.Expect(tag == "skip");
+					requirements.Expect(tag != "run");
+				}
 
-			//	{
-			//		constexpr auto tag = Tag("test") / Tag("skip");
+				{
+					constexpr auto tag = Tag("test") / Tag("skip");
 
-			//		requirements.Expect(tag == SKIP);
-			//		requirements.Expect(tag == "test");
-			//		requirements.Expect(tag != "run");
-			//	}
+					requirements.Expect(tag == SKIP);
+					requirements.Expect(tag == "test");
+					requirements.Expect(tag != "run");
+				}
 
-			//	{
-			//		constexpr auto tag = Tag("test") / SKIP;
+				{
+					constexpr auto tag = Tag("test") / SKIP;
 
-			//		requirements.Expect(tag == SKIP);
-			//		requirements.Expect(tag == "test");
-			//		requirements.Expect(tag != "run");
-			//	}
+					requirements.Expect(tag == SKIP);
+					requirements.Expect(tag == "test");
+					requirements.Expect(tag != "run");
+				}
 
-			//	{
-			//		constexpr auto tag = SKIP / Tag("test");
+				{
+					constexpr auto tag = SKIP / Tag("test");
 
-			//		requirements.Expect(tag == SKIP);
-			//		requirements.Expect(tag == "test");
-			//		requirements.Expect(tag != "run");
-			//	}
+					requirements.Expect(tag == SKIP);
+					requirements.Expect(tag == "test");
+					requirements.Expect(tag != "run");
+				}
 
-			//	{
-			//		constexpr auto tag = SKIP / SKIP;
+				{
+					constexpr auto tag = SKIP / SKIP;
 
-			//		requirements.Expect(tag == SKIP);
-			//		requirements.Expect(tag != "test");
-			//		requirements.Expect(tag != "run");
-			//	}
-			//};
+					requirements.Expect(tag == SKIP);
+					requirements.Expect(tag != "test");
+					requirements.Expect(tag != "run");
+				}
+			};
 
 			// co_yield "test"_test = [](const Requirements& requirements)
 			//{

@@ -31,6 +31,11 @@ namespace synodic::honesty::test
 		using size_type				 = std::size_t;
 		using difference_type		 = std::ptrdiff_t;
 
+		constexpr Tag() :
+			size_(0)
+		{
+		}
+
 		template<std::convertible_to<char>... Chars>
 			requires(... && !std::is_pointer_v<Chars>)
 		consteval explicit Tag(Chars... chars) noexcept :
@@ -56,9 +61,17 @@ namespace synodic::honesty::test
 		constexpr Tag(const Tag&) noexcept			  = default;
 		constexpr Tag& operator=(const Tag&) noexcept = default;
 
-		constexpr Tag& operator/(const Tag& tag)
+		constexpr Tag operator/(const Tag& other) const
 		{
-			return *this;
+			Tag tag;
+
+			// First we copy the internal tags from this instance
+			tag.tags_ = tags_;
+			tag.size_ = size_;
+
+			// Then we append the tags from the other instance
+
+			return tag;
 		}
 
 		constexpr std::size_t Size() const noexcept
@@ -100,6 +113,7 @@ namespace synodic::honesty::test
 		}
 
 	private:
+
 		std::array<value_type, MAX_TAGS> tags_;
 		utility::MinimalIntegerType<MAX_TAGS> size_;
 	};

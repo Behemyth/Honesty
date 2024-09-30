@@ -52,13 +52,13 @@ namespace
 				}
 			};
 
-			// co_yield "range"_test = [](const Requirements& requirements)
-			//{
-			//	for (constexpr Tag tags("one"); std::string_view tag: tags.View())
-			//	{
-			//		requirements.Expect(not tag.empty());
-			//	}
-			// };
+			co_yield "range"_test = [](const Requirements& requirements)
+			{
+				for (constexpr Tag tags("test"); std::string_view tag: tags)
+				{
+					requirements.Expect(not tag.empty());
+				}
+			};
 
 			// co_yield "equality"_test = [](const Requirements& requirements)
 			//{

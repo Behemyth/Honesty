@@ -35,7 +35,7 @@ namespace synodic::honesty::test
 			requires(... && !std::is_pointer_v<Chars>)
 		consteval explicit Tag(Chars... chars) noexcept :
 			tags_({value_type(chars...)}),
-			size_(0)
+			size_(1)
 		{
 		}
 
@@ -43,22 +43,22 @@ namespace synodic::honesty::test
 			requires(N - 1 <= MAX_NAME_SIZE)
 		explicit consteval Tag(const char (&tag)[N]) noexcept :
 			tags_({value_type(tag)}),
-			size_(0)
+			size_(1)
 		{
 		}
 
 		consteval explicit Tag(const std::string_view view) noexcept :
 			tags_({value_type(view)}),
-			size_(0)
+			size_(1)
 		{
 		}
 
 		constexpr Tag(const Tag&) noexcept			  = default;
 		constexpr Tag& operator=(const Tag&) noexcept = default;
 
-		constexpr Tag operator/(const Tag& tag) const
+		constexpr Tag& operator/(const Tag& tag)
 		{
-			return Tag();
+			return *this;
 		}
 
 		constexpr std::size_t Size() const noexcept
@@ -68,7 +68,17 @@ namespace synodic::honesty::test
 
 		constexpr std::span<const value_type> View() const noexcept
 		{
-			return tags_;
+			return {tags_.data(), size_};
+		}
+
+		auto begin() const noexcept
+		{
+			return tags_.begin();
+		}
+
+		auto end() const noexcept
+		{
+			return tags_.begin() + size_;
 		}
 
 		friend constexpr bool operator==(const Tag& first, const Tag& second)

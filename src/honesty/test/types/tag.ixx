@@ -67,9 +67,10 @@ namespace synodic::honesty::test
 
 			// First we copy the internal tags from this instance
 			tag.tags_ = tags_;
-			tag.size_ = size_;
+			tag.size_ = size_ + other.size_;
 
 			// Then we append the tags from the other instance
+			std::ranges::copy(other.begin(), other.end(), tag.tags_.begin() + size_);
 
 			return tag;
 		}
@@ -84,14 +85,14 @@ namespace synodic::honesty::test
 			return {tags_.data(), size_};
 		}
 
-		auto begin() const noexcept
+		constexpr const_iterator begin() const noexcept
 		{
-			return tags_.begin();
+			return tags_.data();
 		}
 
-		auto end() const noexcept
+		constexpr const_iterator end() const noexcept
 		{
-			return tags_.begin() + size_;
+			return tags_.data() + size_;
 		}
 
 		friend constexpr bool operator==(const Tag& first, const Tag& second)
@@ -113,7 +114,6 @@ namespace synodic::honesty::test
 		}
 
 	private:
-
 		std::array<value_type, MAX_TAGS> tags_;
 		utility::MinimalIntegerType<MAX_TAGS> size_;
 	};

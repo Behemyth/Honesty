@@ -21,7 +21,8 @@ namespace synodic::honesty::test
 		}
 
 		consteval TestLiteral(const std::string_view name, const Tag& tag) :
-			name_(name)
+			name_(name),
+			tag_(tag)
 		{
 		}
 
@@ -35,7 +36,7 @@ namespace synodic::honesty::test
 					 std::same_as<void, std::invoke_result_t<Fn, const Requirements&>>
 		inline Test operator=(const Fn& test) const
 		{
-			return Test(name_, std::function_ref<void(const Requirements&)>(test));
+			return Test(name_, tag_, std::function_ref<void(const Requirements&)>(test));
 		}
 
 		template<typename Fn>
@@ -43,7 +44,7 @@ namespace synodic::honesty::test
 					 std::same_as<Generator, std::invoke_result_t<Fn, const Requirements&>>
 		inline Test operator=(const Fn& test) const
 		{
-			return Test(name_, std::function_ref<Generator(const Requirements&)>(test));
+			return Test(name_, tag_, std::function_ref<Generator(const Requirements&)>(test));
 		}
 
 		auto operator=(Generator&& generator) const
@@ -59,7 +60,7 @@ namespace synodic::honesty::test
 	private:
 		std::string_view name_;
 
-		// std::inplace_vector<std::string_view, 8> tags_;
+		Tag tag_;
 	};
 
 	export template<typename Fn, std::ranges::input_range R>
@@ -71,6 +72,7 @@ namespace synodic::honesty::test
 		{
 			co_yield Test(
 				std::format("{}", index++),
+				Tag(),
 				[&function, &element](const Requirements& requirements)
 				{
 					function(requirements, element);
@@ -88,6 +90,7 @@ namespace synodic::honesty::test
 				int index = 0;
 				(co_yield Test(
 					 std::format("{}", index++),
+					 Tag(),
 					 [&function, &args](const Requirements& requirements)
 					 {
 						 function(requirements, args);

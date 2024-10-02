@@ -60,22 +60,33 @@ namespace synodic::honesty::test
 			});
 	}
 
+	// Forward declaration
+	export class TestData;
+
 	class Test final
 	{
 		using VariantType = std::
 			variant<std::function_ref<void(const Requirements&)>, std::function_ref<Generator(const Requirements&)>>;
 
 	public:
-		constexpr Test(const std::string_view name, const std::function_ref<void(const Requirements&)> test) :
+		constexpr Test(
+			const std::string_view name,
+			const Tag& tag,
+			const std::function_ref<void(const Requirements&)>& test) :
 			name_(name),
-			test_(test)
+			test_(test),
+			tag_(tag)
 		{
 			VerifyTestName(name);
 		}
 
-		constexpr Test(const std::string_view name, const std::function_ref<Generator(const Requirements&)> test) :
+		constexpr Test(
+			const std::string_view name,
+			const Tag& tag,
+			const std::function_ref<Generator(const Requirements&)>& test) :
 			name_(name),
-			test_(test)
+			test_(test),
+			tag_(tag)
 		{
 			VerifyTestName(name);
 		}
@@ -90,24 +101,27 @@ namespace synodic::honesty::test
 			return name_;
 		}
 
-		std::span<const std::string_view> Tags() const
+		std::span<const Tag::value_type> Tags() const
 		{
-			return tags_;
+			return tag_.View();
 		}
 
 	private:
-		friend class TestData;
+		friend TestData;
 
 		std::string_view name_;
 		VariantType test_;
 
-		std::inplace_vector<std::string_view, 8> tags_;
+		Tag tag_;
 	};
 
-	export class TestData
+	/**
+	 * @brief Data that can be extracted from a test object
+	 */
+	class TestData
 	{
 	public:
-		constexpr TestData(const Test& test) :
+		explicit constexpr TestData(const Test& test) :
 			test_(test)
 		{
 		}

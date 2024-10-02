@@ -55,7 +55,7 @@ namespace synodic::honesty::utility
 			size_(data.size())
 		{
 			std::copy_n(data.data(), size_, data_.begin());
-			std::fill(data_.begin() + size_, data_.end(), CharT());	// Will always fill at least the built-in terminator
+			std::fill(data_.begin() + size_, data_.end(), CharT(0));	// Will always fill at least the built-in terminator
 		}
 
 		constexpr BasicInplaceString(const BasicInplaceString&) noexcept			= default;

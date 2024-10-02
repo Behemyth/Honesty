@@ -103,15 +103,15 @@ namespace
 				}
 			};
 
-			// co_yield "test"_test = [](const Requirements& requirements)
-			//{
-			//	{
-			//		const Test test = SKIP / "test"_tag / "inner"_test = [](const Requirements&)
-			//		{
-			//		};
-			//		requirements.ExpectEquals(test.Tags().size(), 2);
-			//	}
-			// };
+			co_yield "test"_test = [](const Requirements& requirements)
+			{
+				{
+					const Test test = SKIP / "test"_tag / "inner"_test = [](const Requirements&)
+					{
+					};
+					requirements.ExpectEquals(test.Tags().size(), 2);
+				}
+			};
 
 			co_yield "fail"_test = [](const Requirements& requirements)
 			{

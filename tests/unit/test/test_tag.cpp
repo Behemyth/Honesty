@@ -113,8 +113,9 @@ namespace
 				}
 			};
 
-			co_yield "fail"_test = [](const Requirements& requirements)
+			co_yield FAIL / "fail"_test = [](const Requirements& requirements)
 			{
+				requirements.Expect(false);
 			};
 		});
 	SuiteRegistrar _(SUITE);

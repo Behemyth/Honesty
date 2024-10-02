@@ -93,11 +93,11 @@ namespace synodic::honesty::test::api
 
 				for (const Test& test: generator)
 				{
-					const TestData& view = static_cast<TestData>(test);
+					const auto& testData = static_cast<TestData>(test);
 
-					bool testSucess = ProcessTest(view, filter, parameters);
+					bool testSuccess = ProcessTest(testData, filter, parameters);
 
-					if (not testSucess)
+					if (not testSuccess)
 					{
 						success = false;
 					}
@@ -110,6 +110,7 @@ namespace synodic::honesty::test::api
 		}
 		catch (AssertException)
 		{
+			// TODO: Respond to the FAIL tag
 		}
 
 		if (not requirements.Context().success)

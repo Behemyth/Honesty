@@ -9,6 +9,13 @@ import inplace_vector;
 
 namespace synodic::honesty::test
 {
+	export enum class ExpectedOutcome
+	{
+		PASS,  // The test is expected to pass
+		FAIL,  // The test is expected to fail
+		SKIP  // The test is expected to be skipped
+	};
+
 	export namespace event
 	{
 		struct SuiteBegin
@@ -81,14 +88,17 @@ namespace synodic::honesty::test
 			explicit AssertionFail(
 				std::source_location location,
 				const std::string_view message,
-				const bool exception = false) :
+				const bool exception		  = false,
+				const ExpectedOutcome outcome = ExpectedOutcome::PASS) :
 				exception(exception),
+				outcome(outcome),
 				message(message),
 				location(std::move(location))
 			{
 			}
 
 			bool exception;	 // True if the remainder of the test is skipped
+			ExpectedOutcome outcome;
 			std::string_view message;
 			std::source_location location;
 		};
@@ -101,8 +111,9 @@ namespace synodic::honesty::test
 				const std::string_view a,
 				const std::string_view b,
 				const std::string_view message,
-				const bool exception = false) :
-				AssertionFail(std::move(location), message, exception),
+				const bool exception		  = false,
+				const ExpectedOutcome outcome = ExpectedOutcome::PASS) :
+				AssertionFail(std::move(location), message, exception, outcome),
 				equal(equal),
 				a(a),
 				b(b)
@@ -123,8 +134,9 @@ namespace synodic::honesty::test
 				const std::string_view a,
 				const std::string_view b,
 				const std::string_view message,
-				const bool exception = false) :
-				AssertionFail(std::move(location), message, exception),
+				const bool exception		  = false,
+				const ExpectedOutcome outcome = ExpectedOutcome::PASS) :
+				AssertionFail(std::move(location), message, exception, outcome),
 				ordering(ordering),
 				a(a),
 				b(b)
@@ -140,12 +152,16 @@ namespace synodic::honesty::test
 		struct AssertionPass
 
 		{
-			explicit AssertionPass(std::source_location location) :
-				location(std::move(location))
+			explicit AssertionPass(
+				std::source_location location,
+				const ExpectedOutcome outcome = ExpectedOutcome::PASS) :
+				location(std::move(location)),
+				outcome(outcome)
 			{
 			}
 
 			std::source_location location;
+			ExpectedOutcome outcome;
 		};
 
 		struct AssertionSkip

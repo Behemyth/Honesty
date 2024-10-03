@@ -6,8 +6,9 @@ import std;
 
 namespace synodic::honesty::test
 {
+
 	/**
-	 * @brief Provides consistent text styling for assertion failures.
+	 * @brief Provides consistent text styling for assertion failure summaries.
 	 * @param relation The string representing the relationship between the two failed comparisons.
 	 * @param a Comparison value a.
 	 * @param b Comparison value b.
@@ -67,22 +68,16 @@ namespace synodic::honesty::test
 
 		void Signal(const event::AssertionFail& event) override
 		{
-			++failCount_;
-
 			const log::Logger& logger = Logger();
 
-			std::string styledResult = format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
-			logger.Info("Test {}: File({}), Line({})", styledResult, event.location.file_name(), event.location.line());
+			StyleAssertion(event, logger);
 		}
 
 		void Signal(const event::EqualityFail& event) override
 		{
-			++failCount_;
-
 			const log::Logger& logger = Logger();
 
-			std::string styledResult = format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
-			logger.Info("Test {}: File({}), Line({})", styledResult, event.location.file_name(), event.location.line());
+			StyleAssertion(event, logger);
 
 			const std::string relation = event.equal ? "==" : "!=";
 
@@ -91,12 +86,9 @@ namespace synodic::honesty::test
 
 		void Signal(const event::ComparisonFail& event) override
 		{
-			++failCount_;
-
 			const log::Logger& logger = Logger();
 
-			std::string styledResult = format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
-			logger.Info("Test {}: File({}), Line({})", styledResult, event.location.file_name(), event.location.line());
+			StyleAssertion(event, logger);
 
 			const std::string relation = [](const std::strong_ordering ordering) -> std::string
 			{
@@ -116,8 +108,10 @@ namespace synodic::honesty::test
 
 		void Signal(const event::Summary& event) override
 		{
-			std::string passedStyled = format(log::TextStyle(log::Colour24(0, 255, 0)), "Passed");
-			std::string failedStyled = format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
+			std::string passedStyled		= format(log::TextStyle(log::Colour24(0, 255, 0)), "Passed");
+			std::string failedStyled		= format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
+			std::string expectedFailsStyled = format(log::TextStyle(log::Colour24(255, 255, 0)), "Expected Failures");
+			std::string skippedStyled		= format(log::TextStyle(log::Colour24(128, 128, 128)), "Skipped");
 
 			Logger().Info("{} Assertions {}", passCount_, passedStyled);
 
@@ -125,11 +119,69 @@ namespace synodic::honesty::test
 			{
 				Logger().Info("{} Assertions {}", failCount_, failedStyled);
 			}
+
+			if (expectedFailures_)
+			{
+				Logger().Info("{} Assertions {}", expectedFailures_, expectedFailsStyled);
+			}
+
+			if (skippedCount_)
+			{
+				Logger().Info("{} Assertions {}", skippedCount_, skippedStyled);
+			}
 		}
 
 	private:
-		std::size_t passCount_ = 0;
-		std::size_t failCount_ = 0;
+		void StyleAssertion(const event::AssertionFail& event, const log::Logger& logger)
+		{
+			switch (event.outcome)
+			{
+				case ExpectedOutcome::PASS :
+				{
+					std::string styledResult = format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
+					logger.Info(
+						"Test {}: File({}), Line({})",
+						styledResult,
+						event.location.file_name(),
+						event.location.line());
+
+					++failCount_;
+
+					break;
+				}
+				case ExpectedOutcome::FAIL :
+				{
+					std::string styledResult = format(log::TextStyle(log::Colour24(0, 255, 0)), "Passed");
+					logger.Info(
+						"Test {}: File({}), Line({})",
+						styledResult,
+						event.location.file_name(),
+						event.location.line());
+
+					++expectedFailures_;
+
+					break;
+				}
+				case ExpectedOutcome::SKIP :
+				{
+					std::string styledResult = format(log::TextStyle(log::Colour24(128, 128, 128)), "Skipped");
+					logger.Info(
+						"Test {}: File({}), Line({})",
+						styledResult,
+						event.location.file_name(),
+						event.location.line());
+
+					++skippedCount_;
+
+					break;
+				}
+			}
+		}
+
+		std::size_t passCount_		  = 0;
+		std::size_t failCount_		  = 0;
+		std::size_t expectedFailures_ = 0;
+		std::size_t skippedCount_	  = 0;
 	};
 
 }

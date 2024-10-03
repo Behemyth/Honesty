@@ -60,58 +60,60 @@ namespace synodic::honesty::test::api
 		bool success;
 	};
 
-	bool ProcessTest(const TestData& view, std::span<std::string_view> filter, const ExecuteParameters& parameters)
+	bool ProcessTest(const TestData& testData, std::span<std::string_view> filter, const ExecuteParameters& parameters)
 	{
 		bool success = true;
 
 		// Filter the test by name
-		if (not filter.empty() and view.Name() != filter.front())
+		if (not filter.empty() and testData.Name() != filter.front())
 		{
 			return success;
 		}
 
 		event::TestBegin testBegin;
-		testBegin.name = view.Name();
+		testBegin.name = testData.Name();
 
 		for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
 		{
 			reporter->Signal(testBegin);
 		}
 
-		RequirementsBackend requirements(parameters.reporters, view.Name(), parameters.logger);
+		auto outcome = ExpectedOutcome::PASS;
+
+		if (testData.Tag() == "fail")
+		{
+			outcome = ExpectedOutcome::FAIL;
+		}
+		else if (testData.Tag() == "fail")
+		{
+			outcome = ExpectedOutcome::SKIP;
+		}
+
+		const RequirementsBackend requirements(parameters.reporters, testData.Name(), outcome, parameters.logger);
 
 		Runner& runner = parameters.runner.get();
 
 		auto testExecutor = Overload {
-			[&](const std::function_ref<void(const Requirements&)> testCallback)
+			[&](const std::function_ref<void(const Requirements&)>& testCallback)
 			{
 				runner.Run(requirements, testCallback);
 			},
-			[&](const std::function_ref<Generator(const Requirements&)> testCallback)
+			[&](const std::function_ref<Generator(const Requirements&)>& testCallback)
 			{
 				Generator generator = runner.Run(requirements, testCallback);
 
 				for (const Test& test: generator)
 				{
-					const auto& testData = static_cast<TestData>(test);
-
-					bool testSuccess = ProcessTest(testData, filter, parameters);
-
-					if (not testSuccess)
+					if (not ProcessTest(static_cast<TestData>(test), filter, parameters))
 					{
 						success = false;
+						break;
 					}
 				}
 			}};
 
-		try
-		{
-			std::visit(testExecutor, view.Variant());
-		}
-		catch (AssertException)
-		{
-			// TODO: Respond to the FAIL tag
-		}
+		// Start the recursive test execution
+		std::visit(testExecutor, testData.Variant());
 
 		if (not requirements.Context().success)
 		{
@@ -119,7 +121,7 @@ namespace synodic::honesty::test::api
 		}
 
 		event::TestEnd testEnd;
-		testEnd.name = view.Name();
+		testEnd.name = testData.Name();
 
 		for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
 		{

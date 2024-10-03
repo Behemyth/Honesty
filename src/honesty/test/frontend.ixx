@@ -8,6 +8,7 @@ import function_ref;
 
 namespace synodic::honesty::test
 {
+	// Built-in tags
 	export constexpr Tag RUN("run");
 	export constexpr Tag SKIP("skip");
 	export constexpr Tag FAIL("fail");

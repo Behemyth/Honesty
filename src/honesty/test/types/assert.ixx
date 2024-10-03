@@ -6,10 +6,12 @@ import :reporter;
 
 import synodic.honesty.log;
 
-import :exception;
-
 namespace synodic::honesty::test
 {
+	/**
+	 * @brief A context for the requirements class. This is used to provide state from the user requirements and is what
+	 *	the testing framework is able to read back
+	 */
 	export struct RequirementsContext
 	{
 		RequirementsContext() :
@@ -17,7 +19,7 @@ namespace synodic::honesty::test
 		{
 		}
 
-		bool success;
+		bool success;  // True if the test passed, false if it failed
 	};
 
 	export class Requirements
@@ -26,9 +28,11 @@ namespace synodic::honesty::test
 		Requirements(
 			const std::span<std::unique_ptr<Reporter>> reporters,
 			const std::string_view testName,
+			const ExpectedOutcome outcome,
 			const log::Logger& logger) :
 			reporters_(reporters),
 			testName_(testName),
+			outcome_(outcome),
 			logger_(logger)
 		{
 		}
@@ -55,7 +59,6 @@ namespace synodic::honesty::test
 				const event::AssertionFail failed(location, descriptionCallback(), true);
 
 				Signal(failed);
-				throw AssertException("Assertion failed");
 			}
 		}
 
@@ -336,7 +339,6 @@ namespace synodic::honesty::test
 					failed(location, false, std::format("{}", a), std::format("{}", b), descriptionCallback(), true);
 
 				Signal(failed);
-				throw AssertException("Assertion failed");
 			}
 		}
 
@@ -378,7 +380,6 @@ namespace synodic::honesty::test
 					failed(location, true, std::format("{}", a), std::format("{}", b), descriptionCallback(), true);
 
 				Signal(failed);
-				throw AssertException("Assertion failed");
 			}
 		}
 
@@ -507,7 +508,6 @@ namespace synodic::honesty::test
 					failed(location, order, std::format("{}", a), std::format("{}", b), descriptionCallback(), true);
 
 				Signal(failed);
-				throw AssertException("Assertion failed");
 			}
 		}
 
@@ -551,7 +551,6 @@ namespace synodic::honesty::test
 					failed(location, order, std::format("{}", a), std::format("{}", b), descriptionCallback(), true);
 
 				Signal(failed);
-				throw AssertException("Assertion failed");
 			}
 		}
 
@@ -595,7 +594,6 @@ namespace synodic::honesty::test
 					failed(location, order, std::format("{}", a), std::format("{}", b), descriptionCallback(), true);
 
 				Signal(failed);
-				throw AssertException("Assertion failed");
 			}
 		}
 
@@ -639,7 +637,6 @@ namespace synodic::honesty::test
 					failed(location, order, std::format("{}", a), std::format("{}", b), descriptionCallback(), true);
 
 				Signal(failed);
-				throw AssertException("Assertion failed");
 			}
 		}
 
@@ -889,6 +886,8 @@ namespace synodic::honesty::test
 		 */
 		void Signal(const event::ComparisonFail& failed) const
 		{
+			// We stub in the expected outcome
+
 			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(failed);
@@ -899,20 +898,30 @@ namespace synodic::honesty::test
 
 		std::span<std::unique_ptr<Reporter>> reporters_;
 		std::string_view testName_;
+		ExpectedOutcome outcome_;
 		std::reference_wrapper<const log::Logger> logger_;
 	};
 
+	/**
+	 * @brief A backend for the Requirements class. This is what the testing framework uses to interact with the
+	 *	requirements populated by the user
+	 */
 	export class RequirementsBackend : public Requirements
 	{
 	public:
 		RequirementsBackend(
-			std::span<std::unique_ptr<Reporter>> reporters,
+			const std::span<std::unique_ptr<Reporter>> reporters,
 			const std::string_view testName,
+			const ExpectedOutcome outcome,
 			const log::Logger& logger) :
-			Requirements(reporters, testName, logger)
+			Requirements(reporters, testName, outcome, logger)
 		{
 		}
 
+		/**
+		 * @brief Returns the part of the base class that can't be modified or seen directly by the user
+		 * @return The mutable context of the constant requirements
+		 */
 		const RequirementsContext& Context() const
 		{
 			return context_;

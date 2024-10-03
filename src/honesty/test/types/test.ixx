@@ -136,6 +136,11 @@ namespace synodic::honesty::test
 			return test_.test_;
 		}
 
+		const Tag& Tag() const
+		{
+			return test_.tag_;
+		}
+
 	private:
 		const Test& test_;
 	};

@@ -89,7 +89,8 @@ namespace synodic::honesty::test::api
 			outcome = ExpectedOutcome::SKIP;
 		}
 
-		const RequirementsBackend requirements(parameters.reporters, testData.Name(), outcome, parameters.logger);
+		const RequirementParameters requirementParameters(testData.Name(), outcome);
+		const RequirementContext requirements(parameters.reporters, requirementParameters, parameters.logger);
 
 		Runner& runner = parameters.runner.get();
 
@@ -115,7 +116,7 @@ namespace synodic::honesty::test::api
 		// Start the recursive test execution
 		std::visit(testExecutor, testData.Variant());
 
-		if (not requirements.Context().success)
+		if (not requirements.Output().success)
 		{
 			success = false;
 		}

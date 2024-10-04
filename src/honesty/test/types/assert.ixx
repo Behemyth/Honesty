@@ -9,12 +9,27 @@ import synodic.honesty.log;
 namespace synodic::honesty::test
 {
 	/**
-	 * @brief A context for the requirements class. This is used to provide state from the user requirements and is what
-	 *	the testing framework is able to read back
+	 * @brief The parameters for a set of requirements. This is used to provide test state to the requirements object.
 	 */
-	export struct RequirementsContext
+	export struct RequirementParameters
 	{
-		RequirementsContext() :
+		RequirementParameters(const std::string_view testName, const ExpectedOutcome outcome) :
+			testName(testName),
+			outcome(outcome)
+		{
+		}
+
+		std::string_view testName;
+		ExpectedOutcome outcome;
+	};
+
+	/**
+	 * @brief Output provided by a set of requirements. This is used to provide state from the user requirements and is
+	 *	what the testing framework is able to read back
+	 */
+	export struct RequirementOutput
+	{
+		RequirementOutput() :
 			success(true)
 		{
 		}
@@ -27,12 +42,10 @@ namespace synodic::honesty::test
 	public:
 		Requirements(
 			const std::span<std::unique_ptr<Reporter>> reporters,
-			const std::string_view testName,
-			const ExpectedOutcome outcome,
+			const RequirementParameters& parameters,
 			const log::Logger& logger) :
+			parameters_(parameters),
 			reporters_(reporters),
-			testName_(testName),
-			outcome_(outcome),
 			logger_(logger)
 		{
 		}
@@ -56,7 +69,7 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(location, descriptionCallback(), true);
+				const event::AssertionFail failed(location, descriptionCallback(), true, parameters_.outcome);
 
 				Signal(failed);
 			}
@@ -101,7 +114,7 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(location, descriptionCallback());
+				const event::AssertionFail failed(location, descriptionCallback(), false, parameters_.outcome);
 
 				Signal(failed);
 			}
@@ -172,7 +185,7 @@ namespace synodic::honesty::test
 			try
 			{
 				std::invoke(std::forward<Fn>(function));
-				const event::AssertionFail failed(location, descriptionCallback(), true);
+				const event::AssertionFail failed(location, descriptionCallback(), true, parameters_.outcome);
 
 				Signal(failed);
 			}
@@ -184,7 +197,7 @@ namespace synodic::honesty::test
 			}
 			catch (...)
 			{
-				const event::AssertionFail failed(location, descriptionCallback(), true);
+				const event::AssertionFail failed(location, descriptionCallback(), true, parameters_.outcome);
 
 				Signal(failed);
 			}
@@ -220,7 +233,7 @@ namespace synodic::honesty::test
 			}
 			catch (...)
 			{
-				const event::AssertionFail failed(location, descriptionCallback(), true);
+				const event::AssertionFail failed(location, descriptionCallback(), true, parameters_.outcome);
 
 				Signal(failed);
 			}
@@ -250,7 +263,7 @@ namespace synodic::honesty::test
 			try
 			{
 				std::invoke(std::forward<Fn>(function));
-				const event::AssertionFail failed(location, descriptionCallback());
+				const event::AssertionFail failed(location, descriptionCallback(), false, parameters_.outcome);
 
 				Signal(failed);
 			}
@@ -262,7 +275,7 @@ namespace synodic::honesty::test
 			}
 			catch (...)
 			{
-				const event::AssertionFail failed(location, descriptionCallback());
+				const event::AssertionFail failed(location, descriptionCallback(), false, parameters_.outcome);
 
 				Signal(failed);
 			}
@@ -298,7 +311,7 @@ namespace synodic::honesty::test
 			}
 			catch (...)
 			{
-				const event::AssertionFail failed(location, descriptionCallback());
+				const event::AssertionFail failed(location, descriptionCallback(), false, parameters_.outcome);
 
 				Signal(failed);
 			}
@@ -421,8 +434,14 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::EqualityFail
-					failed(location, false, std::format("{}", a), std::format("{}", b), descriptionCallback());
+				const event::EqualityFail failed(
+					location,
+					false,
+					std::format("{}", a),
+					std::format("{}", b),
+					descriptionCallback(),
+					false,
+					parameters_.outcome);
 
 				Signal(failed);
 			}
@@ -462,8 +481,14 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::EqualityFail
-					failed(location, true, std::format("{}", a), std::format("{}", b), descriptionCallback());
+				const event::EqualityFail failed(
+					location,
+					true,
+					std::format("{}", a),
+					std::format("{}", b),
+					descriptionCallback(),
+					false,
+					parameters_.outcome);
 
 				Signal(failed);
 			}
@@ -504,8 +529,14 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::ComparisonFail
-					failed(location, order, std::format("{}", a), std::format("{}", b), descriptionCallback(), true);
+				const event::ComparisonFail failed(
+					location,
+					order,
+					std::format("{}", a),
+					std::format("{}", b),
+					descriptionCallback(),
+					true,
+					parameters_.outcome);
 
 				Signal(failed);
 			}
@@ -676,8 +707,14 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::ComparisonFail
-					failed(location, order, std::format("{}", a), std::format("{}", b), descriptionCallback());
+				const event::ComparisonFail failed(
+					location,
+					order,
+					std::format("{}", a),
+					std::format("{}", b),
+					descriptionCallback(),
+					false,
+					parameters_.outcome);
 
 				Signal(failed);
 			}
@@ -805,8 +842,14 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::ComparisonFail
-					failed(location, order, std::format("{}", a), std::format("{}", b), descriptionCallback());
+				const event::ComparisonFail failed(
+					location,
+					order,
+					std::format("{}", a),
+					std::format("{}", b),
+					descriptionCallback(),
+					false,
+					parameters_.outcome);
 
 				Signal(failed);
 			}
@@ -833,11 +876,12 @@ namespace synodic::honesty::test
 
 		std::string_view TestName() const
 		{
-			return testName_;
+			return parameters_.testName;
 		}
 
 	protected:
-		mutable RequirementsContext context_;
+		mutable RequirementOutput output_;
+		RequirementParameters parameters_;
 
 	private:
 		/**
@@ -863,7 +907,7 @@ namespace synodic::honesty::test
 				reporter->Signal(failed);
 			}
 
-			context_.success = false;
+			output_.success = false;
 		}
 
 		/**
@@ -877,7 +921,7 @@ namespace synodic::honesty::test
 				reporter->Signal(failed);
 			}
 
-			context_.success = false;
+			output_.success = false;
 		}
 
 		/**
@@ -886,19 +930,15 @@ namespace synodic::honesty::test
 		 */
 		void Signal(const event::ComparisonFail& failed) const
 		{
-			// We stub in the expected outcome
-
 			for (const std::unique_ptr<Reporter>& reporter: reporters_)
 			{
 				reporter->Signal(failed);
 			}
 
-			context_.success = false;
+			output_.success = false;
 		}
 
 		std::span<std::unique_ptr<Reporter>> reporters_;
-		std::string_view testName_;
-		ExpectedOutcome outcome_;
 		std::reference_wrapper<const log::Logger> logger_;
 	};
 
@@ -906,25 +946,29 @@ namespace synodic::honesty::test
 	 * @brief A backend for the Requirements class. This is what the testing framework uses to interact with the
 	 *	requirements populated by the user
 	 */
-	export class RequirementsBackend : public Requirements
+	export class RequirementContext : public Requirements
 	{
 	public:
-		RequirementsBackend(
+		RequirementContext(
 			const std::span<std::unique_ptr<Reporter>> reporters,
-			const std::string_view testName,
-			const ExpectedOutcome outcome,
+			const RequirementParameters& input,
 			const log::Logger& logger) :
-			Requirements(reporters, testName, outcome, logger)
+			Requirements(reporters, input, logger)
 		{
+		}
+
+		const RequirementParameters& Parameters() const
+		{
+			return parameters_;
 		}
 
 		/**
 		 * @brief Returns the part of the base class that can't be modified or seen directly by the user
 		 * @return The mutable context of the constant requirements
 		 */
-		const RequirementsContext& Context() const
+		const RequirementOutput& Output() const
 		{
-			return context_;
+			return output_;
 		}
 	};
 

@@ -88,8 +88,8 @@ namespace synodic::honesty::test
 			explicit AssertionFail(
 				std::source_location location,
 				const std::string_view message,
-				const bool exception		  = false,
-				const ExpectedOutcome outcome = ExpectedOutcome::PASS) :
+				const bool exception,
+				const ExpectedOutcome outcome) :
 				exception(exception),
 				outcome(outcome),
 				message(message),
@@ -111,8 +111,8 @@ namespace synodic::honesty::test
 				const std::string_view a,
 				const std::string_view b,
 				const std::string_view message,
-				const bool exception		  = false,
-				const ExpectedOutcome outcome = ExpectedOutcome::PASS) :
+				const bool exception,
+				const ExpectedOutcome outcome) :
 				AssertionFail(std::move(location), message, exception, outcome),
 				equal(equal),
 				a(a),
@@ -134,8 +134,8 @@ namespace synodic::honesty::test
 				const std::string_view a,
 				const std::string_view b,
 				const std::string_view message,
-				const bool exception		  = false,
-				const ExpectedOutcome outcome = ExpectedOutcome::PASS) :
+				const bool exception,
+				const ExpectedOutcome outcome) :
 				AssertionFail(std::move(location), message, exception, outcome),
 				ordering(ordering),
 				a(a),

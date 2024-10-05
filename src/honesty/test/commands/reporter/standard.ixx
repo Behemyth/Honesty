@@ -2,6 +2,7 @@ export module synodic.honesty.test.commands:reporter.standard;
 
 import synodic.honesty.log;
 import synodic.honesty.test;
+import synodic.honesty.utility;
 import std;
 
 namespace
@@ -48,7 +49,7 @@ namespace synodic::honesty::test
 		{
 			ReportFailure(event);
 
-			const std::string relation = event.equal ? "==" : "!=";
+			const std::string_view relation = event.equal ? "==" : "!=";
 
 			ReportFailureSummary(relation, event.a, event.b);
 		}
@@ -57,7 +58,7 @@ namespace synodic::honesty::test
 		{
 			ReportFailure(event);
 
-			const std::string relation = [](const std::strong_ordering ordering) -> std::string
+			const std::string_view relation = [](const std::strong_ordering ordering) -> std::string_view
 			{
 				if (ordering == std::strong_ordering::less)
 				{
@@ -87,27 +88,29 @@ namespace synodic::honesty::test
 		 */
 		void ReportFailureSummary(std::string_view relation, std::string_view a, std::string_view b) const
 		{
-			// const auto& logger = logger_.get();
-			// const std::string indent(4, ' ');
+			constexpr std::size_t maxLineLength = 79;
 
-			// auto makeView = [](auto range)
-			//{
-			//	return std::string_view(range);
-			// };
+			const log::Logger& logger = logger_.get();
+			constexpr std::string_view indent("	");
 
-			//// First line isn't indented
-			// const std::string indentedA = a | std::views::split('\n') | std::views::transform(makeView) |
-			//							  std::views::join_with("\n" + indent) | std::ranges::to<std::string>();
+			// Size of the inputs including the space between them.
+			const std::size_t totalSize = a.size() + b.size() + 2 + relation.size();
 
-			//// First line isn't indented
-			// const std::string indentedB = b | std::views::split('\n') | std::views::transform(makeView) |
-			//							  std::views::join_with("\n" + indent) | std::ranges::to<std::string>();
+			// Check to see if the compacted summary can fit on a single line
+			if (a.contains("\n") or b.contains("\n") or totalSize >= maxLineLength)
+			{
+				throw utility::NotImplemented();
+			}
+			else
+			{
+				logger.Info("{}Expected:", indent);
 
-			// logger.Info(
-			//	"{}\n{}\n{}",
-			//	format(HIGHLIGHT, "{}'{}'", indent, indentedA),
-			//	relation,
-			//	format(HIGHLIGHT, "{}'{}'", indent, indentedB));
+				/*	logger.Info(
+						"Expected: {}\n{}\n{}",
+						format(HIGHLIGHT, "{}'{}'", indent, a),
+						relation,
+						format(HIGHLIGHT, "{}'{}'", indent, b));*/
+			}
 		}
 
 		/**
@@ -186,50 +189,65 @@ namespace synodic::honesty::test
 		Output output_;
 	};
 
-	// class SuiteState
-	//{
-	// public:
-	//	SuiteState(const event::SuiteBegin& event, const log::Logger& logger) :
-	//		logger_(logger)
-	//	{
-	//	}
+	class SuiteState
+	{
+	public:
+		struct Output
+		{
+			std::size_t passedAssertions		  = 0;
+			std::size_t failedAssertions		  = 0;
+			std::size_t undefinedPassedAssertions = 0;
+			std::size_t undefinedFailedAssertions = 0;
+		};
 
-	//	void Signal(const event::TestBegin& event)
-	//	{
-	//		currentTestState_.emplace(event, logger_);
-	//	}
+		SuiteState(const event::SuiteBegin& event, const log::Logger& logger) :
+			logger_(logger)
+		{
+		}
 
-	//	void Signal(const event::TestEnd& event)
-	//	{
-	//		auto output = currentTestState_->Summarize(event);
-	//		currentTestState_.reset();
-	//	}
+		void Signal(const event::TestBegin& event)
+		{
+			currentTestState_.emplace(event, logger_);
+		}
 
-	//	void Signal(const event::AssertionPass& event)
-	//	{
-	//		currentTestState_->Signal(event);
-	//	}
+		void Signal(const event::TestEnd& event)
+		{
+			auto output = currentTestState_->Summarize(event);
+			currentTestState_.reset();
+		}
 
-	//	void Signal(const event::AssertionFail& event)
-	//	{
-	//		currentTestState_->Signal(event);
-	//	}
+		void Signal(const event::AssertionPass& event)
+		{
+			currentTestState_->Signal(event);
+		}
 
-	//	void Signal(const event::EqualityFail& event)
-	//	{
-	//		currentTestState_->Signal(event);
-	//	}
+		void Signal(const event::AssertionFail& event)
+		{
+			currentTestState_->Signal(event);
+		}
 
-	//	void Signal(const event::ComparisonFail& event)
-	//	{
-	//		currentTestState_->Signal(event);
-	//	}
+		void Signal(const event::EqualityFail& event)
+		{
+			currentTestState_->Signal(event);
+		}
 
-	// private:
-	//	std::optional<TestState> currentTestState_;
+		void Signal(const event::ComparisonFail& event)
+		{
+			currentTestState_->Signal(event);
+		}
 
-	//	std::reference_wrapper<const log::Logger> logger_;
-	//};
+		Output Summarize(const event::TestEnd& event)
+		{
+			return output_;
+		}
+
+	private:
+		std::optional<TestState> currentTestState_;
+
+		std::reference_wrapper<const log::Logger> logger_;
+
+		Output output_;
+	};
 
 	export class StandardReporter final : public StreamingAdapter
 	{

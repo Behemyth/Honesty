@@ -181,7 +181,7 @@ namespace synodic::honesty::log
 			return attributeMask_;
 		}
 
-		friend auto operator<=>(const TextStyle&, const TextStyle&) = default;
+		friend constexpr auto operator<=>(const TextStyle&, const TextStyle&) = default;
 
 	private:
 		std::optional<ColorType> foreground_;

@@ -9,10 +9,18 @@ import inplace_vector;
 
 namespace synodic::honesty::test
 {
-	export enum class ExpectedOutcome
+	export enum class ExpectedAssertOutcome
+	{
+		PASS,  // The assertion is expected to pass
+		FAIL,  // The assertion is expected to fail
+		TODO  // The assertion outcome is undefined
+	};
+
+	export enum class ExpectedTestOutcome
 	{
 		PASS,  // The test is expected to pass
 		FAIL,  // The test is expected to fail
+		TODO,  // The test outcome is undefined
 		SKIP  // The test is expected to be skipped
 	};
 
@@ -55,14 +63,14 @@ namespace synodic::honesty::test
 
 		struct TestBegin
 		{
-			TestBegin(const std::string_view name, const ExpectedOutcome outcome) :
+			TestBegin(const std::string_view name, const ExpectedAssertOutcome outcome) :
 				name(name),
 				outcome(outcome)
 			{
 			}
 
 			std::string_view name;
-			ExpectedOutcome outcome;
+			ExpectedAssertOutcome outcome;
 		};
 
 		struct TestEnd
@@ -191,14 +199,14 @@ namespace synodic::honesty::test
 		virtual void Signal(const event::TestBegin& event) = 0;
 		virtual void Signal(const event::TestEnd& event)   = 0;
 
-		virtual void Signal(const event::TestSkip& event)  = 0;
+		virtual void Signal(const event::TestSkip& event) = 0;
 
 		virtual void Signal(const event::AssertionFail& event)	= 0;
 		virtual void Signal(const event::EqualityFail& event)	= 0;
 		virtual void Signal(const event::ComparisonFail& event) = 0;
 
-		virtual void Signal(const event::AssertionPass& event)	= 0;
-		virtual void Signal(const event::AssertionSkip& event)	= 0;
+		virtual void Signal(const event::AssertionPass& event) = 0;
+		virtual void Signal(const event::AssertionSkip& event) = 0;
 
 		virtual void Signal(const event::Summary& event) = 0;
 

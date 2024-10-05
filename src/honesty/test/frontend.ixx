@@ -12,6 +12,7 @@ namespace synodic::honesty::test
 	export constexpr Tag RUN("run");
 	export constexpr Tag SKIP("skip");
 	export constexpr Tag FAIL("fail");
+	export constexpr Tag TODO("todo");
 
 	class TestLiteral
 	{

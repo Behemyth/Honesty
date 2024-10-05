@@ -20,14 +20,23 @@ namespace synodic::honesty::test
 	class TestState
 	{
 	public:
-		TestState(const ExpectedOutcome outcome, const log::Logger& logger) :
-			testOutcome_(outcome),
+		struct Output
+		{
+			std::size_t passedAssertions		  = 0;
+			std::size_t failedAssertions		  = 0;
+			std::size_t undefinedPassedAssertions = 0;
+			std::size_t undefinedFailedAssertions = 0;
+		};
+
+		TestState(const event::TestBegin& event, const log::Logger& logger) :
+			testOutcome_(event.outcome),
 			logger_(logger)
 		{
 		}
 
 		void Signal(const event::AssertionPass& event)
 		{
+			ReportSuccess(event);
 		}
 
 		void Signal(const event::AssertionFail& event)
@@ -64,6 +73,11 @@ namespace synodic::honesty::test
 			ReportFailureSummary(relation, event.a, event.b);
 		}
 
+		Output Summarize(const event::TestEnd& event)
+		{
+			return output_;
+		}
+
 	private:
 		/**
 		 * @brief Provides consistent text styling for assertion failure summaries.
@@ -73,23 +87,23 @@ namespace synodic::honesty::test
 		 */
 		void ReportFailureSummary(std::string_view relation, std::string_view a, std::string_view b) const
 		{
-			//const auto& logger = logger_.get();
-			//const std::string indent(4, ' ');
+			// const auto& logger = logger_.get();
+			// const std::string indent(4, ' ');
 
-			//auto makeView = [](auto range)
+			// auto makeView = [](auto range)
 			//{
 			//	return std::string_view(range);
-			//};
+			// };
 
 			//// First line isn't indented
-			//const std::string indentedA = a | std::views::split('\n') | std::views::transform(makeView) |
+			// const std::string indentedA = a | std::views::split('\n') | std::views::transform(makeView) |
 			//							  std::views::join_with("\n" + indent) | std::ranges::to<std::string>();
 
 			//// First line isn't indented
-			//const std::string indentedB = b | std::views::split('\n') | std::views::transform(makeView) |
+			// const std::string indentedB = b | std::views::split('\n') | std::views::transform(makeView) |
 			//							  std::views::join_with("\n" + indent) | std::ranges::to<std::string>();
 
-			//logger.Info(
+			// logger.Info(
 			//	"{}\n{}\n{}",
 			//	format(HIGHLIGHT, "{}'{}'", indent, indentedA),
 			//	relation,
@@ -97,59 +111,79 @@ namespace synodic::honesty::test
 		}
 
 		/**
+		 * @brief Reports the success of an assertion.
+		 * @param event The assertion event.
+		 */
+		void ReportSuccess(const event::AssertionPass& event)
+		{
+			const log::Logger& logger = logger_.get();
+			switch (testOutcome_)
+			{
+				case ExpectedAssertOutcome::PASS :
+				{
+					++output_.passedAssertions;
+					break;
+				}
+				case ExpectedAssertOutcome::FAIL :
+				{
+					std::string styledResult = format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
+					logger.Info(
+						"Test {}: File({}), Line({})",
+						styledResult,
+						event.location.file_name(),
+						event.location.line());
+
+					++output_.failedAssertions;
+					break;
+				}
+				case ExpectedAssertOutcome::TODO :
+				{
+					++output_.undefinedPassedAssertions;
+					break;
+				}
+			}
+		}
+
+		/**
 		 * @brief Reports the failure of an assertion.
-		 * @param event The event containing the assertion failure.
-		 * @param logger The logger to report the failure to.
+		 * @param event The assertion event.
 		 */
 		void ReportFailure(const event::AssertionFail& event)
 		{
-			//const auto& logger = logger_.get();
-			//switch (testOutcome_)
-			//{
-			//	case ExpectedOutcome::PASS :
-			//	{
-			//		std::string styledResult = format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
-			//		logger.Info(
-			//			"Test {}: File({}), Line({})",
-			//			styledResult,
-			//			event.location.file_name(),
-			//			event.location.line());
+			const log::Logger& logger = logger_.get();
+			switch (testOutcome_)
+			{
+				case ExpectedAssertOutcome::PASS :
+				{
+					std::string styledResult = format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
+					logger.Info(
+						"Test {}: File({}), Line({})",
+						styledResult,
+						event.location.file_name(),
+						event.location.line());
 
-			//		//++assertionFailedCount_;
+					++output_.failedAssertions;
 
-			//		break;
-			//	}
-			//	case ExpectedOutcome::FAIL :
-			//	{
-			//		std::string styledResult = format(log::TextStyle(log::Colour24(0, 255, 0)), "Passed");
-			//		logger.Info(
-			//			"Test {}: File({}), Line({})",
-			//			styledResult,
-			//			event.location.file_name(),
-			//			event.location.line());
+					break;
+				}
+				case ExpectedAssertOutcome::FAIL :
+				{
+					++output_.passedAssertions;
 
-			//		//++expectedFailures_;
-
-			//		break;
-			//	}
-			//	case ExpectedOutcome::SKIP :
-			//	{
-			//		std::string styledResult = format(log::TextStyle(log::Colour24(128, 128, 128)), "Skipped");
-			//		logger.Info(
-			//			"Test {}: File({}), Line({})",
-			//			styledResult,
-			//			event.location.file_name(),
-			//			event.location.line());
-
-			//		//++skippedCount_;
-
-			//		break;
-			//	}
-			//}
+					break;
+				}
+				case ExpectedAssertOutcome::TODO :
+				{
+					++output_.undefinedFailedAssertions;
+					break;
+				}
+			}
 		}
 
-		ExpectedOutcome testOutcome_;
+		ExpectedAssertOutcome testOutcome_;
 		std::reference_wrapper<const log::Logger> logger_;
+
+		Output output_;
 	};
 
 	// class SuiteState
@@ -162,11 +196,12 @@ namespace synodic::honesty::test
 
 	//	void Signal(const event::TestBegin& event)
 	//	{
-	//		currentTestState_.emplace(event.outcome, logger_);
+	//		currentTestState_.emplace(event, logger_);
 	//	}
 
 	//	void Signal(const event::TestEnd& event)
 	//	{
+	//		auto output = currentTestState_->Summarize(event);
 	//		currentTestState_.reset();
 	//	}
 

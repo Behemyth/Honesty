@@ -13,14 +13,14 @@ namespace synodic::honesty::test
 	 */
 	export struct RequirementParameters
 	{
-		RequirementParameters(const std::string_view testName, const ExpectedOutcome outcome) :
+		RequirementParameters(const std::string_view testName, const ExpectedTestOutcome outcome) :
 			testName(testName),
 			outcome(outcome)
 		{
 		}
 
 		std::string_view testName;
-		ExpectedOutcome outcome;
+		ExpectedTestOutcome outcome;
 	};
 
 	/**

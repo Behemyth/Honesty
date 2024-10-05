@@ -70,25 +70,35 @@ namespace synodic::honesty::test::api
 			return success;
 		}
 
-		auto outcome = ExpectedOutcome::PASS;
+		auto testOutcome   = ExpectedTestOutcome::PASS;
+		auto assertOutcome = ExpectedAssertOutcome::PASS;
 
-		if (testData.Tag() == "fail")
+		// Write the outcomes based on the input tags. The tags should already be constrained.
 		{
-			outcome = ExpectedOutcome::FAIL;
-		}
-		else if (testData.Tag() == "fail")
-		{
-			outcome = ExpectedOutcome::SKIP;
+			if (testData.Tag() == "fail")
+			{
+				testOutcome	  = ExpectedTestOutcome::FAIL;
+				assertOutcome = ExpectedAssertOutcome::FAIL;
+			}
+			else if (testData.Tag() == "skip")
+			{
+				testOutcome = ExpectedTestOutcome::SKIP;
+			}
+			else if (testData.Tag() == "todo")
+			{
+				testOutcome	  = ExpectedTestOutcome::TODO;
+				assertOutcome = ExpectedAssertOutcome::TODO;
+			}
 		}
 
-		event::TestBegin testBegin(testData.Name(), outcome);
+		const event::TestBegin testBegin(testData.Name(), assertOutcome);
 
 		for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
 		{
 			reporter->Signal(testBegin);
 		}
 
-		const RequirementParameters requirementParameters(testData.Name(), outcome);
+		const RequirementParameters requirementParameters(testData.Name(), testOutcome);
 		const RequirementContext requirements(parameters.reporters, requirementParameters, parameters.logger);
 
 		Runner& runner = parameters.runner.get();
@@ -178,7 +188,7 @@ namespace synodic::honesty::test::api
 				{
 					return generator();
 				},
-				[&](const std::function_ref<Generator(Fixture&)> generator) -> Generator
+				[&](const std::function_ref<Generator(Fixture&)>& generator) -> Generator
 				{
 					return generator(fixture);
 				}};
@@ -205,14 +215,14 @@ namespace synodic::honesty::test::api
 			event::SuiteEnd end;
 			end.name = suite.Name();
 
-			for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
+			for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
 			{
 				reporter->Signal(end);
 			}
 		}
 
-		event::Summary summary;
-		for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
+		const event::Summary summary;
+		for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
 		{
 			reporter->Signal(summary);
 		}

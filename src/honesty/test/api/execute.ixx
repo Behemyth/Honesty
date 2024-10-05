@@ -29,7 +29,7 @@ namespace synodic::honesty::test::api
 			const std::string_view filter,
 			Runner& runner,
 			const std::span<std::unique_ptr<Reporter>> reporters,
-			bool dryRun,
+			const bool dryRun,
 			const log::Logger& logger) :
 			applicationName(applicationName),
 			filter(filter),

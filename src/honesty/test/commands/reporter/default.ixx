@@ -25,13 +25,14 @@ namespace synodic::honesty::test
 
 		void Signal(const event::AssertionFail& event)
 		{
-			StyleAssertion(event, logger_);
+			auto& logger = logger_.get();
+			//StyleAssertion(event, logger);
 		}
 
 		void Signal(const event::EqualityFail& event)
 		{
 			auto& logger = logger_.get();
-			StyleAssertion(event, logger);
+			//StyleAssertion(event, logger);
 
 			const std::string relation = event.equal ? "==" : "!=";
 
@@ -42,7 +43,7 @@ namespace synodic::honesty::test
 		{
 			auto& logger = logger_.get();
 
-			StyleAssertion(event, logger);
+			//StyleAssertion(event, logger);
 
 			const std::string relation = [](const std::strong_ordering ordering) -> std::string
 			{
@@ -61,51 +62,83 @@ namespace synodic::honesty::test
 		}
 
 	private:
-		void StyleAssertion(const event::AssertionFail& event, const log::Logger& logger)
-		{
-			switch (testOutcome_)
-			{
-				case ExpectedOutcome::PASS :
-				{
-					std::string styledResult = format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
-					logger.Info(
-						"Test {}: File({}), Line({})",
-						styledResult,
-						event.location.file_name(),
-						event.location.line());
+		/**
+		 * @brief Provides consistent text styling for assertion failure summaries.
+		 * @param relation The string representing the relationship between the two failed comparisons.
+		 * @param a Comparison value a.
+		 * @param b Comparison value b.
+		 */
+		//std::string StyleAssertionReason(std::string_view relation, std::string_view a, std::string_view b)
 
-					//++failCount_;
+		//{
+		//	constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
+		//	const std::string indent(4, ' ');
 
-					break;
-				}
-				case ExpectedOutcome::FAIL :
-				{
-					std::string styledResult = format(log::TextStyle(log::Colour24(0, 255, 0)), "Passed");
-					logger.Info(
-						"Test {}: File({}), Line({})",
-						styledResult,
-						event.location.file_name(),
-						event.location.line());
+		//	auto makeView = [](auto range)
+		//	{
+		//		return std::string_view(range);
+		//	};
 
-					//++expectedFailures_;
+		//	// First line isn't indented
+		//	const std::string indentedA = a | std::views::split('\n') | std::views::transform(makeView) |
+		//								  std::views::join_with("\n" + indent) | std::ranges::to<std::string>();
 
-					break;
-				}
-				case ExpectedOutcome::SKIP :
-				{
-					std::string styledResult = format(log::TextStyle(log::Colour24(128, 128, 128)), "Skipped");
-					logger.Info(
-						"Test {}: File({}), Line({})",
-						styledResult,
-						event.location.file_name(),
-						event.location.line());
+		//	// First line isn't indented
+		//	const std::string indentedB = b | std::views::split('\n') | std::views::transform(makeView) |
+		//								  std::views::join_with("\n" + indent) | std::ranges::to<std::string>();
 
-					//++skippedCount_;
+		//	return std::format(
+		//		"{}\n{}\n{}",
+		//		format(highlight, "{}'{}'", indent, indentedA),
+		//		relation,
+		//		format(highlight, "{}'{}'", indent, indentedB));
+		//}
 
-					break;
-				}
-			}
-		}
+		//void StyleAssertion(const event::AssertionFail& event, const log::Logger& logger)
+		//{
+		//	switch (testOutcome_)
+		//	{
+		//		case ExpectedOutcome::PASS :
+		//		{
+		//			std::string styledResult = format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
+		//			logger.Info(
+		//				"Test {}: File({}), Line({})",
+		//				styledResult,
+		//				event.location.file_name(),
+		//				event.location.line());
+
+		//			//++failCount_;
+
+		//			break;
+		//		}
+		//		case ExpectedOutcome::FAIL :
+		//		{
+		//			std::string styledResult = format(log::TextStyle(log::Colour24(0, 255, 0)), "Passed");
+		//			logger.Info(
+		//				"Test {}: File({}), Line({})",
+		//				styledResult,
+		//				event.location.file_name(),
+		//				event.location.line());
+
+		//			//++expectedFailures_;
+
+		//			break;
+		//		}
+		//		case ExpectedOutcome::SKIP :
+		//		{
+		//			std::string styledResult = format(log::TextStyle(log::Colour24(128, 128, 128)), "Skipped");
+		//			logger.Info(
+		//				"Test {}: File({}), Line({})",
+		//				styledResult,
+		//				event.location.file_name(),
+		//				event.location.line());
+
+		//			//++skippedCount_;
+
+		//			break;
+		//		}
+		//	}
+		//}
 
 		ExpectedOutcome testOutcome_;
 		std::reference_wrapper<const log::Logger> logger_;
@@ -114,66 +147,46 @@ namespace synodic::honesty::test
 	class SuiteState
 	{
 	public:
-		SuiteState(const std::string_view name, const log::Logger& logger) :
-			suiteName_(name),
+		SuiteState(const event::SuiteBegin& event, const log::Logger& logger) :
 			logger_(logger)
 		{
 		}
 
-		void BeginTest(const event::TestBegin& event)
+		void Signal(const event::TestBegin& event)
 		{
 			currentTestState_.emplace(event.outcome, logger_);
 		}
 
-		void EndTest(const event::TestEnd& event)
+		void Signal(const event::TestEnd& event)
 		{
 			currentTestState_.reset();
 		}
 
-		TestState& Test()
+		void Signal(const event::AssertionPass& event)
 		{
-			return currentTestState_.value();
+			currentTestState_->Signal(event);
+		}
+
+		void Signal(const event::AssertionFail& event)
+		{
+			currentTestState_->Signal(event);
+		}
+
+		void Signal(const event::EqualityFail& event)
+		{
+			currentTestState_->Signal(event);
+		}
+
+		void Signal(const event::ComparisonFail& event)
+		{
+			currentTestState_->Signal(event);
 		}
 
 	private:
 		std::optional<TestState> currentTestState_;
 
-		std::string_view suiteName_;
-
 		std::reference_wrapper<const log::Logger> logger_;
 	};
-
-	/**
-	 * @brief Provides consistent text styling for assertion failure summaries.
-	 * @param relation The string representing the relationship between the two failed comparisons.
-	 * @param a Comparison value a.
-	 * @param b Comparison value b.
-	 */
-	std::string StyleAssertionReason(std::string_view relation, std::string_view a, std::string_view b)
-
-	{
-		constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
-		const std::string indent(4, ' ');
-
-		auto makeView = [](auto range)
-		{
-			return std::string_view(range);
-		};
-
-		// First line isn't indented
-		const std::string indentedA = a | std::views::split('\n') | std::views::transform(makeView) |
-									  std::views::join_with("\n" + indent) | std::ranges::to<std::string>();
-
-		// First line isn't indented
-		const std::string indentedB = b | std::views::split('\n') | std::views::transform(makeView) |
-									  std::views::join_with("\n" + indent) | std::ranges::to<std::string>();
-
-		return std::format(
-			"{}\n{}\n{}",
-			format(highlight, "{}'{}'", indent, indentedA),
-			relation,
-			format(highlight, "{}'{}'", indent, indentedB));
-	}
 
 	export class DefaultReporter final : public StreamingAdapter
 	{
@@ -192,7 +205,7 @@ namespace synodic::honesty::test
 
 		void Signal(const event::SuiteBegin& event) override
 		{
-			currentSuiteState_.emplace(event.name, Logger());
+			currentSuiteState_.emplace(event, Logger());
 		}
 
 		void Signal(const event::SuiteEnd& event) override
@@ -202,28 +215,32 @@ namespace synodic::honesty::test
 
 		void Signal(const event::TestBegin& event) override
 		{
-			Suite().BeginTest(event);
+			currentSuiteState_->Signal(event);
 		}
 
 		void Signal(const event::TestEnd& event) override
 		{
-			Suite().EndTest(event);
+			currentSuiteState_->Signal(event);
 		}
 
 		void Signal(const event::AssertionPass& event) override
 		{
+			currentSuiteState_->Signal(event);
 		}
 
 		void Signal(const event::AssertionFail& event) override
 		{
+			currentSuiteState_->Signal(event);
 		}
 
 		void Signal(const event::EqualityFail& event) override
 		{
+			currentSuiteState_->Signal(event);
 		}
 
 		void Signal(const event::ComparisonFail& event) override
 		{
+			currentSuiteState_->Signal(event);
 		}
 
 		void Signal(const event::Summary& event) override
@@ -252,11 +269,6 @@ namespace synodic::honesty::test
 		}
 
 	private:
-		SuiteState& Suite()
-		{
-			return currentSuiteState_.value();
-		}
-
 		std::size_t passCount_		  = 0;
 		std::size_t failCount_		  = 0;
 		std::size_t expectedFailures_ = 0;

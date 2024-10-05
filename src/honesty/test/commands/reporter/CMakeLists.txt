@@ -3,5 +3,5 @@ target_sources(honesty
 	FILE_SET interfaces
 	FILES
 	compact.ixx
-	default.ixx
+	standard.ixx
 )

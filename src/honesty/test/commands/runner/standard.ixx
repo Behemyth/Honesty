@@ -1,14 +1,14 @@
-export module synodic.honesty.test.commands:runner.default;
+export module synodic.honesty.test.commands:runner.standard;
 
 import std;
 import synodic.honesty.test;
 
 namespace synodic::honesty::test
 {
-	export class DefaultRunner final : public Runner
+	export class StandardRunner final : public Runner
 	{
 	public:
-		explicit DefaultRunner(const log::Logger& logger) :
+		explicit StandardRunner(const log::Logger& logger) :
 			Runner(logger)
 		{
 		}

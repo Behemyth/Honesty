@@ -13,9 +13,9 @@ import :types;
 import :execute;
 export import :list;
 
-import :reporter.default;
+import :reporter.standard;
 import :reporter.compact;
-import :runner.default;
+import :runner.standard;
 
 namespace
 {
@@ -225,10 +225,10 @@ namespace synodic::honesty::test
 		{
 			// Register our default runners and reporters
 			{
-				static ReporterRegistrar<DefaultReporter> defaultReporterRegistrar;
+				static ReporterRegistrar<StandardReporter> defaultReporterRegistrar;
 				static ReporterRegistrar<CompactReporter> compactReporterRegistrar;
 
-				static RunnerRegistrar<DefaultRunner> defaultRunnerRegistrar;
+				static RunnerRegistrar<StandardRunner> defaultRunnerRegistrar;
 			}
 
 			// Gather our user defined runners and reporters

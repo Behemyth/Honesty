@@ -207,33 +207,39 @@ namespace synodic::honesty::test
 
 		void Signal(const event::TestBegin& event)
 		{
-			currentTestState_.emplace(event, logger_);
+			TestState& state = testStates_.emplace_back(event, logger_);
 		}
 
 		void Signal(const event::TestEnd& event)
 		{
-			auto output = currentTestState_->Summarize(event);
-			currentTestState_.reset();
+			TestState& state = testStates_.back();
+			auto output		 = state.Summarize(event);
+
+			testStates_.pop_back();
 		}
 
 		void Signal(const event::AssertionPass& event)
 		{
-			currentTestState_->Signal(event);
+			TestState& state = testStates_.back();
+			state.Signal(event);
 		}
 
 		void Signal(const event::AssertionFail& event)
 		{
-			currentTestState_->Signal(event);
+			TestState& state = testStates_.back();
+			state.Signal(event);
 		}
 
 		void Signal(const event::EqualityFail& event)
 		{
-			currentTestState_->Signal(event);
+			TestState& state = testStates_.back();
+			state.Signal(event);
 		}
 
 		void Signal(const event::ComparisonFail& event)
 		{
-			currentTestState_->Signal(event);
+			TestState& state = testStates_.back();
+			state.Signal(event);
 		}
 
 		Output Summarize(const event::TestEnd& event)
@@ -242,7 +248,8 @@ namespace synodic::honesty::test
 		}
 
 	private:
-		std::optional<TestState> currentTestState_;
+		// Tests are recursive, and we should keep track of state as such.
+		std::list<TestState> testStates_;
 
 		std::reference_wrapper<const log::Logger> logger_;
 
@@ -264,7 +271,7 @@ namespace synodic::honesty::test
 			return "default";
 		}
 
-		/*void Signal(const event::SuiteBegin& event) override
+		void Signal(const event::SuiteBegin& event) override
 		{
 			currentSuiteState_.emplace(event, Logger());
 		}
@@ -274,6 +281,7 @@ namespace synodic::honesty::test
 			currentSuiteState_.reset();
 		}
 
+		/*
 		void Signal(const event::TestBegin& event) override
 		{
 			currentSuiteState_->Signal(event);
@@ -321,7 +329,7 @@ namespace synodic::honesty::test
 		std::size_t assertionsPassedCount_ = 0;
 		std::size_t assertionFailedCount_  = 0;
 
-		// std::optional<SuiteState> currentSuiteState_;
+		std::optional<SuiteState> currentSuiteState_;
 	};
 
 }

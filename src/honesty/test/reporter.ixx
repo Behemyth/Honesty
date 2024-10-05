@@ -29,26 +29,6 @@ namespace synodic::honesty::test
 		{
 		}
 
-		void Signal(const event::SuiteSkip& event) override
-		{
-		}
-
-		void Signal(const event::SuiteRun& event) override
-		{
-		}
-
-		void Signal(const event::SuiteFail& event) override
-		{
-		}
-
-		void Signal(const event::SuitePass& event) override
-		{
-		}
-
-		void Signal(const event::SuiteSummary& event) override
-		{
-		}
-
 		void Signal(const event::TestBegin& event) override
 		{
 		}
@@ -58,18 +38,6 @@ namespace synodic::honesty::test
 		}
 
 		void Signal(const event::TestSkip& event) override
-		{
-		}
-
-		void Signal(const event::TestRun& event) override
-		{
-		}
-
-		void Signal(const event::TestFail& event) override
-		{
-		}
-
-		void Signal(const event::TestPass& event) override
 		{
 		}
 
@@ -146,26 +114,6 @@ namespace synodic::honesty::test
 			name = event.name;
 		}
 
-		void Signal(const event::SuiteSkip& event) final
-		{
-		}
-
-		void Signal(const event::SuiteRun& event) final
-		{
-		}
-
-		void Signal(const event::SuiteFail& event) final
-		{
-		}
-
-		void Signal(const event::SuitePass& event) final
-		{
-		}
-
-		void Signal(const event::SuiteSummary& event) final
-		{
-		}
-
 		void Signal(const event::TestBegin& event) final
 		{
 			SuiteData& suiteData = data_.suites.back();
@@ -181,18 +129,6 @@ namespace synodic::honesty::test
 		}
 
 		void Signal(const event::TestSkip& event) final
-		{
-		}
-
-		void Signal(const event::TestRun& event) final
-		{
-		}
-
-		void Signal(const event::TestFail& event) final
-		{
-		}
-
-		void Signal(const event::TestPass& event) final
 		{
 		}
 

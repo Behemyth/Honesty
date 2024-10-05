@@ -69,7 +69,7 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(location, descriptionCallback(), true, parameters_.outcome);
+				const event::AssertionFail failed(location, descriptionCallback(), true);
 
 				Signal(failed);
 			}
@@ -114,7 +114,7 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(location, descriptionCallback(), false, parameters_.outcome);
+				const event::AssertionFail failed(location, descriptionCallback(), false);
 
 				Signal(failed);
 			}
@@ -185,7 +185,7 @@ namespace synodic::honesty::test
 			try
 			{
 				std::invoke(std::forward<Fn>(function));
-				const event::AssertionFail failed(location, descriptionCallback(), true, parameters_.outcome);
+				const event::AssertionFail failed(location, descriptionCallback(), true);
 
 				Signal(failed);
 			}
@@ -197,7 +197,7 @@ namespace synodic::honesty::test
 			}
 			catch (...)
 			{
-				const event::AssertionFail failed(location, descriptionCallback(), true, parameters_.outcome);
+				const event::AssertionFail failed(location, descriptionCallback(), true);
 
 				Signal(failed);
 			}
@@ -233,7 +233,7 @@ namespace synodic::honesty::test
 			}
 			catch (...)
 			{
-				const event::AssertionFail failed(location, descriptionCallback(), true, parameters_.outcome);
+				const event::AssertionFail failed(location, descriptionCallback(), true);
 
 				Signal(failed);
 			}
@@ -263,7 +263,7 @@ namespace synodic::honesty::test
 			try
 			{
 				std::invoke(std::forward<Fn>(function));
-				const event::AssertionFail failed(location, descriptionCallback(), false, parameters_.outcome);
+				const event::AssertionFail failed(location, descriptionCallback(), false);
 
 				Signal(failed);
 			}
@@ -275,7 +275,7 @@ namespace synodic::honesty::test
 			}
 			catch (...)
 			{
-				const event::AssertionFail failed(location, descriptionCallback(), false, parameters_.outcome);
+				const event::AssertionFail failed(location, descriptionCallback(), false);
 
 				Signal(failed);
 			}
@@ -311,7 +311,7 @@ namespace synodic::honesty::test
 			}
 			catch (...)
 			{
-				const event::AssertionFail failed(location, descriptionCallback(), false, parameters_.outcome);
+				const event::AssertionFail failed(location, descriptionCallback(), false);
 
 				Signal(failed);
 			}
@@ -434,14 +434,8 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::EqualityFail failed(
-					location,
-					false,
-					std::format("{}", a),
-					std::format("{}", b),
-					descriptionCallback(),
-					false,
-					parameters_.outcome);
+				const event::EqualityFail
+					failed(location, false, std::format("{}", a), std::format("{}", b), descriptionCallback(), false);
 
 				Signal(failed);
 			}
@@ -481,14 +475,8 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::EqualityFail failed(
-					location,
-					true,
-					std::format("{}", a),
-					std::format("{}", b),
-					descriptionCallback(),
-					false,
-					parameters_.outcome);
+				const event::EqualityFail
+					failed(location, true, std::format("{}", a), std::format("{}", b), descriptionCallback(), false);
 
 				Signal(failed);
 			}
@@ -529,14 +517,8 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::ComparisonFail failed(
-					location,
-					order,
-					std::format("{}", a),
-					std::format("{}", b),
-					descriptionCallback(),
-					true,
-					parameters_.outcome);
+				const event::ComparisonFail
+					failed(location, order, std::format("{}", a), std::format("{}", b), descriptionCallback(), true);
 
 				Signal(failed);
 			}
@@ -707,14 +689,8 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::ComparisonFail failed(
-					location,
-					order,
-					std::format("{}", a),
-					std::format("{}", b),
-					descriptionCallback(),
-					false,
-					parameters_.outcome);
+				const event::ComparisonFail
+					failed(location, order, std::format("{}", a), std::format("{}", b), descriptionCallback(), false);
 
 				Signal(failed);
 			}
@@ -842,14 +818,8 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::ComparisonFail failed(
-					location,
-					order,
-					std::format("{}", a),
-					std::format("{}", b),
-					descriptionCallback(),
-					false,
-					parameters_.outcome);
+				const event::ComparisonFail
+					failed(location, order, std::format("{}", a), std::format("{}", b), descriptionCallback(), false);
 
 				Signal(failed);
 			}

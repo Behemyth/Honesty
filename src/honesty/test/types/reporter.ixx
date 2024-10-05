@@ -55,7 +55,14 @@ namespace synodic::honesty::test
 
 		struct TestBegin
 		{
+			TestBegin(const std::string_view name, const ExpectedOutcome outcome) :
+				name(name),
+				outcome(outcome)
+			{
+			}
+
 			std::string_view name;
+			ExpectedOutcome outcome;
 		};
 
 		struct TestEnd
@@ -88,17 +95,14 @@ namespace synodic::honesty::test
 			explicit AssertionFail(
 				std::source_location location,
 				const std::string_view message,
-				const bool exception,
-				const ExpectedOutcome outcome) :
+				const bool exception) :
 				exception(exception),
-				outcome(outcome),
 				message(message),
 				location(std::move(location))
 			{
 			}
 
 			bool exception;	 // True if the remainder of the test is skipped
-			ExpectedOutcome outcome;
 			std::string_view message;
 			std::source_location location;
 		};
@@ -111,9 +115,8 @@ namespace synodic::honesty::test
 				const std::string_view a,
 				const std::string_view b,
 				const std::string_view message,
-				const bool exception,
-				const ExpectedOutcome outcome) :
-				AssertionFail(std::move(location), message, exception, outcome),
+				const bool exception) :
+				AssertionFail(std::move(location), message, exception),
 				equal(equal),
 				a(a),
 				b(b)
@@ -134,9 +137,8 @@ namespace synodic::honesty::test
 				const std::string_view a,
 				const std::string_view b,
 				const std::string_view message,
-				const bool exception,
-				const ExpectedOutcome outcome) :
-				AssertionFail(std::move(location), message, exception, outcome),
+				const bool exception) :
+				AssertionFail(std::move(location), message, exception),
 				ordering(ordering),
 				a(a),
 				b(b)
@@ -152,16 +154,12 @@ namespace synodic::honesty::test
 		struct AssertionPass
 
 		{
-			explicit AssertionPass(
-				std::source_location location,
-				const ExpectedOutcome outcome = ExpectedOutcome::PASS) :
-				location(std::move(location)),
-				outcome(outcome)
+			explicit AssertionPass(std::source_location location) :
+				location(std::move(location))
 			{
 			}
 
 			std::source_location location;
-			ExpectedOutcome outcome;
 		};
 
 		struct AssertionSkip
@@ -189,25 +187,16 @@ namespace synodic::honesty::test
 
 		virtual void Signal(const event::SuiteBegin& event) = 0;
 		virtual void Signal(const event::SuiteEnd& event)	= 0;
-		virtual void Signal(const event::SuiteSkip& event)	= 0;
-
-		virtual void Signal(const event::SuiteRun& event)  = 0;
-		virtual void Signal(const event::SuiteFail& event) = 0;
-		virtual void Signal(const event::SuitePass& event) = 0;
-
-		virtual void Signal(const event::SuiteSummary& event) = 0;
 
 		virtual void Signal(const event::TestBegin& event) = 0;
 		virtual void Signal(const event::TestEnd& event)   = 0;
-		virtual void Signal(const event::TestSkip& event)  = 0;
 
-		virtual void Signal(const event::TestRun& event)  = 0;
-		virtual void Signal(const event::TestFail& event) = 0;
-		virtual void Signal(const event::TestPass& event) = 0;
+		virtual void Signal(const event::TestSkip& event)  = 0;
 
 		virtual void Signal(const event::AssertionFail& event)	= 0;
 		virtual void Signal(const event::EqualityFail& event)	= 0;
 		virtual void Signal(const event::ComparisonFail& event) = 0;
+
 		virtual void Signal(const event::AssertionPass& event)	= 0;
 		virtual void Signal(const event::AssertionSkip& event)	= 0;
 

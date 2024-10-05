@@ -70,14 +70,6 @@ namespace synodic::honesty::test::api
 			return success;
 		}
 
-		event::TestBegin testBegin;
-		testBegin.name = testData.Name();
-
-		for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
-		{
-			reporter->Signal(testBegin);
-		}
-
 		auto outcome = ExpectedOutcome::PASS;
 
 		if (testData.Tag() == "fail")
@@ -87,6 +79,13 @@ namespace synodic::honesty::test::api
 		else if (testData.Tag() == "fail")
 		{
 			outcome = ExpectedOutcome::SKIP;
+		}
+
+		event::TestBegin testBegin(testData.Name(), outcome);
+
+		for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
+		{
+			reporter->Signal(testBegin);
 		}
 
 		const RequirementParameters requirementParameters(testData.Name(), outcome);

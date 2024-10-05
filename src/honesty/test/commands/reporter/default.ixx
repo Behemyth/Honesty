@@ -8,12 +8,149 @@ namespace synodic::honesty::test
 {
 
 	/**
+	 * @brief The state required for the lifetime of a test
+	 */
+	class TestState
+	{
+	public:
+		TestState(const ExpectedOutcome outcome, const log::Logger& logger) :
+			testOutcome_(outcome),
+			logger_(logger)
+		{
+		}
+
+		void Signal(const event::AssertionPass& event)
+		{
+		}
+
+		void Signal(const event::AssertionFail& event)
+		{
+			StyleAssertion(event, logger_);
+		}
+
+		void Signal(const event::EqualityFail& event)
+		{
+			auto& logger = logger_.get();
+			StyleAssertion(event, logger);
+
+			const std::string relation = event.equal ? "==" : "!=";
+
+			//logger.Info("{}", StyleAssertionReason(relation, event.a, event.b));
+		}
+
+		void Signal(const event::ComparisonFail& event)
+		{
+			auto& logger = logger_.get();
+
+			StyleAssertion(event, logger);
+
+			const std::string relation = [](const std::strong_ordering ordering) -> std::string
+			{
+				if (ordering == std::strong_ordering::less)
+				{
+					return "<";
+				}
+				if (ordering == std::strong_ordering::greater)
+				{
+					return ">";
+				}
+				return "==";
+			}(event.ordering);
+
+			//logger.Info("{}", StyleAssertionReason(relation, event.a, event.b));
+		}
+
+	private:
+		void StyleAssertion(const event::AssertionFail& event, const log::Logger& logger)
+		{
+			switch (testOutcome_)
+			{
+				case ExpectedOutcome::PASS :
+				{
+					std::string styledResult = format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
+					logger.Info(
+						"Test {}: File({}), Line({})",
+						styledResult,
+						event.location.file_name(),
+						event.location.line());
+
+					//++failCount_;
+
+					break;
+				}
+				case ExpectedOutcome::FAIL :
+				{
+					std::string styledResult = format(log::TextStyle(log::Colour24(0, 255, 0)), "Passed");
+					logger.Info(
+						"Test {}: File({}), Line({})",
+						styledResult,
+						event.location.file_name(),
+						event.location.line());
+
+					//++expectedFailures_;
+
+					break;
+				}
+				case ExpectedOutcome::SKIP :
+				{
+					std::string styledResult = format(log::TextStyle(log::Colour24(128, 128, 128)), "Skipped");
+					logger.Info(
+						"Test {}: File({}), Line({})",
+						styledResult,
+						event.location.file_name(),
+						event.location.line());
+
+					//++skippedCount_;
+
+					break;
+				}
+			}
+		}
+
+		ExpectedOutcome testOutcome_;
+		std::reference_wrapper<const log::Logger> logger_;
+	};
+
+	class SuiteState
+	{
+	public:
+		SuiteState(const std::string_view name, const log::Logger& logger) :
+			suiteName_(name),
+			logger_(logger)
+		{
+		}
+
+		void BeginTest(const event::TestBegin& event)
+		{
+			currentTestState_.emplace(event.outcome, logger_);
+		}
+
+		void EndTest(const event::TestEnd& event)
+		{
+			currentTestState_.reset();
+		}
+
+		TestState& Test()
+		{
+			return currentTestState_.value();
+		}
+
+	private:
+		std::optional<TestState> currentTestState_;
+
+		std::string_view suiteName_;
+
+		std::reference_wrapper<const log::Logger> logger_;
+	};
+
+	/**
 	 * @brief Provides consistent text styling for assertion failure summaries.
 	 * @param relation The string representing the relationship between the two failed comparisons.
 	 * @param a Comparison value a.
 	 * @param b Comparison value b.
 	 */
 	std::string StyleAssertionReason(std::string_view relation, std::string_view a, std::string_view b)
+
 	{
 		constexpr log::TextStyle highlight(log::Colour24(255, 255, 0));
 		const std::string indent(4, ' ');
@@ -55,55 +192,38 @@ namespace synodic::honesty::test
 
 		void Signal(const event::SuiteBegin& event) override
 		{
+			currentSuiteState_.emplace(event.name, Logger());
+		}
+
+		void Signal(const event::SuiteEnd& event) override
+		{
+			currentSuiteState_.reset();
 		}
 
 		void Signal(const event::TestBegin& event) override
 		{
+			Suite().BeginTest(event);
+		}
+
+		void Signal(const event::TestEnd& event) override
+		{
+			Suite().EndTest(event);
 		}
 
 		void Signal(const event::AssertionPass& event) override
 		{
-			++passCount_;
 		}
 
 		void Signal(const event::AssertionFail& event) override
 		{
-			const log::Logger& logger = Logger();
-
-			StyleAssertion(event, logger);
 		}
 
 		void Signal(const event::EqualityFail& event) override
 		{
-			const log::Logger& logger = Logger();
-
-			StyleAssertion(event, logger);
-
-			const std::string relation = event.equal ? "==" : "!=";
-
-			logger.Info("{}", StyleAssertionReason(relation, event.a, event.b));
 		}
 
 		void Signal(const event::ComparisonFail& event) override
 		{
-			const log::Logger& logger = Logger();
-
-			StyleAssertion(event, logger);
-
-			const std::string relation = [](const std::strong_ordering ordering) -> std::string
-			{
-				if (ordering == std::strong_ordering::less)
-				{
-					return "<";
-				}
-				if (ordering == std::strong_ordering::greater)
-				{
-					return ">";
-				}
-				return "==";
-			}(event.ordering);
-
-			logger.Info("{}", StyleAssertionReason(relation, event.a, event.b));
 		}
 
 		void Signal(const event::Summary& event) override
@@ -132,56 +252,17 @@ namespace synodic::honesty::test
 		}
 
 	private:
-		void StyleAssertion(const event::AssertionFail& event, const log::Logger& logger)
+		SuiteState& Suite()
 		{
-			switch (event.outcome)
-			{
-				case ExpectedOutcome::PASS :
-				{
-					std::string styledResult = format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
-					logger.Info(
-						"Test {}: File({}), Line({})",
-						styledResult,
-						event.location.file_name(),
-						event.location.line());
-
-					++failCount_;
-
-					break;
-				}
-				case ExpectedOutcome::FAIL :
-				{
-					std::string styledResult = format(log::TextStyle(log::Colour24(0, 255, 0)), "Passed");
-					logger.Info(
-						"Test {}: File({}), Line({})",
-						styledResult,
-						event.location.file_name(),
-						event.location.line());
-
-					++expectedFailures_;
-
-					break;
-				}
-				case ExpectedOutcome::SKIP :
-				{
-					std::string styledResult = format(log::TextStyle(log::Colour24(128, 128, 128)), "Skipped");
-					logger.Info(
-						"Test {}: File({}), Line({})",
-						styledResult,
-						event.location.file_name(),
-						event.location.line());
-
-					++skippedCount_;
-
-					break;
-				}
-			}
+			return currentSuiteState_.value();
 		}
 
 		std::size_t passCount_		  = 0;
 		std::size_t failCount_		  = 0;
 		std::size_t expectedFailures_ = 0;
 		std::size_t skippedCount_	  = 0;
+
+		std::optional<SuiteState> currentSuiteState_;
 	};
 
 }

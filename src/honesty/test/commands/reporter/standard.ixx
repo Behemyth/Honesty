@@ -7,9 +7,9 @@ import std;
 
 namespace
 {
-	constexpr auto SUCCESS	 = synodic::honesty::log::TextStyle(synodic::honesty::log::Colour24(0, 255, 0));
-	constexpr auto FAILURE	 = synodic::honesty::log::TextStyle(synodic::honesty::log::Colour24(255, 0, 0));
-	constexpr auto HIGHLIGHT = synodic::honesty::log::TextStyle(synodic::honesty::log::Colour24(255, 255, 0));
+	constexpr auto SUCCESS_STYLE   = synodic::honesty::log::TextStyle(synodic::honesty::log::Colour24(0, 255, 0));
+	constexpr auto FAILURE_STYLE   = synodic::honesty::log::TextStyle(synodic::honesty::log::Colour24(255, 0, 0));
+	constexpr auto HIGHLIGHT_STYLE = synodic::honesty::log::TextStyle(synodic::honesty::log::Colour24(255, 255, 0));
 }
 
 namespace synodic::honesty::test
@@ -315,8 +315,8 @@ namespace synodic::honesty::test
 		{
 			const log::Logger& logger = Logger();
 
-			std::string passedStyled = format(SUCCESS, "Passed");
-			std::string failedStyled = format(FAILURE, "Failed");
+			std::string passedStyled = format(SUCCESS_STYLE, "Passed");
+			std::string failedStyled = format(FAILURE_STYLE, "Failed");
 
 			logger.Info("{} Assertions {}", assertionsPassedCount_, passedStyled);
 

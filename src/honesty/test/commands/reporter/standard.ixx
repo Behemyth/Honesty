@@ -103,8 +103,7 @@ namespace synodic::honesty::test
 			{
 				logger.Info("{}Expected:", indent);
 
-				const auto HIGHLIGHT_STYLE(
-					log::TextStyle(log::Colour24(255, 255, 0)));
+				const auto HIGHLIGHT_STYLE(log::TextStyle(log::Colour24(255, 255, 0)));
 
 				logger.Info(
 					"Expected: {}\n{}\n{}",
@@ -214,7 +213,13 @@ namespace synodic::honesty::test
 		void Signal(const event::TestEnd& event)
 		{
 			TestState& state = testStates_.back();
-			auto output		 = state.Summarize(event);
+			const auto [passedAssertions, failedAssertions, undefinedPassedAssertions, undefinedFailedAssertions] =
+				state.Summarize(event);
+
+			output_.passedAssertions		  += passedAssertions;
+			output_.failedAssertions		  += failedAssertions;
+			output_.undefinedPassedAssertions += undefinedPassedAssertions;
+			output_.undefinedFailedAssertions += undefinedFailedAssertions;
 
 			testStates_.pop_back();
 		}
@@ -243,7 +248,7 @@ namespace synodic::honesty::test
 			state.Signal(event);
 		}
 
-		Output Summarize(const event::TestEnd& event)
+		Output Summarize(const event::SuiteEnd& event)
 		{
 			return output_;
 		}
@@ -279,6 +284,13 @@ namespace synodic::honesty::test
 
 		void Signal(const event::SuiteEnd& event) override
 		{
+			SuiteState& state = currentSuiteState_.value();
+			const auto [passedAssertions, failedAssertions, undefinedPassedAssertions, undefinedFailedAssertions] =
+				state.Summarize(event);
+
+			assertionsPassedCount_ += passedAssertions;
+			assertionFailedCount_  += failedAssertions;
+
 			currentSuiteState_.reset();
 		}
 

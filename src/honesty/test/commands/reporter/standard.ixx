@@ -104,7 +104,7 @@ namespace synodic::honesty::test
 				logger.Info("{}Expected:", indent);
 
 				const auto HIGHLIGHT_STYLE(
-					synodic::honesty::log::TextStyle(synodic::honesty::log::Colour24(255, 255, 0)));
+					log::TextStyle(log::Colour24(255, 255, 0)));
 
 				logger.Info(
 					"Expected: {}\n{}\n{}",

@@ -5,12 +5,10 @@ import synodic.honesty.test;
 import synodic.honesty.utility;
 import std;
 
-namespace
-{
-	constexpr auto SUCCESS_STYLE   = synodic::honesty::log::TextStyle(synodic::honesty::log::Colour24(0, 255, 0));
-	constexpr auto FAILURE_STYLE   = synodic::honesty::log::TextStyle(synodic::honesty::log::Colour24(255, 0, 0));
-	constexpr auto HIGHLIGHT_STYLE = synodic::honesty::log::TextStyle(synodic::honesty::log::Colour24(255, 255, 0));
-}
+// TODO: Make constexpr when
+//	'https://developercommunity.visualstudio.com/t/Inexplicable-ICE-when-using-modules/1593396' is fixed
+// static const inline auto
+//	HIGHLIGHT_STYLE(synodic::honesty::log::TextStyle(synodic::honesty::log::Colour24(255, 255, 0)));
 
 namespace synodic::honesty::test
 {
@@ -105,11 +103,14 @@ namespace synodic::honesty::test
 			{
 				logger.Info("{}Expected:", indent);
 
-				/*	logger.Info(
-						"Expected: {}\n{}\n{}",
-						format(HIGHLIGHT, "{}'{}'", indent, a),
-						relation,
-						format(HIGHLIGHT, "{}'{}'", indent, b));*/
+				const auto HIGHLIGHT_STYLE(
+					synodic::honesty::log::TextStyle(synodic::honesty::log::Colour24(255, 255, 0)));
+
+				logger.Info(
+					"Expected: {}\n{}\n{}",
+					format(HIGHLIGHT_STYLE, "{}'{}'", indent, a),
+					relation,
+					format(HIGHLIGHT_STYLE, "{}'{}'", indent, b));
 			}
 		}
 
@@ -314,6 +315,9 @@ namespace synodic::honesty::test
 		void Signal(const event::Summary& event) override
 		{
 			const log::Logger& logger = Logger();
+
+			const auto SUCCESS_STYLE(log::TextStyle(log::Colour24(0, 255, 0)));
+			const auto FAILURE_STYLE(log::TextStyle(log::Colour24(255, 0, 0)));
 
 			std::string passedStyled = format(SUCCESS_STYLE, "Passed");
 			std::string failedStyled = format(FAILURE_STYLE, "Failed");

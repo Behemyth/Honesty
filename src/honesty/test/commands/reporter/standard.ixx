@@ -281,7 +281,6 @@ namespace synodic::honesty::test
 			currentSuiteState_.reset();
 		}
 
-		/*
 		void Signal(const event::TestBegin& event) override
 		{
 			currentSuiteState_->Signal(event);
@@ -314,16 +313,18 @@ namespace synodic::honesty::test
 
 		void Signal(const event::Summary& event) override
 		{
+			const log::Logger& logger = Logger();
+
 			std::string passedStyled = format(SUCCESS, "Passed");
 			std::string failedStyled = format(FAILURE, "Failed");
 
-			Logger().Info("{} Assertions {}", assertionsPassedCount_, passedStyled);
+			logger.Info("{} Assertions {}", assertionsPassedCount_, passedStyled);
 
 			if (assertionFailedCount_)
 			{
-				Logger().Info("{} Assertions {}", assertionFailedCount_, failedStyled);
+				logger.Info("{} Assertions {}", assertionFailedCount_, failedStyled);
 			}
-		}*/
+		}
 
 	private:
 		std::size_t assertionsPassedCount_ = 0;

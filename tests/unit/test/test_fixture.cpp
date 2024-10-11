@@ -22,6 +22,11 @@ namespace
 
 				requirements.ExpectEquals(stream.str(), message);
 			};
+
+			co_yield "root_log"_test = [&](const Requirements& requirements)
+			{
+				//fixture.
+			};
 		});
 	SuiteRegistrar _(SUITE);
 }

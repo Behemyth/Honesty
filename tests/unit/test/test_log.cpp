@@ -8,11 +8,11 @@ namespace
 {
 	Suite SUITE(
 		"test_log",
-		[]() -> Generator
+		[](const Fixture& fixture) -> Generator
 		{
-			// Verify that you can capture the information going into the root logger
+			//fixture.
 
-			// TODO: Do we support error descriptions on tests?
+			// Verify that you can capture the information going into the root logger
 			co_yield "test"_test = [](const Requirements& requirements)
 			{
 			};

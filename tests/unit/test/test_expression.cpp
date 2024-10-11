@@ -11,10 +11,13 @@ namespace
 {
 	Suite SUITE(
 		"expectation",
-		[]() -> Generator
+		[](const Fixture& fixture) -> Generator
 		{
-			co_yield "error_description"_test = [](const Requirements& requirements)
+			co_yield "error_description"_test = [&](const Requirements& requirements)
 			{
+				//std::stringstream stream;
+				//const TempLogger logger = fixture.TempLog(stream);
+
 				// Tests callable for error message
 				const auto description = []() -> std::string
 				{

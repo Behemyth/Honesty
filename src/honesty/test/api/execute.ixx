@@ -106,6 +106,19 @@ namespace synodic::honesty::test::api
 		auto testExecutor = Overload {
 			[&](const std::function_ref<void(const Requirements&)>& testCallback)
 			{
+				if (testData.Tag() == "skip")
+				{
+					event::TestSkip testSkip;
+					testSkip.name = testData.Name();
+
+					for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
+					{
+						reporter->Signal(testSkip);
+					}
+
+					return;
+				}
+
 				runner.Run(requirements, testCallback);
 			},
 			[&](const std::function_ref<Generator(const Requirements&)>& testCallback)
@@ -133,7 +146,7 @@ namespace synodic::honesty::test::api
 		event::TestEnd testEnd;
 		testEnd.name = testData.Name();
 
-		for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
+		for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
 		{
 			reporter->Signal(testEnd);
 		}

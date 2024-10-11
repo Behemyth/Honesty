@@ -198,6 +198,8 @@ namespace synodic::honesty::test
 			std::size_t failedAssertions		  = 0;
 			std::size_t undefinedPassedAssertions = 0;
 			std::size_t undefinedFailedAssertions = 0;
+
+			std::size_t skippedTests = 0;
 		};
 
 		SuiteState(const event::SuiteBegin& event, const log::Logger& logger) :
@@ -222,6 +224,11 @@ namespace synodic::honesty::test
 			output_.undefinedFailedAssertions += undefinedFailedAssertions;
 
 			testStates_.pop_back();
+		}
+
+		void Signal(const event::TestSkip& event)
+		{
+			++output_.skippedTests;
 		}
 
 		void Signal(const event::AssertionPass& event)
@@ -285,11 +292,16 @@ namespace synodic::honesty::test
 		void Signal(const event::SuiteEnd& event) override
 		{
 			SuiteState& state = currentSuiteState_.value();
-			const auto [passedAssertions, failedAssertions, undefinedPassedAssertions, undefinedFailedAssertions] =
-				state.Summarize(event);
+			const auto
+				[passedAssertions,
+				 failedAssertions,
+				 undefinedPassedAssertions,
+				 undefinedFailedAssertions,
+				 skippedTests] = state.Summarize(event);
 
 			assertionsPassedCount_ += passedAssertions;
 			assertionFailedCount_  += failedAssertions;
+			skippedTestsCount_	   += skippedTests;
 
 			currentSuiteState_.reset();
 		}
@@ -300,6 +312,11 @@ namespace synodic::honesty::test
 		}
 
 		void Signal(const event::TestEnd& event) override
+		{
+			currentSuiteState_->Signal(event);
+		}
+
+		void Signal(const event::TestSkip& event) override
 		{
 			currentSuiteState_->Signal(event);
 		}
@@ -330,9 +347,11 @@ namespace synodic::honesty::test
 
 			const auto SUCCESS_STYLE(log::TextStyle(log::Colour24(0, 255, 0)));
 			const auto FAILURE_STYLE(log::TextStyle(log::Colour24(255, 0, 0)));
+			const auto SKIP_STYLE(log::TextStyle(log::Colour24(128,128, 128)));
 
 			std::string passedStyled = format(SUCCESS_STYLE, "Passed");
 			std::string failedStyled = format(FAILURE_STYLE, "Failed");
+			std::string skipStyled = format(SKIP_STYLE, "Skipped");
 
 			logger.Info("{} Assertions {}", assertionsPassedCount_, passedStyled);
 
@@ -340,11 +359,17 @@ namespace synodic::honesty::test
 			{
 				logger.Info("{} Assertions {}", assertionFailedCount_, failedStyled);
 			}
+
+			if (skippedTestsCount_)
+			{
+				logger.Info("{} Tests {}", skippedTestsCount_, skipStyled);
+			}
 		}
 
 	private:
 		std::size_t assertionsPassedCount_ = 0;
 		std::size_t assertionFailedCount_  = 0;
+		std::size_t skippedTestsCount_	   = 0;
 
 		std::optional<SuiteState> currentSuiteState_;
 	};

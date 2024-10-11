@@ -71,7 +71,14 @@ namespace
 
 			co_yield "nested"_test = [](const Requirements& requirements) -> Generator
 			{
-				co_return;
+				std::size_t count = 0;
+
+				co_yield "inner"_test = [&](const Requirements&)
+				{
+					++count;
+				};
+
+				requirements.ExpectGreater(count, 0u);
 			};
 		});
 

@@ -8,5 +8,6 @@ target_sources(honesty
 			synchronized.ixx
 			ostream.ixx
 			callback.ixx
+			scatter.ixx
 )
 

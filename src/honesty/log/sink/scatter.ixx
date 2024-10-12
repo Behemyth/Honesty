@@ -8,19 +8,23 @@ import :logger;
 
 namespace synodic::honesty::log
 {
-	export template<mutex Mutex>
-	class Scatter final : public SynchronizedSink<Mutex>
+	export template<std::size_t N>
+	class Scatter final : public Sink
 	{
 	public:
 		explicit Scatter()
 		{
 		}
 
-		void SynchronizedLogV(const LevelType level, const std::string_view fmt, std::format_args args) override
+		void LogV(const LevelType level, const std::string_view fmt, const std::format_args args) override
 		{
-			const Message message(level, std::format(fmt, args));
+			for (Sink* sink: sinks_)
+			{
+				sink->LogV(level, fmt, args);
+			}
 		}
 
 	private:
+		std::array<Sink*, N> sinks_;
 	};
 }

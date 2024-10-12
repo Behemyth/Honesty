@@ -13,7 +13,7 @@ namespace
 		"expectation",
 		[](const Fixture& fixture) -> Generator
 		{
-			co_yield "error_description"_test = [&](const Requirements& requirements)
+			co_yield "error_description"_test = [&](const Requirements& requirements) -> Generator
 			{
 				//std::stringstream stream;
 				//const TempLogger logger = fixture.TempLog(stream);
@@ -34,6 +34,11 @@ namespace
 					// TODO: Enable when the "Fail" tag works
 					//requirements.Assert(false, description);
 				}
+
+				co_yield FAIL / "inner"_test = [&](const Requirements&)
+				{
+					
+				};
 
 				// Expect
 				{

@@ -18,7 +18,9 @@ auto main(const int argc, const char* argv[]) -> int
 
 	synodic::honesty::log::Console sink;
 
-	const synodic::honesty::test::Instance::Configuration configuration("honesty", &sink);
+	const unsigned int threadCount = std::thread::hardware_concurrency();
+
+	const synodic::honesty::test::Instance::Configuration configuration("honesty", &sink, threadCount);
 	synodic::honesty::test::Instance command(configuration, arguments);
 
 	command.Execute();

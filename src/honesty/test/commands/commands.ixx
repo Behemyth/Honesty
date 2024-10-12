@@ -56,12 +56,17 @@ namespace synodic::honesty::test
 	public:
 		struct Configuration
 		{
-			explicit Configuration(std::string_view name, log::Sink* sink) :
+			explicit Configuration(const std::string_view name, log::Sink* sink, const std::size_t threadCount = 1) :
 				defaultRunnerName("default"),
 				defaultReporterName("default"),
 				sink(sink),
-				name(name)
+				name(name),
+				threadCount(threadCount)
 			{
+				if (threadCount == 0)
+				{
+					this->threadCount = std::thread::hardware_concurrency();
+				}
 			}
 
 			std::string_view defaultRunnerName;
@@ -69,6 +74,8 @@ namespace synodic::honesty::test
 
 			log::Sink* sink;
 			std::string_view name;
+
+			std::size_t threadCount;
 		};
 
 		// Resolve all input into immediately executable state ready for the 'Execute' function
@@ -76,7 +83,8 @@ namespace synodic::honesty::test
 			applicationName_(std::filesystem::path(arguments.front()).stem().generic_string()),
 			sink_(configuration.sink),
 			logger_(log::RootLogger().CreateLogger(configuration.name)),
-			command_(std::monostate {})
+			command_(std::monostate {}),
+			additionalThreads_(configuration.threadCount - 1)
 
 		{
 			logger_.SetSink(sink_);
@@ -310,5 +318,6 @@ namespace synodic::honesty::test
 
 		std::unique_ptr<Runner> runner_;
 		std::vector<std::unique_ptr<Reporter>> reporters_;
+		std::vector<std::jthread> additionalThreads_;
 	};
 }

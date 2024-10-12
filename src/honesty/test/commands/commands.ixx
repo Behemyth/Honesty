@@ -82,15 +82,16 @@ namespace synodic::honesty::test
 		Instance(const Configuration& configuration, std::span<std::string_view> arguments) :
 			applicationName_(std::filesystem::path(arguments.front()).stem().generic_string()),
 			sink_(configuration.sink),
-			logger_(log::RootLogger().CreateLogger(configuration.name)),
+			appLogger_(log::RootLogger().CreateLogger(configuration.name)),
 			command_(std::monostate {}),
-			additionalThreads_(configuration.threadCount - 1)
+			additionalThreads_(configuration.threadCount - 1),
+			threadLogger_(appLogger_.CreateLogger("main"))
 
 		{
-			logger_.SetSink(sink_);
+			appLogger_.SetSink(sink_);
 
 			command::Configuration commandConfiguration = ResolveConfiguration(configuration);
-			logger_.Debug("Finding command for `{}` application", commandConfiguration.applicationName);
+			appLogger_.Debug("Finding command for `{}` application", commandConfiguration.applicationName);
 
 			// If the executable and at least one argument is given we can look for subcommands
 			if (arguments.size() >= 2)
@@ -184,7 +185,7 @@ namespace synodic::honesty::test
 				const log::TextStyle style(log::TerminalColor::RED);
 				std::string message = log::format(style, "Internal Exception: {}", e.what());
 
-				logger_.Error("{}", message);
+				appLogger_.Error("{}", message);
 
 				// TODO: Replace with a return code
 				std::exit(134);
@@ -220,7 +221,7 @@ namespace synodic::honesty::test
 		 */
 		[[nodiscard]] command::Configuration ResolveConfiguration(const Configuration& configuration) const
 		{
-			return command::Configuration(applicationName_, logger_);
+			return command::Configuration(applicationName_, appLogger_);
 		}
 
 		/***
@@ -279,7 +280,7 @@ namespace synodic::honesty::test
 				{
 					const RunnerRegistry* registry = *iterator;
 
-					runner_ = registry->Create(logger_);
+					runner_ = registry->Create(appLogger_);
 				}
 				else
 				{
@@ -300,7 +301,7 @@ namespace synodic::honesty::test
 				if (iterator != reporterRegistrars.end())
 				{
 					const ReporterRegistry* registry = *iterator;
-					reporters_.push_back(registry->Create(logger_));
+					reporters_.push_back(registry->Create(appLogger_));
 				}
 				else
 				{
@@ -312,12 +313,15 @@ namespace synodic::honesty::test
 		std::string applicationName_;
 
 		log::Sink* sink_;
-		log::Logger logger_;
+		log::Logger appLogger_; // The shared logger for the application
 
 		TopType command_;
 
 		std::unique_ptr<Runner> runner_;
 		std::vector<std::unique_ptr<Reporter>> reporters_;
+
 		std::vector<std::jthread> additionalThreads_;
+
+		thread_local log::Logger threadLogger_;
 	};
 }

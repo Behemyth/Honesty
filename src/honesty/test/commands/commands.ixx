@@ -83,10 +83,7 @@ namespace synodic::honesty::test
 			applicationName_(std::filesystem::path(arguments.front()).stem().generic_string()),
 			sink_(configuration.sink),
 			appLogger_(log::RootLogger().CreateLogger(configuration.name)),
-			command_(std::monostate {}),
-			additionalThreads_(configuration.threadCount - 1),
-			threadLogger_(appLogger_.CreateLogger("main"))
-
+			command_(std::monostate {})
 		{
 			appLogger_.SetSink(sink_);
 
@@ -319,9 +316,5 @@ namespace synodic::honesty::test
 
 		std::unique_ptr<Runner> runner_;
 		std::vector<std::unique_ptr<Reporter>> reporters_;
-
-		std::vector<std::jthread> additionalThreads_;
-
-		thread_local log::Logger threadLogger_;
 	};
 }

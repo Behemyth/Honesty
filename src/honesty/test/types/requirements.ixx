@@ -1,4 +1,4 @@
-export module synodic.honesty.test.types:assert;
+export module synodic.honesty.test.types:requirements;
 
 import std;
 

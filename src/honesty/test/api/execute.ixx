@@ -30,7 +30,7 @@ namespace synodic::honesty::test::api
 			Runner& runner,
 			const std::span<std::unique_ptr<Reporter>> reporters,
 			const bool dryRun,
-			log::Logger& logger) :
+			const log::Logger& logger) :
 			applicationName(applicationName),
 			filter(filter),
 			runner(runner),
@@ -47,7 +47,7 @@ namespace synodic::honesty::test::api
 		std::span<std::unique_ptr<Reporter>> reporters;
 
 		bool dryRun;
-		std::reference_wrapper<log::Logger> logger;
+		std::reference_wrapper<const log::Logger> logger;
 	};
 
 	export struct ExecuteResult
@@ -106,7 +106,7 @@ namespace synodic::honesty::test::api
 		const TestContext testContext =
 			suiteContext.CreateRequirements(suiteContext.Reporters(), requirementParameters);
 
-		Runner& runner = parameters.runner.get();
+		Runner& runner = suiteContext.GetRunner();
 
 		auto testExecutor = Overload {
 			[&](const std::function_ref<void(const Requirements&)>& testCallback)
@@ -180,7 +180,7 @@ namespace synodic::honesty::test::api
 		std::string threadName = std::format("{}", std::this_thread::get_id());
 
 		// Todo: Use threads
-		SuiteContext suiteContext(logger.CreateLogger(threadName));
+		SuiteContext suiteContext(parameters.runner, logger.CreateLogger(threadName));
 
 		for (const SuiteData& suite: GetSuites())
 		{

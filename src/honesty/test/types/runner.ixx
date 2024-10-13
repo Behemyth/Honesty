@@ -6,7 +6,7 @@ import std;
 import inplace_vector;
 import function_ref;
 
-import :assert;
+import :requirements;
 import :reporter;
 import :test;
 

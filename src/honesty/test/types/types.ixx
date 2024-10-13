@@ -1,6 +1,6 @@
 export module synodic.honesty.test.types;
 
-export import :assert;
+export import :requirements;
 export import :reporter;
 export import :runner;
 export import :test;

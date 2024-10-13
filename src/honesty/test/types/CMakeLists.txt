@@ -4,11 +4,14 @@ target_sources(honesty
 	FILE_SET interfaces
 	TYPE CXX_MODULES
 	FILES
-	assert.ixx
+	requirements.ixx
 	test.ixx
 	types.ixx
 	reporter.ixx
 	runner.ixx
 	suite.ixx
 	fixture.ixx
-	tag.ixx)
+	tag.ixx
+	suite_context.ixx
+	test_context.ixx
+)

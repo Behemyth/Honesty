@@ -6,7 +6,7 @@ import generator;
 import function_ref;
 import inplace_vector;
 
-import :assert;
+import :requirements;
 import :tag;
 
 namespace synodic::honesty::test

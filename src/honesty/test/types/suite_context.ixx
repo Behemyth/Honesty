@@ -13,8 +13,9 @@ namespace synodic::honesty::test
 	export class SuiteContext
 	{
 	public:
-		explicit SuiteContext(log::Logger logger) :
-			logger_(std::move(logger))
+		explicit SuiteContext(Runner& runner, log::Logger logger) :
+			logger_(std::move(logger)),
+			runner_(runner)
 		{
 		}
 
@@ -40,9 +41,15 @@ namespace synodic::honesty::test
 			return reporters_;
 		}
 
+		Runner& GetRunner() const
+		{
+			return runner_.get();
+		}
+
 	private:
 		log::Logger logger_;
 
+		std::reference_wrapper<Runner> runner_;
 		std::span<std::unique_ptr<Reporter>> reporters_;
 	};
 }

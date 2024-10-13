@@ -153,6 +153,11 @@ namespace synodic::honesty::log
 			sink_ = sink;
 		}
 
+		void RemoveSink()
+		{
+			sink_ = nullptr;
+		}
+
 		/**
 		 * @brief Checks to see if this logger or its ancestors have any sinks
 		 * @return Whether sinks were found

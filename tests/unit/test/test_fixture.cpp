@@ -25,7 +25,7 @@ namespace
 
 			co_yield "log_listener"_test = [&](const Requirements& requirements)
 			{
-				std::stringstream& stream = fixture.AttachListener();
+				const std::stringstream& stream = fixture.AttachListener();
 
 				requirements.Expect(stream.view().empty());
 

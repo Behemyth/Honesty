@@ -29,17 +29,22 @@ namespace synodic::honesty::log
 			}
 		}
 
-		void AddSink(Sink* input)
+		void SetSink(Sink* input)
 		{
-			for (const Sink* sink: sinks_)
+			if (std::ranges::find(sinks_, input) == sinks_.end())
 			{
-				if (sink == input)
-				{
-					return;
-				}
+				sinks_.push_back(input);
 			}
+		}
 
-			sinks_.push_back(input);
+		void RemoveSink(Sink* input)
+		{
+			std::ranges::remove_if(
+				sinks_,
+				[input](const Sink* sink)
+				{
+					return sink == input;
+				});
 		}
 
 	private:

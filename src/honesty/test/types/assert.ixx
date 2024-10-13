@@ -916,10 +916,10 @@ namespace synodic::honesty::test
 	 * @brief A backend for the Requirements class. This is what the testing framework uses to interact with the
 	 *	requirements populated by the user
 	 */
-	export class RequirementContext : public Requirements
+	export class TestContext : public Requirements
 	{
 	public:
-		RequirementContext(
+		TestContext(
 			const std::span<std::unique_ptr<Reporter>> reporters,
 			const RequirementParameters& input,
 			const log::Logger& logger) :

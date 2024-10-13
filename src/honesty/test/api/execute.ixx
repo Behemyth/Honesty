@@ -30,7 +30,7 @@ namespace synodic::honesty::test::api
 			Runner& runner,
 			const std::span<std::unique_ptr<Reporter>> reporters,
 			const bool dryRun,
-			const log::Logger& logger) :
+			log::Logger& logger) :
 			applicationName(applicationName),
 			filter(filter),
 			runner(runner),
@@ -47,7 +47,7 @@ namespace synodic::honesty::test::api
 		std::span<std::unique_ptr<Reporter>> reporters;
 
 		bool dryRun;
-		std::reference_wrapper<const log::Logger> logger;
+		std::reference_wrapper<log::Logger> logger;
 	};
 
 	export struct ExecuteResult
@@ -60,7 +60,10 @@ namespace synodic::honesty::test::api
 		bool success;
 	};
 
-	bool ProcessTest(const TestData& testData, std::span<std::string_view> filter, const ExecuteParameters& parameters)
+	bool ProcessTest(
+		const TestData& testData,
+		const std::span<std::string_view> filter,
+		const SuiteContext& suiteContext)
 	{
 		bool success = true;
 
@@ -93,13 +96,15 @@ namespace synodic::honesty::test::api
 
 		const event::TestBegin testBegin(testData.Name(), assertOutcome);
 
-		for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
+		for (const std::unique_ptr<Reporter>& reporter: suiteContext.Reporters())
 		{
 			reporter->Signal(testBegin);
 		}
 
 		const RequirementParameters requirementParameters(testData.Name(), testOutcome);
-		const RequirementContext requirements(parameters.reporters, requirementParameters, parameters.logger);
+
+		const TestContext testContext =
+			suiteContext.CreateRequirements(suiteContext.Reporters(), requirementParameters);
 
 		Runner& runner = parameters.runner.get();
 
@@ -111,7 +116,7 @@ namespace synodic::honesty::test::api
 					event::TestSkip testSkip;
 					testSkip.name = testData.Name();
 
-					for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
+					for (const std::unique_ptr<Reporter>& reporter: suiteContext.Reporters())
 					{
 						reporter->Signal(testSkip);
 					}
@@ -119,15 +124,15 @@ namespace synodic::honesty::test::api
 					return;
 				}
 
-				runner.Run(requirements, testCallback);
+				runner.Run(testContext, testCallback);
 			},
 			[&](const std::function_ref<Generator(const Requirements&)>& testCallback)
 			{
-				Generator generator = runner.Run(requirements, testCallback);
+				Generator generator = runner.Run(testContext, testCallback);
 
 				for (const Test& test: generator)
 				{
-					if (not ProcessTest(static_cast<TestData>(test), filter, parameters))
+					if (not ProcessTest(static_cast<TestData>(test), filter, suiteContext))
 					{
 						success = false;
 						break;
@@ -138,7 +143,7 @@ namespace synodic::honesty::test::api
 		// Start the recursive test execution
 		std::visit(testExecutor, testData.Variant());
 
-		if (not requirements.Output().success)
+		if (not testContext.Output().success)
 		{
 			success = false;
 		}
@@ -146,7 +151,7 @@ namespace synodic::honesty::test::api
 		event::TestEnd testEnd;
 		testEnd.name = testData.Name();
 
-		for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
+		for (const std::unique_ptr<Reporter>& reporter: suiteContext.Reporters())
 		{
 			reporter->Signal(testEnd);
 		}
@@ -169,6 +174,13 @@ namespace synodic::honesty::test::api
 		std::span filter = filterData;
 
 		bool success = true;
+
+		const log::Logger& logger = parameters.logger.get();
+
+		std::string threadName = std::format("{}", std::this_thread::get_id());
+
+		// Todo: Use threads
+		SuiteContext suiteContext(logger.CreateLogger(threadName));
 
 		for (const SuiteData& suite: GetSuites())
 		{
@@ -194,7 +206,7 @@ namespace synodic::honesty::test::api
 			}
 
 			// Fixture lifetime should be for the whole suite
-			Fixture fixture(parameters.applicationName, suite.Name(), parameters.logger);
+			Fixture fixture = suiteContext.CreateFixture(parameters.applicationName, suite.Name());
 
 			auto executor = Overload {
 				[&](const std::function_ref<Generator()> generator) -> Generator
@@ -210,13 +222,13 @@ namespace synodic::honesty::test::api
 
 			for (const Test& test: generator)
 			{
-				const TestData& view = static_cast<TestData>(test);
+				const auto& view = static_cast<TestData>(test);
 
 				bool testSuccess = true;
 
 				if (not parameters.dryRun)
 				{
-					testSuccess = ProcessTest(view, filter, parameters);
+					testSuccess = ProcessTest(view, filter, suiteContext);
 				}
 
 				if (not testSuccess)

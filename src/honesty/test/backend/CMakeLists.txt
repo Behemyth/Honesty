@@ -7,5 +7,5 @@ target_sources(honesty
 	storage.ixx
 	reporter.ixx
 	runner.ixx
-	thread_context.ixx
+	suite_context.ixx
 )

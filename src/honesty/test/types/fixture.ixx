@@ -42,12 +42,11 @@ namespace synodic::honesty::test
 	export class Fixture
 	{
 	public:
-		Fixture(const std::string_view applicationName, const std::string_view suiteName, const log::Logger& logger, log::FixedScatter<2>& sink) :
+		Fixture(const std::string_view applicationName, const std::string_view suiteName, log::Logger& logger) :
 			applicationName_(applicationName),
 			suiteName_(suiteName),
 			logger_(logger),
-			sink_(sink),
-			streamSink_()
+			streamSink_(stream_)
 		{
 			const std::string suiteDirectory = GenerateName(suiteName_);
 
@@ -55,7 +54,12 @@ namespace synodic::honesty::test
 				std::filesystem::temp_directory_path() / "honesty" / applicationName_ / suiteDirectory;
 		}
 
-		~Fixture() = default;
+		~Fixture()
+		{
+			log::Logger& logger = logger_.get();
+
+			logger.RemoveSink();
+		}
 
 		Fixture(const Fixture& other)				 = delete;
 		Fixture(Fixture&& other) noexcept			 = delete;
@@ -100,7 +104,9 @@ namespace synodic::honesty::test
 
 		std::stringstream& AttachListener()
 		{
-			sink_.get().AddSink(&streamSink_);
+			log::Logger& logger = logger_.get();
+
+			logger.SetSink(&streamSink_);
 
 			return stream_;
 		}
@@ -120,8 +126,7 @@ namespace synodic::honesty::test
 		std::string_view suiteName_;
 		std::filesystem::path suiteTempDirectory_;
 
-		std::reference_wrapper<const log::Logger> logger_;
-		std::reference_wrapper<log::FixedScatter<2>> sink_;
+		std::reference_wrapper<log::Logger> logger_;
 
 		log::OStream<std::mutex> streamSink_;
 		std::stringstream stream_;

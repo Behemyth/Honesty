@@ -6,8 +6,13 @@ import :sink.synchronized;
 import :types;
 import :logger;
 
+import inplace_vector;
+
 namespace synodic::honesty::log
 {
+
+	// TODO: Share functionality when deducing this works
+
 	export template<std::size_t N>
 	class FixedScatter final : public Sink
 	{
@@ -24,8 +29,21 @@ namespace synodic::honesty::log
 			}
 		}
 
+		void AddSink(Sink* input)
+		{
+			for (const Sink* sink: sinks_)
+			{
+				if (sink == input)
+				{
+					return;
+				}
+			}
+
+			sinks_.push_back(input);
+		}
+
 	private:
-		std::array<Sink*, N> sinks_;
+		std::inplace_vector<Sink*, N> sinks_;
 	};
 
 	export class Scatter final : public Sink
@@ -41,6 +59,19 @@ namespace synodic::honesty::log
 			{
 				sink->LogV(level, fmt, args);
 			}
+		}
+
+		void AddSink(Sink* input)
+		{
+			for (const Sink* sink: sinks_)
+			{
+				if (sink == input)
+				{
+					return;
+				}
+			}
+
+			sinks_.push_back(input);
 		}
 
 	private:

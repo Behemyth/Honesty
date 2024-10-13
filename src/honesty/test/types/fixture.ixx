@@ -42,10 +42,12 @@ namespace synodic::honesty::test
 	export class Fixture
 	{
 	public:
-		Fixture(const std::string_view applicationName, const std::string_view suiteName, const log::Logger& logger) :
+		Fixture(const std::string_view applicationName, const std::string_view suiteName, const log::Logger& logger, log::FixedScatter<2>& sink) :
 			applicationName_(applicationName),
 			suiteName_(suiteName),
-			logger_(logger)
+			logger_(logger),
+			sink_(sink),
+			streamSink_()
 		{
 			const std::string suiteDirectory = GenerateName(suiteName_);
 
@@ -91,9 +93,16 @@ namespace synodic::honesty::test
 		{
 			const std::string name = GenerateName(suiteName_);
 
-			// The temporary logger is added to the root logger and not the application's logger
+			// The temporary logger is added to the thread's logger and not the application's logger
 			log::Logger logger = log::RootLogger().CreateLogger(name);
 			return log::ScopedLogger<log::OStream<std::mutex>>(std::move(logger), stream);
+		}
+
+		std::stringstream& AttachListener()
+		{
+			sink_.get().AddSink(&streamSink_);
+
+			return stream_;
 		}
 
 		std::string_view ApplicationName() const
@@ -112,6 +121,10 @@ namespace synodic::honesty::test
 		std::filesystem::path suiteTempDirectory_;
 
 		std::reference_wrapper<const log::Logger> logger_;
+		std::reference_wrapper<log::FixedScatter<2>> sink_;
+
+		log::OStream<std::mutex> streamSink_;
+		std::stringstream stream_;
 	};
 
 }

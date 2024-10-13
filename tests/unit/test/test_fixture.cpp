@@ -8,7 +8,7 @@ namespace
 {
 	Suite SUITE(
 		"fixture",
-		[](const Fixture& fixture) -> Generator
+		[](Fixture& fixture) -> Generator
 		{
 			co_yield "log"_test = [&](const Requirements& requirements)
 			{
@@ -23,9 +23,16 @@ namespace
 				requirements.ExpectEquals(stream.str(), message);
 			};
 
-			co_yield "root_log"_test = [&](const Requirements& requirements)
+			co_yield "log_listener"_test = [&](const Requirements& requirements)
 			{
-				//fixture.
+				std::stringstream& stream = fixture.AttachListener();
+
+				requirements.Expect(stream.view().empty());
+
+				constexpr std::string_view expectedString = "This should be visible to the listener";
+
+				requirements.Expect(not stream.view().empty(), expectedString);
+				requirements.ExpectEquals(stream.view(), expectedString);
 			};
 		});
 	SuiteRegistrar _(SUITE);

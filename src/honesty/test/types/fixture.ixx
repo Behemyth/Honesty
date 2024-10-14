@@ -39,9 +39,23 @@ namespace synodic::honesty::test
 	 * @brief A set of thread-safe, stateful utilities for testing. Data fixtures can be implemented by the user's tests
 	 *	themselves.
 	 */
-	export class Fixture
+	export class Fixture final
 	{
 	public:
+		/**
+		 * @brief The parameters for the fixture. This is used to provide helpers to the suite.
+		 */
+		struct Parameters
+		{
+		};
+
+		/**
+		 * @brief Output provided by the fixture. Not accessible from the user's suite.
+		 */
+		struct Output
+		{
+		};
+
 		Fixture(const std::string_view applicationName, const std::string_view suiteName, log::Logger& logger) :
 			applicationName_(applicationName),
 			suiteName_(suiteName),
@@ -99,7 +113,7 @@ namespace synodic::honesty::test
 
 			// The temporary logger is added to the thread's logger and not the application's logger
 			log::Logger logger = log::RootLogger().CreateLogger(name);
-			return log::ScopedLogger<log::OStream<std::mutex>>(std::move(logger), stream);
+			return TempLogger(std::move(logger), stream);
 		}
 
 		std::stringstream& AttachListener()

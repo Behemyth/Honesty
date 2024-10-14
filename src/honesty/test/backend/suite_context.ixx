@@ -11,10 +11,8 @@ namespace synodic::honesty::test
 	/**
 	 * @brief The context for a suite of tests. All execution within a suite must be synchronous
 	 */
-	export struct SuiteContext : Fixture
+	export struct SuiteContext
 	{
-		// NOTE: We inherit from Fixture to pull data that the user creates without exposing it publicly
-
 		explicit SuiteContext(Runner& runner, log::Logger logger) :
 			logger(std::move(logger)),
 			runner(runner),

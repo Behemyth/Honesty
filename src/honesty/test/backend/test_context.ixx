@@ -10,10 +10,8 @@ namespace synodic::honesty::test
 	 * @brief A backend for the Requirements class. This is what the testing framework uses to interact with the
 	 *	requirements populated by the user. All nested tests must be synchronous.
 	 */
-	export struct TestContext : Requirements
+	export struct TestContext
 	{
-		// NOTE: We inherit from Requirements to pull data that the user creates without exposing it publicly
-
 		TestContext(
 			const std::span<std::unique_ptr<Reporter>> reporters,
 			const RequirementParameters& input,

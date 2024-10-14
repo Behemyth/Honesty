@@ -8,41 +8,43 @@ import synodic.honesty.log;
 
 namespace synodic::honesty::test
 {
-	/**
-	 * @brief The parameters for a set of requirements. This is used to provide test state to the requirements object.
-	 */
-	export struct RequirementParameters
-	{
-		RequirementParameters(const std::string_view testName, const ExpectedTestOutcome outcome) :
-			testName(testName),
-			outcome(outcome)
-		{
-		}
 
-		std::string_view testName;
-		ExpectedTestOutcome outcome;
-	};
-
-	/**
-	 * @brief Output provided by a set of requirements. This is used to provide state from the user requirements and is
-	 *	what the testing framework is able to read back
-	 */
-	export struct RequirementOutput
-	{
-		RequirementOutput() :
-			success(true)
-		{
-		}
-
-		bool success;  // True if the test passed, false if it failed
-	};
-
-	export class Requirements
+	export class Requirements final
 	{
 	public:
+		/**
+		 * @brief The parameters for a set of requirements. This is used to provide test state to the requirements
+		 * object.
+		 */
+		struct Parameters
+		{
+			Parameters(const std::string_view testName, const ExpectedTestOutcome outcome) :
+				testName(testName),
+				outcome(outcome)
+			{
+			}
+
+			std::string_view testName;
+			ExpectedTestOutcome outcome;
+		};
+
+		/**
+		 * @brief Output provided by a set of requirements. This is used to provide state from the user requirements and
+		 *is what the testing framework is able to read back
+		 */
+		struct Output
+		{
+			Output() :
+				success(true)
+			{
+			}
+
+			bool success;  // True if the test passed, false if it failed
+		};
+
 		Requirements(
 			const std::span<std::unique_ptr<Reporter>> reporters,
-			const RequirementParameters& parameters,
+			const Parameters& parameters,
 			const log::Logger& logger) :
 			parameters_(parameters),
 			reporters_(reporters),
@@ -850,8 +852,8 @@ namespace synodic::honesty::test
 		}
 
 	protected:
-		mutable RequirementOutput output_;
-		RequirementParameters parameters_;
+		mutable Output output_;
+		Parameters parameters_;
 
 	private:
 		/**

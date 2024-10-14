@@ -1,0 +1,27 @@
+= CMake Targets
+:toc:
+:toclevels: 3
+
+---
+
+== Root Targets
+
+=== `synodic::honesty` [[honesty]]
+
+A static target that links to every other target in the project.
+
+=== `synodic::honesty::entry` [[entry]]
+
+A static target that provides the same functionality as <<honesty, synodic::honesty>> but also includes a main function that will run all tests discoverable in the executable.
+
+---
+
+== `Test` Targets
+
+=== `synodic::honesty::test` [[test]]
+
+A static target that links to just the test library.
+
+=== `synodic::honesty::test::main` [[test::entry]]
+
+A static target that provides the same functionality as <<test, synodic::honesty::test>> but also includes a main function that will run all tests discoverable in the executable.

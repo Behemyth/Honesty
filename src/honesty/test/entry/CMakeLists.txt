@@ -1,4 +1,4 @@
-target_sources(honesty_main
+target_sources(honesty_entry
 	PRIVATE
-	entry.cpp
+		entry.cpp
 )

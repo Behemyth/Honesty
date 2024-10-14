@@ -1,22 +1,13 @@
-# Define file sets for HONESTY
+# honesty module definition
 target_sources(honesty
-	PUBLIC
-	FILE_SET interfaces
-	TYPE CXX_MODULES
-)
-
-target_sources(honesty
-	PRIVATE
-	FILE_SET implementations
-	TYPE CXX_MODULES
-)
-
-# Define the file sets for the library
-target_sources(honesty
-	PUBLIC
-		FILE_SET interfaces
+	PUBLIC # For building the library and dependents
+		FILE_SET honesty_public
+		TYPE CXX_MODULES
 		FILES
-			"honesty.ixx"
+			honesty.ixx
+	PRIVATE # For building the target
+		FILE_SET honesty_private
+		TYPE CXX_MODULES
 )
 
 add_subdirectory(
@@ -41,4 +32,12 @@ add_subdirectory(
 
 add_subdirectory(
 	utility
+)
+
+target_link_libraries(honesty
+	PUBLIC
+		synodic::benchmark
+		synodic::platform
+		synodic::profile
+		synodic::log
 )

@@ -12,6 +12,4 @@ target_sources(honesty
 	suite.ixx
 	fixture.ixx
 	tag.ixx
-	suite_context.ixx
-	test_context.ixx
 )

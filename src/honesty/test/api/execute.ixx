@@ -62,8 +62,8 @@ namespace synodic::honesty::test::api
 
 	bool ProcessTest(
 		const TestData& testData,
-		const std::span<std::string_view> filter,
-		const SuiteContext& suiteContext)
+		const SuiteContext& suiteContext,
+		const TestContext& testContext)
 	{
 		bool success = true;
 
@@ -159,6 +159,76 @@ namespace synodic::honesty::test::api
 		return success;
 	}
 
+	bool ProcessSuite(const SuiteData& suite, SuiteContext& suiteContext)
+	{
+		bool success = true;
+
+		// Before we start, check to see if we have a filter
+		if (not parameters.filter.empty())
+		{
+			// Check if the suite name matches the filter
+			if (suite.Name() != filter.front())
+			{
+				return true;
+			}
+
+			// Move to the next filter part
+			filter = filter | std::ranges::views::drop(1);
+		}
+
+		event::SuiteBegin suiteBegin;
+		suiteBegin.name = suite.Name();
+
+		for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
+		{
+			reporter->Signal(suiteBegin);
+		}
+
+		// Fixture lifetime should be for the whole suite
+		Fixture fixture = suiteContext.CreateFixture(parameters.applicationName, suite.Name());
+
+		//runner.Run(testContext, testCallback);
+
+		auto executor = Overload {
+			[&](const std::function_ref<Generator()> generator) -> Generator
+			{
+				return generator();
+			},
+			[&](const std::function_ref<Generator(Fixture&)>& generator) -> Generator
+			{
+				return generator(fixture);
+			}};
+
+		Generator generator = std::visit(executor, suite.Variant());
+
+		for (const Test& test: generator)
+		{
+			const auto& view = static_cast<TestData>(test);
+
+			bool testSuccess = true;
+
+			if (not parameters.dryRun)
+			{
+				testSuccess = ProcessTest(view, filter, suiteContext);
+			}
+
+			if (not testSuccess)
+			{
+				success = false;
+			}
+		}
+
+		event::SuiteEnd end;
+		end.name = suite.Name();
+
+		for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
+		{
+			reporter->Signal(end);
+		}
+
+		return success;
+	}
+
 	export auto Execute(const ExecuteParameters& parameters) -> ExecuteResult
 	{
 		// Break down the filter into individual views
@@ -179,70 +249,14 @@ namespace synodic::honesty::test::api
 
 		std::string threadName = std::format("{}", std::this_thread::get_id());
 
-		// Todo: Use threads
-		SuiteContext suiteContext(parameters.runner, logger.CreateLogger(threadName));
-
 		for (const SuiteData& suite: GetSuites())
 		{
-			// Before we start, check to see if we have a filter
-			if (not parameters.filter.empty())
+
+			SuiteContext suiteContext(parameters.runner, logger.CreateLogger(threadName));
+
+			if (not ProcessSuite(suite, parameters, suiteContext))
 			{
-				// Check if the suite name matches the filter
-				if (suite.Name() != filter.front())
-				{
-					continue;
-				}
-
-				// Move to the next filter part
-				filter = filter | std::ranges::views::drop(1);
-			}
-
-			event::SuiteBegin suiteBegin;
-			suiteBegin.name = suite.Name();
-
-			for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
-			{
-				reporter->Signal(suiteBegin);
-			}
-
-			// Fixture lifetime should be for the whole suite
-			Fixture fixture = suiteContext.CreateFixture(parameters.applicationName, suite.Name());
-
-			auto executor = Overload {
-				[&](const std::function_ref<Generator()> generator) -> Generator
-				{
-					return generator();
-				},
-				[&](const std::function_ref<Generator(Fixture&)>& generator) -> Generator
-				{
-					return generator(fixture);
-				}};
-
-			Generator generator = std::visit(executor, suite.Variant());
-
-			for (const Test& test: generator)
-			{
-				const auto& view = static_cast<TestData>(test);
-
-				bool testSuccess = true;
-
-				if (not parameters.dryRun)
-				{
-					testSuccess = ProcessTest(view, filter, suiteContext);
-				}
-
-				if (not testSuccess)
-				{
-					success = false;
-				}
-			}
-
-			event::SuiteEnd end;
-			end.name = suite.Name();
-
-			for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
-			{
-				reporter->Signal(end);
+				success = false;
 			}
 		}
 

@@ -5,6 +5,7 @@ import std;
 import synodic.honesty.log;
 import synodic.honesty.test.backend;
 import synodic.honesty.test.types;
+import synodic.honesty.test.core;
 
 import function_ref;
 

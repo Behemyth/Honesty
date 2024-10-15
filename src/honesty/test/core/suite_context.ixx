@@ -1,9 +1,8 @@
 
-export module synodic.honesty.test.backend:suite_context;
+export module synodic.honesty.test.core:suite_context;
 
 import std;
 import synodic.honesty.log;
-import synodic.honesty.test.types;
 import :test_context;
 
 namespace synodic::honesty::test

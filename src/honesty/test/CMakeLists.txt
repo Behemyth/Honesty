@@ -18,6 +18,10 @@ add_subdirectory(
 )
 
 add_subdirectory(
+	core
+)
+
+add_subdirectory(
 	entry
 )
 

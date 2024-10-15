@@ -7,4 +7,6 @@ target_sources(honesty
 		TYPE CXX_MODULES
 		FILES
 			core.ixx
+			suite_context.ixx
+			test_context.ixx
 )

@@ -10,6 +10,4 @@ target_sources(honesty
 			storage.ixx
 			reporter.ixx
 			runner.ixx
-			suite_context.ixx
-			test_context.ixx
 )

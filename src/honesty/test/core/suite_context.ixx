@@ -15,16 +15,13 @@ namespace synodic::honesty::test
 	{
 		explicit SuiteContext(Runner& runner, log::Logger logger) :
 			logger(std::move(logger)),
-			runner(runner),
-			Fixture(applicationName, suiteName, logger)
+			runner(runner)
 		{
 		}
 
-		TestContext CreateTestContext(
-			const std::span<std::unique_ptr<Reporter>> reporters,
-			const RequirementParameters& input) const
+		TestContext CreateTestContext(const std::span<std::unique_ptr<Reporter>> reporters) const
 		{
-			return TestContext(reporters, input, logger);
+			return TestContext(reporters, logger);
 		}
 
 		log::Logger logger;

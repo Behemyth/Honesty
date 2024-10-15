@@ -1,5 +1,5 @@
-target_sources(log
-	PUBLIC # For building the library and dependents
+target_sources(honesty
+	PUBLIC
 		FILE_SET log_public
 		TYPE CXX_MODULES
 		FILES
@@ -10,7 +10,7 @@ target_sources(log
 			ostream.ixx
 			callback.ixx
 			scatter.ixx
-	PRIVATE # For building the target
+	PRIVATE
 		FILE_SET log_private
 		TYPE CXX_MODULES
 )

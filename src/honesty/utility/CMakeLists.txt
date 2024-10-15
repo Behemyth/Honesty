@@ -1,6 +1,7 @@
 target_sources(honesty
 	PUBLIC
-		FILE_SET interfaces
+		FILE_SET utility_public
+		TYPE CXX_MODULES
 		FILES
 			exception.ixx
 			hash.ixx
@@ -12,4 +13,7 @@ target_sources(honesty
 			function_ref.ixx
 			fixed_string.ixx
 			traits.ixx
+	PRIVATE
+		FILE_SET utility_private
+		TYPE CXX_MODULES
 )

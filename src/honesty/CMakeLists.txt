@@ -1,11 +1,10 @@
-# honesty module definition
 target_sources(honesty
-	PUBLIC # For building the library and dependents
+	PUBLIC
 		FILE_SET honesty_public
 		TYPE CXX_MODULES
 		FILES
 			honesty.ixx
-	PRIVATE # For building the target
+	PRIVATE
 		FILE_SET honesty_private
 		TYPE CXX_MODULES
 )
@@ -32,12 +31,4 @@ add_subdirectory(
 
 add_subdirectory(
 	utility
-)
-
-target_link_libraries(honesty
-	PUBLIC
-		synodic::benchmark
-		synodic::platform
-		synodic::profile
-		synodic::log
 )

@@ -1,10 +1,10 @@
 target_sources(honesty
 	PUBLIC
-		FILE_SET profile_public
+		FILE_SET test_core_public
 		TYPE CXX_MODULES
 		FILES
-			profile.ixx
+			core.ixx
 	PRIVATE
-		FILE_SET profile_private
+		FILE_SET test_core_private
 		TYPE CXX_MODULES
 )

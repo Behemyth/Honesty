@@ -11,45 +11,27 @@ option(BUILD_TESTING "Build the tests verifying Honesty functionality" ON)
 # Register our custom module location with CMake
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/tool/cmake/modules")
 
-# Provide a helper interface library that all other libraries should link against
-add_library(properties_public INTERFACE)
-add_library(properties_private INTERFACE)
-
-set_target_properties(properties_public
-	PROPERTIES
-		LINKER_LANGUAGE CXX
-		CXX_STANDARD 26
-		CXX_STANDARD_REQUIRED ON
-		CXX_EXTENSIONS NO
-		FOLDER "honesty"
-)
-
-set_target_properties(properties_private
-	PROPERTIES
-)
-
 # Provide the main library
 add_library(honesty STATIC)
 add_library(synodic::honesty ALIAS honesty)
 
 # Provide a convenience variant with a main function
-add_library(honesty_entry STATIC)
-add_library(synodic::honesty::entry ALIAS honesty_entry)
+add_library(honesty_main STATIC)
+add_library(synodic::honesty::main ALIAS honesty_main)
 
-target_link_libraries(honesty
-	PUBLIC
-		properties_public
-	PRIVATE
-		properties_private
+set_target_properties(honesty honesty_main
+	PROPERTIES
+		LINKER_LANGUAGE CXX
+		CXX_STANDARD 23
+		CXX_STANDARD_REQUIRED ON
+		CXX_EXTENSIONS NO
+		FOLDER "honesty"
 )
 
 # Link the main library to the convenience variant
-target_link_libraries(honesty_entry
+target_link_libraries(honesty_main
 	PUBLIC
 		synodic::honesty
-		properties_public
-	PRIVATE
-		properties_private
 )
 
 # Gather and define all the project and subproject sources

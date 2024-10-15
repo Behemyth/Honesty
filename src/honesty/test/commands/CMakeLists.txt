@@ -1,17 +1,16 @@
-
 target_sources(honesty
 	PUBLIC
-	FILE_SET interfaces
-	TYPE CXX_MODULES
-	FILES
-	commands.ixx
-	list.ixx
+		FILE_SET test_commands_public
+		TYPE CXX_MODULES
+		FILES
+			commands.ixx
+			list.ixx
 	PRIVATE
-	FILE_SET implementations
-	TYPE CXX_MODULES
-	FILES
-	execute.cpp
-	types.cpp
+		FILE_SET test_commands_private
+		TYPE CXX_MODULES
+		FILES
+			execute.cpp
+			types.cpp
 )
 
 add_subdirectory(

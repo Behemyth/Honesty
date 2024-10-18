@@ -32,25 +32,13 @@ Direct access to the test API
 
 ==== `synodic.honesty.test.commands`
 
-Frontend for running tests from the command line. Includes an Instance entrypoint for all commands and wrappers for each individual command and subcommand.
-
-==== `synodic.honesty.test.schema`
-
-Defines the plugin types that are used both internally and externally.
-
-==== `synodic.honesty.test.types`
-
-Defines the types used in the test, commands, and backend modules.
+Frontend for running tests from the command line. Includes an Instance entrypoint for all commands. Also includes wrappers for each individual command and subcommand with utilities to create your own
 
 ---
 
 === Private Modules
 
 Modules that are used in multiple other, public modules that are not intended to be used directly by the user.
-
-==== `synodic.honesty.test.core`
-
-The top level module that defines core types and utilities for the test library.
 
 ==== `synodic.honesty.test.backend`
 
@@ -67,13 +55,8 @@ The entrypoint for the library that defines the main function. Linking to the ta
 [mermaid]
 ....
 flowchart LR
-	Schema --> Types
-	Types --> Test
-	Core --> Backend
-	Core --> Types
 	Backend --> API
-	Schema --> Core
-	Types --> Backend
+	Backend --> Test
 	API --> Commands
 	Commands --> Entry
 ....

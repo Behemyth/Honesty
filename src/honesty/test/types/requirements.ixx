@@ -9,7 +9,7 @@ import synodic.honesty.log;
 namespace synodic::honesty::test
 {
 
-	export class Requirements final
+	export class Requirements final : protected TestContext
 	{
 	public:
 		/**

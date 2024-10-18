@@ -57,7 +57,7 @@ The entrypoint for the library that defines the main function. Linking to the ta
 flowchart LR
 	Backend --> API
 	Backend --> Test
-	API --> Commands
-	Commands --> Entry
+	API --> CLI
+	CLI --> Entry
 ....
 

@@ -4,34 +4,51 @@ export module synodic.honesty.test.backend:runner;
 import std;
 
 import inplace_vector;
+import function_ref;
 
-import synodic.honesty.log;
-import synodic.honesty.test.types;
+import :requirements;
+import :reporter;
+import :test;
+import :fixture;
 
 namespace synodic::honesty::test
 {
 
-	export class RunnerRegistry
+	/**
+	 * @brief The type of runner can be selected by the user when invoking tests, for example, via the command line
+	 *	api. Additionally, the user can specify a specific runner for a specific test suite. Test suites must be
+	 *	registered with runtime registration to avoid having every translation unit recompile. With
+	 *	these two constraints the Runner api must be runtime polymorphic.
+	 *	Handles the api to the test std::execution context.
+	 */
+	export class Runner
 	{
 	public:
-		RunnerRegistry()
+		/**
+		 * @brief
+		 */
+		explicit constexpr Runner(const log::Logger& logger) :
+			logger_(logger)
 		{
-			registrars_.push_back(this);
 		}
 
-		virtual ~RunnerRegistry() = default;
+		virtual ~Runner() = default;
 
-		virtual std::string_view Name() const									= 0;
-		virtual std::unique_ptr<Runner> Create(const log::Logger& logger) const = 0;
+		virtual void Run(const Requirements& requirements, std::function_ref<void(const Requirements&)> function) = 0;
 
-		static std::span<RunnerRegistry*> Registrars()
+		virtual Generator
+			Run(const Requirements& requirements, std::function_ref<Generator(const Requirements&)> function) = 0;
+
+		virtual Generator Run(Fixture& fixture, std::function_ref<Generator(Fixture&)> function) = 0;
+
+		virtual Generator Run(std::function_ref<Generator()> function) = 0;
+
+		const log::Logger& Logger() const
 		{
-			return registrars_;
+			return logger_;
 		}
 
 	private:
-		constinit static std::inplace_vector<RunnerRegistry*, 2> registrars_;
+		std::reference_wrapper<const log::Logger> logger_;
 	};
-
-	constinit std::inplace_vector<RunnerRegistry*, 2> RunnerRegistry::registrars_;
 }

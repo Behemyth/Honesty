@@ -2,7 +2,7 @@ module synodic.honesty.test.commands:types;
 
 import std;
 import synodic.honesty.log;
-import synodic.honesty.test.types;
+import synodic.honesty.test.backend;
 import synodic.honesty.test.backend;
 
 namespace synodic::honesty::test::command

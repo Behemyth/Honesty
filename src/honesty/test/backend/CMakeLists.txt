@@ -8,6 +8,16 @@ target_sources(honesty
 		FILES
 			backend.ixx
 			storage.ixx
-			reporter.ixx
-			runner.ixx
+			"reporter_registry.ixx"
+			"runner_registry.ixx"
+			suite_context.ixx
+			test_context.ixx
+			requirements.ixx
+			test.ixx
+			
+			"reporter.ixx"
+			"runner.ixx"
+			suite.ixx
+			fixture.ixx
+			tag.ixx
 )

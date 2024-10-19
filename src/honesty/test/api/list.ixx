@@ -4,6 +4,7 @@ import std;
 
 import synodic.honesty.log;
 import synodic.honesty.test;
+import synodic.honesty.test.backend;
 
 import :types;
 import :execute;

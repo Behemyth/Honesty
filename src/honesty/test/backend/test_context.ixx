@@ -1,7 +1,8 @@
-export module synodic.honesty.test.core:test_context;
+export module synodic.honesty.test.backend:test_context;
 
 import std;
 import synodic.honesty.log;
+import :reporter;
 
 namespace synodic::honesty::test
 {

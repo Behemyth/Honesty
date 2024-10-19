@@ -16,11 +16,6 @@ target_sources(honesty
 add_subdirectory(
 	api
 )
-
-add_subdirectory(
-	core
-)
-
 add_subdirectory(
 	entry
 )
@@ -31,8 +26,4 @@ add_subdirectory(
 
 add_subdirectory(
 	commands
-)
-
-add_subdirectory(
-	types
 )

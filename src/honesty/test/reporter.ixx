@@ -1,7 +1,6 @@
 export module synodic.honesty.test:reporter;
 
 import synodic.honesty.log;
-import synodic.honesty.test.types;
 import synodic.honesty.test.backend;
 
 import std;

@@ -1,8 +1,9 @@
-export module synodic.honesty.test.types:requirements;
+export module synodic.honesty.test.backend:requirements;
 
 import std;
 
 import :reporter;
+import :test_context;
 
 import synodic.honesty.log;
 
@@ -46,6 +47,7 @@ namespace synodic::honesty::test
 			const std::span<std::unique_ptr<Reporter>> reporters,
 			const Parameters& parameters,
 			const log::Logger& logger) :
+			TestContext(reporters, logger),
 			parameters_(parameters),
 			reporters_(reporters),
 			logger_(logger)

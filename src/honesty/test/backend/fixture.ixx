@@ -1,4 +1,4 @@
-export module synodic.honesty.test.types:fixture;
+export module synodic.honesty.test.backend:fixture;
 
 import std;
 

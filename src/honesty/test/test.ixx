@@ -5,4 +5,4 @@ export import :reporter;
 export import :runner;
 export import :suite;
 
-export import synodic.honesty.test.types;
+export import synodic.honesty.test.backend;

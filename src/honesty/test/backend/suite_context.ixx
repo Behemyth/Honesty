@@ -1,9 +1,10 @@
 
-export module synodic.honesty.test.core:suite_context;
+export module synodic.honesty.test.backend:suite_context;
 
 import std;
 import synodic.honesty.log;
 import :test_context;
+import :runner;
 
 namespace synodic::honesty::test
 {

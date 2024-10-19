@@ -3,7 +3,7 @@ export module synodic.honesty.test.commands;
 
 import std;
 
-import synodic.honesty.test.types;
+import synodic.honesty.test.backend;
 import synodic.honesty.test.backend;
 
 import synodic.honesty.log;

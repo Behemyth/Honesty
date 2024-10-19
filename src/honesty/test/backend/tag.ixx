@@ -1,4 +1,4 @@
-export module synodic.honesty.test.types:tag;
+export module synodic.honesty.test.backend:tag;
 
 import std;
 import fixed_string;

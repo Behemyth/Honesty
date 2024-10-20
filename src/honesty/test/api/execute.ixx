@@ -67,7 +67,7 @@ namespace synodic::honesty::test::api
 		bool success = true;
 
 		// Filter the test by name
-		if (not filter.empty() and testData.Name() != filter.front())
+		if (not testContext.filter.empty() and testData.Name() != testContext.filter.front())
 		{
 			return success;
 		}
@@ -95,14 +95,15 @@ namespace synodic::honesty::test::api
 
 		const event::TestBegin testBegin(testData.Name(), assertOutcome);
 
-		for (const std::unique_ptr<Reporter>& reporter: suiteContext.Reporters())
+		for (const std::unique_ptr<Reporter>& reporter: suiteContext.reporters)
 		{
 			reporter->Signal(testBegin);
 		}
 
-		const RequirementParameters requirementParameters(testData.Name(), testOutcome);
 
-		const TestContext testContext =
+		const Requirements::Parameters requirementParameters(testData.Name(), testOutcome);
+
+		const Requirements requirements =
 			suiteContext.CreateRequirements(suiteContext.Reporters(), requirementParameters);
 
 		Runner& runner = suiteContext.GetRunner();

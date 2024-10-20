@@ -12,8 +12,11 @@ namespace synodic::honesty::test
 	 */
 	export struct TestContext
 	{
-		TestContext(const std::span<std::unique_ptr<Reporter>> reporters, const log::Logger& logger)
+		explicit TestContext(const log::Logger& logger)
 		{
 		}
+
+
+		std::span<std::string_view> filter;
 	};
 }

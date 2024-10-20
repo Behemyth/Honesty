@@ -9,50 +9,17 @@ import synodic.honesty.log;
 
 namespace synodic::honesty::test
 {
-
-	export class Requirements final : protected TestContext
+	export class Requirements final : TestContext
 	{
+		friend TestContext;
+		friend struct SuiteContext;
+
 	public:
-		/**
-		 * @brief The parameters for a set of requirements. This is used to provide test state to the requirements
-		 * object.
-		 */
-		struct Parameters
-		{
-			Parameters(const std::string_view testName, const ExpectedTestOutcome outcome) :
-				testName(testName),
-				outcome(outcome)
-			{
-			}
 
-			std::string_view testName;
-			ExpectedTestOutcome outcome;
-		};
-
-		/**
-		 * @brief Output provided by a set of requirements. This is used to provide state from the user requirements and
-		 *is what the testing framework is able to read back
-		 */
-		struct Output
-		{
-			Output() :
-				success(true)
-			{
-			}
-
-			bool success;  // True if the test passed, false if it failed
-		};
-
-		Requirements(
-			const std::span<std::unique_ptr<Reporter>> reporters,
-			const Parameters& parameters,
-			const log::Logger& logger) :
-			TestContext(reporters, logger),
-			parameters_(parameters),
-			reporters_(reporters),
-			logger_(logger)
-		{
-		}
+		Requirements(const Requirements& other)				 = delete;
+		Requirements(Requirements&& other) noexcept			 = delete;
+		Requirements& operator=(const Requirements& other)	 = delete;
+		Requirements& operator=(Requirements&& other) noexcept = delete;
 
 		/**
 		 * @brief Asserts that the expression is true. Fatal on failure.
@@ -853,11 +820,48 @@ namespace synodic::honesty::test
 			return parameters_.testName;
 		}
 
-	protected:
-		mutable Output output_;
-		Parameters parameters_;
-
 	private:
+		/**
+		 * @brief The parameters for a set of requirements. This is used to provide test state to the requirements
+		 * object.
+		 */
+		struct Parameters
+		{
+			Parameters(const std::string_view testName, const ExpectedTestOutcome outcome) :
+				testName(testName),
+				outcome(outcome)
+			{
+			}
+
+			std::string_view testName;
+			ExpectedTestOutcome outcome;
+		};
+
+		/**
+		 * @brief Output provided by a set of requirements. This is used to provide state from the user requirements and
+		 *is what the testing framework is able to read back
+		 */
+		struct Output
+		{
+			Output() :
+				success(true)
+			{
+			}
+
+			bool success;  // True if the test passed, false if it failed
+		};
+
+		Requirements(
+			const std::span<std::unique_ptr<Reporter>> reporters,
+			const Parameters& parameters,
+			const log::Logger& logger) :
+			TestContext(logger),
+			parameters_(parameters),
+			reporters_(reporters),
+			logger_(logger)
+		{
+		}
+
 		/**
 		 * @brief Internal function to signal an assertion passed.
 		 * @param passed
@@ -911,6 +915,9 @@ namespace synodic::honesty::test
 
 			output_.success = false;
 		}
+
+		mutable Output output_;
+		Parameters parameters_;
 
 		std::span<std::unique_ptr<Reporter>> reporters_;
 		std::reference_wrapper<const log::Logger> logger_;

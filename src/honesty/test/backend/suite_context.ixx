@@ -3,8 +3,9 @@ export module synodic.honesty.test.backend:suite_context;
 
 import std;
 import synodic.honesty.log;
-import :test_context;
-import :runner;
+
+import :reporter;
+import :requirements;
 
 namespace synodic::honesty::test
 {
@@ -13,20 +14,23 @@ namespace synodic::honesty::test
 	 */
 	export struct SuiteContext
 	{
-		explicit SuiteContext(Runner& runner, log::Logger logger) :
+		explicit SuiteContext(
+			const std::span<std::unique_ptr<Reporter>> reporters,
+			log::Logger logger) :
 			logger(std::move(logger)),
-			runner(runner)
+			reporters(reporters)
 		{
 		}
 
-		TestContext CreateTestContext(const std::span<std::unique_ptr<Reporter>> reporters) const
+		Requirements CreateRequirements(const std::string_view testName, const ExpectedTestOutcome outcome) const
 		{
-			return TestContext(reporters, logger);
+			const Requirements::Parameters parameters(testName, outcome);
+
+			return Requirements(reporters, parameters, logger);
 		}
 
 		log::Logger logger;
 
-		std::reference_wrapper<Runner> runner;
 		std::span<std::unique_ptr<Reporter>> reporters;
 
 		const std::span<std::string_view> filter;

@@ -6,13 +6,14 @@ import std;
 import inplace_vector;
 import function_ref;
 
-import :requirements;
 import :reporter;
 import :test;
-import :fixture;
 
 namespace synodic::honesty::test
 {
+	// Forward declarations
+	class Fixture;
+	class Requirements;
 
 	/**
 	 * @brief The type of runner can be selected by the user when invoking tests, for example, via the command line

@@ -4,6 +4,8 @@ import std;
 
 import synodic.honesty.log;
 
+import :suite_context;
+
 // TODO: Implement user fixture extensions.
 
 /***
@@ -39,42 +41,11 @@ namespace synodic::honesty::test
 	 * @brief A set of thread-safe, stateful utilities for testing. Data fixtures can be implemented by the user's tests
 	 *	themselves.
 	 */
-	export class Fixture final
+	export class Fixture final : SuiteContext
 	{
+		friend SuiteContext;
+
 	public:
-		/**
-		 * @brief The parameters for the fixture. This is used to provide helpers to the suite.
-		 */
-		struct Parameters
-		{
-		};
-
-		/**
-		 * @brief Output provided by the fixture. Not accessible from the user's suite.
-		 */
-		struct Output
-		{
-		};
-
-		Fixture(const std::string_view applicationName, const std::string_view suiteName, log::Logger& logger) :
-			applicationName_(applicationName),
-			suiteName_(suiteName),
-			logger_(logger),
-			streamSink_(stream_)
-		{
-			const std::string suiteDirectory = GenerateName(suiteName_);
-
-			suiteTempDirectory_ =
-				std::filesystem::temp_directory_path() / "honesty" / applicationName_ / suiteDirectory;
-		}
-
-		~Fixture()
-		{
-			log::Logger& logger = logger_.get();
-
-			logger.RemoveSink();
-		}
-
 		Fixture(const Fixture& other)				 = delete;
 		Fixture(Fixture&& other) noexcept			 = delete;
 		Fixture& operator=(const Fixture& other)	 = delete;
@@ -136,6 +107,40 @@ namespace synodic::honesty::test
 		}
 
 	private:
+		/**
+		 * @brief The parameters for the fixture. This is used to provide helpers to the suite.
+		 */
+		struct Parameters
+		{
+		};
+
+		/**
+		 * @brief Output provided by the fixture. Not accessible from the user's suite.
+		 */
+		struct Output
+		{
+		};
+
+		Fixture(const std::span<std::unique_ptr<Reporter>> reporters, const std::string_view applicationName, const std::string_view suiteName, log::Logger logger) :
+			SuiteContext(reporters, std::move(logger)),
+			applicationName_(applicationName),
+			suiteName_(suiteName),
+			logger_(logger),
+			streamSink_(stream_)
+		{
+			const std::string suiteDirectory = GenerateName(suiteName_);
+
+			suiteTempDirectory_ =
+				std::filesystem::temp_directory_path() / "honesty" / applicationName_ / suiteDirectory;
+		}
+
+		~Fixture()
+		{
+			log::Logger& logger = logger_.get();
+
+			logger.RemoveSink();
+		}
+
 		std::string_view applicationName_;
 		std::string_view suiteName_;
 		std::filesystem::path suiteTempDirectory_;

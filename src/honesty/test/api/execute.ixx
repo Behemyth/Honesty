@@ -60,6 +60,7 @@ namespace synodic::honesty::test::api
 	};
 
 	bool ProcessTest(
+		Runner& runner,
 		const TestData& testData,
 		const SuiteContext& suiteContext,
 		const TestContext& testContext)
@@ -100,13 +101,7 @@ namespace synodic::honesty::test::api
 			reporter->Signal(testBegin);
 		}
 
-
-		const Requirements::Parameters requirementParameters(testData.Name(), testOutcome);
-
-		const Requirements requirements =
-			suiteContext.CreateRequirements(suiteContext.Reporters(), requirementParameters);
-
-		Runner& runner = suiteContext.GetRunner();
+		const Requirements requirements = suiteContext.CreateRequirements(testData.Name(), testOutcome);
 
 		auto testExecutor = Overload {
 			[&](const std::function_ref<void(const Requirements&)>& testCallback)
@@ -116,7 +111,7 @@ namespace synodic::honesty::test::api
 					event::TestSkip testSkip;
 					testSkip.name = testData.Name();
 
-					for (const std::unique_ptr<Reporter>& reporter: suiteContext.Reporters())
+					for (const std::unique_ptr<Reporter>& reporter: suiteContext.reporters)
 					{
 						reporter->Signal(testSkip);
 					}
@@ -187,7 +182,7 @@ namespace synodic::honesty::test::api
 		// Fixture lifetime should be for the whole suite
 		Fixture fixture = suiteContext.CreateFixture(parameters.applicationName, suite.Name());
 
-		//runner.Run(testContext, testCallback);
+		// runner.Run(testContext, testCallback);
 
 		auto executor = Overload {
 			[&](const std::function_ref<Generator()> generator) -> Generator
@@ -251,10 +246,9 @@ namespace synodic::honesty::test::api
 
 		for (const SuiteData& suite: GetSuites())
 		{
+			SuiteContext suiteContext(parameters.reporters, logger.CreateLogger(threadName));
 
-			SuiteContext suiteContext(parameters.runner, logger.CreateLogger(threadName));
-
-			if (not ProcessSuite(suite, parameters, suiteContext))
+			if (not ProcessSuite(parameters.runner, suite, parameters, suiteContext))
 			{
 				success = false;
 			}

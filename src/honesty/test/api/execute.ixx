@@ -127,7 +127,7 @@ namespace synodic::honesty::test::api
 
 				for (const Test& test: generator)
 				{
-					if (not ProcessTest(static_cast<TestData>(test), filter, suiteContext))
+					if (not ProcessTest(runner, static_cast<TestData>(test), suiteContext, testContext))
 					{
 						success = false;
 						break;

@@ -9,7 +9,7 @@ import synodic.honesty.log;
 
 namespace synodic::honesty::test
 {
-	export class Requirements final : TestContext
+	export class Requirements final
 	{
 		friend TestContext;
 		friend struct SuiteContext;
@@ -855,7 +855,6 @@ namespace synodic::honesty::test
 			const std::span<std::unique_ptr<Reporter>> reporters,
 			const Parameters& parameters,
 			const log::Logger& logger) :
-			TestContext(logger),
 			parameters_(parameters),
 			reporters_(reporters),
 			logger_(logger)

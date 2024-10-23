@@ -41,7 +41,7 @@ namespace synodic::honesty::test
 	 * @brief A set of thread-safe, stateful utilities for testing. Data fixtures can be implemented by the user's tests
 	 *	themselves.
 	 */
-	export class Fixture final : SuiteContext
+	export class Fixture final
 	{
 		friend SuiteContext;
 
@@ -122,7 +122,6 @@ namespace synodic::honesty::test
 		};
 
 		Fixture(const std::span<std::unique_ptr<Reporter>> reporters, const std::string_view applicationName, const std::string_view suiteName, log::Logger logger) :
-			SuiteContext(reporters, std::move(logger)),
 			applicationName_(applicationName),
 			suiteName_(suiteName),
 			logger_(logger),

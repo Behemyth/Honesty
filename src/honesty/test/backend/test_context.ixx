@@ -4,6 +4,8 @@ import std;
 import synodic.honesty.log;
 import :reporter;
 
+import :requirements;
+
 namespace synodic::honesty::test
 {
 	/**
@@ -14,6 +16,15 @@ namespace synodic::honesty::test
 	{
 		explicit TestContext(const log::Logger& logger)
 		{
+		}
+
+		/**
+		 * @brief Creates a Requirements object to be passed to a executing test
+		 */
+		auto CreateRequirements(const std::string_view testName, const ExpectedTestOutcome testOutcome) const
+			-> Requirements
+		{
+			return Requirements();
 		}
 
 

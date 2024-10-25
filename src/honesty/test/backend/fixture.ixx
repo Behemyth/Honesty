@@ -33,7 +33,7 @@ std::string GenerateName(const std::string_view prefix, const std::size_t length
 
 namespace synodic::honesty::test
 {
-	class Reporter;
+	export class Reporter;
 
 	export using TempLogger = log::ScopedLogger<log::OStream<std::mutex>>;
 
@@ -46,6 +46,13 @@ namespace synodic::honesty::test
 		friend class SuiteContext;
 
 	public:
+		~Fixture()
+		{
+			log::Logger& logger = logger_.get();
+
+			logger.RemoveSink();
+		}
+
 		Fixture(const Fixture& other)				 = delete;
 		Fixture(Fixture&& other) noexcept			 = delete;
 		Fixture& operator=(const Fixture& other)	 = delete;
@@ -138,13 +145,6 @@ namespace synodic::honesty::test
 
 			suiteTempDirectory_ =
 				std::filesystem::temp_directory_path() / "honesty" / applicationName_ / suiteDirectory;
-		}
-
-		~Fixture()
-		{
-			log::Logger& logger = logger_.get();
-
-			logger.RemoveSink();
 		}
 
 		std::string_view applicationName_;

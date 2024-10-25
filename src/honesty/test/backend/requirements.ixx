@@ -8,10 +8,11 @@ import synodic.honesty.log;
 
 namespace synodic::honesty::test
 {
+	export struct TestContext; 
+
 	export class Requirements final
 	{
-		friend class TestContext;
-		friend struct SuiteContext;
+		friend TestContext;
 
 	public:
 

@@ -3,6 +3,8 @@ export module synodic.honesty.test.commands:runner.standard;
 import std;
 import synodic.honesty.test;
 
+import function_ref;
+
 namespace synodic::honesty::test
 {
 	export class StandardRunner final : public Runner
@@ -29,5 +31,16 @@ namespace synodic::honesty::test
 		{
 			return function(requirements);
 		}
+
+		Generator Run(Fixture& fixture, const std::function_ref<Generator(Fixture&)> function) override
+		{
+			return function(fixture);
+		}
+
+		Generator Run(const std::function_ref<Generator()> function) override
+		{
+			return function();
+		}
+
 	};
 }

@@ -12,8 +12,8 @@ import :test;
 namespace synodic::honesty::test
 {
 	// Forward declarations
-	class Fixture;
-	class Requirements;
+	export class Fixture;
+	export class Requirements;
 
 	/**
 	 * @brief The type of runner can be selected by the user when invoking tests, for example, via the command line

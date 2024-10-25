@@ -47,6 +47,18 @@ public:
 	{
 		return function(requirements);
 	}
+
+	synodic::honesty::test::Generator
+		Run(synodic::honesty::test::Fixture& fixture,
+			std::function_ref<synodic::honesty::test::Generator(synodic::honesty::test::Fixture&)> function) override
+	{
+		return function(fixture);
+	}
+
+	synodic::honesty::test::Generator Run(std::function_ref<synodic::honesty::test::Generator()> function) override
+	{
+		return function();
+	}
 };
 
 namespace

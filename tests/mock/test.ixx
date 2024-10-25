@@ -50,12 +50,12 @@ public:
 
 	synodic::honesty::test::Generator
 		Run(synodic::honesty::test::Fixture& fixture,
-			std::function_ref<synodic::honesty::test::Generator(synodic::honesty::test::Fixture&)> function) override
+			const std::function_ref<synodic::honesty::test::Generator(synodic::honesty::test::Fixture&)> function) override
 	{
 		return function(fixture);
 	}
 
-	synodic::honesty::test::Generator Run(std::function_ref<synodic::honesty::test::Generator()> function) override
+	synodic::honesty::test::Generator Run(const std::function_ref<synodic::honesty::test::Generator()> function) override
 	{
 		return function();
 	}

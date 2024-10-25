@@ -14,19 +14,42 @@ namespace synodic::honesty::test
 	 */
 	export struct TestContext
 	{
-		explicit TestContext(const log::Logger& logger)
+		struct OutputData
+		{
+			explicit OutputData(const Requirements::Output& requirementsOutput) :
+				success(requirementsOutput.success)
+			{
+			}
+
+			bool success;
+		};
+
+		explicit TestContext(const std::span<std::unique_ptr<Reporter>> reporters, log::Logger logger) :
+			logger(std::move(logger)),
+			reporters(reporters)
 		{
 		}
 
 		/**
-		 * @brief Creates a Requirements object to be passed to a executing test
+		 * @brief Creates a Requirements object to be passed to an executing test
 		 */
-		auto CreateRequirements(const std::string_view testName, const ExpectedTestOutcome testOutcome) const
-			-> Requirements
+		Requirements CreateRequirements(const std::string_view testName, const ExpectedTestOutcome outcome) const
 		{
-			return Requirements();
+			const Requirements::Parameters parameters(testName, outcome);
+
+			return Requirements(reporters, parameters, logger);
 		}
 
+		OutputData Output(const Requirements& requirements) const
+		{
+			const Requirements::Output& output = requirements.output_;
+
+			return OutputData(output);
+		}
+
+		log::Logger logger;
+
+		std::span<std::unique_ptr<Reporter>> reporters;
 
 		std::span<std::string_view> filter;
 	};

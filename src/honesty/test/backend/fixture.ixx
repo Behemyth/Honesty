@@ -4,8 +4,6 @@ import std;
 
 import synodic.honesty.log;
 
-import :suite_context;
-
 // TODO: Implement user fixture extensions.
 
 /***
@@ -35,6 +33,8 @@ std::string GenerateName(const std::string_view prefix, const std::size_t length
 
 namespace synodic::honesty::test
 {
+	class Reporter;
+
 	export using TempLogger = log::ScopedLogger<log::OStream<std::mutex>>;
 
 	/**
@@ -43,7 +43,7 @@ namespace synodic::honesty::test
 	 */
 	export class Fixture final
 	{
-		friend SuiteContext;
+		friend class SuiteContext;
 
 	public:
 		Fixture(const Fixture& other)				 = delete;
@@ -121,6 +121,13 @@ namespace synodic::honesty::test
 		{
 		};
 
+		/**
+		 * @brief 
+		 * @param reporters 
+		 * @param applicationName 
+		 * @param suiteName 
+		 * @param logger A new logger object to take ownership of.
+		 */
 		Fixture(const std::span<std::unique_ptr<Reporter>> reporters, const std::string_view applicationName, const std::string_view suiteName, log::Logger logger) :
 			applicationName_(applicationName),
 			suiteName_(suiteName),

@@ -101,7 +101,7 @@ namespace synodic::honesty::test::api
 			reporter->Signal(testBegin);
 		}
 
-		const Requirements requirements = suiteContext.CreateRequirements(testData.Name(), testOutcome);
+		const Requirements requirements = testContext.CreateRequirements(testData.Name(), testOutcome);
 
 		auto testExecutor = Overload {
 			[&](const std::function_ref<void(const Requirements&)>& testCallback)
@@ -119,11 +119,11 @@ namespace synodic::honesty::test::api
 					return;
 				}
 
-				runner.Run(testContext, testCallback);
+				runner.Run(requirements, testCallback);
 			},
 			[&](const std::function_ref<Generator(const Requirements&)>& testCallback)
 			{
-				Generator generator = runner.Run(testContext, testCallback);
+				Generator generator = runner.Run(requirements, testCallback);
 
 				for (const Test& test: generator)
 				{
@@ -138,7 +138,10 @@ namespace synodic::honesty::test::api
 		// Start the recursive test execution
 		std::visit(testExecutor, testData.Variant());
 
-		if (not testContext.Output().success)
+		// Get the output from the test
+		const TestContext::OutputData testOutput =  testContext.Output(requirements);
+
+		if (not testOutput.success)
 		{
 			success = false;
 		}
@@ -146,7 +149,7 @@ namespace synodic::honesty::test::api
 		event::TestEnd testEnd;
 		testEnd.name = testData.Name();
 
-		for (const std::unique_ptr<Reporter>& reporter: suiteContext.Reporters())
+		for (const std::unique_ptr<Reporter>& reporter: suiteContext.reporters)
 		{
 			reporter->Signal(testEnd);
 		}
@@ -154,15 +157,17 @@ namespace synodic::honesty::test::api
 		return success;
 	}
 
-	bool ProcessSuite(const SuiteData& suite, SuiteContext& suiteContext)
+	bool ProcessSuite(Runner& runner, const SuiteData& suite, SuiteContext& suiteContext)
 	{
 		bool success = true;
 
+		std::span filter = suiteContext.filterViews;
+
 		// Before we start, check to see if we have a filter
-		if (not parameters.filter.empty())
+		if (not suiteContext.filterViews.empty())
 		{
 			// Check if the suite name matches the filter
-			if (suite.Name() != filter.front())
+			if (suite.Name() != suiteContext.filterViews.front())
 			{
 				return true;
 			}
@@ -174,13 +179,13 @@ namespace synodic::honesty::test::api
 		event::SuiteBegin suiteBegin;
 		suiteBegin.name = suite.Name();
 
-		for (std::unique_ptr<Reporter>& reporter: parameters.reporters)
+		for (std::unique_ptr<Reporter>& reporter: suiteContext.reporters)
 		{
 			reporter->Signal(suiteBegin);
 		}
 
 		// Fixture lifetime should be for the whole suite
-		Fixture fixture = suiteContext.CreateFixture(parameters.applicationName, suite.Name());
+		Fixture fixture = suiteContext.CreateFixture();
 
 		// runner.Run(testContext, testCallback);
 
@@ -202,9 +207,11 @@ namespace synodic::honesty::test::api
 
 			bool testSuccess = true;
 
-			if (not parameters.dryRun)
+			if (not suiteContext.dryRun)
 			{
-				testSuccess = ProcessTest(view, filter, suiteContext);
+				TestContext testContext(suiteContext.reporters, suiteContext.logger.CreateLogger(view.Name()));
+
+				testSuccess = ProcessTest(runner, view, suiteContext, testContext);
 			}
 
 			if (not testSuccess)
@@ -216,7 +223,7 @@ namespace synodic::honesty::test::api
 		event::SuiteEnd end;
 		end.name = suite.Name();
 
-		for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
+		for (const std::unique_ptr<Reporter>& reporter: suiteContext.reporters)
 		{
 			reporter->Signal(end);
 		}
@@ -236,7 +243,7 @@ namespace synodic::honesty::test::api
 
 		std::vector<std::string_view> filterData = std::ranges::to<std::vector>(splitData);
 
-		std::span filter = filterData;
+		std::span filterViews = filterData;
 
 		bool success = true;
 
@@ -246,9 +253,15 @@ namespace synodic::honesty::test::api
 
 		for (const SuiteData& suite: GetSuites())
 		{
-			SuiteContext suiteContext(parameters.reporters, logger.CreateLogger(threadName));
+			SuiteContext suiteContext(
+				parameters.reporters,
+				logger.CreateLogger(threadName),
+				parameters.applicationName,
+				suite.Name(),
+				filterViews,
+				parameters.dryRun);
 
-			if (not ProcessSuite(parameters.runner, suite, parameters, suiteContext))
+			if (not ProcessSuite(parameters.runner, suite, suiteContext))
 			{
 				success = false;
 			}

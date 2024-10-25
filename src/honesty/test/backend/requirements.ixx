@@ -3,7 +3,6 @@ export module synodic.honesty.test.backend:requirements;
 import std;
 
 import :reporter;
-import :test_context;
 
 import synodic.honesty.log;
 
@@ -11,7 +10,7 @@ namespace synodic::honesty::test
 {
 	export class Requirements final
 	{
-		friend TestContext;
+		friend class TestContext;
 		friend struct SuiteContext;
 
 	public:

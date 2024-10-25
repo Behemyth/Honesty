@@ -5,7 +5,7 @@ import std;
 import synodic.honesty.log;
 
 import :reporter;
-import :requirements;
+import :fixture;
 
 namespace synodic::honesty::test
 {
@@ -16,23 +16,37 @@ namespace synodic::honesty::test
 	{
 		explicit SuiteContext(
 			const std::span<std::unique_ptr<Reporter>> reporters,
-			log::Logger logger) :
+			log::Logger logger,
+			const std::string_view applicationName,
+			const std::string_view suiteName,
+			const std::span<std::string_view> filterViews,
+			const bool dryRun) :
 			logger(std::move(logger)),
-			reporters(reporters)
+			reporters(reporters),
+			applicationName(applicationName),
+			suiteName(suiteName),
+			filterViews(filterViews),
+			dryRun(dryRun)
 		{
 		}
 
-		Requirements CreateRequirements(const std::string_view testName, const ExpectedTestOutcome outcome) const
+		/**
+		 * @brief Creates a Fixture object to be passed to an executing suite
+		 */
+		Fixture CreateFixture() const
 		{
-			const Requirements::Parameters parameters(testName, outcome);
-
-			return Requirements(reporters, parameters, logger);
+			return Fixture(reporters, applicationName, suiteName, logger.CreateLogger("fixture"));
 		}
 
 		log::Logger logger;
 
 		std::span<std::unique_ptr<Reporter>> reporters;
 
-		const std::span<std::string_view> filter;
+		std::string_view applicationName;
+		std::string_view suiteName;
+
+		std::span<std::string_view> filterViews;
+
+		bool dryRun;
 	};
 }

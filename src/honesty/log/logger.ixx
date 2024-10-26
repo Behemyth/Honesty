@@ -48,7 +48,7 @@ namespace synodic::honesty::log
 		 */
 		void LogV(const LevelType level, const std::string_view fmt, const std::format_args args) const
 		{
-			if (sink_)
+			if (sink_ && level >= level_)
 			{
 				sink_->LogV(level, fmt, args);
 			}

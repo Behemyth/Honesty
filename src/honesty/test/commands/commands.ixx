@@ -87,6 +87,11 @@ namespace synodic::honesty::test
 		{
 			appLogger_.SetSink(sink_);
 
+
+			// TODO: Enable the -v option to increase the verbosity of the logger
+			appLogger_.SetLevel(log::LevelType::INFO);
+
+
 			command::Configuration commandConfiguration = ResolveConfiguration(configuration);
 			appLogger_.Debug("Finding command for `{}` application", commandConfiguration.applicationName);
 

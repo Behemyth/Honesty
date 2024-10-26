@@ -43,7 +43,7 @@ namespace synodic::honesty::test::command
 			if (not result.success)
 			{
 				// TODO: Replace with a return code
-				std::exit(134);
+				std::abort();
 			}
 		}
 

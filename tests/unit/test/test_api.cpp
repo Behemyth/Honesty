@@ -27,14 +27,14 @@ namespace
 			{
 				const api::ExecuteParameters baseParameters("execute_test", "", runner, reporters, false, logger);
 
-				co_yield "dry_run"_test = [&](const Requirements&)
+				co_yield "dry_run"_test = [&](const Requirements& requirements)
 				{
 					api::ExecuteParameters parameters = baseParameters;
 					parameters.dryRun = true;
 
 					const auto result = Execute(parameters);
 
-					// TODO: Verify the result
+					requirements.Expect(result.success);
 				};
 			};
 

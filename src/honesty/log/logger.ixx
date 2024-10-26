@@ -48,7 +48,13 @@ namespace synodic::honesty::log
 		 */
 		void LogV(const LevelType level, const std::string_view fmt, const std::format_args args) const
 		{
-			if (sink_ && level >= level_)
+			// If the logger's filter prevents sinks or parent loggers from receiving the message, don't log
+			if (level < level_)
+			{
+				return;
+			}
+
+			if (sink_)
 			{
 				sink_->LogV(level, fmt, args);
 			}

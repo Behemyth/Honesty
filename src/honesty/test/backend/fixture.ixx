@@ -98,6 +98,7 @@ namespace synodic::honesty::test
 		{
 			log::Logger& logger = logger_.get();
 
+			// Filter our sink based on what the user wants to listen to
 			streamSink_.SetLevel(level);
 
 			logger.SetSink(&streamSink_);
@@ -137,7 +138,7 @@ namespace synodic::honesty::test
 		 * @param suiteName 
 		 * @param logger A new logger object to take ownership of.
 		 */
-		Fixture(const std::span<std::unique_ptr<Reporter>> reporters, const std::string_view applicationName, const std::string_view suiteName, log::Logger logger) :
+		Fixture(const std::span<std::unique_ptr<Reporter>> reporters, const std::string_view applicationName, const std::string_view suiteName, log::Logger& logger) :
 			applicationName_(applicationName),
 			suiteName_(suiteName),
 			logger_(logger),
@@ -153,6 +154,7 @@ namespace synodic::honesty::test
 		std::string_view suiteName_;
 		std::filesystem::path suiteTempDirectory_;
 
+		// Reference to the base logger for the suite
 		std::reference_wrapper<log::Logger> logger_;
 
 		log::OStream<std::mutex> streamSink_;

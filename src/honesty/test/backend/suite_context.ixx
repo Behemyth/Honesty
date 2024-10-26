@@ -33,9 +33,9 @@ namespace synodic::honesty::test
 		/**
 		 * @brief Creates a Fixture object to be passed to an executing suite
 		 */
-		Fixture CreateFixture() const
+		Fixture CreateFixture()
 		{
-			return Fixture(reporters, applicationName, suiteName, logger.CreateLogger("fixture"));
+			return Fixture(reporters, applicationName, suiteName, logger);
 		}
 
 		log::Logger logger;

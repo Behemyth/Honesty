@@ -187,8 +187,6 @@ namespace synodic::honesty::test::api
 		// Fixture lifetime should be for the whole suite
 		Fixture fixture = suiteContext.CreateFixture();
 
-		// runner.Run(testContext, testCallback);
-
 		auto executor = Overload {
 			[&](const std::function_ref<Generator()> generator) -> Generator
 			{

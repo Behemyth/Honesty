@@ -25,12 +25,24 @@ namespace
 
 			co_yield "log_listener"_test = [&](const Requirements& requirements)
 			{
-				const std::stringstream& stream = fixture.AttachListener();
+				const std::stringstream& stream = fixture.AttachListener(synodic::honesty::log::LevelType::TRACE);
 
-				requirements.Expect(stream.view().empty(), "The stream should be empty");
+				requirements.Expect(
+					stream.view().empty(),
+					"The stream should be empty because we just started listening");
 				requirements.Expect(
 					stream.view().empty(),
 					"The previous expectation passed, so the log stream should be empty");
+
+				requirements.ExpectThrow<std::runtime_error>(
+					[]()
+					{
+						throw std::runtime_error("Test exception");
+					});
+
+				requirements.Expect(
+					not stream.view().empty(),
+					"An exception was thrown and should have been written to the log");
 			};
 		});
 	SuiteRegistrar _(SUITE);

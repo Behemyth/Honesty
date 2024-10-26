@@ -94,9 +94,11 @@ namespace synodic::honesty::test
 			return TempLogger(std::move(logger), stream);
 		}
 
-		std::stringstream& AttachListener()
+		std::stringstream& AttachListener(const log::LevelType level = log::LevelType::INFO)
 		{
 			log::Logger& logger = logger_.get();
+
+			streamSink_.SetLevel(level);
 
 			logger.SetSink(&streamSink_);
 

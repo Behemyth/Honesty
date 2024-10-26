@@ -6,7 +6,7 @@ using namespace synodic::honesty::test::literals;
 
 namespace
 {
-	Suite exceptionSuite(
+	Suite SUITE(
 		"exception",
 		[]()-> Generator
 		{
@@ -25,5 +25,5 @@ namespace
 			};
 		});
 
-	SuiteRegistrar _(exceptionSuite);
+	SuiteRegistrar _(SUITE);
 }

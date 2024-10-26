@@ -246,9 +246,12 @@ namespace synodic::honesty::test
 
 				Signal(failed);
 			}
-			catch (const Exception&)
+			catch (const Exception& exception)
 			{
 				const event::AssertionPass passed(location);
+
+				auto& logger = logger_.get();
+				logger.Trace("Exception: {}", exception.what());
 
 				Signal(passed);
 			}

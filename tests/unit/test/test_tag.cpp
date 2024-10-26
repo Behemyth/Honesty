@@ -118,9 +118,9 @@ namespace
 				requirements.Expect(false);
 			};
 
-			co_yield SKIP / "skip"_test = [](const Requirements& requirements)
+			co_yield SKIP / "skip"_test = [](const Requirements&)
 			{
-				requirements.Expect(false);
+				throw std::runtime_error("This test should not be run");
 			};
 		});
 	SuiteRegistrar _(SUITE);

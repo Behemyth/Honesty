@@ -16,18 +16,18 @@ namespace
 		[](const Fixture& fixture) -> Generator
 		{
 			const synodic::honesty::log::Logger& root = synodic::honesty::log::RootLogger();
-			synodic::honesty::log::Logger logger	  = root.CreateLogger("test");
+			synodic::honesty::log::Logger logger = root.CreateLogger("test");
 
 			MockRunner runner(logger);
 
 			std::vector<std::unique_ptr<Reporter>> reporters;
 			reporters.push_back(std::make_unique<MockReporter>(logger));
 
-			co_yield "execute"_test = [&](const Requirements& requirements) -> Generator
+			co_yield "execute"_test = [&](const Requirements&) -> Generator
 			{
 				const api::ExecuteParameters baseParameters("execute_test", "", runner, reporters, false, logger);
 
-				co_yield "dry_run"_test = [&](const Requirements& requirements)
+				co_yield "dry_run"_test = [&](const Requirements&)
 				{
 					api::ExecuteParameters parameters = baseParameters;
 					parameters.dryRun = true;

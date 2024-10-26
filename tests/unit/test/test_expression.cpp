@@ -11,13 +11,12 @@ namespace
 {
 	Suite SUITE(
 		"expectation",
-		[](const Fixture& fixture) -> Generator
+		[](Fixture& fixture) -> Generator
 		{
+			const std::stringstream& stream = fixture.AttachListener(synodic::honesty::log::LevelType::TRACE);
+
 			co_yield "error_description"_test = [&](const Requirements& requirements) -> Generator
 			{
-				//std::stringstream stream;
-				//const TempLogger logger = fixture.TempLog(stream);
-
 				// Tests callable for error message
 				const auto description = []() -> std::string
 				{
@@ -37,7 +36,6 @@ namespace
 
 				co_yield FAIL / "inner"_test = [&](const Requirements&)
 				{
-					
 				};
 
 				// Expect

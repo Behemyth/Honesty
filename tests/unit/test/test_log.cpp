@@ -8,11 +8,11 @@ namespace
 {
 	Suite SUITE(
 		"test_log",
-		[](const Fixture& fixture) -> Generator
+		[](Fixture& fixture) -> Generator
 		{
-			//fixture.
+			const std::stringstream& stream = fixture.AttachListener(synodic::honesty::log::LevelType::TRACE);
 
-			// Verify that you can capture the information going into the root logger
+			// Verify that you can capture the information going into the suite logger
 			co_yield "test"_test = [](const Requirements& requirements)
 			{
 			};

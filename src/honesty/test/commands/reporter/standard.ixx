@@ -89,7 +89,7 @@ namespace synodic::honesty::test
 			constexpr std::size_t maxLineLength = 79;
 
 			const log::Logger& logger = logger_.get();
-			constexpr std::string_view indent("	");
+			constexpr std::string_view indent("  ");
 
 			// Size of the inputs including the space between them.
 			const std::size_t totalSize = a.size() + b.size() + 2 + relation.size();
@@ -101,15 +101,14 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				logger.Info("{}Expected:", indent);
-
 				const auto HIGHLIGHT_STYLE(log::TextStyle(log::Colour24(255, 255, 0)));
 
-				logger.Info(
-					"Expected: {}\n{}\n{}",
-					format(HIGHLIGHT_STYLE, "{}'{}'", indent, a),
-					relation,
-					format(HIGHLIGHT_STYLE, "{}'{}'", indent, b));
+				const std::string introduction = format("{}Expected:", indent);
+				const std::string expected	   = format(HIGHLIGHT_STYLE, "{}{}'{}'", indent, indent, a);
+				const std::string relationText = format("{}{}{}{}", indent, indent, indent, relation);
+				const std::string actual	   = format(HIGHLIGHT_STYLE, "{}{}'{}'", indent, indent, b);
+
+				logger.Info("{}\n{}\n{}\n{}", introduction, expected, relationText, actual);
 			}
 		}
 
@@ -347,11 +346,11 @@ namespace synodic::honesty::test
 
 			const auto SUCCESS_STYLE(log::TextStyle(log::Colour24(0, 255, 0)));
 			const auto FAILURE_STYLE(log::TextStyle(log::Colour24(255, 0, 0)));
-			const auto SKIP_STYLE(log::TextStyle(log::Colour24(128,128, 128)));
+			const auto SKIP_STYLE(log::TextStyle(log::Colour24(128, 128, 128)));
 
 			std::string passedStyled = format(SUCCESS_STYLE, "Passed");
 			std::string failedStyled = format(FAILURE_STYLE, "Failed");
-			std::string skipStyled = format(SKIP_STYLE, "Skipped");
+			std::string skipStyled	 = format(SKIP_STYLE, "Skipped");
 
 			logger.Info("{} Assertions {}", assertionsPassedCount_, passedStyled);
 

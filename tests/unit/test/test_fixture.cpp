@@ -34,15 +34,21 @@ namespace
 					stream.view().empty(),
 					"The previous expectation passed, so the log stream should be empty");
 
+				const std::string exceptionMessage = "Test exception";
+
 				requirements.ExpectThrow<std::runtime_error>(
-					[]()
+					[&]()
 					{
-						throw std::runtime_error("Test exception");
+						throw std::runtime_error(exceptionMessage);
 					});
 
 				requirements.Expect(
 					not stream.view().empty(),
 					"An exception was thrown and should have been written to the log");
+
+				requirements.Expect(
+					stream.view().contains(exceptionMessage),
+					"The exception message did not propagate to the logger as given");
 			};
 		});
 	SuiteRegistrar _(SUITE);

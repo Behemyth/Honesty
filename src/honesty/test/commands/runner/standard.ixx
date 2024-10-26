@@ -25,22 +25,14 @@ namespace synodic::honesty::test
 			function(requirements);
 		}
 
-		Generator
-			Run(const Requirements& requirements,
-				const std::function_ref<Generator(const Requirements&)> function) override
+		Generator Run(const std::function_ref<Generator()> function) override
 		{
-			return function(requirements);
+			return function();
 		}
 
 		Generator Run(Fixture& fixture, const std::function_ref<Generator(Fixture&)> function) override
 		{
 			return function(fixture);
 		}
-
-		Generator Run(const std::function_ref<Generator()> function) override
-		{
-			return function();
-		}
-
 	};
 }

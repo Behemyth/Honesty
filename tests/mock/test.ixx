@@ -41,23 +41,16 @@ public:
 	}
 
 	synodic::honesty::test::Generator
-		Run(const synodic::honesty::test::Requirements& requirements,
-			const std::function_ref<synodic::honesty::test::Generator(const synodic::honesty::test::Requirements&)>
-				function) override
-	{
-		return function(requirements);
-	}
-
-	synodic::honesty::test::Generator
-		Run(synodic::honesty::test::Fixture& fixture,
-			const std::function_ref<synodic::honesty::test::Generator(synodic::honesty::test::Fixture&)> function) override
-	{
-		return function(fixture);
-	}
-
-	synodic::honesty::test::Generator Run(const std::function_ref<synodic::honesty::test::Generator()> function) override
+		Run(const std::function_ref<synodic::honesty::test::Generator()> function) override
 	{
 		return function();
+	}
+
+	synodic::honesty::test::Generator Run(
+		synodic::honesty::test::Fixture& fixture,
+		const std::function_ref<synodic::honesty::test::Generator(synodic::honesty::test::Fixture&)> function) override
+	{
+		return function(fixture);
 	}
 };
 

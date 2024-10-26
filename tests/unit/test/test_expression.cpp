@@ -15,7 +15,7 @@ namespace
 		{
 			const std::stringstream& stream = fixture.AttachListener(synodic::honesty::log::LevelType::TRACE);
 
-			co_yield "error_description"_test = [&](const Requirements& requirements) -> Generator
+			co_yield "error_description"_test = [&]() -> Generator
 			{
 				// Tests callable for error message
 				const auto description = []() -> std::string
@@ -28,7 +28,7 @@ namespace
 					// TODO: Enable when the "Fail" tag works
 					//requirements.Assert(false, "This outputs only on error");
 
-					requirements.Assert(true, "This outputs only on error");
+					//requirements.Assert(true, "This outputs only on error");
 
 					// TODO: Enable when the "Fail" tag works
 					//requirements.Assert(false, description);
@@ -43,7 +43,7 @@ namespace
 					// TODO: Enable when the "Fail" tag works
 					//requirements.Expect(false, "This outputs only on error");
 
-					requirements.Expect(true, "This outputs only on error");
+					//requirements.Expect(true, "This outputs only on error");
 
 					// TODO: Enable when the "Fail" tag works
 					//requirements.Expect(false, description);

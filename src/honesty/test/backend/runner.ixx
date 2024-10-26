@@ -37,12 +37,9 @@ namespace synodic::honesty::test
 
 		virtual void Run(const Requirements& requirements, std::function_ref<void(const Requirements&)> function) = 0;
 
-		virtual Generator
-			Run(const Requirements& requirements, std::function_ref<Generator(const Requirements&)> function) = 0;
+		virtual Generator Run(std::function_ref<Generator()> function) = 0;
 
 		virtual Generator Run(Fixture& fixture, std::function_ref<Generator(Fixture&)> function) = 0;
-
-		virtual Generator Run(std::function_ref<Generator()> function) = 0;
 
 		const log::Logger& Logger() const
 		{

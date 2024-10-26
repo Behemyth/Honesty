@@ -42,11 +42,11 @@ namespace synodic::honesty::test
 		}
 
 		template<typename Fn>
-			requires std::invocable<Fn, const Requirements&> &&
-					 std::same_as<Generator, std::invoke_result_t<Fn, const Requirements&>>
+			requires std::invocable<Fn> &&
+					 std::same_as<Generator, std::invoke_result_t<Fn>>
 		inline Test operator=(const Fn& test) const
 		{
-			return Test(name_, tag_, std::function_ref<Generator(const Requirements&)>(test));
+			return Test(name_, tag_, std::function_ref<Generator()>(test));
 		}
 
 		auto operator=(Generator&& generator) const

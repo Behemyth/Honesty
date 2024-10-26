@@ -69,16 +69,12 @@ namespace
 				requirements.ExpectEquals(counter(arrayParameterization), 2);
 			};
 
-			co_yield "nested"_test = [](const Requirements& requirements) -> Generator
+			co_yield "nested"_test = []() -> Generator
 			{
-				std::size_t count = 0;
-
-				co_yield "inner"_test = [&](const Requirements&)
+				co_yield "inner"_test = [&](const Requirements& requirements)
 				{
-					++count;
+					requirements.Expect(true);
 				};
-
-				requirements.ExpectGreater(count, 0u);
 			};
 		});
 

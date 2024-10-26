@@ -23,7 +23,7 @@ namespace
 			std::vector<std::unique_ptr<Reporter>> reporters;
 			reporters.push_back(std::make_unique<MockReporter>(logger));
 
-			co_yield "execute"_test = [&](const Requirements&) -> Generator
+			co_yield "execute"_test = [&]() -> Generator
 			{
 				const api::ExecuteParameters baseParameters("execute_test", "", runner, reporters, false, logger);
 

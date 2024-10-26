@@ -121,9 +121,9 @@ namespace synodic::honesty::test::api
 
 				runner.Run(requirements, testCallback);
 			},
-			[&](const std::function_ref<Generator(const Requirements&)>& testCallback)
+			[&](const std::function_ref<Generator()>& testCallback)
 			{
-				Generator generator = runner.Run(requirements, testCallback);
+				Generator generator = runner.Run(testCallback);
 
 				for (const Test& test: generator)
 				{

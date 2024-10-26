@@ -42,8 +42,7 @@ namespace synodic::honesty::test::command
 
 			if (not result.success)
 			{
-				// TODO: Replace with a return code
-				std::abort();
+				throw std::runtime_error("Test execution failed");
 			}
 		}
 

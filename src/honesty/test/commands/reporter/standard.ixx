@@ -41,11 +41,13 @@ namespace synodic::honesty::test
 		void Signal(const event::AssertionFail& event)
 		{
 			ReportFailure(event);
+			ReportDescription(event);
 		}
 
 		void Signal(const event::EqualityFail& event)
 		{
 			ReportFailure(event);
+			ReportDescription(event);
 
 			const std::string_view relation = event.equal ? "==" : "!=";
 
@@ -55,6 +57,7 @@ namespace synodic::honesty::test
 		void Signal(const event::ComparisonFail& event)
 		{
 			ReportFailure(event);
+			ReportDescription(event);
 
 			const std::string_view relation = [](const std::strong_ordering ordering) -> std::string_view
 			{
@@ -179,6 +182,22 @@ namespace synodic::honesty::test
 					++output_.undefinedFailedAssertions;
 					break;
 				}
+			}
+		}
+
+		/**
+		 * @brief Reports the description of the event.
+		 * @param event The assertion event.
+		 */
+		void ReportDescription(const event::AssertionFail& event) const
+		{
+			if (not event.message.empty())
+			{
+				const log::Logger& logger = logger_.get();
+
+				constexpr std::string_view indent("  ");
+
+				logger.Info("{}Description: {}", indent, event.message);
 			}
 		}
 

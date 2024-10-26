@@ -40,7 +40,8 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(location, descriptionCallback(), true);
+				const std::string message = descriptionCallback();
+				const event::AssertionFail failed(location, message, true);
 
 				Signal(failed);
 			}
@@ -85,7 +86,8 @@ namespace synodic::honesty::test
 			}
 			else
 			{
-				const event::AssertionFail failed(location, descriptionCallback(), false);
+				const std::string message = descriptionCallback();
+				const event::AssertionFail failed(location, message, false);
 
 				Signal(failed);
 			}
@@ -156,7 +158,9 @@ namespace synodic::honesty::test
 			try
 			{
 				std::invoke(std::forward<Fn>(function));
-				const event::AssertionFail failed(location, descriptionCallback(), true);
+
+				const std::string message = descriptionCallback();
+				const event::AssertionFail failed(location, message, true);
 
 				Signal(failed);
 			}
@@ -168,7 +172,8 @@ namespace synodic::honesty::test
 			}
 			catch (...)
 			{
-				const event::AssertionFail failed(location, descriptionCallback(), true);
+				const std::string message = descriptionCallback();
+				const event::AssertionFail failed(location, message, true);
 
 				Signal(failed);
 			}
@@ -204,7 +209,8 @@ namespace synodic::honesty::test
 			}
 			catch (...)
 			{
-				const event::AssertionFail failed(location, descriptionCallback(), true);
+				const std::string message = descriptionCallback();
+				const event::AssertionFail failed(location, message, true);
 
 				Signal(failed);
 			}
@@ -234,7 +240,9 @@ namespace synodic::honesty::test
 			try
 			{
 				std::invoke(std::forward<Fn>(function));
-				const event::AssertionFail failed(location, descriptionCallback(), false);
+
+				const std::string message = descriptionCallback();
+				const event::AssertionFail failed(location, message, false);
 
 				Signal(failed);
 			}
@@ -246,7 +254,8 @@ namespace synodic::honesty::test
 			}
 			catch (...)
 			{
-				const event::AssertionFail failed(location, descriptionCallback(), false);
+				const std::string message = descriptionCallback();
+				const event::AssertionFail failed(location, message, false);
 
 				Signal(failed);
 			}
@@ -282,7 +291,8 @@ namespace synodic::honesty::test
 			}
 			catch (...)
 			{
-				const event::AssertionFail failed(location, descriptionCallback(), false);
+				const std::string message = descriptionCallback();
+				const event::AssertionFail failed(location, message, false);
 
 				Signal(failed);
 			}
@@ -319,8 +329,9 @@ namespace synodic::honesty::test
 			}
 			else
 			{
+				const std::string message = descriptionCallback();
 				const event::EqualityFail
-					failed(location, false, std::format("{}", a), std::format("{}", b), descriptionCallback(), true);
+					failed(location, false, std::format("{}", a), std::format("{}", b), message, true);
 
 				Signal(failed);
 			}
@@ -360,8 +371,9 @@ namespace synodic::honesty::test
 			}
 			else
 			{
+				const std::string message = descriptionCallback();
 				const event::EqualityFail
-					failed(location, true, std::format("{}", a), std::format("{}", b), descriptionCallback(), true);
+					failed(location, true, std::format("{}", a), std::format("{}", b), message, true);
 
 				Signal(failed);
 			}
@@ -405,8 +417,9 @@ namespace synodic::honesty::test
 			}
 			else
 			{
+				const std::string message = descriptionCallback();
 				const event::EqualityFail
-					failed(location, false, std::format("{}", a), std::format("{}", b), descriptionCallback(), false);
+					failed(location, false, std::format("{}", a), std::format("{}", b), message, false);
 
 				Signal(failed);
 			}
@@ -446,8 +459,9 @@ namespace synodic::honesty::test
 			}
 			else
 			{
+				const std::string message = descriptionCallback();
 				const event::EqualityFail
-					failed(location, true, std::format("{}", a), std::format("{}", b), descriptionCallback(), false);
+					failed(location, true, std::format("{}", a), std::format("{}", b), message, false);
 
 				Signal(failed);
 			}
@@ -488,8 +502,9 @@ namespace synodic::honesty::test
 			}
 			else
 			{
+				const std::string message = descriptionCallback();
 				const event::ComparisonFail
-					failed(location, order, std::format("{}", a), std::format("{}", b), descriptionCallback(), true);
+					failed(location, order, std::format("{}", a), std::format("{}", b), message, true);
 
 				Signal(failed);
 			}
@@ -531,8 +546,9 @@ namespace synodic::honesty::test
 			}
 			else
 			{
+				const std::string message = descriptionCallback();
 				const event::ComparisonFail
-					failed(location, order, std::format("{}", a), std::format("{}", b), descriptionCallback(), true);
+					failed(location, order, std::format("{}", a), std::format("{}", b), message, true);
 
 				Signal(failed);
 			}
@@ -574,8 +590,10 @@ namespace synodic::honesty::test
 			}
 			else
 			{
+				const std::string message = descriptionCallback();
+
 				const event::ComparisonFail
-					failed(location, order, std::format("{}", a), std::format("{}", b), descriptionCallback(), true);
+					failed(location, order, std::format("{}", a), std::format("{}", b), message, true);
 
 				Signal(failed);
 			}
@@ -617,8 +635,9 @@ namespace synodic::honesty::test
 			}
 			else
 			{
+				const std::string message = descriptionCallback();
 				const event::ComparisonFail
-					failed(location, order, std::format("{}", a), std::format("{}", b), descriptionCallback(), true);
+					failed(location, order, std::format("{}", a), std::format("{}", b), message, true);
 
 				Signal(failed);
 			}
@@ -660,8 +679,9 @@ namespace synodic::honesty::test
 			}
 			else
 			{
+				const std::string message = descriptionCallback();
 				const event::ComparisonFail
-					failed(location, order, std::format("{}", a), std::format("{}", b), descriptionCallback(), false);
+					failed(location, order, std::format("{}", a), std::format("{}", b), message, false);
 
 				Signal(failed);
 			}
@@ -703,8 +723,9 @@ namespace synodic::honesty::test
 			}
 			else
 			{
+				const std::string message = descriptionCallback();
 				const event::ComparisonFail
-					failed(location, order, std::format("{}", a), std::format("{}", b), descriptionCallback());
+					failed(location, order, std::format("{}", a), std::format("{}", b), message);
 
 				Signal(failed);
 			}
@@ -746,8 +767,10 @@ namespace synodic::honesty::test
 			}
 			else
 			{
+				const std::string message = descriptionCallback();
+
 				const event::ComparisonFail
-					failed(location, order, std::format("{}", a), std::format("{}", b), descriptionCallback());
+					failed(location, order, std::format("{}", a), std::format("{}", b), message);
 
 				Signal(failed);
 			}
@@ -789,8 +812,9 @@ namespace synodic::honesty::test
 			}
 			else
 			{
+				const std::string message = descriptionCallback();
 				const event::ComparisonFail
-					failed(location, order, std::format("{}", a), std::format("{}", b), descriptionCallback(), false);
+					failed(location, order, std::format("{}", a), std::format("{}", b), message, false);
 
 				Signal(failed);
 			}

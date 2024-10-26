@@ -65,8 +65,7 @@ namespace synodic::honesty::test
 
 	class Test final
 	{
-		using VariantType = std::
-			variant<std::function_ref<void(const Requirements&)>, std::function_ref<Generator()>>;
+		using VariantType = std::variant<std::function_ref<void(const Requirements&)>, std::function_ref<Generator()>>;
 
 	public:
 		constexpr Test(
@@ -80,10 +79,7 @@ namespace synodic::honesty::test
 			VerifyTestName(name);
 		}
 
-		constexpr Test(
-			const std::string_view name,
-			const Tag& tag,
-			const std::function_ref<Generator()>& test) :
+		constexpr Test(const std::string_view name, const Tag& tag, const std::function_ref<Generator()>& test) :
 			name_(name),
 			test_(test),
 			tag_(tag)

@@ -139,7 +139,7 @@ namespace synodic::honesty::test::api
 		std::visit(testExecutor, testData.Variant());
 
 		// Get the output from the test
-		const TestContext::OutputData testOutput =  testContext.Output(requirements);
+		TestContext::OutputData testOutput = testContext.Output(requirements);
 
 		if (not testOutput.success)
 		{

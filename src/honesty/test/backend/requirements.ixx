@@ -8,17 +8,16 @@ import synodic.honesty.log;
 
 namespace synodic::honesty::test
 {
-	export struct TestContext; 
+	export struct TestContext;
 
 	export class Requirements final
 	{
 		friend TestContext;
 
 	public:
-
-		Requirements(const Requirements& other)				 = delete;
-		Requirements(Requirements&& other) noexcept			 = delete;
-		Requirements& operator=(const Requirements& other)	 = delete;
+		Requirements(const Requirements& other)				   = delete;
+		Requirements(Requirements&& other) noexcept			   = delete;
+		Requirements& operator=(const Requirements& other)	   = delete;
 		Requirements& operator=(Requirements&& other) noexcept = delete;
 
 		/**
@@ -898,6 +897,11 @@ namespace synodic::honesty::test
 			{
 				reporter->Signal(passed);
 			}
+
+			if (output_.success && parameters_.outcome == ExpectedTestOutcome::FAIL)
+			{
+				output_.success = false;
+			}
 		}
 
 		/**
@@ -911,7 +915,10 @@ namespace synodic::honesty::test
 				reporter->Signal(failed);
 			}
 
-			output_.success = false;
+			if (output_.success && parameters_.outcome == ExpectedTestOutcome::PASS)
+			{
+				output_.success = false;
+			}
 		}
 
 		/**
@@ -925,7 +932,10 @@ namespace synodic::honesty::test
 				reporter->Signal(failed);
 			}
 
-			output_.success = false;
+			if (output_.success && parameters_.outcome == ExpectedTestOutcome::PASS)
+			{
+				output_.success = false;
+			}
 		}
 
 		/**
@@ -939,7 +949,10 @@ namespace synodic::honesty::test
 				reporter->Signal(failed);
 			}
 
-			output_.success = false;
+			if (output_.success && parameters_.outcome == ExpectedTestOutcome::PASS)
+			{
+				output_.success = false;
+			}
 		}
 
 		mutable Output output_;

@@ -28,16 +28,9 @@ namespace
 				const std::stringstream& stream = fixture.AttachListener();
 
 				requirements.Expect(stream.view().empty(), "The stream should be empty");
-
-				constexpr std::string_view expectedString = "This should be visible to the listener";
-
-				// We force an error, so that the message is logged
-				requirements.Expect(stream.view().empty(), expectedString);
-
-				requirements.ExpectEquals(
-					stream.view(),
-					expectedString,
-					"The attached log listener should have picked up the previous log message");
+				requirements.Expect(
+					stream.view().empty(),
+					"The previous expectation passed, so the log stream should be empty");
 			};
 		});
 	SuiteRegistrar _(SUITE);

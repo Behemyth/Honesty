@@ -23,7 +23,7 @@ function(honesty_extract_tests)
 		)
 	endif()
 
-	set(HONESTY_ARGS list --json --file honesty_test.json)
+	set(HONESTY_ARGS "list --json --file honesty_test.json")
 
 	message("Running command:\n	'${HONESTY_ARGS}'")
 

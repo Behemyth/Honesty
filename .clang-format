@@ -27,10 +27,10 @@ AlignTrailingComments:
 #  MaxEmptyLinesToKeep - Unused
 AllowAllArgumentsOnNextLine: false
 AllowAllParametersOfDeclarationOnNextLine: false
-# AllowBreakBeforeNoexceptSpecifier: OnlyWithParen - Clang 18
+AllowBreakBeforeNoexceptSpecifier: OnlyWithParen
 AllowShortBlocksOnASingleLine: Never
 AllowShortCaseLabelsOnASingleLine: false
-# AllowShortCompoundRequirementOnASingleLine: true - Clang 18
+AllowShortCompoundRequirementOnASingleLine: true
 #  AlignConsecutiveShortCaseStatements - Unused
 AllowShortEnumsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: None
@@ -46,7 +46,7 @@ BinPackParameters: false
 BitFieldColonSpacing: Both
 # BraceWrapping - Ignored because of 'BreakBeforeBraces'
 # BracedInitializerIndentWidth - Ignored, prioritizing 'ContinuationIndentWidth'
-# BreakAdjacentStringLiterals: true - Clang 18
+BreakAdjacentStringLiterals: true
 BreakAfterAttributes: Never
 BreakAfterJavaFieldAnnotations: true
 BreakArrays: true
@@ -113,6 +113,7 @@ NamespaceMacros: []
 # ObjCBinPackProtocolList - Unused
 # ObjCBlockIndentWidth - Unused
 # ObjCBreakBeforeNestedBlockParam - Unused
+# ObjCPropertyAttributeOrder - Unused
 # ObjCSpaceAfterProperty - Unused
 # ObjCSpaceBeforeProtocolList - Unused
 PPIndentWidth: -1
@@ -122,6 +123,7 @@ PackConstructorInitializers: Never
 # PenaltyBreakComment - Unused
 # PenaltyBreakFirstLessLess - Unused
 # PenaltyBreakOpenParenthesis - Unused
+# PenaltyBreakScopeResolution - Unused
 # PenaltyBreakString - Unused
 # PenaltyBreakTemplateDeclaration - Unused
 # PenaltyExcessCharacter - Unused
@@ -140,7 +142,7 @@ RequiresClausePosition: OwnLine
 RequiresExpressionIndentation: OuterScope
 SeparateDefinitionBlocks: Always
 ShortNamespaceLines: 0
-# SkipMacroDefinitionBody: false - Clang 18
+SkipMacroDefinitionBody: false
 SortIncludes: CaseSensitive
 # SortJavaStaticImport - Unused
 SortUsingDeclarations: LexicographicNumeric

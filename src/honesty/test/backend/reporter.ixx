@@ -26,6 +26,11 @@ namespace synodic::honesty::test
 
 	export namespace event
 	{
+		struct Initialize
+		{
+			std::uint64_t seed;
+		};
+
 		struct SuiteBegin
 		{
 			std::string_view name;
@@ -192,6 +197,8 @@ namespace synodic::honesty::test
 		}
 
 		virtual ~Reporter() = default;
+
+		virtual void Signal(const event::Initialize& event) = 0;
 
 		virtual void Signal(const event::SuiteBegin& event) = 0;
 		virtual void Signal(const event::SuiteEnd& event)	= 0;

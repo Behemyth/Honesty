@@ -20,6 +20,10 @@ namespace synodic::honesty::test
 
 		~StreamingAdapter() override = default;
 
+		void Signal(const event::Initialize& event) override
+		{
+		}
+
 		void Signal(const event::SuiteBegin& event) override
 		{
 		}
@@ -100,6 +104,10 @@ namespace synodic::honesty::test
 		}
 
 		~CumulativeAdapter() override = default;
+
+		void Signal(const event::Initialize& event) final
+		{
+		}
 
 		void Signal(const event::SuiteBegin& event) final
 		{

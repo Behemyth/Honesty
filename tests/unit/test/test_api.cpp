@@ -55,7 +55,7 @@ namespace
 
 				for (auto& suite: result.suites)
 				{
-					requirements.Expect(not suite.tests.empty());
+					requirements.Expect(not suite.tests.empty(), std::format("Suite '{}' had no tests", suite.name));
 				}
 			};
 		});

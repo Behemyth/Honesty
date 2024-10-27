@@ -11,7 +11,9 @@ namespace
 		"hash",
 		[]() -> Generator
 		{
-			co_return;
+			co_yield "hash"_test = [](const Requirements&)
+			{
+			};
 		});
 
 	SuiteRegistrar _(SUITE);

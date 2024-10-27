@@ -87,10 +87,8 @@ namespace synodic::honesty::test
 		{
 			appLogger_.SetSink(sink_);
 
-
 			// TODO: Enable the -v option to increase the verbosity of the logger
 			appLogger_.SetLevel(log::LevelType::INFO);
-
 
 			command::Configuration commandConfiguration = ResolveConfiguration(configuration);
 			appLogger_.Debug("Finding command for `{}` application", commandConfiguration.applicationName);
@@ -99,7 +97,7 @@ namespace synodic::honesty::test
 			if (arguments.size() >= 2)
 			{
 				// Check for an option or flag
-				if (std::string_view possibleSubCommand = arguments[1];
+				if (const std::string_view possibleSubCommand = arguments[1];
 					not possibleSubCommand.starts_with("-") and not possibleSubCommand.starts_with("--"))
 				{
 					SearchSubCommand(possibleSubCommand, commandConfiguration);
@@ -163,21 +161,26 @@ namespace synodic::honesty::test
 				auto executor = Overload {
 					[this](command::Execute& command)
 					{
-						command::ProcessConfiguration configuration(*runner_, reporters_);
+						const std::string header = "Command: Default";
+
+						command::ProcessConfiguration configuration(*runner_, reporters_, header);
 						command.Process(configuration);
 					},
 					[this](SubType& command)
 					{
 						auto subExecutor =
-							Overload {[this](auto& subCommand)
+							Overload {[this]<typename T>(T& subCommand)
 									  {
-										  command::ProcessConfiguration configuration(*runner_, reporters_);
+										  const std::string header = std::format("Command: {}", T::NAME);
+										  command::ProcessConfiguration configuration(*runner_, reporters_, header);
 										  subCommand.Process(configuration);
 									  }};
 						std::visit(subExecutor, command);
 					},
 					[](std::monostate)
 					{
+						// We replace mono-state prior to execution of the command
+						std::unreachable();
 					}};
 
 				std::visit(executor, command_);
@@ -271,7 +274,7 @@ namespace synodic::honesty::test
 
 			// Find the runner
 			{
-				auto iterator = std::ranges::find_if(
+				const auto iterator = std::ranges::find_if(
 					runnerRegistrars,
 					[&](const RunnerRegistry* registry) -> bool
 					{
@@ -315,7 +318,7 @@ namespace synodic::honesty::test
 		std::string applicationName_;
 
 		log::Sink* sink_;
-		log::Logger appLogger_; // The shared logger for the application
+		log::Logger appLogger_;	 // The shared logger for the application
 
 		TopType command_;
 

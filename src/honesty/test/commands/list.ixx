@@ -68,7 +68,8 @@ namespace synodic::honesty::test::command
 
 		void Process(ProcessConfiguration& configuration) override
 		{
-			std::string header = std::format("File: {}", data.file.value_or("None").generic_string());
+			std::string fileName = data.file.value_or("None").generic_string();
+			std::string header	 = std::format("{}\nFile: {}", configuration.header, fileName);
 
 			api::ListParameters parameters(applicationName_, configuration.runner.get(), header, logger_);
 			api::ListResult result = api::List(parameters);

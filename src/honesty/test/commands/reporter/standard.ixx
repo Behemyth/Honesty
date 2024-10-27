@@ -306,7 +306,8 @@ namespace synodic::honesty::test
 		{
 			const log::Logger& logger = Logger();
 
-			logger.Info("Seed: {} | {}", event.seed, event.header);
+			logger.Info("{}\nSeed: {}", event.header, event.seed);
+			logger.Info("-------------------");
 		}
 
 		void Signal(const event::SuiteBegin& event) override

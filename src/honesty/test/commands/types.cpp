@@ -34,55 +34,56 @@ namespace synodic::honesty::test::command
 
 	struct ProcessConfiguration
 	{
-		ProcessConfiguration(Runner& runner, const std::span<std::unique_ptr<Reporter>> reporter) :
+		ProcessConfiguration(
+			Runner& runner,
+			const std::span<std::unique_ptr<Reporter>> reporter,
+			const std::string_view header) :
 			runner(runner),
-			reporters(reporter)
+			reporters(reporter),
+			header(header)
 		{
 		}
 
 		std::reference_wrapper<Runner> runner;
 		std::span<std::unique_ptr<Reporter>> reporters;
+
+		std::string_view header;
 	};
 
 	class Command
 	{
 	public:
 		constexpr Command() = default;
-		virtual ~Command()	= default;
+		virtual ~Command() = default;
 
-		Command(const Command& other)						 = delete;
-		Command(Command&& other) noexcept					 = delete;
-		auto operator=(const Command& other) -> Command&	 = delete;
+		Command(const Command& other) = delete;
+		Command(Command&& other) noexcept = delete;
+		auto operator=(const Command& other) -> Command& = delete;
 		auto operator=(Command&& other) noexcept -> Command& = delete;
 
 		virtual auto Parse(std::span<std::string_view> arguments) -> ParseResult = 0;
-		virtual void Process(ProcessConfiguration& configuration)				 = 0;
+		virtual void Process(ProcessConfiguration& configuration) = 0;
 
 	private:
 	};
 
 	template<typename T>
-	concept command = requires(const T constValue, const Configuration& config) {
+	concept command = requires(const T constValue, const Configuration& config)
+	{
 		// Constructable from a Configuration
 		T(config);
 
 		// The command must have a name, and it must be a string_view
-		{
-			T::NAME
-		} -> std::same_as<std::string_view>;
+		{ T::NAME } -> std::same_as<std::string_view>;
 
 		// The name must be constant
-		{
-			std::bool_constant<T::NAME>()
-		} -> std::same_as<std::true_type>;
+		{ std::bool_constant<T::NAME>() } -> std::same_as<std::true_type>;
 
 		// The command must have a type defined as Data
 		T::Data;
 
 		// The command must have a GetData() method that returns a const reference to the Data type
-		{
-			constValue.GetData()
-		} -> std::same_as<const T::Data&>;
+		{ constValue.GetData() } -> std::same_as<const T::Data&>;
 
 		// Must be derived from the Command class
 		std::derived_from<T, Command>;

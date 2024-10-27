@@ -93,6 +93,8 @@ namespace synodic::honesty::test::command
 				// Clear the file
 				file.clear();
 
+				logger_.get().Debug("Writing list data to file: {}", path.generic_string());
+
 				switch (data.outputType)
 				{
 					case ListOutputType::LOG :
@@ -110,15 +112,21 @@ namespace synodic::honesty::test::command
 					{
 						utility::JSON json;
 
-						utility::JSON& tests = json["tests"];
+						utility::JSON& suites = json["suites"];
 
-						size_t testIndex = 0;
+						size_t suiteIndex = 0;
 
 						for (auto& suiteDescription: result.suites)
 						{
+							utility::JSON& suite = suites[suiteIndex++];
+							suite["name"]		 = suiteDescription.name;
+
+							size_t testIndex = 0;
 							for (auto& testDescription: suiteDescription.tests)
 							{
-								tests[testIndex++] = std::format("{}.{}", suiteDescription.name, testDescription.name);
+								utility::JSON& test = suite["tests"][testIndex++];
+
+								test["name"] = std::format("{}", testDescription.name);
 							}
 						}
 

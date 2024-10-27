@@ -40,7 +40,7 @@ namespace
 
 			/**
 			 *	@brief For the 'list' test we need to add a few things to the context. The runner that runs all the
-			 *		honesty tests will be reused, but the reporters has two additional considerations:
+			 *		honesty tests will be reused, but the reporters have two additional considerations:
 			 *		1. We need to use the explicit ListReporter to capture the output
 			 *		2. We don't want to have the results duplicated with our normal reporters, the one running this test
 			 *		As a result, the context is unique to the test, and cannot be managed by the Interface class.
@@ -51,7 +51,12 @@ namespace
 
 				const auto result = List(parameters);
 
-				requirements.ExpectGreater(result.suites.size(), static_cast<std::size_t>(0));
+				requirements.Expect(not result.suites.empty());
+
+				for (auto& suite: result.suites)
+				{
+					requirements.Expect(not suite.tests.empty());
+				}
 			};
 		});
 	SuiteRegistrar _(SUITE);

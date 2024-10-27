@@ -260,6 +260,12 @@ namespace synodic::honesty::test::api
 
 		std::string threadName = std::format("{}", std::this_thread::get_id());
 
+		const event::Initialize initialize;
+		for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
+		{
+			reporter->Signal(initialize);
+		}
+
 		for (const SuiteData& suite: GetSuites())
 		{
 			SuiteContext suiteContext(

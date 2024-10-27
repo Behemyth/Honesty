@@ -28,6 +28,11 @@ namespace synodic::honesty::test
 	{
 		struct Initialize
 		{
+			Initialize() :
+				seed(std::random_device()())
+			{
+			}
+
 			std::uint64_t seed;
 		};
 

@@ -260,7 +260,9 @@ namespace synodic::honesty::test::api
 
 		std::string threadName = std::format("{}", std::this_thread::get_id());
 
-		const event::Initialize initialize;
+		std::uint64_t seed = std::random_device()();
+
+		const event::Initialize initialize(seed);
 		for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
 		{
 			reporter->Signal(initialize);

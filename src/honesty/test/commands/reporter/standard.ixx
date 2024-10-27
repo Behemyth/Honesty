@@ -302,6 +302,13 @@ namespace synodic::honesty::test
 			return "default";
 		}
 
+		void Signal(const event::Initialize& event) override
+		{
+			const log::Logger& logger = Logger();
+
+			logger.Info("Seed: {}", event.seed);
+		}
+
 		void Signal(const event::SuiteBegin& event) override
 		{
 			currentSuiteState_.emplace(event, Logger());

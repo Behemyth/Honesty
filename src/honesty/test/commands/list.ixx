@@ -68,7 +68,9 @@ namespace synodic::honesty::test::command
 
 		void Process(ProcessConfiguration& configuration) override
 		{
-			api::ListParameters parameters(applicationName_, configuration.runner.get(), logger_);
+			std::string header;
+
+			api::ListParameters parameters(applicationName_, configuration.runner.get(), header, logger_);
 			api::ListResult result = api::List(parameters);
 
 			if (data.file)

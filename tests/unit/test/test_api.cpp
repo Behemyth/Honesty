@@ -25,7 +25,9 @@ namespace
 
 			co_yield "execute"_test = [&]() -> Generator
 			{
-				const api::ExecuteParameters baseParameters("execute_test", "", runner, reporters, false, logger);
+				std::string header;
+				const api::ExecuteParameters
+					baseParameters("execute_test", "", runner, reporters, false, header, logger);
 
 				co_yield "dry_run"_test = [&](const Requirements& requirements)
 				{
@@ -47,7 +49,8 @@ namespace
 			 */
 			co_yield "list"_test = [&](const Requirements& requirements)
 			{
-				const api::ListParameters parameters("list_test", runner, logger);
+				std::string header;
+				const api::ListParameters parameters("list_test", runner, header, logger);
 
 				const auto result = List(parameters);
 

@@ -42,9 +42,14 @@ namespace synodic::honesty::test::api
 {
 	export struct ListParameters
 	{
-		explicit ListParameters(const std::string_view applicationName, Runner& runner, const log::Logger& logger) :
+		explicit ListParameters(
+			const std::string_view applicationName,
+			Runner& runner,
+			std::string_view header,
+			const log::Logger& logger) :
 			applicationName(applicationName),
 			runner(runner),
+			header(header),
 			logger(logger)
 		{
 		}
@@ -52,6 +57,8 @@ namespace synodic::honesty::test::api
 		std::string_view applicationName;
 
 		std::reference_wrapper<Runner> runner;
+
+		std::string_view header;
 
 		std::reference_wrapper<const log::Logger> logger;
 	};
@@ -88,8 +95,14 @@ namespace synodic::honesty::test::api
 		}
 
 		// TODO: Filter with list command
-		const ExecuteParameters
-			executeParameters(parameters.applicationName, "", parameters.runner, reporters, true, parameters.logger);
+		const ExecuteParameters executeParameters(
+			parameters.applicationName,
+			"",
+			parameters.runner,
+			reporters,
+			true,
+			parameters.header,
+			parameters.logger);
 
 		ExecuteResult executeResult = Execute(executeParameters);
 

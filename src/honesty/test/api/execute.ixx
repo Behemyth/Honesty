@@ -29,12 +29,14 @@ namespace synodic::honesty::test::api
 			Runner& runner,
 			const std::span<std::unique_ptr<Reporter>> reporters,
 			const bool dryRun,
+			const std::string_view header,
 			const log::Logger& logger) :
 			applicationName(applicationName),
 			filter(filter),
 			runner(runner),
 			reporters(reporters),
 			dryRun(dryRun),
+			header(header),
 			logger(logger)
 		{
 		}
@@ -46,6 +48,7 @@ namespace synodic::honesty::test::api
 		std::span<std::unique_ptr<Reporter>> reporters;
 
 		bool dryRun;
+		std::string_view header;
 		std::reference_wrapper<const log::Logger> logger;
 	};
 
@@ -261,7 +264,7 @@ namespace synodic::honesty::test::api
 		const std::string threadName = std::format("{}", std::this_thread::get_id());
 		const std::uint64_t seed	 = std::random_device()();
 
-		const event::Initialize initialize(seed);
+		const event::Initialize initialize(seed, parameters.header);
 		for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
 		{
 			reporter->Signal(initialize);

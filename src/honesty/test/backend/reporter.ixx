@@ -28,12 +28,14 @@ namespace synodic::honesty::test
 	{
 		struct Initialize
 		{
-			explicit Initialize(const std::uint64_t seed) :
-				seed(seed)
+			explicit Initialize(const std::uint64_t seed, const std::string_view header) :
+				seed(seed),
+				header(header)
 			{
 			}
 
 			std::uint64_t seed;
+			std::string_view header;
 		};
 
 		struct SuiteBegin

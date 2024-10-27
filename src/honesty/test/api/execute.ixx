@@ -59,16 +59,12 @@ namespace synodic::honesty::test::api
 		bool success;
 	};
 
-	bool ProcessTest(
-		Runner& runner,
-		const TestData& testData,
-		const SuiteContext& suiteContext,
-		const TestContext& testContext)
+	bool ProcessTest(Runner& runner, const TestData& testData, const TestContext& testContext)
 	{
 		bool success = true;
 
 		// Filter the test by name
-		if (not testContext.filter.empty() and testData.Name() != testContext.filter.front())
+		if (not testContext.filterViews.empty() and testData.Name() != testContext.filterViews.front())
 		{
 			return success;
 		}
@@ -96,7 +92,7 @@ namespace synodic::honesty::test::api
 
 		const event::TestBegin testBegin(testData.Name(), assertOutcome);
 
-		for (const std::unique_ptr<Reporter>& reporter: suiteContext.reporters)
+		for (const std::unique_ptr<Reporter>& reporter: testContext.reporters)
 		{
 			reporter->Signal(testBegin);
 		}
@@ -111,7 +107,7 @@ namespace synodic::honesty::test::api
 					event::TestSkip testSkip;
 					testSkip.name = testData.Name();
 
-					for (const std::unique_ptr<Reporter>& reporter: suiteContext.reporters)
+					for (const std::unique_ptr<Reporter>& reporter: testContext.reporters)
 					{
 						reporter->Signal(testSkip);
 					}
@@ -119,15 +115,29 @@ namespace synodic::honesty::test::api
 					return;
 				}
 
-				runner.Run(requirements, testCallback);
+				if (not testContext.dryRun)
+				{
+					runner.Run(requirements, testCallback);
+				}
 			},
 			[&](const std::function_ref<Generator()>& testCallback)
 			{
 				Generator generator = runner.Run(testCallback);
 
+				std::span filter = testContext.filterViews;
+
+				// Move to the next filter part
+				filter = filter | std::ranges::views::drop(1);
+
 				for (const Test& test: generator)
 				{
-					if (not ProcessTest(runner, static_cast<TestData>(test), suiteContext, testContext))
+					TestContext newContext(
+						testContext.reporters,
+						testContext.logger.CreateLogger(test.Name()),
+						filter,
+						testContext.dryRun);
+
+					if (not ProcessTest(runner, static_cast<TestData>(test), newContext))
 					{
 						success = false;
 						break;
@@ -149,7 +159,7 @@ namespace synodic::honesty::test::api
 		event::TestEnd testEnd;
 		testEnd.name = testData.Name();
 
-		for (const std::unique_ptr<Reporter>& reporter: suiteContext.reporters)
+		for (const std::unique_ptr<Reporter>& reporter: testContext.reporters)
 		{
 			reporter->Signal(testEnd);
 		}
@@ -205,12 +215,13 @@ namespace synodic::honesty::test::api
 
 			bool testSuccess = true;
 
-			if (not suiteContext.dryRun)
-			{
-				TestContext testContext(suiteContext.reporters, suiteContext.logger.CreateLogger(view.Name()));
+			TestContext testContext(
+				suiteContext.reporters,
+				suiteContext.logger.CreateLogger(view.Name()),
+				filter,
+				suiteContext.dryRun);
 
-				testSuccess = ProcessTest(runner, view, suiteContext, testContext);
-			}
+			testSuccess = ProcessTest(runner, view, testContext);
 
 			if (not testSuccess)
 			{

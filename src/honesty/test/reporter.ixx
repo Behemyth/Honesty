@@ -78,6 +78,8 @@ namespace synodic::honesty::test
 		struct TestData
 		{
 			std::string name;
+
+			std::vector<TestData> subTests;
 		};
 
 		struct SuiteData

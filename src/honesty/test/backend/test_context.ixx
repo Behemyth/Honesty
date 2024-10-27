@@ -24,9 +24,15 @@ namespace synodic::honesty::test
 			bool success;
 		};
 
-		explicit TestContext(const std::span<std::unique_ptr<Reporter>> reporters, log::Logger logger) :
+		explicit TestContext(
+			const std::span<std::unique_ptr<Reporter>> reporters,
+			log::Logger logger,
+			const std::span<std::string_view> filterViews,
+			const bool dryRun) :
 			logger(std::move(logger)),
-			reporters(reporters)
+			reporters(reporters),
+			filterViews(filterViews),
+			dryRun(dryRun)
 		{
 		}
 
@@ -51,6 +57,8 @@ namespace synodic::honesty::test
 
 		std::span<std::unique_ptr<Reporter>> reporters;
 
-		std::span<std::string_view> filter;
+		std::span<std::string_view> filterViews;
+
+		bool dryRun;
 	};
 }

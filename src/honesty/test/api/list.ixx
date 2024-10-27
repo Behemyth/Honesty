@@ -106,7 +106,7 @@ namespace synodic::honesty::test::api
 			auto& resultSuite = result.suites.emplace_back();
 			resultSuite.name  = name;
 
-			for (const auto& [name]: tests)
+			for (const auto& [name, subTests]: tests)
 			{
 				TestDescription description;
 				description.name = name;

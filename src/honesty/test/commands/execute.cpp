@@ -36,14 +36,15 @@ namespace synodic::honesty::test::command
 
 		void Process(ProcessConfiguration& configuration) override
 		{
-			std::string header;
+			bool dryRun = false;
+			const std::string header = std::format("Dry run: {}", dryRun);
 
 			const api::ExecuteParameters parameters(
 				applicationName_,
 				filter_,
 				configuration.runner,
 				configuration.reporters,
-				false,
+				dryRun,
 				header,
 				logger_);
 			const api::ExecuteResult result = api::Execute(parameters);

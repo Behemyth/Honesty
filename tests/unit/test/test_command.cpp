@@ -26,7 +26,7 @@ namespace
 				std::stringstream stringStream;
 				synodic::honesty::log::OStream<std::mutex> stream(stringStream);
 
-				Instance::Configuration configuration("instance_test", &stream);
+				const Instance::Configuration configuration("instance_test", &stream);
 				Instance command(configuration, arguments);
 				const std::optional<command::ListData> data = command.CommandData<command::List>();
 

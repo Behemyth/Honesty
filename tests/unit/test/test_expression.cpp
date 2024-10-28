@@ -23,6 +23,11 @@ namespace
 					return "This outputs only on error";
 				};
 
+				co_yield TODO / "stream operator"_test = [&](const Requirements&)
+				{
+					//<< "message on failure"
+				};
+
 				// Assert
 				{
 					// TODO: Enable when the "Fail" tag works

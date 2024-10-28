@@ -15,6 +15,10 @@ namespace
 		"command",
 		[](const Fixture& fixture) -> Generator
 		{
+			co_yield TODO / "delegation"_test = [&](const Requirements& requirements)
+			{
+			};
+
 			// We generate a string from the path to the temporary file for comparison.
 			const std::filesystem::path temporaryPath = fixture.SuiteDirectory() / "passThrough.json";
 

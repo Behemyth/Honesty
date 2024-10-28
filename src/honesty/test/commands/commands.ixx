@@ -54,6 +54,12 @@ namespace synodic::honesty::test
 		using TopType = std::variant<std::monostate, command::Execute, SubType>;
 
 	public:
+		enum class Result : std::uint8_t
+		{
+			SUCCESS,
+			FAILURE
+		};
+
 		struct Configuration
 		{
 			explicit Configuration(const std::string_view name, log::Sink* sink, const std::size_t threadCount = 1) :
@@ -153,7 +159,7 @@ namespace synodic::honesty::test
 			return {};
 		}
 
-		void Execute()
+		Result Execute()
 		{
 			try
 			{
@@ -192,9 +198,10 @@ namespace synodic::honesty::test
 
 				appLogger_.Error("{}", message);
 
-				// TODO: Replace with a return code
-				std::exit(134);
+				return Result::FAILURE;
 			}
+
+			return Result::SUCCESS;
 		}
 
 	private:

@@ -23,7 +23,7 @@ namespace
 					return "This outputs only on error";
 				};
 
-				co_yield TODO / "stream operator"_test = [&](const Requirements&)
+				co_yield TODO / "stream_operator"_test = [&](const Requirements&)
 				{
 					//<< "message on failure"
 				};

@@ -29,7 +29,8 @@ namespace synodic::honesty::test
 
 		TestState(const event::TestBegin& event, const log::Logger& logger) :
 			testOutcome_(event.outcome),
-			logger_(logger)
+			logger_(logger),
+			name_(event.name)
 		{
 		}
 
@@ -78,6 +79,11 @@ namespace synodic::honesty::test
 		Output Summarize(const event::TestEnd& event)
 		{
 			return output_;
+		}
+
+		std::string_view Name() const
+		{
+			return name_;
 		}
 
 	private:
@@ -204,6 +210,8 @@ namespace synodic::honesty::test
 		ExpectedAssertOutcome testOutcome_;
 		std::reference_wrapper<const log::Logger> logger_;
 
+		std::string_view name_;
+
 		Output output_;
 	};
 
@@ -221,7 +229,8 @@ namespace synodic::honesty::test
 		};
 
 		SuiteState(const event::SuiteBegin& event, const log::Logger& logger) :
-			logger_(logger)
+			logger_(logger),
+			name_(event.name)
 		{
 		}
 
@@ -250,8 +259,16 @@ namespace synodic::honesty::test
 			{
 				const log::Logger& logger = logger_.get();
 
+				std::string name(name_);
+
+				for (auto& test: testStates_)
+				{
+					name.append(".");
+					name.append(test.Name());
+				}
+
 				std::string styledToDo = format(log::TextStyle(log::Colour24(255, 255, 0)), "TODO");
-				std::string styledName = format(log::TextStyle(log::Colour24(255, 255, 0)), "{}", event.name);
+				std::string styledName = format(log::TextStyle(log::Colour24(255, 255, 0)), "{}", name);
 
 				logger.Info("{}: Implement '{}' test", styledToDo, styledName);
 			}

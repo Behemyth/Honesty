@@ -250,8 +250,10 @@ namespace synodic::honesty::test
 			{
 				const log::Logger& logger = logger_.get();
 
-				std::string styledResult = format(log::TextStyle(log::Colour24(255, 255, 0)), "TODO");
-				logger.Info("Test '{}' marked {}", event.name, styledResult);
+				std::string styledToDo = format(log::TextStyle(log::Colour24(255, 255, 0)), "TODO");
+				std::string styledName = format(log::TextStyle(log::Colour24(255, 255, 0)), event.name);
+
+				logger.Info("{}: Implement '{}' test", styledToDo, styledName);
 			}
 
 			++output_.skippedTests;
@@ -291,6 +293,8 @@ namespace synodic::honesty::test
 		std::list<TestState> testStates_;
 
 		std::reference_wrapper<const log::Logger> logger_;
+
+		std::string_view name_;
 
 		Output output_;
 	};

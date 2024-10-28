@@ -15,8 +15,9 @@ namespace
 		"command",
 		[](const Fixture& fixture) -> Generator
 		{
-			co_yield TODO / "delegation"_test = [&](const Requirements& requirements)
+			co_yield "subcommand_delegation"_test = [&](const Requirements& requirements)
 			{
+				constexpr std::size_t size = std::variant_size_v<SubType>;
 			};
 
 			// We generate a string from the path to the temporary file for comparison.

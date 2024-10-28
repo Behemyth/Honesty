@@ -93,6 +93,7 @@ namespace synodic::honesty::test
 		struct TestSkip
 		{
 			std::string_view name;
+			bool todo;	// True if the test was skipped because it was a TODO task
 		};
 
 		struct TestRun

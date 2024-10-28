@@ -246,6 +246,14 @@ namespace synodic::honesty::test
 
 		void Signal(const event::TestSkip& event)
 		{
+			if (event.todo)
+			{
+				const log::Logger& logger = logger_.get();
+
+				std::string styledResult = format(log::TextStyle(log::Colour24(255, 255, 0)), "TODO");
+				logger.Info("Test '{}' marked {}", event.name, styledResult);
+			}
+
 			++output_.skippedTests;
 		}
 

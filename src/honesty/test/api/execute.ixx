@@ -105,10 +105,11 @@ namespace synodic::honesty::test::api
 		auto testExecutor = Overload {
 			[&](const std::function_ref<void(const Requirements&)>& testCallback)
 			{
-				if (testData.Tag() == "skip")
+				if (const bool todo = testData.Tag() == "todo"; testData.Tag() == "skip" || todo)
 				{
 					event::TestSkip testSkip;
 					testSkip.name = testData.Name();
+					testSkip.todo = todo;
 
 					for (const std::unique_ptr<Reporter>& reporter: testContext.reporters)
 					{

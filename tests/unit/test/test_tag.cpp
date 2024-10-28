@@ -122,6 +122,11 @@ namespace
 			{
 				throw std::runtime_error("This test should not be run");
 			};
+
+			co_yield TODO / "todo"_test = [](const Requirements&)
+			{
+				throw std::runtime_error("This test should not be run");
+			};
 		});
 	SuiteRegistrar _(SUITE);
 }

@@ -251,7 +251,7 @@ namespace synodic::honesty::test
 				const log::Logger& logger = logger_.get();
 
 				std::string styledToDo = format(log::TextStyle(log::Colour24(255, 255, 0)), "TODO");
-				std::string styledName = format(log::TextStyle(log::Colour24(255, 255, 0)), event.name);
+				std::string styledName = format(log::TextStyle(log::Colour24(255, 255, 0)), "{}", event.name);
 
 				logger.Info("{}: Implement '{}' test", styledToDo, styledName);
 			}

@@ -53,6 +53,25 @@ namespace synodic::honesty::test
 		// Top level command storage
 		using TopType = std::variant<std::monostate, command::Execute, SubType>;
 
+		static constexpr std::size_t SUB_TYPE_COUNT = std::variant_size_v<SubType>;
+
+		struct SubCommandMetaData
+		{
+			consteval SubCommandMetaData(const std::string_view name, const std::size_t index) :
+				name(name),
+				index(index)
+			{
+			}
+
+			consteval std::size_t Index() const
+			{
+				return index;
+			}
+
+			std::string_view name;
+			std::size_t index;
+		};
+
 	public:
 		enum class Result : std::uint8_t
 		{
@@ -106,7 +125,17 @@ namespace synodic::honesty::test
 				if (const std::string_view possibleSubCommand = arguments[1];
 					not possibleSubCommand.starts_with("-") and not possibleSubCommand.starts_with("--"))
 				{
-					SearchSubCommand(possibleSubCommand, commandConfiguration);
+					for (auto index = 0; index < SUB_COMMAND_DATA.size(); ++index)
+					{
+						const SubCommandMetaData& metaData = SUB_COMMAND_DATA[index];
+						if (metaData.name == possibleSubCommand)
+						{
+							using CommandType = std::variant_alternative_t<metaData.Index(), SubType>;
+
+							command_.emplace<SubType>(std::in_place_type<CommandType>, commandConfiguration);
+							break;
+						}
+					}
 				}
 			}
 
@@ -159,6 +188,11 @@ namespace synodic::honesty::test
 			return {};
 		}
 
+		static std::span<const SubCommandMetaData> SubCommands()
+		{
+			return SUB_COMMAND_DATA;
+		}
+
 		Result Execute()
 		{
 			try
@@ -205,26 +239,27 @@ namespace synodic::honesty::test
 		}
 
 	private:
-		template<std::size_t Index = 0>
-		void SearchSubCommand(
-			const std::string_view possibleSubCommand,
-			const command::Configuration& commandConfiguration)
+		/**
+		 * @brief Populate the subcommands for the instance so that we can search for them later.
+		 * @return The populated subcommand metadata
+		 */
+		[[nodiscard]] static consteval std::array<SubCommandMetaData, SUB_TYPE_COUNT> PopulateSubCommands()
 		{
-			constexpr std::size_t size = std::variant_size_v<SubType>;
-
-			if constexpr (Index < size)
+			auto populate = []<std::size_t... Indices>(
+								std::index_sequence<Indices...>) -> std::array<SubCommandMetaData, SUB_TYPE_COUNT>
 			{
-				using CommandType = std::variant_alternative_t<Index, SubType>;
+				return {PopulateSubCommand<Indices>()...};
+			};
 
-				if (const std::string_view commandName = CommandType::NAME; commandName == possibleSubCommand)
-				{
-					command_.emplace<SubType>(std::in_place_type<CommandType>, commandConfiguration);
-				}
-				else
-				{
-					SearchSubCommand<Index + 1>(possibleSubCommand, commandConfiguration);
-				}
-			}
+			return populate(std::make_index_sequence<SUB_TYPE_COUNT>());
+		}
+
+		template<std::size_t Index = 0>
+		static consteval SubCommandMetaData PopulateSubCommand()
+		{
+			using CommandType = std::variant_alternative_t<Index, SubType>;
+
+			return SubCommandMetaData(CommandType::NAME, Index);
 		}
 
 		/**
@@ -331,5 +366,7 @@ namespace synodic::honesty::test
 
 		std::unique_ptr<Runner> runner_;
 		std::vector<std::unique_ptr<Reporter>> reporters_;
+
+		static constexpr std::array<SubCommandMetaData, SUB_TYPE_COUNT> SUB_COMMAND_DATA = PopulateSubCommands();
 	};
 }

@@ -17,7 +17,10 @@ namespace
 		{
 			co_yield "subcommand_delegation"_test = [&](const Requirements& requirements)
 			{
-				constexpr std::size_t size = std::variant_size_v<SubType>;
+				for (const auto& commandMetaData: Instance::SubCommands())
+				{
+
+				}
 			};
 
 			// We generate a string from the path to the temporary file for comparison.
@@ -26,7 +29,7 @@ namespace
 			co_yield "list_json"_test = [&](const Requirements& requirements)
 			{
 				const auto path = temporaryPath.generic_string();
-				std::array<std::string_view, 5> arguments{"fakeEXE", "list", "--json", "--file", path};
+				std::array<std::string_view, 5> arguments {"fakeEXE", "list", "--json", "--file", path};
 
 				std::stringstream stringStream;
 				synodic::honesty::log::OStream<std::mutex> stream(stringStream);

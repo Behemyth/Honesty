@@ -36,6 +36,19 @@ namespace
 
 	template<typename T, typename V>
 	concept type_in_variant = TypeInVariant<T, V>::value;
+
+	// Helper template to iterate over the types in a std::variant
+	template<typename Variant, typename Callable, std::size_t Index = 0>
+	constexpr void ForEachType(Callable&& callable)
+	{
+		if constexpr (Index < std::variant_size_v<Variant>)
+		{
+			using Type = std::variant_alternative_t<Index, Variant>;
+			callable(std::integral_constant<std::size_t, Index> {}, std::type_identity<Type>{});
+			ForEachType<Variant, Callable, Index + 1>(std::forward<Callable>(callable));
+		}
+	}
+
 }
 
 namespace synodic::honesty::test
@@ -125,17 +138,15 @@ namespace synodic::honesty::test
 				if (const std::string_view possibleSubCommand = arguments[1];
 					not possibleSubCommand.starts_with("-") and not possibleSubCommand.starts_with("--"))
 				{
-					for (auto index = 0; index < SUB_COMMAND_DATA.size(); ++index)
-					{
-						const SubCommandMetaData& metaData = SUB_COMMAND_DATA[index];
-						if (metaData.name == possibleSubCommand)
+					ForEachType<SubType>(
+						[&](auto index, auto type)
 						{
-							using CommandType = std::variant_alternative_t<metaData.Index(), SubType>;
-
-							command_.emplace<SubType>(std::in_place_type<CommandType>, commandConfiguration);
-							break;
-						}
-					}
+							using Type = typename decltype(type)::type;
+							if (Type::NAME == possibleSubCommand)
+							{
+								command_.emplace<SubType>(std::in_place_type<Type>, commandConfiguration);
+							}
+						});
 				}
 			}
 
@@ -188,11 +199,6 @@ namespace synodic::honesty::test
 			return {};
 		}
 
-		static std::span<const SubCommandMetaData> SubCommands()
-		{
-			return SUB_COMMAND_DATA;
-		}
-
 		Result Execute()
 		{
 			try
@@ -239,29 +245,6 @@ namespace synodic::honesty::test
 		}
 
 	private:
-		/**
-		 * @brief Populate the subcommands for the instance so that we can search for them later.
-		 * @return The populated subcommand metadata
-		 */
-		[[nodiscard]] static consteval std::array<SubCommandMetaData, SUB_TYPE_COUNT> PopulateSubCommands()
-		{
-			auto populate = []<std::size_t... Indices>(
-								std::index_sequence<Indices...>) -> std::array<SubCommandMetaData, SUB_TYPE_COUNT>
-			{
-				return {PopulateSubCommand<Indices>()...};
-			};
-
-			return populate(std::make_index_sequence<SUB_TYPE_COUNT>());
-		}
-
-		template<std::size_t Index = 0>
-		static consteval SubCommandMetaData PopulateSubCommand()
-		{
-			using CommandType = std::variant_alternative_t<Index, SubType>;
-
-			return SubCommandMetaData(CommandType::NAME, Index);
-		}
-
 		/**
 		 * @brief Resolve the configuration into a command configuration to be passed to the instantiated command.
 		 * @return The resolved command configuration.
@@ -366,7 +349,5 @@ namespace synodic::honesty::test
 
 		std::unique_ptr<Runner> runner_;
 		std::vector<std::unique_ptr<Reporter>> reporters_;
-
-		static constexpr std::array<SubCommandMetaData, SUB_TYPE_COUNT> SUB_COMMAND_DATA = PopulateSubCommands();
 	};
 }

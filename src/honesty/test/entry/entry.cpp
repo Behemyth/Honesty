@@ -1,7 +1,7 @@
 import std;
 
 import synodic.honesty.log;
-import synodic.honesty.test.commands;
+import synodic.honesty.test.api;
 
 auto main(const int argc, const char* argv[]) -> int
 {
@@ -18,12 +18,15 @@ auto main(const int argc, const char* argv[]) -> int
 
 	synodic::honesty::log::Console sink;
 
-	const unsigned int threadCount = std::thread::hardware_concurrency();
-
-	const synodic::honesty::test::Instance::Configuration configuration("honesty", &sink, threadCount);
-	synodic::honesty::test::Instance command(configuration, arguments);
-
-	command.Execute();
+	const synodic::honesty::test::api::ExecuteParameters configuration(
+		"honesty",
+		"",
+		runner,
+		reporters,
+		false,
+		header,
+		logger);
+	synodic::honesty::test::api::ExecuteResult result = Execute(configuration);
 
 	return 0;
 }

@@ -11,3 +11,11 @@ target_sources(honesty
 		FILE_SET test_api_private
 		TYPE CXX_MODULES
 )
+
+add_subdirectory(
+	runner
+)
+
+add_subdirectory(
+	reporter
+)

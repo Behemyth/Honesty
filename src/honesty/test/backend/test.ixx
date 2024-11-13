@@ -2,7 +2,6 @@ export module synodic.honesty.test.backend:test;
 
 import std;
 
-import generator;
 import function_ref;
 import inplace_vector;
 

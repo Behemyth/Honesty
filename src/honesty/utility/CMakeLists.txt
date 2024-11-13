@@ -9,7 +9,6 @@ target_sources(honesty
 			utility.ixx
 			inplace_vector.ixx
 			inplace_string.ixx
-			generator.ixx
 			function_ref.ixx
 			fixed_string.ixx
 			traits.ixx

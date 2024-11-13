@@ -18,6 +18,8 @@ auto main(const int argc, const char* argv[]) -> int
 
 	synodic::honesty::log::Console sink;
 
+	synodic::honesty::test::StandardRunner runner();
+	synodic::honesty::test::StandardReporter reporter();
 	const synodic::honesty::test::api::ExecuteParameters configuration(
 		"honesty",
 		"",

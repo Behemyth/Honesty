@@ -1,4 +1,4 @@
-export module synodic.honesty.test.commands:runner.standard;
+export module synodic.honesty.test.api:runner.standard;
 
 import std;
 import synodic.honesty.test;

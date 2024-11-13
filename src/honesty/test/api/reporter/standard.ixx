@@ -1,4 +1,4 @@
-export module synodic.honesty.test.commands:reporter.standard;
+export module synodic.honesty.test.api:reporter.standard;
 
 import synodic.honesty.log;
 import synodic.honesty.test;

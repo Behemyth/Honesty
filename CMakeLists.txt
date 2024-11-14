@@ -11,15 +11,8 @@ option(BUILD_TESTING "Build the tests verifying Honesty functionality" ON)
 # Register our custom module location with CMake
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/tool/cmake/modules")
 
-# Warn the user that they are not running inside a virtual environment
-if(NOT DEFINED ENV{VIRTUAL_ENV})
-	message(WARNING
-		" You are not running CMake inside a Python virtual environment."
-		" This may cause issues with the build."
-	)
-endif()
 
-# Make sure we only search for the virtual environment
+# Make sure we only search for the virtual environment if we are in one
 set(Python3_FIND_VIRTUALENV ONLY)
 set(Python3_FIND_STRATEGY LOCATION)
 

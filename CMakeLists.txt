@@ -11,6 +11,21 @@ option(BUILD_TESTING "Build the tests verifying Honesty functionality" ON)
 # Register our custom module location with CMake
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/tool/cmake/modules")
 
+# Warn the user that they are not running inside a virtual environment
+if(NOT DEFINED ENV{VIRTUAL_ENV})
+	message(WARNING
+		" You are not running CMake inside a Python virtual environment."
+		" This may cause issues with the build."
+	)
+endif()
+
+# Make sure we only search for the virtual environment
+set(Python3_FIND_VIRTUALENV ONLY)
+set(Python3_FIND_STRATEGY LOCATION)
+
+# Search for python and enable the modules required by 'nanobind'.
+find_package(Python3 3.13 REQUIRED COMPONENTS Interpreter Development.Module)
+
 # Provide the main library
 add_library(honesty STATIC)
 add_library(synodic::honesty ALIAS honesty)
@@ -21,17 +36,17 @@ add_library(synodic::honesty::main ALIAS honesty_main)
 
 set_target_properties(honesty honesty_main
 	PROPERTIES
-		LINKER_LANGUAGE CXX
-		CXX_STANDARD 23
-		CXX_STANDARD_REQUIRED ON
-		CXX_EXTENSIONS NO
-		FOLDER "honesty"
+	LINKER_LANGUAGE CXX
+	CXX_STANDARD 23
+	CXX_STANDARD_REQUIRED ON
+	CXX_EXTENSIONS NO
+	FOLDER "honesty"
 )
 
 # Link the main library to the convenience variant
 target_link_libraries(honesty_main
 	PUBLIC
-		synodic::honesty
+	synodic::honesty
 )
 
 # Gather and define all the project and subproject sources
@@ -40,12 +55,11 @@ add_subdirectory(
 )
 
 # NOTE: For IDE setups that do not use CMake directly, we setup all IDE directories to mimic
-#	their system directory structure. See https://gitlab.kitware.com/cmake/cmake/-/issues/25992
-
+# their system directory structure. See https://gitlab.kitware.com/cmake/cmake/-/issues/25992
 file(GLOB_RECURSE file_list ${CMAKE_CURRENT_SOURCE_DIR}/src/*)
 
 # Must be called from the target definition directory. Only matched against 'target_sources'
-#	files (No nested CMakeList.txt, docs, etc).
+# files (No nested CMakeList.txt, docs, etc).
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src FILES ${file_list})
 
 if(BUILD_TESTING)

@@ -12,26 +12,26 @@ readme = "README.md"
 
 dynamic = ["version"]
 
-dependencies = []
+dependencies = ["nanobind>=2.2.0"]
 requires-python = ">=3.13"
 
 [project.urls]
 homepage = "https://github.com/Synodic-Software/Honesty"
 repository = "https://github.com/Synodic-Software/Honesty"
 
-[tool.pdm.dev-dependencies]
+[dependency-groups]
 dev = [
-  "cmake>=3.29.0",
+  "cmake>=3.31.0",
 ]
 lint = [
   "black>=24.3.0",
   "pylint>=3.1.0",
   "isort>=5.13.2",
-  "mypy>=1.9.0",
+  "mypy>=1.13.0",
 ]
 test = [
   "pytest>=8.0.2",
-  "pytest-cov>=4.1.0",
+  "pytest-cov>=6.0.0",
   "pytest-click>=1.1",
   "pytest-mock>=3.12.0",
 ]

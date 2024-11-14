@@ -30,10 +30,6 @@ For defining and implementing tests.
 
 Direct access to the test API
 
-==== `synodic.honesty.test.commands`
-
-Frontend for running tests from the command line. Includes an Instance entrypoint for all commands. Also includes wrappers for each individual command and subcommand with utilities to create your own
-
 ---
 
 === Private Modules

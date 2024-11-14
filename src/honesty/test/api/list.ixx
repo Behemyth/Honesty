@@ -45,7 +45,7 @@ namespace synodic::honesty::test::api
 		explicit ListParameters(
 			const std::string_view applicationName,
 			Runner& runner,
-			std::string_view header,
+			const std::string_view header,
 			const log::Logger& logger) :
 			applicationName(applicationName),
 			runner(runner),

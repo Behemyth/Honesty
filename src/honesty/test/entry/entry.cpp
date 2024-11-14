@@ -18,16 +18,17 @@ auto main(const int argc, const char* argv[]) -> int
 
 	synodic::honesty::log::Console sink;
 
-	synodic::honesty::test::StandardRunner runner();
-	synodic::honesty::test::StandardReporter reporter();
-	const synodic::honesty::test::api::ExecuteParameters configuration(
-		"honesty",
-		"",
-		runner,
-		reporters,
-		false,
-		header,
-		logger);
+	synodic::honesty::log::Logger logger = synodic::honesty::log::RootLogger().CreateLogger("main");
+
+	logger.SetSink(&sink);
+
+	synodic::honesty::test::StandardRunner runner(logger);
+
+	std::array<std::unique_ptr<synodic::honesty::test::Reporter>, 1> reporters{
+		std::make_unique<synodic::honesty::test::StandardReporter>(logger)};
+
+	const synodic::honesty::test::api::ExecuteParameters
+		configuration("honesty", "", runner, reporters, false, {}, logger);
 	synodic::honesty::test::api::ExecuteResult result = Execute(configuration);
 
 	return 0;

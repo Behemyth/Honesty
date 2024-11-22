@@ -84,7 +84,7 @@ nanobind_compile_options(honesty_bindings)
 
 nanobind_link_options(honesty_bindings)
 
-# Gather and define all the project and subproject sources
+# Gather and define all the project and sub-project sources
 add_subdirectory(
 	src
 )

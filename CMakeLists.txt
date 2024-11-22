@@ -11,13 +11,28 @@ option(BUILD_TESTING "Build the tests verifying Honesty functionality" ON)
 # Register our custom module location with CMake
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/tool/cmake/modules")
 
-
+# TODO: Make this variables configurable only in CMakePresets.json
 # Make sure we only search for the virtual environment if we are in one
 set(Python3_FIND_VIRTUALENV ONLY)
 set(Python3_FIND_STRATEGY LOCATION)
 
+set(VENV_PATH "${PROJECT_SOURCE_DIR}/.venv")
+set(ENV{VIRTUAL_ENV} "${VENV_PATH}")
+
+
 # Search for python and enable the modules required by 'nanobind'.
-find_package(Python3 3.13 REQUIRED COMPONENTS Interpreter Development.Module)
+# NOTE: CMake will only find our virtual interpreter if we are in its virtual environment
+find_package(Python 3.13 REQUIRED COMPONENTS Interpreter Development.Module)
+
+# Detect the installed nanobind package and import it into CMake
+execute_process(
+	COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
+	OUTPUT_STRIP_TRAILING_WHITESPACE
+	OUTPUT_VARIABLE nanobind_ROOT
+	COMMAND_ERROR_IS_FATAL ANY
+)
+
+find_package(nanobind CONFIG REQUIRED)
 
 # Provide the main library
 add_library(honesty STATIC)

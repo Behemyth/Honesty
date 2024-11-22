@@ -19,7 +19,6 @@ set(Python3_FIND_STRATEGY LOCATION)
 set(VENV_PATH "${PROJECT_SOURCE_DIR}/.venv")
 set(ENV{VIRTUAL_ENV} "${VENV_PATH}")
 
-
 # Search for python and enable the modules required by 'nanobind'.
 # NOTE: CMake will only find our virtual interpreter if we are in its virtual environment
 find_package(Python 3.13 REQUIRED COMPONENTS Interpreter Development.Module)
@@ -42,7 +41,11 @@ add_library(synodic::honesty ALIAS honesty)
 add_library(honesty_main STATIC)
 add_library(synodic::honesty::main ALIAS honesty_main)
 
-set_target_properties(honesty honesty_main
+# Provide the Python bindings module
+add_library(honesty_bindings MODULE)
+add_library(synodic::honesty::bindings ALIAS honesty_bindings)
+
+set_target_properties(honesty honesty_main honesty_bindings
 	PROPERTIES
 	LINKER_LANGUAGE CXX
 	CXX_STANDARD 23
@@ -51,11 +54,35 @@ set_target_properties(honesty honesty_main
 	FOLDER "honesty"
 )
 
+# Link the Python bindings to nanobind
+target_link_libraries(honesty_bindings
+	PRIVATE
+	nanobind
+	synodic::honesty
+)
+
 # Link the main library to the convenience variant
 target_link_libraries(honesty_main
 	PUBLIC
 	synodic::honesty
 )
+
+# Optimization flags for size
+nanobind_opt_size(honesty_bindings)
+
+# Set the visibility of the bindings to hidden
+nanobind_set_visibility(honesty_bindings)
+
+# Strip the bindings module of symbols for release builds
+nanobind_strip(honesty_bindings)
+
+nanobind_disable_stack_protector(honesty_bindings)
+
+nanobind_extension(honesty_bindings)
+
+nanobind_compile_options(honesty_bindings)
+
+nanobind_link_options(honesty_bindings)
 
 # Gather and define all the project and subproject sources
 add_subdirectory(

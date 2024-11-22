@@ -19,3 +19,8 @@ add_subdirectory(
 add_subdirectory(
 	reporter
 )
+
+target_sources(honesty_bindings
+PUBLIC
+	bindings.cpp
+)

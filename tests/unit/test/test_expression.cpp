@@ -17,7 +17,7 @@ namespace
 
 			co_yield "error_description"_test = [&]() -> Generator
 			{
-				// Tests callable for error message
+				// Tests callable for error message        
 				const auto description = []() -> std::string
 				{
 					return "This outputs only on error";

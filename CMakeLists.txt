@@ -42,10 +42,9 @@ add_library(honesty_main STATIC)
 add_library(synodic::honesty::main ALIAS honesty_main)
 
 # Provide the Python bindings module
-add_library(honesty_bindings MODULE)
-add_library(synodic::honesty::bindings ALIAS honesty_bindings)
+nanobind_add_module(honesty_bindings src/bindings/bindings.cpp)
 
-set_target_properties(honesty honesty_main honesty_bindings
+set_target_properties(honesty honesty_main
 	PROPERTIES
 	LINKER_LANGUAGE CXX
 	CXX_STANDARD 23
@@ -54,10 +53,9 @@ set_target_properties(honesty honesty_main honesty_bindings
 	FOLDER "honesty"
 )
 
-# Link the Python bindings to nanobind
+# Link our library to the bindings
 target_link_libraries(honesty_bindings
 	PRIVATE
-	nanobind
 	synodic::honesty
 )
 
@@ -66,23 +64,6 @@ target_link_libraries(honesty_main
 	PUBLIC
 	synodic::honesty
 )
-
-# Optimization flags for size
-nanobind_opt_size(honesty_bindings)
-
-# Set the visibility of the bindings to hidden
-nanobind_set_visibility(honesty_bindings)
-
-# Strip the bindings module of symbols for release builds
-nanobind_strip(honesty_bindings)
-
-nanobind_disable_stack_protector(honesty_bindings)
-
-nanobind_extension(honesty_bindings)
-
-nanobind_compile_options(honesty_bindings)
-
-nanobind_link_options(honesty_bindings)
 
 # Gather and define all the project and sub-project sources
 add_subdirectory(

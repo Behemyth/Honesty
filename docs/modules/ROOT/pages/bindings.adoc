@@ -1,0 +1,4 @@
+= Python Bindings
+
+*At some point these binding will use C++26 reflection to generate the bindings automatically.*
+

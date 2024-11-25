@@ -28,25 +28,6 @@ export module inplace_vector;
 
 import std;
 
-// Optimizer allowed to assume that EXPR evaluates to true
-#define __IV_ASSUME(__EXPR) \
-    static_cast<void>((__EXPR) ? void(0) : __builtin_unreachable)
-
-// Assert pretty printer
-#define __IV_ASSERT(...)                                                      \
-    static_cast<void>((__VA_ARGS__)                                           \
-                          ? void(0)                                           \
-                          : ::std::__iv_detail::__assert_failure(             \
-                                static_cast<const char*>(__FILE__), __LINE__, \
-                                "assertion failed: " #__VA_ARGS__))
-
-// Assert in debug, assume in release.
-#ifdef NDEBUG
-#define __IV_EXPECT(__EXPR) __IV_ASSUME(__EXPR)
-#else
-#define __IV_EXPECT(__EXPR) __IV_ASSERT(__EXPR)
-#endif
-
 // BUGBUG workaround for libstdc++ not providing from_range_t / from_range yet
 namespace std {
     #if defined(__GLIBCXX__) || defined(__GLIBCPP__)
@@ -81,7 +62,6 @@ template <ranges::random_access_range __Rng, integral __Index>
 static constexpr decltype(auto) __index(__Rng&& __rng, __Index __i) noexcept 
   requires(ranges::sized_range<__Rng>) 
 {
-    __IV_EXPECT(static_cast<ptrdiff_t>(__i) < ranges::size(__rng));
     return begin(::std::forward<__Rng>(__rng))[::std::forward<__Index>(__i)];
 }
 
@@ -105,11 +85,9 @@ template <class __T, size_t __N>
 struct __aligned_storage2 {
     alignas(__T) byte __d[sizeof(__T) * __N];
     constexpr __T* __data(size_t __i) noexcept {
-        __IV_EXPECT(__i < __N);
         return reinterpret_cast<__T*>(__d) + __i;
     }
     constexpr const __T* __data(size_t __i) const noexcept {
-        __IV_EXPECT(__i < __N);
         return reinterpret_cast<const __T*>(__d) + __i;
     }
 }; 
@@ -122,7 +100,6 @@ struct __zero_sized {
     static constexpr __T* __data() noexcept { return nullptr; }
     static constexpr __size_type __size() noexcept { return 0; }
     static constexpr void __unsafe_set_size(size_t __new_size) noexcept {
-        __IV_EXPECT(__new_size == 0 && "tried to change size of empty storage to non-zero value");
     }
   public:
     constexpr __zero_sized()                             = default;
@@ -153,7 +130,6 @@ struct __trivial {
     constexpr __T* __data() noexcept { return __data_.data(); }
     constexpr __size_type __size() const noexcept { return __size_; }
     constexpr void __unsafe_set_size(size_t __new_size) noexcept {
-        __IV_EXPECT(__size_type(__new_size) <= __N && "new_size out-of-bounds [0, N]");
         __size_ = __size_type(__new_size);
     }
   public:
@@ -183,7 +159,6 @@ struct __non_trivial {
     constexpr __T* __data() noexcept { return __data_.__data(0); }
     constexpr __size_type __size() const noexcept { return __size_; }
     constexpr void __unsafe_set_size(size_t __new_size) noexcept {
-        __IV_EXPECT(__size_type(__new_size) <= __N && "new_size out-of-bounds [0, __N)");
         __size_ = __size_type(__new_size);
     }
   public:
@@ -340,11 +315,8 @@ struct inplace_vector : private __iv_detail::__storage::_t<__T, __N> {
   private: // Utilities
 
     constexpr void __assert_iterator_in_range(const_iterator __it) noexcept {        
-        __IV_EXPECT(begin() <= __it && "iterator not in range");
-        __IV_EXPECT(__it <= end() && "iterator not in range");
     }
     constexpr void __assert_valid_iterator_pair(const_iterator __first, const_iterator __last) noexcept {
-        __IV_EXPECT(__first <= __last && "invalid iterator pair");
     }
     constexpr void __assert_iterator_pair_in_range(const_iterator __first, const_iterator __last) noexcept {
         __assert_iterator_in_range(__first);
@@ -368,7 +340,6 @@ struct inplace_vector : private __iv_detail::__storage::_t<__T, __N> {
     constexpr __T& unchecked_emplace_back(__Args&&... __args)
       requires(constructible_from<__T, __Args...>) 
     {
-        __IV_EXPECT(size() < capacity() && "inplace_vector out-of-memory");
         construct_at(end(), ::std::forward<__Args>(__args)...);
         __unsafe_set_size(size() + size_type(1));
         return back();
@@ -584,7 +555,6 @@ struct inplace_vector : private __iv_detail::__storage::_t<__T, __N> {
 
     constexpr void pop_back() 
     {
-        __IV_EXPECT(size() > 0 && "pop_back from empty inplace_vector!");
         __unsafe_destroy(end() - 1, end());
         __unsafe_set_size(size() - 1);
     }
@@ -669,8 +639,3 @@ struct inplace_vector : private __iv_detail::__storage::_t<__T, __N> {
 };
 
 }  // namespace std
-
-// undefine all the internal macros
-#undef __IV_ASSUME
-#undef __IV_ASSERT
-#undef __IV_EXPECT

@@ -1,7 +1,6 @@
 [project]
 description = "Profiling, testing, and benchmarking"
 name = "honesty"
-version = "0.1.0"
 
 license = {text = "MIT"}
 
@@ -11,11 +10,12 @@ authors = [
 
 readme = "README.md"
 
+dynamic = ["version"]
+
 dependencies = [
   "pytest>=8.3.3",
   "pytest-cmake>=0.11.1",
   "cmake>=3.31.1",
-  "scikit-build-core>=0.10.7",
 ]
 requires-python = ">=3.13"
 
@@ -96,5 +96,5 @@ build = {shell = "cppython build"}
 test = {shell = "cppython test"}
 
 [build-system]
-build-backend = "scikit_build_core.build"
-requires = ["scikit-build-core", "nanobind"]
+build-backend = "pdm.backend"
+requires = ["pdm.backend"]

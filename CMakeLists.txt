@@ -8,18 +8,12 @@ project(honesty
 
 option(BUILD_TESTING "Build the tests verifying Honesty functionality" ON)
 
-# Register our custom module location with CMake
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/tool/cmake/modules")
-
-if (NOT SKBUILD)
-	message(FATAL_ERROR
-	" The project is being built outside of the 'scikit-build' environment."
-	)
-endif()
-
-# Search for python and enable the modules required by 'nanobind'.
+# Search for python and enable the modules required for the build backend
 # NOTE: CMake will only find our virtual interpreter if we are in its virtual environment
 find_package(Python 3.13 REQUIRED COMPONENTS Interpreter Development.Module)
+
+# Register our custom module location with CMake
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/tool/cmake/modules")
 
 # Register our environment location with CMake for Find utilities
 list(APPEND CMAKE_PREFIX_PATH "$ENV{VIRTUAL_ENV}")

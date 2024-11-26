@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.29 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.30 FATAL_ERROR)
 
 project(honesty
 	VERSION 0.1.0
@@ -16,12 +16,12 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/tool/cmake/modules")
 set(Python3_FIND_VIRTUALENV ONLY)
 set(Python3_FIND_STRATEGY LOCATION)
 
-set(VENV_PATH "${PROJECT_SOURCE_DIR}/.venv")
-set(ENV{VIRTUAL_ENV} "${VENV_PATH}")
-
 # Search for python and enable the modules required by 'nanobind'.
 # NOTE: CMake will only find our virtual interpreter if we are in its virtual environment
 find_package(Python 3.13 REQUIRED COMPONENTS Interpreter Development.Module)
+
+# Register our venv location with CMake
+list(APPEND CMAKE_PREFIX_PATH "$ENV{VIRTUAL_ENV}")
 
 # Detect the installed nanobind package and import it into CMake
 execute_process(
@@ -32,6 +32,8 @@ execute_process(
 )
 
 find_package(nanobind CONFIG REQUIRED)
+
+find_package(Pytest REQUIRED)
 
 # Provide the main library
 add_library(honesty STATIC)

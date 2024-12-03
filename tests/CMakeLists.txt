@@ -50,12 +50,16 @@ set_property(
 	VS_STARTUP_PROJECT tests
 )
 
-pytest_discover_tests(
-    PythonTest
-    LIBRARY_PATH_PREPEND
-        $<TARGET_FILE_DIR:tests>
-    PYTHON_PATH_PREPEND
-        $<TARGET_FILE_DIR:tests>
-	TRIM_FROM_NAME "^test_"
-    DEPENDS honesty_bindings
-)
+if(${SKBUILD})
+
+	pytest_discover_tests(
+		PythonTest
+		LIBRARY_PATH_PREPEND
+			$<TARGET_FILE_DIR:tests>
+		PYTHON_PATH_PREPEND
+			$<TARGET_FILE_DIR:tests>
+		TRIM_FROM_NAME "^test_"
+		DEPENDS honesty_bindings
+	)
+
+endif()

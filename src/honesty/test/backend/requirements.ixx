@@ -250,7 +250,11 @@ namespace synodic::honesty::test
 				const event::AssertionPass passed(location);
 
 				auto& logger = logger_.get();
-				logger.Trace("Exception: {}", exception.what());
+
+				const auto textStyle		= log::TextStyle(log::Colour24(255, 0, 0));
+				std::string exceptionHeader = format(textStyle, "Exception:");
+
+				logger.Trace("{} {}", exceptionHeader, exception.what());
 
 				Signal(passed);
 			}

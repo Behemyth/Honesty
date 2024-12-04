@@ -226,6 +226,7 @@ namespace synodic::honesty::test
 			std::size_t undefinedFailedAssertions = 0;
 
 			std::size_t skippedTests = 0;
+			std::size_t todoTests	 = 0;
 		};
 
 		SuiteState(const event::SuiteBegin& event, const log::Logger& logger) :
@@ -271,9 +272,13 @@ namespace synodic::honesty::test
 				std::string styledName = format(log::TextStyle(log::Colour24(255, 255, 0)), "{}", name);
 
 				logger.Info("{}: Implement '{}' test", styledToDo, styledName);
-			}
 
-			++output_.skippedTests;
+				++output_.todoTests;
+			}
+			else
+			{
+				++output_.skippedTests;
+			}
 		}
 
 		void Signal(const event::AssertionPass& event)
@@ -352,11 +357,13 @@ namespace synodic::honesty::test
 				 failedAssertions,
 				 undefinedPassedAssertions,
 				 undefinedFailedAssertions,
-				 skippedTests] = state.Summarize(event);
+				 skippedTests,
+				 todoTests] = state.Summarize(event);
 
 			assertionsPassedCount_ += passedAssertions;
 			assertionFailedCount_  += failedAssertions;
 			skippedTestsCount_	   += skippedTests;
+			todoTestsCount_		   += todoTests;
 
 			currentSuiteState_.reset();
 		}
@@ -403,10 +410,12 @@ namespace synodic::honesty::test
 			const auto SUCCESS_STYLE(log::TextStyle(log::Colour24(0, 255, 0)));
 			const auto FAILURE_STYLE(log::TextStyle(log::Colour24(255, 0, 0)));
 			const auto SKIP_STYLE(log::TextStyle(log::Colour24(128, 128, 128)));
+			const auto TODO_STYLE(log::TextStyle(log::Colour24(255, 255, 0)));
 
 			std::string passedStyled = format(SUCCESS_STYLE, "Passed");
 			std::string failedStyled = format(FAILURE_STYLE, "Failed");
 			std::string skipStyled	 = format(SKIP_STYLE, "Skipped");
+			std::string todoStyled	 = format(TODO_STYLE, "TODO");
 
 			logger.Info("{} Assertions {}", assertionsPassedCount_, passedStyled);
 
@@ -419,12 +428,18 @@ namespace synodic::honesty::test
 			{
 				logger.Info("{} Tests {}", skippedTestsCount_, skipStyled);
 			}
+
+			if (todoTestsCount_)
+			{
+				logger.Info("{} Tests Marked {}", todoTestsCount_, todoStyled);
+			}
 		}
 
 	private:
 		std::size_t assertionsPassedCount_ = 0;
 		std::size_t assertionFailedCount_  = 0;
 		std::size_t skippedTestsCount_	   = 0;
+		std::size_t todoTestsCount_		   = 0;
 
 		std::optional<SuiteState> currentSuiteState_;
 	};

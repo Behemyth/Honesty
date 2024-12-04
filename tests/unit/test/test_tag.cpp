@@ -60,8 +60,9 @@ namespace
 				}
 			};
 
-			co_yield "equality"_test = [](const Requirements& requirements)
+			co_yield TODO / "equality"_test = [](const Requirements& requirements)
 			{
+				// TODO: We need a way to skip the test without skipping it in the test runner
 				{
 					constexpr auto tag = SKIP;
 
@@ -106,7 +107,7 @@ namespace
 			co_yield "test"_test = [](const Requirements& requirements)
 			{
 				{
-					const Test test = SKIP / "test"_tag / "inner"_test = [](const Requirements&)
+					const Test test = TODO / "test"_tag / "inner"_test = [](const Requirements&)
 					{
 					};
 					requirements.ExpectEquals(test.Tags().size(), 2);
@@ -118,13 +119,16 @@ namespace
 				requirements.Expect(false);
 			};
 
-			co_yield SKIP / "skip"_test = [](const Requirements&)
+			co_yield TODO / "skip"_test = [](const Requirements&)
 			{
+				// TODO: We need a way to skip the test without skipping it in the test runner
+
 				throw std::runtime_error("This test should not be run");
 			};
 
 			co_yield TODO / "todo"_test = [](const Requirements&)
 			{
+				// TODO: We need a way to skip the test without skipping it in the test runner
 				throw std::runtime_error("This test should not be run");
 			};
 		});

@@ -8,27 +8,8 @@ project(honesty
 
 option(BUILD_TESTING "Build the tests verifying Honesty functionality" ON)
 
-# Search for python and enable the modules required for the build backend
-# NOTE: CMake will only find our virtual interpreter if we are in its virtual environment
-find_package(Python 3.13 REQUIRED COMPONENTS Interpreter Development.Module)
-
 # Register our custom module location with CMake
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/tool/cmake/modules")
-
-# Register our environment location with CMake for Find utilities
-list(APPEND CMAKE_PREFIX_PATH "$ENV{VIRTUAL_ENV}")
-
-# Detect the installed nanobind package and import it into CMake
-execute_process(
-	COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
-	OUTPUT_STRIP_TRAILING_WHITESPACE
-	OUTPUT_VARIABLE nanobind_ROOT
-	COMMAND_ERROR_IS_FATAL ANY
-)
-
-find_package(nanobind CONFIG REQUIRED)
-
-find_package(Pytest REQUIRED)
 
 # Provide the main library
 add_library(honesty STATIC)
@@ -38,9 +19,6 @@ add_library(synodic::honesty ALIAS honesty)
 add_library(honesty_main STATIC)
 add_library(synodic::honesty::main ALIAS honesty_main)
 
-# Provide the Python bindings module
-nanobind_add_module(honesty_bindings src/bindings/bindings.cpp)
-
 set_target_properties(honesty honesty_main
 	PROPERTIES
 	LINKER_LANGUAGE CXX
@@ -48,12 +26,6 @@ set_target_properties(honesty honesty_main
 	CXX_STANDARD_REQUIRED ON
 	CXX_EXTENSIONS NO
 	FOLDER "honesty"
-)
-
-# Link our library to the bindings
-target_link_libraries(honesty_bindings
-	PRIVATE
-	synodic::honesty
 )
 
 # Link the main library to the convenience variant

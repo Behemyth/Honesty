@@ -4,9 +4,12 @@ import std;
 
 namespace synodic::honesty::profile
 {
-	using Clock = std::conditional_t<
+	export using Clock = std::conditional_t<
 		std::chrono::high_resolution_clock::is_steady,
 		std::chrono::high_resolution_clock,
 		std::chrono::steady_clock>;
+
+	// A duration that can optionally exist
+	export using Duration = std::optional<Clock::duration>;
 
 }

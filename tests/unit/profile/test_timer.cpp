@@ -14,7 +14,7 @@ namespace
 			{
 				synodic::honesty::profile::Duration duration;
 
-				requirements.Expect(not duration.has_value());
+				requirements.Expect(not duration);
 
 				{
 					synodic::honesty::profile::Timer timer(duration);

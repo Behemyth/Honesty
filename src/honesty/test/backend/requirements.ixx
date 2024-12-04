@@ -251,10 +251,7 @@ namespace synodic::honesty::test
 
 				auto& logger = logger_.get();
 
-				const auto textStyle		= log::TextStyle(log::Colour24(255, 0, 0));
-				std::string exceptionHeader = format(textStyle, "Exception:");
-
-				logger.Trace("{} {}", exceptionHeader, exception.what());
+				logger.Trace("Expected Exception: {}", exception.what());
 
 				Signal(passed);
 			}

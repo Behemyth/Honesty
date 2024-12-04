@@ -2,14 +2,27 @@ export module synodic.honesty.benchmark:context;
 
 namespace synodic::honesty::benchmark
 {
-	class RegressionContext
+	/**
+	 *	@brief Base class for all internal benchmarking state
+	 */
+	class Context
+	{
+	};
+
+	/**
+	 *	@brief Context for iterative state
+	 */
+	class RegressionContext : public Context
 	{
 	public:
 
 	private:
 	};
 
-	class TimedContext
+	/**
+	 *	@brief Context for timed state
+	 */
+	class TimedContext : public Context
 	{
 	public:
 

@@ -5,6 +5,8 @@ target_sources(honesty
 		FILES
 			benchmark.ixx
 			context.ixx
+			types.ixx
+			timer.ixx
 	PRIVATE
 		FILE_SET benchmark_private
 		TYPE CXX_MODULES

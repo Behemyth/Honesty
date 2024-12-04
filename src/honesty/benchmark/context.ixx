@@ -12,7 +12,7 @@ namespace synodic::honesty::benchmark
 	/**
 	 *	@brief Context for iterative state
 	 */
-	class RegressionContext : public Context
+	export class RegressionContext : public Context
 	{
 	public:
 
@@ -22,7 +22,7 @@ namespace synodic::honesty::benchmark
 	/**
 	 *	@brief Context for timed state
 	 */
-	class TimedContext : public Context
+	export class TimedContext : public Context
 	{
 	public:
 

@@ -4,6 +4,7 @@ import std;
 
 import synodic.honesty.log;
 import synodic.honesty.test.backend;
+import synodic.honesty.benchmark;
 
 import function_ref;
 
@@ -100,68 +101,75 @@ namespace synodic::honesty::test::api
 			reporter->Signal(testBegin);
 		}
 
-		const Requirements requirements = testContext.CreateRequirements(testData.Name(), testOutcome);
+		benchmark::Duration duration;
 
-		auto testExecutor = Overload {
-			[&](const std::function_ref<void(const Requirements&)>& testCallback)
-			{
-				if (const bool todo = testData.Tag() == "todo"; testData.Tag() == "skip" || todo)
-				{
-					event::TestSkip testSkip;
-					testSkip.name = testData.Name();
-					testSkip.todo = todo;
-
-					for (const std::unique_ptr<Reporter>& reporter: testContext.reporters)
-					{
-						reporter->Signal(testSkip);
-					}
-
-					return;
-				}
-
-				if (not testContext.dryRun)
-				{
-					runner.Run(requirements, testCallback);
-				}
-			},
-			[&](const std::function_ref<Generator()>& testCallback)
-			{
-				Generator generator = runner.Run(testCallback);
-
-				std::span filter = testContext.filterViews;
-
-				// Move to the next filter part
-				filter = filter | std::ranges::views::drop(1);
-
-				for (const Test& test: generator)
-				{
-					TestContext newContext(
-						testContext.reporters,
-						testContext.logger.CreateLogger(test.Name()),
-						filter,
-						testContext.dryRun);
-
-					if (not ProcessTest(runner, static_cast<TestData>(test), newContext))
-					{
-						success = false;
-						break;
-					}
-				}
-			}};
-
-		// Start the recursive test execution
-		std::visit(testExecutor, testData.Variant());
-
-		// Get the output from the test
-		TestContext::OutputData testOutput = testContext.Output(requirements);
-
-		if (not testOutput.success)
 		{
-			success = false;
+			benchmark::Timer timer(duration);
+
+			const Requirements requirements = testContext.CreateRequirements(testData.Name(), testOutcome);
+
+			auto testExecutor = Overload {
+				[&](const std::function_ref<void(const Requirements&)>& testCallback)
+				{
+					if (const bool todo = testData.Tag() == "todo"; testData.Tag() == "skip" || todo)
+					{
+						event::TestSkip testSkip;
+						testSkip.name = testData.Name();
+						testSkip.todo = todo;
+
+						for (const std::unique_ptr<Reporter>& reporter: testContext.reporters)
+						{
+							reporter->Signal(testSkip);
+						}
+
+						return;
+					}
+
+					if (not testContext.dryRun)
+					{
+						runner.Run(requirements, testCallback);
+					}
+				},
+				[&](const std::function_ref<Generator()>& testCallback)
+				{
+					Generator generator = runner.Run(testCallback);
+
+					std::span filter = testContext.filterViews;
+
+					// Move to the next filter part
+					filter = filter | std::ranges::views::drop(1);
+
+					for (const Test& test: generator)
+					{
+						TestContext newContext(
+							testContext.reporters,
+							testContext.logger.CreateLogger(test.Name()),
+							filter,
+							testContext.dryRun);
+
+						if (not ProcessTest(runner, static_cast<TestData>(test), newContext))
+						{
+							success = false;
+							break;
+						}
+					}
+				}};
+
+			// Start the recursive test execution
+			std::visit(testExecutor, testData.Variant());
+
+			// Get the output from the test
+			TestContext::OutputData testOutput = testContext.Output(requirements);
+
+			if (not testOutput.success)
+			{
+				success = false;
+			}
 		}
 
 		event::TestEnd testEnd;
 		testEnd.name = testData.Name();
+		testEnd.duration = duration;
 
 		for (const std::unique_ptr<Reporter>& reporter: testContext.reporters)
 		{
@@ -198,43 +206,50 @@ namespace synodic::honesty::test::api
 			reporter->Signal(suiteBegin);
 		}
 
-		// Fixture lifetime should be for the whole suite
-		Fixture fixture = suiteContext.CreateFixture();
+		benchmark::Duration duration;
 
-		auto executor = Overload {
-			[&](const std::function_ref<Generator()> generator) -> Generator
-			{
-				return generator();
-			},
-			[&](const std::function_ref<Generator(Fixture&)>& generator) -> Generator
-			{
-				return generator(fixture);
-			}};
-
-		Generator generator = std::visit(executor, suite.Variant());
-
-		for (const Test& test: generator)
 		{
-			const auto& view = static_cast<TestData>(test);
+			benchmark::Timer timer(duration);
 
-			bool testSuccess = true;
+			// Fixture lifetime should be for the whole suite
+			Fixture fixture = suiteContext.CreateFixture();
 
-			TestContext testContext(
-				suiteContext.reporters,
-				suiteContext.logger.CreateLogger(view.Name()),
-				filter,
-				suiteContext.dryRun);
+			auto executor = Overload {
+				[&](const std::function_ref<Generator()> generator) -> Generator
+				{
+					return generator();
+				},
+				[&](const std::function_ref<Generator(Fixture&)>& generator) -> Generator
+				{
+					return generator(fixture);
+				}};
 
-			testSuccess = ProcessTest(runner, view, testContext);
+			Generator generator = std::visit(executor, suite.Variant());
 
-			if (not testSuccess)
+			for (const Test& test: generator)
 			{
-				success = false;
+				const auto& view = static_cast<TestData>(test);
+
+				bool testSuccess = true;
+
+				TestContext testContext(
+					suiteContext.reporters,
+					suiteContext.logger.CreateLogger(view.Name()),
+					filter,
+					suiteContext.dryRun);
+
+				testSuccess = ProcessTest(runner, view, testContext);
+
+				if (not testSuccess)
+				{
+					success = false;
+				}
 			}
 		}
 
 		event::SuiteEnd end;
 		end.name = suite.Name();
+		end.duration = duration;
 
 		for (const std::unique_ptr<Reporter>& reporter: suiteContext.reporters)
 		{
@@ -271,23 +286,26 @@ namespace synodic::honesty::test::api
 			reporter->Signal(initialize);
 		}
 
-		for (const SuiteData& suite: GetSuites())
+		benchmark::Duration duration;
 		{
-			SuiteContext suiteContext(
-				parameters.reporters,
-				logger.CreateLogger(threadName),
-				parameters.applicationName,
-				suite.Name(),
-				filterViews,
-				parameters.dryRun);
-
-			if (not ProcessSuite(parameters.runner, suite, suiteContext))
+			benchmark::Timer timer(duration);
+			for (const SuiteData& suite: GetSuites())
 			{
-				success = false;
+				SuiteContext suiteContext(
+					parameters.reporters,
+					logger.CreateLogger(threadName),
+					parameters.applicationName,
+					suite.Name(),
+					filterViews,
+					parameters.dryRun);
+
+				success |= ProcessSuite(parameters.runner, suite, suiteContext);
 			}
 		}
 
-		const event::Summary summary;
+		event::Summary summary;
+		summary.duration = duration;
+
 		for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
 		{
 			reporter->Signal(summary);

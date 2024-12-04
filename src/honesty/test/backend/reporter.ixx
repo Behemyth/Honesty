@@ -1,7 +1,7 @@
 export module synodic.honesty.test.backend:reporter;
 
 import synodic.honesty.log;
-
+import synodic.honesty.benchmark;
 import std;
 
 import function_ref;
@@ -46,6 +46,7 @@ namespace synodic::honesty::test
 		struct SuiteEnd
 		{
 			std::string_view name;
+			benchmark::Duration duration;
 		};
 
 		struct SuiteSkip
@@ -88,6 +89,7 @@ namespace synodic::honesty::test
 		struct TestEnd
 		{
 			std::string_view name;
+			benchmark::Duration duration;
 		};
 
 		struct TestSkip
@@ -189,6 +191,7 @@ namespace synodic::honesty::test
 
 		struct Summary
 		{
+			benchmark::Duration duration;
 		};
 	}
 

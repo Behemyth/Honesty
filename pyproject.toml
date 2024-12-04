@@ -25,6 +25,7 @@ repository = "https://github.com/Synodic-Software/Honesty"
 
 [dependency-groups]
 dev = [
+  "nanobind>=2.2.0",
   "cppython>=0.8.0",
 ]
 lint = [
@@ -94,11 +95,6 @@ update = ["--update-all"]
 build = {shell = "cppython build"}
 test = {shell = "cppython test"}
 
-[tool.scikit-build]
-metadata.version.provider = "scikit_build_core.metadata.setuptools_scm"
-
-[tool.setuptools_scm]
-
 [build-system]
-build-backend = "scikit_build_core.build"
-requires = ["scikit-build-core", "nanobind"]
+build-backend = "pdm.backend"
+requires = ["pdm.backend"]

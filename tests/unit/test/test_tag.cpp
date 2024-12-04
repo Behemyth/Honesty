@@ -62,7 +62,7 @@ namespace
 
 			co_yield TODO / "equality"_test = [](const Requirements& requirements)
 			{
-				// TODO: We need a way to skip the test without skipping it in the test runner
+				// TODO: We need a way to skip the test without logging it as a skip for debug purposes
 				{
 					constexpr auto tag = SKIP;
 

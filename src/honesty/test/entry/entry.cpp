@@ -21,6 +21,7 @@ auto main(const int argc, const char* argv[]) -> int
 	synodic::honesty::log::Logger logger = synodic::honesty::log::RootLogger().CreateLogger("main");
 
 	logger.SetSink(&sink);
+	logger.SetLevel(synodic::honesty::log::LevelType::INFO);
 
 	synodic::honesty::test::StandardRunner runner(logger);
 

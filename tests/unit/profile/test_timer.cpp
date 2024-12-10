@@ -13,15 +13,11 @@ namespace
 			co_yield "construction"_test = [](const synodic::honesty::test::Requirements& requirements)
 			{
 				synodic::honesty::profile::Duration duration;
-
-				requirements.Expect(not duration);
-
 				{
 					synodic::honesty::profile::Timer timer(duration);
 				}
 
-				requirements.Expect(duration.has_value());
-				requirements.ExpectGreater(duration.value().count(), 0);
+				requirements.ExpectGreater(duration.count(), 0);
 			};
 		});
 

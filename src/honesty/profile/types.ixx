@@ -9,7 +9,6 @@ namespace synodic::honesty::profile
 		std::chrono::high_resolution_clock,
 		std::chrono::steady_clock>;
 
-	// A duration that can optionally exist
-	export using Duration = std::optional<Clock::duration>;
+	export using Duration = Clock::duration;
 
 }

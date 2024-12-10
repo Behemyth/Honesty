@@ -4,6 +4,7 @@ import std;
 
 import synodic.honesty.log;
 import synodic.honesty.test.backend;
+import synodic.honesty.profile;
 
 import function_ref;
 
@@ -198,43 +199,50 @@ namespace synodic::honesty::test::api
 			reporter->Signal(suiteBegin);
 		}
 
-		// Fixture lifetime should be for the whole suite
-		Fixture fixture = suiteContext.CreateFixture();
+		profile::Duration duration;
 
-		auto executor = Overload {
-			[&](const std::function_ref<Generator()> generator) -> Generator
-			{
-				return generator();
-			},
-			[&](const std::function_ref<Generator(Fixture&)>& generator) -> Generator
-			{
-				return generator(fixture);
-			}};
-
-		Generator generator = std::visit(executor, suite.Variant());
-
-		for (const Test& test: generator)
 		{
-			const auto& view = static_cast<TestData>(test);
+			profile::Timer timer(duration);
 
-			bool testSuccess = true;
+			// Fixture lifetime should be for the whole suite
+			Fixture fixture = suiteContext.CreateFixture();
 
-			TestContext testContext(
-				suiteContext.reporters,
-				suiteContext.logger.CreateLogger(view.Name()),
-				filter,
-				suiteContext.dryRun);
+			auto executor = Overload {
+				[&](const std::function_ref<Generator()> generator) -> Generator
+				{
+					return generator();
+				},
+				[&](const std::function_ref<Generator(Fixture&)>& generator) -> Generator
+				{
+					return generator(fixture);
+				}};
 
-			testSuccess = ProcessTest(runner, view, testContext);
+			Generator generator = std::visit(executor, suite.Variant());
 
-			if (not testSuccess)
+			for (const Test& test: generator)
 			{
-				success = false;
+				const auto& view = static_cast<TestData>(test);
+
+				bool testSuccess = true;
+
+				TestContext testContext(
+					suiteContext.reporters,
+					suiteContext.logger.CreateLogger(view.Name()),
+					filter,
+					suiteContext.dryRun);
+
+				testSuccess = ProcessTest(runner, view, testContext);
+
+				if (not testSuccess)
+				{
+					success = false;
+				}
 			}
 		}
 
 		event::SuiteEnd end;
 		end.name = suite.Name();
+		end.duration = duration;
 
 		for (const std::unique_ptr<Reporter>& reporter: suiteContext.reporters)
 		{
@@ -281,10 +289,7 @@ namespace synodic::honesty::test::api
 				filterViews,
 				parameters.dryRun);
 
-			if (not ProcessSuite(parameters.runner, suite, suiteContext))
-			{
-				success = false;
-			}
+			success |= ProcessSuite(parameters.runner, suite, suiteContext);
 		}
 
 		const event::Summary summary;

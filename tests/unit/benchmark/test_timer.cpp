@@ -1,6 +1,6 @@
 import std;
 import synodic.honesty.test;
-import synodic.honesty.profile;
+import synodic.honesty.benchmark;
 
 using namespace synodic::honesty::test::literals;
 
@@ -12,9 +12,9 @@ namespace
 		{
 			co_yield "construction"_test = [](const synodic::honesty::test::Requirements& requirements)
 			{
-				synodic::honesty::profile::Duration duration;
+				synodic::honesty::benchmark::Duration duration;
 				{
-					synodic::honesty::profile::Timer timer(duration);
+					synodic::honesty::benchmark::Timer timer(duration);
 				}
 
 				requirements.ExpectGreater(duration.count(), 0);

@@ -4,7 +4,7 @@ import std;
 
 import synodic.honesty.log;
 import synodic.honesty.test.backend;
-import synodic.honesty.profile;
+import synodic.honesty.benchmark;
 
 import function_ref;
 
@@ -199,10 +199,10 @@ namespace synodic::honesty::test::api
 			reporter->Signal(suiteBegin);
 		}
 
-		profile::Duration duration;
+		benchmark::Duration duration;
 
 		{
-			profile::Timer timer(duration);
+			benchmark::Timer timer(duration);
 
 			// Fixture lifetime should be for the whole suite
 			Fixture fixture = suiteContext.CreateFixture();

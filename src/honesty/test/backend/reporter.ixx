@@ -89,6 +89,7 @@ namespace synodic::honesty::test
 		struct TestEnd
 		{
 			std::string_view name;
+			benchmark::Duration duration;
 		};
 
 		struct TestSkip
@@ -190,6 +191,7 @@ namespace synodic::honesty::test
 
 		struct Summary
 		{
+			benchmark::Duration duration;
 		};
 	}
 

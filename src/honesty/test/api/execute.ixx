@@ -101,68 +101,75 @@ namespace synodic::honesty::test::api
 			reporter->Signal(testBegin);
 		}
 
-		const Requirements requirements = testContext.CreateRequirements(testData.Name(), testOutcome);
+		benchmark::Duration duration;
 
-		auto testExecutor = Overload {
-			[&](const std::function_ref<void(const Requirements&)>& testCallback)
-			{
-				if (const bool todo = testData.Tag() == "todo"; testData.Tag() == "skip" || todo)
-				{
-					event::TestSkip testSkip;
-					testSkip.name = testData.Name();
-					testSkip.todo = todo;
-
-					for (const std::unique_ptr<Reporter>& reporter: testContext.reporters)
-					{
-						reporter->Signal(testSkip);
-					}
-
-					return;
-				}
-
-				if (not testContext.dryRun)
-				{
-					runner.Run(requirements, testCallback);
-				}
-			},
-			[&](const std::function_ref<Generator()>& testCallback)
-			{
-				Generator generator = runner.Run(testCallback);
-
-				std::span filter = testContext.filterViews;
-
-				// Move to the next filter part
-				filter = filter | std::ranges::views::drop(1);
-
-				for (const Test& test: generator)
-				{
-					TestContext newContext(
-						testContext.reporters,
-						testContext.logger.CreateLogger(test.Name()),
-						filter,
-						testContext.dryRun);
-
-					if (not ProcessTest(runner, static_cast<TestData>(test), newContext))
-					{
-						success = false;
-						break;
-					}
-				}
-			}};
-
-		// Start the recursive test execution
-		std::visit(testExecutor, testData.Variant());
-
-		// Get the output from the test
-		TestContext::OutputData testOutput = testContext.Output(requirements);
-
-		if (not testOutput.success)
 		{
-			success = false;
+			benchmark::Timer timer(duration);
+
+			const Requirements requirements = testContext.CreateRequirements(testData.Name(), testOutcome);
+
+			auto testExecutor = Overload {
+				[&](const std::function_ref<void(const Requirements&)>& testCallback)
+				{
+					if (const bool todo = testData.Tag() == "todo"; testData.Tag() == "skip" || todo)
+					{
+						event::TestSkip testSkip;
+						testSkip.name = testData.Name();
+						testSkip.todo = todo;
+
+						for (const std::unique_ptr<Reporter>& reporter: testContext.reporters)
+						{
+							reporter->Signal(testSkip);
+						}
+
+						return;
+					}
+
+					if (not testContext.dryRun)
+					{
+						runner.Run(requirements, testCallback);
+					}
+				},
+				[&](const std::function_ref<Generator()>& testCallback)
+				{
+					Generator generator = runner.Run(testCallback);
+
+					std::span filter = testContext.filterViews;
+
+					// Move to the next filter part
+					filter = filter | std::ranges::views::drop(1);
+
+					for (const Test& test: generator)
+					{
+						TestContext newContext(
+							testContext.reporters,
+							testContext.logger.CreateLogger(test.Name()),
+							filter,
+							testContext.dryRun);
+
+						if (not ProcessTest(runner, static_cast<TestData>(test), newContext))
+						{
+							success = false;
+							break;
+						}
+					}
+				}};
+
+			// Start the recursive test execution
+			std::visit(testExecutor, testData.Variant());
+
+			// Get the output from the test
+			TestContext::OutputData testOutput = testContext.Output(requirements);
+
+			if (not testOutput.success)
+			{
+				success = false;
+			}
 		}
 
 		event::TestEnd testEnd;
 		testEnd.name = testData.Name();
+		testEnd.duration = duration;
 
 		for (const std::unique_ptr<Reporter>& reporter: testContext.reporters)
 		{
@@ -279,20 +286,26 @@ namespace synodic::honesty::test::api
 			reporter->Signal(initialize);
 		}
 
-		for (const SuiteData& suite: GetSuites())
+		benchmark::Duration duration;
 		{
-			SuiteContext suiteContext(
-				parameters.reporters,
-				logger.CreateLogger(threadName),
-				parameters.applicationName,
-				suite.Name(),
-				filterViews,
-				parameters.dryRun);
+			benchmark::Timer timer(duration);
+			for (const SuiteData& suite: GetSuites())
+			{
+				SuiteContext suiteContext(
+					parameters.reporters,
+					logger.CreateLogger(threadName),
+					parameters.applicationName,
+					suite.Name(),
+					filterViews,
+					parameters.dryRun);
 
-			success |= ProcessSuite(parameters.runner, suite, suiteContext);
+				success |= ProcessSuite(parameters.runner, suite, suiteContext);
+			}
 		}
 
-		const event::Summary summary;
+		event::Summary summary;
+		summary.duration = duration;
+
 		for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
 		{
 			reporter->Signal(summary);

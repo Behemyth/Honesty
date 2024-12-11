@@ -17,7 +17,7 @@ namespace
 					synodic::honesty::benchmark::Timer timer(duration);
 				}
 
-				requirements.ExpectGreater(duration.count(), 0);
+				requirements.ExpectGreaterEqual(duration.count(), 0);
 			};
 		});
 

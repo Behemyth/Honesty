@@ -773,7 +773,7 @@ namespace synodic::honesty::test
 				const std::string message = descriptionCallback();
 
 				const event::ComparisonFail
-					failed(location, order, std::format("{}", a), std::format("{}", b), message);
+					failed(location, order, std::format("{}", a), std::format("{}", b), message, false);
 
 				Signal(failed);
 			}

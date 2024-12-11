@@ -36,7 +36,7 @@ namespace
 				 */
 				auto tupleParameterization = []() -> Generator
 				{
-					co_yield "array"_test = [](const Requirements&, const auto&)
+					co_yield "tuple"_test = [](const Requirements&, const auto&)
 					{
 					} | std::tuple{3u, 4.0f};
 				};

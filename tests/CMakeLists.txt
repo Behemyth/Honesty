@@ -5,8 +5,6 @@ project(tests
 	LANGUAGES CXX
 )
 
-include(honesty)
-
 add_executable(tests)
 
 set_target_properties(tests

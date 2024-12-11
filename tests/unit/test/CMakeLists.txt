@@ -11,4 +11,5 @@ PRIVATE
 	test_log.cpp
 	test_fixture.cpp
 	test_inplace_string.cpp
+	test_benchmark.cpp
 )

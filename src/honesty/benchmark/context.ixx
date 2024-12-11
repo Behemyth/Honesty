@@ -21,7 +21,7 @@ namespace synodic::honesty::benchmark
 			const Duration resolution(20);	// TODO: Get the resolution of the current clock
 
 			// TODO: Config the multiplier
-			targetGenerationDuration_ = resolution * 1000;
+			targetSampleDuration_ = resolution * 1000;
 		}
 
 		/**
@@ -52,11 +52,11 @@ namespace synodic::honesty::benchmark
 
 			// Set the next generation iteration count
 			// TODO: Add random variation to the iteration count to avoid aliasing
-			currentIterationCount_ = targetGenerationDuration_ / duration * currentIterationCount_;
+			currentIterationCount_ = targetSampleDuration_ / duration * currentIterationCount_;
 		}
 
 	private:
-		std::chrono::nanoseconds targetGenerationDuration_;
+		std::chrono::nanoseconds targetSampleDuration_;
 
 		std::chrono::nanoseconds totalDuration_;
 		std::uint32_t totalIteration_;

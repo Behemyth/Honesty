@@ -1,5 +1,6 @@
 import std;
 import synodic.honesty.test;
+import synodic.honesty.benchmark;
 
 using namespace synodic::honesty::test::literals;
 
@@ -9,9 +10,9 @@ namespace
 		"context",
 		[]() -> synodic::honesty::test::Generator
 		{
-			co_yield "traits"_test = [](const synodic::honesty::test::Requirements& requirements)
+			co_yield "regression"_test = [](const synodic::honesty::test::Requirements& requirements)
 			{
-
+				synodic::honesty::benchmark::RegressionContext regressionContext;
 			};
 		});
 

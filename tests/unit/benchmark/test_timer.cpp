@@ -17,6 +17,8 @@ namespace
 					synodic::honesty::benchmark::Timer timer(duration);
 				}
 
+				// The system time is accurate only to a certain degree, so we can't guarantee that the duration is
+				//	greater than 0
 				requirements.ExpectGreaterEqual(duration.count(), 0);
 			};
 		});

@@ -13,12 +13,12 @@ namespace
 			co_yield "construction"_test = [](const synodic::honesty::test::Requirements& requirements)
 			{
 				synodic::honesty::benchmark::RegressionContext regressionContext;
-				synodic::honesty::benchmark::TimedContext timedContext;
+				synodic::honesty::benchmark::TimedContext timedContext(std::chrono::nanoseconds(1));
 			};
 
 			// Now that we mark that they work, let's use them
 			synodic::honesty::benchmark::RegressionContext regressionContext;
-			synodic::honesty::benchmark::TimedContext timedContext;
+			synodic::honesty::benchmark::TimedContext timedContext(std::chrono::nanoseconds(1));
 
 			auto parameterization = std::tuple(regressionContext, timedContext);
 

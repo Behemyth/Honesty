@@ -25,17 +25,28 @@ namespace synodic::honesty::benchmark
 
 		Results Measure(const std::function_ref<void()> benchmark)
 		{
+			// TODO: Minimize wrapping logic around the executed function
 			State state;
 
-			while (state.Iterate())
+			// Each measurement depends on the previous sample.
+			while (true)
 			{
+				// All iterations are measured under a single sample. Avoids the overhead of measuring each iteration
 				Duration duration;
 
-				// Scope the timer to just the sampled data
+				// Scope the timer to just the executed operation
 				{
 					Timer timer(duration);
 
-					benchmark();
+					while (state.Iterate())
+					{
+						benchmark();
+					}
+				}
+
+				if (not state.Push(duration))
+				{
+					break;
 				}
 			}
 
@@ -51,28 +62,33 @@ namespace synodic::honesty::benchmark
 		struct State
 		{
 			State() :
-				totalDuration(0),
-				totalIterations(0)
+				targetIterations(1),
+				totalDuration(0)
 			{
 			}
 
-			/**
-			 *	@brief Marks that an iteration of executing the benchmark should start. Returns true if benchmark
-			 *		iteration should continue
-			 */
 			bool Iterate()
 			{
+				return targetIterations-- > 0;
 			}
 
 			/**
 			 *	@brief Updates the internal benchmark state with the sample from the last generation set
 			 */
-			void Update(const Duration& duration)
+			bool Push(const Duration& duration)
 			{
+				totalDuration += duration;
+
+				// Set the next sample's iteration count
+				// TODO: Add random variation to the iteration count to avoid aliasing
+				targetIterations = targetSampleDuration_ / duration * targetIterations;
+
+				return targetIterations > 0;
 			}
 
+			std::uint32_t targetIterations;
+
 			std::chrono::nanoseconds totalDuration;
-			std::uint32_t totalIterations;
 		};
 
 		std::chrono::nanoseconds targetSampleDuration_;
@@ -90,6 +106,9 @@ namespace synodic::honesty::benchmark
 		{
 		};
 
+		/**
+		 * @brief Initializes the context to an estimated minimal fit of iterations/samples
+		 */
 		RegressionContext() :
 			TimedContext(std::chrono::nanoseconds(1))
 		{
@@ -99,62 +118,6 @@ namespace synodic::honesty::benchmark
 			// TODO: Config the multiplier
 			targetSampleDuration_ = resolution * 1000;
 		}
-
-		Results Measure(const std::function_ref<void()> benchmark)
-		{
-			// TODO: Minimize wrapping logic around the executed function
-			State state;
-
-			// Each measurement generation depends on the previous generation's duration. We spend the minimal time
-			//	possible to retrieve an accurate benchmark and only collect multiple samples if necessary
-			while (state.Generate())
-			{
-				// All iterations are measured under a single duration. Avoids the overhead of measuring each iteration
-				Duration duration;
-
-				// Scope the timer to just the sampled data
-				{
-					Timer timer(duration);
-
-					while (state.Iterate())
-					{
-						benchmark();
-					}
-				}
-
-				state.Update(duration);
-			}
-
-			Results results;
-
-			return results;
-		}
-
-	private:
-		/**
-		 *	@brief Data that exists for the lifetime of a measurement
-		 */
-		struct State : TimedContext::State
-		{
-			/**
-			 *	@brief Generates the next set of iterations for the benchmark. Returns true if the generation was
-			 *initiated
-			 */
-			bool Generate()
-			{
-				currentIteration_ = currentIterationCount_;
-				return currentIterationCount_ != 0;
-			}
-
-			void Update(const Duration& duration)
-			{
-				TimedContext::State::Update(duration);
-
-				// Set the next generation iteration count
-				// TODO: Add random variation to the iteration count to avoid aliasing
-				currentIterationCount_ = targetSampleDuration_ / duration * currentIterationCount_;
-			}
-		};
 	};
 
 }

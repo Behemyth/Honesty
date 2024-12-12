@@ -8,89 +8,99 @@ import :timer;
 
 namespace synodic::honesty::benchmark
 {
-
-	class State
+	/**
+	 *	@brief Context for timed state. i.e. Run a measurement for a certain amount of time.
+	 */
+	export class TimedContext
 	{
 	public:
-		State() :
-			totalDuration_(0),
-			totalIteration_(0),
-			currentIteration_(0),
-			currentIterationCount_(0)
+		struct Results
 		{
+		};
+
+		explicit(false) TimedContext(const std::chrono::nanoseconds duration) :
+			targetSampleDuration_(duration)
+		{
+		}
+
+		Results Measure(const std::function_ref<void()> benchmark)
+		{
+			State state;
+
+			while (state.Iterate())
+			{
+				Duration duration;
+
+				// Scope the timer to just the sampled data
+				{
+					Timer timer(duration);
+
+					benchmark();
+				}
+			}
+
+			Results results;
+
+			return results;
+		}
+
+	protected:
+		/**
+		 *	@brief Data that exists for the lifetime of a measurement
+		 */
+		struct State
+		{
+			State() :
+				totalDuration(0),
+				totalIterations(0)
+			{
+			}
+
+			/**
+			 *	@brief Marks that an iteration of executing the benchmark should start. Returns true if benchmark
+			 *		iteration should continue
+			 */
+			bool Iterate()
+			{
+			}
+
+			/**
+			 *	@brief Updates the internal benchmark state with the sample from the last generation set
+			 */
+			void Update(const Duration& duration)
+			{
+			}
+
+			std::chrono::nanoseconds totalDuration;
+			std::uint32_t totalIterations;
+		};
+
+		std::chrono::nanoseconds targetSampleDuration_;
+	};
+
+	/**
+	 *	@brief Context for iterative state. i.e. Run a measurement for a certain number of iterations. Because the real
+	 *		resolution of the underlying hardware clock isn't known we internally introduce a timed context to provide
+	 *		enough variability to provide meaningful results, scaling the iterations accordingly.
+	 */
+	export class RegressionContext : public TimedContext
+	{
+	public:
+		struct Results : TimedContext::Results
+		{
+		};
+
+		RegressionContext() :
+			TimedContext(std::chrono::nanoseconds(1))
+		{
+			// TODO: Move the calculation to the initializer
 			const Duration resolution(20);	// TODO: Get the resolution of the current clock
 
 			// TODO: Config the multiplier
 			targetSampleDuration_ = resolution * 1000;
 		}
 
-		/**
-		 *	@brief Generates the next set of iterations for the benchmark. Returns true if the generation was initiated
-		 */
-		bool Generate()
-		{
-			currentIteration_ = currentIterationCount_;
-			return currentIterationCount_ != 0;
-		}
-
-		/**
-		 *	@brief Marks that an iteration of executing the benchmark should start. Returns true if benchmark iteration
-		 *		should continue
-		 */
-		bool Iterate()
-		{
-			return currentIteration_-- != 0;
-		}
-
-		/**
-		 *	@brief Updates the internal benchmark state with the sample from the last generation set
-		 */
-		void Update(const Duration& duration)
-		{
-			totalDuration_	+= duration;
-			totalIteration_ += currentIterationCount_;
-
-			// Set the next generation iteration count
-			// TODO: Add random variation to the iteration count to avoid aliasing
-			currentIterationCount_ = targetSampleDuration_ / duration * currentIterationCount_;
-		}
-
-	private:
-		std::chrono::nanoseconds targetSampleDuration_;
-
-		std::chrono::nanoseconds totalDuration_;
-		std::uint32_t totalIteration_;
-
-		std::uint32_t currentIteration_;
-		std::uint32_t currentIterationCount_;
-	};
-
-	/**
-	 *	@brief Base class for all internal benchmarking state
-	 */
-	class Context
-	{
-	};
-
-	/**
-	 *	@brief Context for timed state. i.e. Run *this* for a certain amount of time
-	 */
-	export class TimedContext : public Context
-	{
-	public:
-
-	private:
-	};
-
-	/**
-	 *	@brief Context for iterative state. i.e. Run *this* for a certain number of iterations. Because the real
-	 *		resolution of the underlying hardware clock isn't known we internally introduce a timed context to provide
-	 *		enough variability to provide meaningful results
-	 */
-	export class RegressionContext : public TimedContext
-	{
-	public:
-		void Run(const std::function_ref<void()> benchmark)
+		Results Measure(const std::function_ref<void()> benchmark)
 		{
 			// TODO: Minimize wrapping logic around the executed function
 			State state;
@@ -114,9 +124,37 @@ namespace synodic::honesty::benchmark
 
 				state.Update(duration);
 			}
+
+			Results results;
+
+			return results;
 		}
 
 	private:
+		/**
+		 *	@brief Data that exists for the lifetime of a measurement
+		 */
+		struct State : TimedContext::State
+		{
+			/**
+			 *	@brief Generates the next set of iterations for the benchmark. Returns true if the generation was
+			 *initiated
+			 */
+			bool Generate()
+			{
+				currentIteration_ = currentIterationCount_;
+				return currentIterationCount_ != 0;
+			}
+
+			void Update(const Duration& duration)
+			{
+				TimedContext::State::Update(duration);
+
+				// Set the next generation iteration count
+				// TODO: Add random variation to the iteration count to avoid aliasing
+				currentIterationCount_ = targetSampleDuration_ / duration * currentIterationCount_;
+			}
+		};
 	};
 
 }

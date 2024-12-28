@@ -61,9 +61,10 @@ namespace synodic::honesty::benchmark
 		 */
 		struct State
 		{
-			explicit State(std::chrono::nanoseconds targetDuration) :
+			explicit State(const std::chrono::nanoseconds targetDuration) :
 				targetIterations(1),
-				totalDuration(0)
+				totalDuration(0),
+				targetDuration(targetDuration)
 			{
 			}
 

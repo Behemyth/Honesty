@@ -26,7 +26,7 @@ namespace synodic::honesty::benchmark
 		Results Measure(const std::function_ref<void()> benchmark)
 		{
 			// TODO: Minimize wrapping logic around the executed function
-			State state;
+			State state(targetSampleDuration_);
 
 			// Each measurement depends on the previous sample.
 			while (true)
@@ -61,7 +61,7 @@ namespace synodic::honesty::benchmark
 		 */
 		struct State
 		{
-			State() :
+			explicit State(std::chrono::nanoseconds targetDuration) :
 				targetIterations(1),
 				totalDuration(0)
 			{
@@ -81,7 +81,7 @@ namespace synodic::honesty::benchmark
 
 				// Set the next sample's iteration count
 				// TODO: Add random variation to the iteration count to avoid aliasing
-				targetIterations = targetSampleDuration_ / duration * targetIterations;
+				targetIterations = targetDuration / duration * targetIterations;
 
 				return targetIterations > 0;
 			}
@@ -89,6 +89,7 @@ namespace synodic::honesty::benchmark
 			std::uint32_t targetIterations;
 
 			std::chrono::nanoseconds totalDuration;
+			std::chrono::nanoseconds targetDuration;
 		};
 
 		std::chrono::nanoseconds targetSampleDuration_;

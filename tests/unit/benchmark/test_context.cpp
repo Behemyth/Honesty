@@ -20,15 +20,23 @@ namespace
 			synodic::honesty::benchmark::RegressionContext regressionContext;
 			synodic::honesty::benchmark::TimedContext timedContext(std::chrono::nanoseconds(1));
 
-			auto parameterization = std::tuple(regressionContext, timedContext);
-
-			co_yield "empty"_test = [](const synodic::honesty::test::Requirements& requirements, const auto& context)
-			{
-				context.Measure(
-					[]()
+			/* co_yield "empty"_test = [](const synodic::honesty::test::Requirements& requirements, const auto&
+			   context)
 					{
-					});
-			} | parameterization;
+						context.Measure(
+							[]()
+							{
+							});
+					} | parameterization;*/
+			regressionContext.Measure(
+				[]()
+				{
+				});
+
+			timedContext.Measure(
+				[]()
+				{
+				});
 		});
 
 	synodic::honesty::test::SuiteRegistrar _(SUITE);

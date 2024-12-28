@@ -70,7 +70,7 @@ namespace synodic::honesty::benchmark
 
 			bool Iterate()
 			{
-				return targetIterations-- > 0;
+				return --targetIterations > 0;
 			}
 
 			/**
@@ -78,11 +78,12 @@ namespace synodic::honesty::benchmark
 			 */
 			bool Push(const Duration& duration)
 			{
-				totalDuration += duration;
+				const double elapsed  = duration.count();
+				totalDuration		 += duration;
 
 				// Set the next sample's iteration count
 				// TODO: Add random variation to the iteration count to avoid aliasing
-				targetIterations = targetDuration / duration * targetIterations;
+				targetIterations = targetDuration.count() / elapsed * targetIterations;
 
 				return targetIterations > 0;
 			}

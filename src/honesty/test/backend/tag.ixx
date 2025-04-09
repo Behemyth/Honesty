@@ -8,7 +8,8 @@ import synodic.honesty.utility;
 namespace synodic::honesty::test
 {
 	/**
-	 * @brief TODO: Add description
+	 * @brief A tag is a collection of strings that can be used to identify a test. Tags are used to group tests
+	 *	together
 	 */
 	export class Tag
 	{

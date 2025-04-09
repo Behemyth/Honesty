@@ -3,6 +3,8 @@ export module synodic.honesty.test:suite;
 import synodic.honesty.utility;
 import synodic.honesty.test.backend;
 
+import std;
+
 namespace synodic::honesty::test
 {
 	// TODO: Make this a compile-time check

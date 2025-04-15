@@ -69,7 +69,7 @@ quote-style = "single"
 skip_empty = true
 
 [tool.pdm]
-plugins = ["cppython[cmake,conan]"]
+plugins = ["cppython[cmake,conan,git]"]
 
 [tool.pdm.options]
 update = ["--update-all"]

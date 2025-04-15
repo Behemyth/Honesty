@@ -8,6 +8,9 @@ import :test;
 
 namespace synodic::honesty::test
 {
+	// Forward declaration for exporting
+	export class SuiteData;
+
 	/**
 	 * @brief Allows the static registration of tests in the global scope. Constructed at compile-time so that test
 	 * registration is constrained. We don't want a suite wrapper to be a generic fixture that can contain expensive
@@ -54,7 +57,7 @@ namespace synodic::honesty::test
 		VariantType generator_;
 	};
 
-	export class SuiteData
+	class SuiteData
 	{
 		using VariantType = std::variant<std::function_ref<Generator()>, std::function_ref<Generator(Fixture&)>>;
 

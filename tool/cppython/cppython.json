@@ -1,0 +1,12 @@
+{
+    "version": 9,
+    "include": [
+        "providers/conan.json"
+    ],
+    "configurePresets": [
+        {
+            "name": "cppython",
+            "inherits": "conan"
+        }
+    ]
+}

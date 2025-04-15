@@ -1,0 +1,11 @@
+{
+    "version": 9,
+    "configurePresets": [
+        {
+            "name": "conan",
+            "cacheVariables": {
+                "CMAKE_PROJECT_TOP_LEVEL_INCLUDES": "C:/Users/asher/.cppython/conan/conan_provider.cmake"
+            }
+        }
+    ]
+}

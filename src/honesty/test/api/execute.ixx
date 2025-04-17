@@ -4,7 +4,7 @@ import std;
 
 import synodic.honesty.log;
 import synodic.honesty.test.backend;
-import synodic.honesty.benchmark;
+import synodic.honesty.metric;
 
 import function_ref;
 
@@ -16,12 +16,10 @@ namespace
 	{
 		using Ts::operator()...;
 	};
-
 }
 
 namespace synodic::honesty::test::api
 {
-
 	export struct ExecuteParameters
 	{
 		ExecuteParameters(
@@ -80,7 +78,7 @@ namespace synodic::honesty::test::api
 		{
 			if (testData.Tag() == "fail")
 			{
-				testOutcome	  = ExpectedTestOutcome::FAIL;
+				testOutcome   = ExpectedTestOutcome::FAIL;
 				assertOutcome = ExpectedAssertOutcome::FAIL;
 			}
 			else if (testData.Tag() == "skip")
@@ -89,7 +87,7 @@ namespace synodic::honesty::test::api
 			}
 			else if (testData.Tag() == "todo")
 			{
-				testOutcome	  = ExpectedTestOutcome::TODO;
+				testOutcome   = ExpectedTestOutcome::TODO;
 				assertOutcome = ExpectedAssertOutcome::TODO;
 			}
 		}
@@ -101,14 +99,14 @@ namespace synodic::honesty::test::api
 			reporter->Signal(testBegin);
 		}
 
-		benchmark::Duration duration;
+		metric::Duration duration;
 
 		{
-			benchmark::Timer timer(duration);
+			metric::Timer timer(duration);
 
 			const Requirements requirements = testContext.CreateRequirements(testData.Name(), testOutcome);
 
-			auto testExecutor = Overload {
+			auto testExecutor = Overload{
 				[&](const std::function_ref<void(const Requirements&)>& testCallback)
 				{
 					if (const bool todo = testData.Tag() == "todo"; testData.Tag() == "skip" || todo)
@@ -168,7 +166,7 @@ namespace synodic::honesty::test::api
 		}
 
 		event::TestEnd testEnd;
-		testEnd.name = testData.Name();
+		testEnd.name     = testData.Name();
 		testEnd.duration = duration;
 
 		for (const std::unique_ptr<Reporter>& reporter: testContext.reporters)
@@ -206,15 +204,15 @@ namespace synodic::honesty::test::api
 			reporter->Signal(suiteBegin);
 		}
 
-		benchmark::Duration duration;
+		metric::Duration duration;
 
 		{
-			benchmark::Timer timer(duration);
+			metric::Timer timer(duration);
 
 			// Fixture lifetime should be for the whole suite
 			Fixture fixture = suiteContext.CreateFixture();
 
-			auto executor = Overload {
+			auto executor = Overload{
 				[&](const std::function_ref<Generator()> generator) -> Generator
 				{
 					return generator();
@@ -248,7 +246,7 @@ namespace synodic::honesty::test::api
 		}
 
 		event::SuiteEnd end;
-		end.name = suite.Name();
+		end.name     = suite.Name();
 		end.duration = duration;
 
 		for (const std::unique_ptr<Reporter>& reporter: suiteContext.reporters)
@@ -263,11 +261,11 @@ namespace synodic::honesty::test::api
 	{
 		// Break down the filter into individual views
 		auto splitData = parameters.filter | std::ranges::views::split('.') |
-						 std::ranges::views::transform(
-							 [](auto&& str)
-							 {
-								 return std::string_view(str.data(), std::ranges::distance(str));
-							 });
+		                 std::ranges::views::transform(
+			                 [](auto&& str)
+			                 {
+				                 return std::string_view(str.data(), std::ranges::distance(str));
+			                 });
 
 		std::vector<std::string_view> filterData = std::ranges::to<std::vector>(splitData);
 
@@ -278,7 +276,7 @@ namespace synodic::honesty::test::api
 		const log::Logger& logger = parameters.logger.get();
 
 		const std::string threadName = std::format("{}", std::this_thread::get_id());
-		const std::uint64_t seed	 = std::random_device()();
+		const std::uint64_t seed     = std::random_device()();
 
 		const event::Initialize initialize(seed, parameters.header);
 		for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
@@ -286,9 +284,9 @@ namespace synodic::honesty::test::api
 			reporter->Signal(initialize);
 		}
 
-		benchmark::Duration duration;
+		metric::Duration duration;
 		{
-			benchmark::Timer timer(duration);
+			metric::Timer timer(duration);
 			for (const SuiteData& suite: GetSuites())
 			{
 				SuiteContext suiteContext(

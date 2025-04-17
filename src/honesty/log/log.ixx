@@ -9,4 +9,5 @@ export import :sink.console;
 export import :sink.scatter;
 export import :sink.ringbuffer;
 export import :sink.ostream;
+export import :sink.otel;
 export import :sink.callback;

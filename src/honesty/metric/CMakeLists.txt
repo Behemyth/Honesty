@@ -1,13 +1,13 @@
 target_sources(honesty
 	PUBLIC
-		FILE_SET benchmark_public
+		FILE_SET metric_public
 		TYPE CXX_MODULES
 		FILES
-			benchmark.ixx
+			metric.ixx
 			context.ixx
 			types.ixx
 			timer.ixx
 	PRIVATE
-		FILE_SET benchmark_private
+		FILE_SET metric_private
 		TYPE CXX_MODULES
 )

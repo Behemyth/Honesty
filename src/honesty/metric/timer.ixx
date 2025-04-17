@@ -1,9 +1,9 @@
-export module synodic.honesty.benchmark:timer;
+export module synodic.honesty.metric:timer;
 
 import :types;
 import std;
 
-namespace synodic::honesty::benchmark
+namespace synodic::honesty::metric
 {
 
 	/**

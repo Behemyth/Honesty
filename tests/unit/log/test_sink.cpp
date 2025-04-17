@@ -1,6 +1,6 @@
 import std;
 import synodic.honesty.test;
-import synodic.honesty.utility;
+import synodic.honesty.log;
 
 using namespace synodic::honesty::test;
 using namespace synodic::honesty::test::literals;
@@ -8,17 +8,14 @@ using namespace synodic::honesty::test::literals;
 namespace
 {
 	Suite SUITE(
-		"benchmark",
+		"otel_sink",
 		[]() -> Generator
 		{
-			co_yield TODO / "empty"_test = [](const Requirements& requirements)
+			co_yield TODO / "todo"_test = [](const Requirements& requirements)
 			{
-				requirements.Benchmark(
-					"empty benchmark",
-					[&]()
-					{
-					});
+				requirements.Assert(true);
 			};
 		});
+
 	SuiteRegistrar _(SUITE);
 }

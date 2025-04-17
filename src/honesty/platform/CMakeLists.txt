@@ -3,6 +3,7 @@ target_sources(honesty
 		FILE_SET platform_public
 		TYPE CXX_MODULES
 		FILES
+			build.ixx
 			platform.ixx
 	PRIVATE
 		FILE_SET platform_private

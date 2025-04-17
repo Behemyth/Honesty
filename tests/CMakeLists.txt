@@ -15,6 +15,13 @@ set_target_properties(tests
 	CXX_EXTENSIONS NO
 )
 
+find_package(opentelemetry-cpp CONFIG REQUIRED)
+
+target_link_libraries(tests
+	PRIVATE
+	opentelemetry-cpp::opentelemetry-cpp
+)
+
 target_link_libraries(tests
 	PRIVATE
 	synodic::honesty::main

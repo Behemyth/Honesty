@@ -189,7 +189,7 @@ namespace synodic::honesty::log
 		std::uint8_t attributeMask_;
 	};
 
-	template<class... Ts>
+	template<typename... Ts>
 	struct Overloaded : Ts...
 	{
 		using Ts::operator()...;
@@ -355,7 +355,7 @@ namespace synodic::honesty::log
 	/**
 	 * @brief Overload (1) - https://en.cppreference.com/w/cpp/io/println
 	 */
-	export template<class... Args>
+	export template<typename... Args>
 	void println(std::FILE* stream, const TextStyle& style, std::format_string<Args...> fmt, Args&&... args)
 	{
 		if (SupportsColour())
@@ -371,7 +371,7 @@ namespace synodic::honesty::log
 	/**
 	 * @brief Overload (2) - https://en.cppreference.com/w/cpp/io/println
 	 */
-	export template<class... Args>
+	export template<typename... Args>
 	void println(const TextStyle& style, std::format_string<Args...> fmt, Args&&... args)
 	{
 		if (SupportsColour())

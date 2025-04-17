@@ -6,6 +6,7 @@
     "configurePresets": [
         {
             "name": "cppython",
+            "hidden": true,
             "inherits": "conan"
         }
     ]

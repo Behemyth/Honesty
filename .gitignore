@@ -12,3 +12,4 @@ dist/
 __pypackages__/
 *.pdb
 /Testing
+CMakeUserPresets.json

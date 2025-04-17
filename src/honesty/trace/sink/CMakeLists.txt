@@ -1,11 +1,12 @@
 target_sources(honesty
 	PUBLIC
-		FILE_SET profile_public
+		FILE_SET trace_public
 		TYPE CXX_MODULES
 		FILES
-			profile.ixx
-			types.ixx
+			otel.ixx
+			log.ixx
+			scatter.ixx
 	PRIVATE
-		FILE_SET profile_private
+		FILE_SET trace_private
 		TYPE CXX_MODULES
 )

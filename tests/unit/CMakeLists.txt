@@ -1,5 +1,5 @@
 add_subdirectory(
-	benchmark
+	metric
 )
 
 add_subdirectory(
@@ -11,7 +11,7 @@ add_subdirectory(
 )
 
 add_subdirectory(
-	profile
+	trace
 )
 
 add_subdirectory(

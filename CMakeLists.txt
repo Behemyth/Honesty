@@ -28,6 +28,13 @@ set_target_properties(honesty honesty_main
 	FOLDER "honesty"
 )
 
+find_package(opentelemetry-cpp CONFIG REQUIRED)
+
+target_link_libraries(honesty
+	PRIVATE
+	opentelemetry-cpp::opentelemetry-cpp
+)
+
 # Link the main library to the convenience variant
 target_link_libraries(honesty_main
 	PUBLIC

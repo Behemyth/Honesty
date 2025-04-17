@@ -9,7 +9,6 @@ import synodic.honesty.utility;
 
 namespace synodic::honesty::log
 {
-
 	export struct Message
 	{
 		Message(const LevelType level, const std::string_view message) :
@@ -29,12 +28,12 @@ namespace synodic::honesty::log
 		//	don't track children as they are implicit on user lifetimes. Moving does so also, but the r-value cast makes
 		//	the motive explicit
 
-		Logger(const Logger& other)							 = delete;
-		constexpr Logger(Logger&& other) noexcept			 = default;
-		Logger& operator=(const Logger& other)				 = delete;
+		Logger(const Logger& other)                          = delete;
+		constexpr Logger(Logger&& other) noexcept            = default;
+		Logger& operator=(const Logger& other)               = delete;
 		constexpr Logger& operator=(Logger&& other) noexcept = default;
 
-		template<class... Args>
+		template<typename... Args>
 		inline void Log(const LevelType level, std::format_string<Args...> fmt, Args&&... args) const
 		{
 			LogV(level, fmt.get(), std::make_format_args(args...));
@@ -65,37 +64,37 @@ namespace synodic::honesty::log
 			}
 		}
 
-		template<class... Args>
+		template<typename... Args>
 		inline void Trace(std::format_string<Args...> fmt, Args&&... args) const
 		{
 			Log(LevelType::TRACE, fmt, std::forward<Args>(args)...);
 		}
 
-		template<class... Args>
+		template<typename... Args>
 		inline void Debug(std::format_string<Args...> fmt, Args&&... args) const
 		{
 			Log(LevelType::DEBUG, fmt, std::forward<Args>(args)...);
 		}
 
-		template<class... Args>
+		template<typename... Args>
 		inline void Info(std::format_string<Args...> fmt, Args&&... args) const
 		{
 			Log(LevelType::INFO, fmt, std::forward<Args>(args)...);
 		}
 
-		template<class... Args>
+		template<typename... Args>
 		inline void Warning(std::format_string<Args...> fmt, Args&&... args) const
 		{
 			Log(LevelType::WARNING, fmt, std::forward<Args>(args)...);
 		}
 
-		template<class... Args>
+		template<typename... Args>
 		inline void Error(std::format_string<Args...> fmt, Args&&... args) const
 		{
 			Log(LevelType::ERROR, fmt, std::forward<Args>(args)...);
 		}
 
-		template<class... Args>
+		template<typename... Args>
 		inline void Critical(std::format_string<Args...> fmt, Args&&... args) const
 		{
 			Log(LevelType::CRITICAL, fmt, std::forward<Args>(args)...);
@@ -290,7 +289,7 @@ namespace synodic::honesty::log
 	class LoggerRegistry
 	{
 		static constexpr std::string_view ROOT_LOGGER_NAME = "root";
-		static constexpr auto ROOT_LOGGER_HASH			   = utility::Hash(ROOT_LOGGER_NAME);
+		static constexpr auto ROOT_LOGGER_HASH             = utility::Hash(ROOT_LOGGER_NAME);
 
 	public:
 		consteval LoggerRegistry() :
@@ -299,10 +298,10 @@ namespace synodic::honesty::log
 		}
 
 		LoggerRegistry(const LoggerRegistry& other) = delete;
-		LoggerRegistry(LoggerRegistry&& other)		= delete;
+		LoggerRegistry(LoggerRegistry&& other)      = delete;
 
 		LoggerRegistry& operator=(const LoggerRegistry& other) = delete;
-		LoggerRegistry& operator=(LoggerRegistry&& other)	   = delete;
+		LoggerRegistry& operator=(LoggerRegistry&& other)      = delete;
 
 		~LoggerRegistry() = default;
 
@@ -314,7 +313,6 @@ namespace synodic::honesty::log
 	private:
 		Logger root_;
 	};
-
 }
 
 constinit synodic::honesty::log::LoggerRegistry LOGGER_REGISTRY;

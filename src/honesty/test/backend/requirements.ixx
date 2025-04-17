@@ -847,7 +847,7 @@ namespace synodic::honesty::test
 			return parameters_.testName;
 		}
 
-		inline void Benchmark(std::string_view name, std::function_ref<void()> benchmark) const
+		inline void Benchmark(std::string_view name, std::function_ref<void()> metric) const
 		{
 
 		}

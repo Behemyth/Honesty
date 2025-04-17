@@ -8,6 +8,7 @@ target_sources(honesty
 			ringbuffer.ixx
 			synchronized.ixx
 			ostream.ixx
+			otel.ixx
 			callback.ixx
 			scatter.ixx
 	PRIVATE

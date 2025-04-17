@@ -12,6 +12,7 @@ target_sources(honesty
 			function_ref.ixx
 			fixed_string.ixx
 			traits.ixx
+			zstring_view.ixx
 	PRIVATE
 		FILE_SET utility_private
 		TYPE CXX_MODULES

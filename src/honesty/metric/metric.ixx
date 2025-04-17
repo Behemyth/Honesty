@@ -1,4 +1,4 @@
-export module synodic.honesty.benchmark;
+export module synodic.honesty.metric;
 
 export import :context;
 export import :types;

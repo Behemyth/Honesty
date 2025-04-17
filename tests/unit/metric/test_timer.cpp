@@ -1,6 +1,6 @@
 import std;
 import synodic.honesty.test;
-import synodic.honesty.benchmark;
+import synodic.honesty.metric;
 
 using namespace synodic::honesty::test::literals;
 
@@ -12,9 +12,9 @@ namespace
 		{
 			co_yield "construction"_test = [](const synodic::honesty::test::Requirements& requirements)
 			{
-				synodic::honesty::benchmark::Duration duration;
+				synodic::honesty::metric::Duration duration;
 				{
-					synodic::honesty::benchmark::Timer timer(duration);
+					synodic::honesty::metric::Timer timer(duration);
 				}
 
 				// The system time is accurate only to a certain degree, so we can't guarantee that the duration is

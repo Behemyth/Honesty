@@ -1,0 +1,18 @@
+target_sources(honesty
+	PUBLIC
+		FILE_SET trace_public
+		TYPE CXX_MODULES
+		FILES
+			context.ixx
+			trace.ixx
+			trace_module.ixx
+			tracer.ixx
+			types.ixx
+			zone.ixx
+			span.ixx
+	PRIVATE
+		FILE_SET trace_private
+		TYPE CXX_MODULES
+)
+
+add_subdirectory(sink)

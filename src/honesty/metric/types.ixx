@@ -1,8 +1,8 @@
-export module synodic.honesty.benchmark:types;
+export module synodic.honesty.metric:types;
 
 import std;
 
-namespace synodic::honesty::benchmark
+namespace synodic::honesty::metric
 {
 	export using Clock = std::conditional_t<
 		std::chrono::high_resolution_clock::is_steady,

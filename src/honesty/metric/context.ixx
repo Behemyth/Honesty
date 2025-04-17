@@ -1,4 +1,4 @@
-export module synodic.honesty.benchmark:context;
+export module synodic.honesty.metric:context;
 
 import std;
 import function_ref;
@@ -6,7 +6,7 @@ import function_ref;
 import :types;
 import :timer;
 
-namespace synodic::honesty::benchmark
+namespace synodic::honesty::metric
 {
 	/**
 	 *	@brief Context for timed state. i.e. Run a measurement for a certain amount of time.
@@ -23,7 +23,7 @@ namespace synodic::honesty::benchmark
 		{
 		}
 
-		Results Measure(const std::function_ref<void()> benchmark)
+		Results Measure(const std::function_ref<void()> metric)
 		{
 			// TODO: Minimize wrapping logic around the executed function
 			State state(targetSampleDuration_);
@@ -40,7 +40,7 @@ namespace synodic::honesty::benchmark
 
 					while (state.Iterate())
 					{
-						benchmark();
+						metric();
 					}
 				}
 
@@ -74,7 +74,7 @@ namespace synodic::honesty::benchmark
 			}
 
 			/**
-			 *	@brief Updates the internal benchmark state with the sample from the last generation set
+			 *	@brief Updates the internal metric state with the sample from the last generation set
 			 */
 			bool Push(const Duration& duration)
 			{

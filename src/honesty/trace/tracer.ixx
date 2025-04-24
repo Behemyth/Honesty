@@ -39,11 +39,6 @@ namespace synodic::honesty::trace
 		// Removes and returns the oldest element from the buffer. Assumes the buffer is not empty.
 		Span Pop()
 		{
-			if (Empty())
-			{
-				throw std::runtime_error("SpanRingBuffer is empty");
-			}
-
 			Span span = buffer_[tail_];
 			tail_     = tail_ + 1 & Capacity - 1; // Wrap index
 

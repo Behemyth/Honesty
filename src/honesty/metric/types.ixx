@@ -2,7 +2,7 @@ export module synodic.honesty.metric:types;
 
 import std;
 
-namespace synodic::honesty::metric
+namespace honesty::metric
 {
 	export using Clock = std::conditional_t<
 		std::chrono::high_resolution_clock::is_steady,

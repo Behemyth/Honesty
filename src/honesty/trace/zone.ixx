@@ -3,7 +3,7 @@ export module synodic.honesty.trace:zone;
 import std;
 import zstring_view;
 
-namespace synodic::honesty::trace
+namespace honesty::trace
 {
 	/**
 	 * @brief Metadata for a trace span

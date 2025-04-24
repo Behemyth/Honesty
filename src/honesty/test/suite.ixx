@@ -5,7 +5,7 @@ import synodic.honesty.test.backend;
 
 import std;
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 	// TODO: Make this a compile-time check
 	export void VerifySuiteName(const std::string_view name)

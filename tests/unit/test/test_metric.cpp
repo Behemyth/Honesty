@@ -2,8 +2,8 @@ import std;
 import synodic.honesty.test;
 import synodic.honesty.utility;
 
-using namespace synodic::honesty::test;
-using namespace synodic::honesty::test::literals;
+using namespace honesty::test;
+using namespace honesty::test::literals;
 
 namespace
 {

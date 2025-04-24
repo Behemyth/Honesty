@@ -1,6 +1,6 @@
 export module synodic.honesty.trace:context;
 
-namespace synodic::honesty::trace
+namespace honesty::trace
 {
 	/**
 	 * @brief Object of communication between the trace/span and the owning Tracer

@@ -12,7 +12,7 @@ module;
 
 export module synodic.honesty.trace:sink.otel;
 
-namespace synodic::honesty::trace
+namespace honesty::trace
 {
 	void Init()
 	{

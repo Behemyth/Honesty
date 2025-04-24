@@ -5,7 +5,7 @@ import synodic.honesty.test;
 
 import function_ref;
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 	export class StandardRunner final : public Runner
 	{

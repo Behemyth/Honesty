@@ -3,7 +3,7 @@ export module synodic.honesty.metric:timer;
 import :types;
 import std;
 
-namespace synodic::honesty::metric
+namespace honesty::metric
 {
 
 	/**

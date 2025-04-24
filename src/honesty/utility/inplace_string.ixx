@@ -3,7 +3,7 @@ export module synodic.honesty.utility:inplace_string;
 import std;
 import :traits;
 
-namespace synodic::honesty::utility
+namespace honesty::utility
 {
 
 	/**
@@ -208,36 +208,36 @@ namespace synodic::honesty::utility
 }
 
 export template<std::size_t N>
-struct std::hash<synodic::honesty::utility::InplaceString<N>> : std::hash<std::string_view>
+struct std::hash<honesty::utility::InplaceString<N>> : std::hash<std::string_view>
 {
 };
 
 export template<std::size_t N>
-struct std::hash<synodic::honesty::utility::InplaceU8String<N>> : std::hash<std::u8string_view>
+struct std::hash<honesty::utility::InplaceU8String<N>> : std::hash<std::u8string_view>
 {
 };
 
 export template<std::size_t N>
-struct std::hash<synodic::honesty::utility::InplaceU16String<N>> : std::hash<std::u16string_view>
+struct std::hash<honesty::utility::InplaceU16String<N>> : std::hash<std::u16string_view>
 {
 };
 
 export template<std::size_t N>
-struct std::hash<synodic::honesty::utility::InplaceU32String<N>> : std::hash<std::u32string_view>
+struct std::hash<honesty::utility::InplaceU32String<N>> : std::hash<std::u32string_view>
 {
 };
 
 export template<std::size_t N>
-struct std::hash<synodic::honesty::utility::InplaceWString<N>> : std::hash<std::wstring_view>
+struct std::hash<honesty::utility::InplaceWString<N>> : std::hash<std::wstring_view>
 {
 };
 
 export template<typename CharT, std::size_t N>
-struct std::formatter<synodic::honesty::utility::BasicInplaceString<CharT, N>> :
+struct std::formatter<honesty::utility::BasicInplaceString<CharT, N>> :
 	formatter<std::basic_string_view<CharT>>
 {
 	template<typename FormatContext>
-	auto format(const synodic::honesty::utility::BasicInplaceString<CharT, N>& str, FormatContext& ctx) const
+	auto format(const honesty::utility::BasicInplaceString<CharT, N>& str, FormatContext& ctx) const
 		-> decltype(ctx.out())
 	{
 		return formatter<std::basic_string_view<CharT>>::format(std::basic_string_view<CharT>(str), ctx);

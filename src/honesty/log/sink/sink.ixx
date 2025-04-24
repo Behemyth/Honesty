@@ -4,7 +4,7 @@ import :colour;
 import std;
 import :types;
 
-namespace synodic::honesty::log
+namespace honesty::log
 {
 
 	export class Formatter

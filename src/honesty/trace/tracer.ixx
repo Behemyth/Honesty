@@ -6,7 +6,7 @@ import :context;
 import :span;
 import zstring_view;
 
-namespace synodic::honesty::trace
+namespace honesty::trace
 {
 	/**
 	* @brief A simple thread-local ring buffer for storing spans. We don't have uses for a generic ring
@@ -80,14 +80,14 @@ namespace synodic::honesty::trace
 	export class Tracer
 	{
 	public:
-		static consteval Tracer& Get(std::zstring_view label)
+		static consteval Tracer Get(const std::zstring_view label)
 		{
 			// TODO: Replace with a retrieval
-			return tracer_;
+			return Tracer(label);
 		}
 
 	private:
-		explicit Tracer(std::zstring_view label)
+		constexpr explicit Tracer(std::zstring_view label)
 		{
 		}
 

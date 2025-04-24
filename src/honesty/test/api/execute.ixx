@@ -18,7 +18,7 @@ namespace
 	};
 }
 
-namespace synodic::honesty::test::api
+namespace honesty::test::api
 {
 	export struct ExecuteParameters
 	{

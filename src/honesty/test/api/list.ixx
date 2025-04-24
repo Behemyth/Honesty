@@ -9,10 +9,10 @@ import synodic.honesty.test.backend;
 import :types;
 import :execute;
 
-class ListReporter final : public synodic::honesty::test::CumulativeAdapter
+class ListReporter final : public honesty::test::CumulativeAdapter
 {
 public:
-	explicit(false) ListReporter(const synodic::honesty::log::Logger& logger) :
+	explicit(false) ListReporter(const honesty::log::Logger& logger) :
 		CumulativeAdapter(logger)
 	{
 	}
@@ -38,7 +38,7 @@ private:
 	CumulativeData data_;
 };
 
-namespace synodic::honesty::test::api
+namespace honesty::test::api
 {
 	export struct ListParameters
 	{

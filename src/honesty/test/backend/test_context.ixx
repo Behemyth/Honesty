@@ -6,7 +6,7 @@ import :reporter;
 
 import :requirements;
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 	/**
 	 * @brief A backend for the Requirements class. This is what the testing framework uses to interact with the

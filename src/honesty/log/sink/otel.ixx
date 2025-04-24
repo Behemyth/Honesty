@@ -14,7 +14,7 @@ import :colour;
 import :sink.synchronized;
 import :types;
 
-namespace synodic::honesty::log
+namespace honesty::log
 {
 	export template<mutex Mutex>
 	class OTelemetry final : public SynchronizedSink<Mutex>

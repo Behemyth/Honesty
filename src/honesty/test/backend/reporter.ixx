@@ -7,7 +7,7 @@ import std;
 import function_ref;
 import inplace_vector;
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 	export enum class ExpectedAssertOutcome
 	{

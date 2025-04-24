@@ -4,12 +4,12 @@ import synodic.honesty.test;
 import synodic.honesty.test.mock;
 import synodic.honesty.log;
 ;
-using namespace synodic::honesty::test;
-using namespace synodic::honesty::test::literals;
+using namespace honesty::test;
+using namespace honesty::test::literals;
 
 namespace
 {
-	auto WriteReadJSON(const synodic::honesty::utility::JSON& json, std::filesystem::path path) -> std::string
+	auto WriteReadJSON(const honesty::utility::JSON& json, std::filesystem::path path) -> std::string
 	{
 		{
 			std::ofstream file(path);
@@ -42,34 +42,34 @@ namespace
 			{
 				{
 					// Empty
-					const synodic::honesty::utility::JSON json;
+					const honesty::utility::JSON json;
 
 					requirements.Expect(json.Null());
 				}
 				{
 					// Null
-					const synodic::honesty::utility::JSON json(nullptr);
+					const honesty::utility::JSON json(nullptr);
 
 					requirements.Expect(json.Null());
 				}
 				{
 					// From value
-					const synodic::honesty::utility::JSON json(42.0f);
+					const honesty::utility::JSON json(42.0f);
 				}
 				{
 					// From string
-					const synodic::honesty::utility::JSON json("value");
+					const honesty::utility::JSON json("value");
 				}
 				{
 					// From value array
 					std::vector range {1, 2, 3, 4};
-					synodic::honesty::utility::JSON json(std::from_range, range);
+					honesty::utility::JSON json(std::from_range, range);
 				}
 
 				{
 					// From JSON array
-					std::vector<synodic::honesty::utility::JSON> range {1, 2, 3, 4};
-					synodic::honesty::utility::JSON json(range);
+					std::vector<honesty::utility::JSON> range {1, 2, 3, 4};
+					honesty::utility::JSON json(range);
 				}
 
 				{
@@ -80,18 +80,18 @@ namespace
 						{"3", 3},
 						{"4", 4}
 					};
-					synodic::honesty::utility::JSON json(std::from_range, range);
+					honesty::utility::JSON json(std::from_range, range);
 				}
 
 				{
 					// From JSON map
-					std::map<std::string, synodic::honesty::utility::JSON> range = {
+					std::map<std::string, honesty::utility::JSON> range = {
 						{"1", 1},
 						{"2", 2},
 						{"3", 3},
 						{"4", 4}
 					};
-					synodic::honesty::utility::JSON json(range);
+					honesty::utility::JSON json(range);
 				}
 			};
 
@@ -99,32 +99,32 @@ namespace
 			{
 				{
 					// From value
-					synodic::honesty::utility::JSON json;
+					honesty::utility::JSON json;
 					json = nullptr;
 
 					requirements.Expect(json.Null());
 				}
 				{
 					// From value
-					synodic::honesty::utility::JSON json;
+					honesty::utility::JSON json;
 					json = 42;
 				}
 				{
 					// From string
-					synodic::honesty::utility::JSON json;
+					honesty::utility::JSON json;
 					json = "value";
 				}
 				{
 					// From value array
 					std::vector range {1, 2, 3, 4};
-					synodic::honesty::utility::JSON json;
+					honesty::utility::JSON json;
 					json.AssignRange(range);
 				}
 
 				{
 					// From JSON array
-					std::vector<synodic::honesty::utility::JSON> range {1, 2, 3, 4};
-					synodic::honesty::utility::JSON json;
+					std::vector<honesty::utility::JSON> range {1, 2, 3, 4};
+					honesty::utility::JSON json;
 					json = range;
 				}
 
@@ -136,45 +136,45 @@ namespace
 						{"3", 3},
 						{"4", 4}
 					};
-					synodic::honesty::utility::JSON json;
+					honesty::utility::JSON json;
 					json.AssignRange(range);
 				}
 
 				{
 					// From JSON map
-					std::map<std::string, synodic::honesty::utility::JSON> range = {
+					std::map<std::string, honesty::utility::JSON> range = {
 						{"1", 1},
 						{"2", 2},
 						{"3", 3},
 						{"4", 4}
 					};
-					synodic::honesty::utility::JSON json;
+					honesty::utility::JSON json;
 					json = range;
 				}
 			};
 
-			using Data = std::tuple<synodic::honesty::utility::JSON, std::string>;
+			using Data = std::tuple<honesty::utility::JSON, std::string>;
 			std::vector<Data> expectations;
 			{
-				synodic::honesty::utility::JSON json;
+				honesty::utility::JSON json;
 				expectations.push_back({json, "null"});
 			}
 			{
-				synodic::honesty::utility::JSON json;
+				honesty::utility::JSON json;
 
 				json = 42;
 
 				expectations.push_back({json, "42"});
 			}
 			{
-				 synodic::honesty::utility::JSON json;
+				 honesty::utility::JSON json;
 
 				 json.AssignRange(std::array{1, 2, 3, 4});
 
 				 expectations.push_back({json, "[\n\t1,\n\t2,\n\t3,\n\t4\n]"});
 			}
 			{
-				synodic::honesty::utility::JSON json;
+				honesty::utility::JSON json;
 
 				json.AssignRange(std::map<std::string, int> {
 					{"1", 1},

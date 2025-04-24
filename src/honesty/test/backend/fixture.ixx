@@ -31,7 +31,7 @@ std::string GenerateName(const std::string_view prefix, const std::size_t length
 	return name;
 }
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 	export class Reporter;
 

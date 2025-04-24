@@ -6,7 +6,7 @@ import :reporter;
 
 import synodic.honesty.log;
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 	export struct TestContext;
 

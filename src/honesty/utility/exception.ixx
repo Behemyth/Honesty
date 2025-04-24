@@ -2,7 +2,7 @@ export module synodic.honesty.utility:exception;
 
 import std;
 
-namespace synodic::honesty::utility
+namespace honesty::utility
 {
 
 	export class NotImplemented final : public std::logic_error

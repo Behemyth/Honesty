@@ -1,8 +1,8 @@
 import std;
 import synodic.honesty.test;
 
-using namespace synodic::honesty::test;
-using namespace synodic::honesty::test::literals;
+using namespace honesty::test;
+using namespace honesty::test::literals;
 
 namespace
 {
@@ -25,7 +25,7 @@ namespace
 
 			co_yield "log_listener"_test = [&](const Requirements& requirements)
 			{
-				const std::stringstream& stream = fixture.AttachListener(synodic::honesty::log::LevelType::TRACE);
+				const std::stringstream& stream = fixture.AttachListener(honesty::log::LevelType::TRACE);
 
 				requirements.Expect(
 					stream.view().empty(),

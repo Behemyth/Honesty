@@ -7,10 +7,10 @@ import inplace_vector;
 
 namespace
 {
-	constinit std::inplace_vector<synodic::honesty::test::SuiteData, 50> SUITES;
+	constinit std::inplace_vector<honesty::test::SuiteData, 50> SUITES;
 }
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 	export std::span<SuiteData> GetSuites()
 	{

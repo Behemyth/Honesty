@@ -6,7 +6,7 @@ import synodic.honesty.test.backend;
 
 import function_ref;
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 	// Built-in tags
 	export constexpr Tag RUN("run");

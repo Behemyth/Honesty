@@ -5,7 +5,7 @@ import :colour;
 import :sink.synchronized;
 import :types;
 
-namespace synodic::honesty::log
+namespace honesty::log
 {
 	export template<mutex Mutex>
 	class OStream final : public SynchronizedSink<Mutex>

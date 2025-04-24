@@ -5,7 +5,7 @@ import :colour;
 import :sink;
 import :types;
 
-namespace synodic::honesty::log
+namespace honesty::log
 {
 	export class Console final : public Sink
 	{

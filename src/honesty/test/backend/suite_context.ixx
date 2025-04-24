@@ -7,7 +7,7 @@ import synodic.honesty.log;
 import :reporter;
 import :fixture;
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 	/**
 	 * @brief The context for a suite of tests. All execution within a suite must be synchronous

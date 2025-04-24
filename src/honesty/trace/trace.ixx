@@ -2,7 +2,7 @@ export module synodic.honesty.trace:trace;
 
 import :span;
 
-namespace synodic::honesty::trace
+namespace honesty::trace
 {
 	/**
 	 * @brief A top-level span

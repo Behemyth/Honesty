@@ -5,7 +5,7 @@ import synodic.honesty.test.backend;
 
 import std;
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 	/**
 	 * @brief TODO: Comment

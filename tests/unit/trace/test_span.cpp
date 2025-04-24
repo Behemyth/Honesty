@@ -2,8 +2,8 @@ import std;
 import synodic.honesty.test;
 import synodic.honesty.trace;
 
-using namespace synodic::honesty::test;
-using namespace synodic::honesty::test::literals;
+using namespace honesty::test;
+using namespace honesty::test::literals;
 
 namespace
 {
@@ -13,12 +13,12 @@ namespace
 		{
 			co_yield "root_span"_test = [](const Requirements& requirements)
 			{
-
+				honesty::trace::Tracer::Get("root");
 			};
 
 			co_yield "attach_span"_test = [](const Requirements& requirements)
 			{
-				/*synodic::honesty::trace::Tracer tracer;
+				/*honesty::trace::Tracer tracer;
 
 				{
 					auto span = tracer.AttachSpan();

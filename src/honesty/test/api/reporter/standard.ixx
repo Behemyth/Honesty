@@ -8,9 +8,9 @@ import std;
 // TODO: Make constexpr when
 //	'https://developercommunity.visualstudio.com/t/Inexplicable-ICE-when-using-modules/1593396' is fixed
 // static const inline auto
-//	HIGHLIGHT_STYLE(synodic::honesty::log::TextStyle(synodic::honesty::log::Colour24(255, 255, 0)));
+//	HIGHLIGHT_STYLE(honesty::log::TextStyle(honesty::log::Colour24(255, 255, 0)));
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 
 	/**

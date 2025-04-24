@@ -6,7 +6,7 @@ import :sink.synchronized;
 import :types;
 import :logger;
 
-namespace synodic::honesty::log
+namespace honesty::log
 {
 	export template<mutex Mutex>
 	class Callback final : public SynchronizedSink<Mutex>

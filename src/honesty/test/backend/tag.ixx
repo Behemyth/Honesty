@@ -5,7 +5,7 @@ import fixed_string;
 import inplace_vector;
 import synodic.honesty.utility;
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 	/**
 	 * @brief A tag is a collection of strings that can be used to identify a test. Tags are used to group tests

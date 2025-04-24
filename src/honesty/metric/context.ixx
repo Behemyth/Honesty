@@ -6,7 +6,7 @@ import function_ref;
 import :types;
 import :timer;
 
-namespace synodic::honesty::metric
+namespace honesty::metric
 {
 	/**
 	 *	@brief Context for timed state. i.e. Run a measurement for a certain amount of time.

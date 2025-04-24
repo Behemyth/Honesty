@@ -8,7 +8,7 @@ import inplace_vector;
 import :requirements;
 import :tag;
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 	export class Test;
 	export using Generator = std::generator<Test>;

@@ -2,7 +2,7 @@ export module synodic.honesty.test.api:types;
 
 import std;
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 	enum class TestResultCode : std::uint8_t
 	{

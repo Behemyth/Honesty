@@ -6,10 +6,10 @@ import function_ref;
 
 import synodic.honesty.test;
 
-export class MockReporter final : public synodic::honesty::test::StreamingAdapter
+export class MockReporter final : public honesty::test::StreamingAdapter
 {
 public:
-	explicit MockReporter(const synodic::honesty::log::Logger& logger) :
+	explicit MockReporter(const honesty::log::Logger& logger) :
 		StreamingAdapter(logger)
 	{
 	}
@@ -20,10 +20,10 @@ public:
 	}
 };
 
-export class MockRunner final : public synodic::honesty::test::Runner
+export class MockRunner final : public honesty::test::Runner
 {
 public:
-	explicit MockRunner(const synodic::honesty::log::Logger& logger) :
+	explicit MockRunner(const honesty::log::Logger& logger) :
 		Runner(logger)
 	{
 	}
@@ -34,21 +34,21 @@ public:
 	}
 
 	void
-		Run(const synodic::honesty::test::Requirements& requirements,
-			const std::function_ref<void(const synodic::honesty::test::Requirements&)> function) override
+		Run(const honesty::test::Requirements& requirements,
+			const std::function_ref<void(const honesty::test::Requirements&)> function) override
 	{
 		function(requirements);
 	}
 
-	synodic::honesty::test::Generator
-		Run(const std::function_ref<synodic::honesty::test::Generator()> function) override
+	honesty::test::Generator
+		Run(const std::function_ref<honesty::test::Generator()> function) override
 	{
 		return function();
 	}
 
-	synodic::honesty::test::Generator Run(
-		synodic::honesty::test::Fixture& fixture,
-		const std::function_ref<synodic::honesty::test::Generator(synodic::honesty::test::Fixture&)> function) override
+	honesty::test::Generator Run(
+		honesty::test::Fixture& fixture,
+		const std::function_ref<honesty::test::Generator(honesty::test::Fixture&)> function) override
 	{
 		return function(fixture);
 	}
@@ -56,6 +56,6 @@ public:
 
 namespace
 {
-	synodic::honesty::test::RunnerRegistrar<MockRunner> RUNNER_REGISTRAR;
-	synodic::honesty::test::ReporterRegistrar<MockReporter> REPORTER_REGISTRAR;
+	honesty::test::RunnerRegistrar<MockRunner> RUNNER_REGISTRAR;
+	honesty::test::ReporterRegistrar<MockReporter> REPORTER_REGISTRAR;
 }

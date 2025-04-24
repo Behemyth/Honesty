@@ -5,7 +5,7 @@ export import :tracer;
 export import :types;
 export import :span;
 export import :zone;
-export import :context;
+export import :provider;
 
 export import :sink.log;
 export import :sink.scatter;

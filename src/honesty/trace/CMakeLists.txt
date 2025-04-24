@@ -6,6 +6,7 @@ target_sources(honesty
 			context.ixx
 			trace.ixx
 			module.ixx
+			provider.ixx
 			tracer.ixx
 			types.ixx
 			zone.ixx

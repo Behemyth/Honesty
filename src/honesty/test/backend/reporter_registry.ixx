@@ -7,7 +7,7 @@ import inplace_vector;
 import synodic.honesty.log;
 import :reporter;
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 	constexpr std::size_t DEFAULT_REPORTER_CAPACITY = 4;
 

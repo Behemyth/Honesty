@@ -5,7 +5,7 @@ import std;
 import :types;
 import :sink;
 
-namespace synodic::honesty::log
+namespace honesty::log
 {
 	export template<mutex Mutex>
 	class SynchronizedSink : public Sink

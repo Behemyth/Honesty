@@ -7,7 +7,7 @@ import :types;
 
 import synodic.honesty.utility;
 
-namespace synodic::honesty::log
+namespace honesty::log
 {
 	export struct Message
 	{
@@ -315,9 +315,9 @@ namespace synodic::honesty::log
 	};
 }
 
-constinit synodic::honesty::log::LoggerRegistry LOGGER_REGISTRY;
+constinit honesty::log::LoggerRegistry LOGGER_REGISTRY;
 
-namespace synodic::honesty::log
+namespace honesty::log
 {
 	export constexpr const Logger& RootLogger()
 	{

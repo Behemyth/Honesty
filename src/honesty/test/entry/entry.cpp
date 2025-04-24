@@ -16,21 +16,21 @@ auto main(const int argc, const char* argv[]) -> int
 	// Convert the lazy view to contiguous data
 	auto arguments = std::ranges::to<std::vector>(view);
 
-	synodic::honesty::log::Console sink;
+	honesty::log::Console sink;
 
-	synodic::honesty::log::Logger logger = synodic::honesty::log::RootLogger().CreateLogger("main");
+	honesty::log::Logger logger = honesty::log::RootLogger().CreateLogger("main");
 
 	logger.SetSink(&sink);
-	logger.SetLevel(synodic::honesty::log::LevelType::INFO);
+	logger.SetLevel(honesty::log::LevelType::INFO);
 
-	synodic::honesty::test::StandardRunner runner(logger);
+	honesty::test::StandardRunner runner(logger);
 
-	std::array<std::unique_ptr<synodic::honesty::test::Reporter>, 1> reporters{
-		std::make_unique<synodic::honesty::test::StandardReporter>(logger)};
+	std::array<std::unique_ptr<honesty::test::Reporter>, 1> reporters{
+		std::make_unique<honesty::test::StandardReporter>(logger)};
 
-	const synodic::honesty::test::api::ExecuteParameters
+	const honesty::test::api::ExecuteParameters
 		configuration("honesty", "", runner, reporters, false, {}, logger);
-	synodic::honesty::test::api::ExecuteResult result = Execute(configuration);
+	honesty::test::api::ExecuteResult result = Execute(configuration);
 
 	return 0;
 }

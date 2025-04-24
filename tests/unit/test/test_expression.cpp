@@ -4,8 +4,8 @@ import std;
 
 // TODO: Report compile-time tests
 
-using namespace synodic::honesty::test;
-using namespace synodic::honesty::test::literals;
+using namespace honesty::test;
+using namespace honesty::test::literals;
 
 namespace
 {
@@ -13,7 +13,7 @@ namespace
 		"expectation",
 		[](Fixture& fixture) -> Generator
 		{
-			const std::stringstream& stream = fixture.AttachListener(synodic::honesty::log::LevelType::TRACE);
+			const std::stringstream& stream = fixture.AttachListener(honesty::log::LevelType::TRACE);
 
 			co_yield "error_description"_test = [&]() -> Generator
 			{

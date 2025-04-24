@@ -6,8 +6,8 @@ import synodic.honesty.test.api;
 
 import synodic.honesty.log;
 
-using namespace synodic::honesty::test;
-using namespace synodic::honesty::test::literals;
+using namespace honesty::test;
+using namespace honesty::test::literals;
 
 namespace
 {
@@ -15,8 +15,8 @@ namespace
 		"api",
 		[](const Fixture& fixture) -> Generator
 		{
-			const synodic::honesty::log::Logger& root = synodic::honesty::log::RootLogger();
-			synodic::honesty::log::Logger logger = root.CreateLogger("test");
+			const honesty::log::Logger& root = honesty::log::RootLogger();
+			honesty::log::Logger logger = root.CreateLogger("test");
 
 			MockRunner runner(logger);
 

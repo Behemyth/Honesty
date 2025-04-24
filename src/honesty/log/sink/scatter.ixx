@@ -8,7 +8,7 @@ import :logger;
 
 import inplace_vector;
 
-namespace synodic::honesty::log
+namespace honesty::log
 {
 
 	// TODO: Share functionality when deducing this works

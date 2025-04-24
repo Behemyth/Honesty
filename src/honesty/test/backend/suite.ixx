@@ -6,7 +6,7 @@ import :fixture;
 import function_ref;
 import :test;
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 	// Forward declaration for exporting
 	export class SuiteData;

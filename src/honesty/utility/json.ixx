@@ -19,7 +19,7 @@ namespace
 	};
 }
 
-namespace synodic::honesty::utility
+namespace honesty::utility
 {
 
 	// TODO: Use c++26 reflection for a simple lexer without pulling in a library

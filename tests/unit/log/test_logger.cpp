@@ -2,23 +2,23 @@ import std;
 import synodic.honesty.test;
 import synodic.honesty.log;
 
-using namespace synodic::honesty::test::literals;
+using namespace honesty::test::literals;
 
 namespace
 {
-	synodic::honesty::test::Suite SUITE(
+	honesty::test::Suite SUITE(
 		"logger",
-		[]() -> synodic::honesty::test::Generator
+		[]() -> honesty::test::Generator
 		{
-			co_yield "parent_sink"_test = [](const synodic::honesty::test::Requirements& requirements)
+			co_yield "parent_sink"_test = [](const honesty::test::Requirements& requirements)
 			{
-				const synodic::honesty::log::Logger& root = synodic::honesty::log::RootLogger();
+				const honesty::log::Logger& root = honesty::log::RootLogger();
 
 				std::stringstream stream;
-				synodic::honesty::log::OStream<std::mutex> sink(stream);
+				honesty::log::OStream<std::mutex> sink(stream);
 
-				synodic::honesty::log::Logger parent = root.CreateLogger("parent");
-				const synodic::honesty::log::Logger child = parent.CreateLogger("child");
+				honesty::log::Logger parent = root.CreateLogger("parent");
+				const honesty::log::Logger child = parent.CreateLogger("child");
 
 				parent.SetSink(&sink);
 
@@ -59,5 +59,5 @@ namespace
 			};
 		});
 
-	synodic::honesty::test::SuiteRegistrar _(SUITE);
+	honesty::test::SuiteRegistrar _(SUITE);
 }

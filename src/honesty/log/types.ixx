@@ -2,7 +2,7 @@ export module synodic.honesty.log:types;
 
 import std;
 
-namespace synodic::honesty::log
+namespace honesty::log
 {
 	export enum class LevelType
 	{

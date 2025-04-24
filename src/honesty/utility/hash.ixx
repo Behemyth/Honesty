@@ -7,7 +7,7 @@ export module synodic.honesty.utility:hash;
 import std;
 import :exception;
 
-namespace synodic::honesty::utility
+namespace honesty::utility
 {
 
 	/**
@@ -92,9 +92,9 @@ namespace synodic::honesty::utility
 namespace std
 {
 	export template<typename Integral>
-	struct hash<synodic::honesty::utility::BasicHash<Integral>>
+	struct hash<honesty::utility::BasicHash<Integral>>
 	{
-		std::size_t operator()(const synodic::honesty::utility::BasicHash<Integral>& hash) const noexcept
+		std::size_t operator()(const honesty::utility::BasicHash<Integral>& hash) const noexcept
 		{
 			return static_cast<std::size_t>(hash);
 		}

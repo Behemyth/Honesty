@@ -41,7 +41,7 @@ namespace
 	}();
 }
 
-namespace synodic::honesty::log
+namespace honesty::log
 {
 
 	export bool SupportsColour()
@@ -386,11 +386,11 @@ namespace synodic::honesty::log
 }
 
 export template<>
-struct std::formatter<synodic::honesty::log::Colour24> :
+struct std::formatter<honesty::log::Colour24> :
 	std::formatter<std::tuple<std::uint8_t, std::uint8_t, std::uint8_t>>
 {
 	template<typename Context>
-	auto format(synodic::honesty::log::Colour24 colour, Context& context) const
+	auto format(honesty::log::Colour24 colour, Context& context) const
 	{
 		return std::formatter<std::tuple<std::uint8_t, std::uint8_t, std::uint8_t>>::format(
 			std::make_tuple(colour.red, colour.green, colour.blue),

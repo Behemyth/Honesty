@@ -5,7 +5,7 @@ import std;
 import :context;
 import :zone;
 
-namespace synodic::honesty::trace
+namespace honesty::trace
 {
 	/**
 	 * @brief The collected data of a span. Meant to be a small size and efficient to process in bulk numbers

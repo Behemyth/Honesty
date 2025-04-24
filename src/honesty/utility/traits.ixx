@@ -6,7 +6,7 @@ export module synodic.honesty.utility:traits;
 
 import std;
 
-namespace synodic::honesty::utility
+namespace honesty::utility
 {
 	/**
 	 *	Evaluates the given integer and returns the minimally sized integral type that can hold the value. If the value

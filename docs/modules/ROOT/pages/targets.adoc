@@ -4,10 +4,10 @@
 
 ---
 
-== `synodic::honesty` [[honesty]]
+== `honesty` [[honesty]]
 
 A static target that links to every other target in the project.
 
-== `synodic::honesty::entry` [[entry]]
+== `honesty::entry` [[entry]]
 
-A static target that provides the same functionality as <<honesty, synodic::honesty>> but also includes a main function that will run all tests discoverable in the executable.
+A static target that provides the same functionality as <<honesty, honesty>> but also includes a main function that will run all tests discoverable in the executable.

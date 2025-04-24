@@ -2,7 +2,7 @@ export module synodic.honesty.platform;
 
 import std;
 
-export namespace synodic::honesty::platform
+export namespace honesty::platform
 {
 
 	enum class PlatformID
@@ -111,7 +111,7 @@ export namespace synodic::honesty::platform
 
 module :private;
 
-namespace synodic::honesty::platform
+namespace honesty::platform
 {
 
 }

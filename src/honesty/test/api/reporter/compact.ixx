@@ -4,7 +4,7 @@ import synodic.honesty.log;
 import synodic.honesty.test;
 import std;
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 	export class CompactReporter final : public StreamingAdapter
 	{

@@ -9,7 +9,7 @@ import function_ref;
 import :reporter;
 import :test;
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 	// Forward declarations
 	export class Fixture;

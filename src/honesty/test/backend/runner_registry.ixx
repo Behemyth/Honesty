@@ -8,7 +8,7 @@ import inplace_vector;
 import synodic.honesty.log;
 import :runner;
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 
 	export class RunnerRegistry

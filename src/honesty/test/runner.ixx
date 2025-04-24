@@ -6,7 +6,7 @@ import synodic.honesty.test.backend;
 
 import std;
 
-namespace synodic::honesty::test
+namespace honesty::test
 {
 	template<typename T>
 	concept runner = requires {

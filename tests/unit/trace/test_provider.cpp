@@ -18,13 +18,12 @@ namespace
 				honesty::trace::Provider three("one", "two", "three");
 			};
 
-			co_yield "get"_test = [](const Requirements& requirements)
+			co_yield "validate"_test = [](const Requirements& requirements)
 			{
 				constexpr honesty::trace::Provider three("one", "two", "three");
 
-				const honesty::trace::Tracer& success = three.Get("three");
-
-				const honesty::trace::Tracer& failure = three.Get("four");
+				static_assert(three.ValidateName("three"));
+				static_assert(!three.ValidateName("four"));
 			};
 
 		});

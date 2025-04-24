@@ -259,7 +259,7 @@ namespace std
 			return data_;
 		}
 
-		operator basic_string_view<charT, traits>() const noexcept
+		constexpr operator basic_string_view<charT, traits>() const noexcept
 		{
 			return basic_string_view<charT, traits>{data_, size_};
 		}

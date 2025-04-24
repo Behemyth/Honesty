@@ -22,6 +22,19 @@ namespace honesty::trace
 		{
 		}
 
+		consteval bool ValidateName(const std::zstring_view name) const
+		{
+			for (const Tracer& tracer: tracers_)
+			{
+				if (tracer.Label() == name)
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		consteval const Tracer& Get(const std::zstring_view name) const
 		{
 			for (const Tracer& tracer: tracers_)

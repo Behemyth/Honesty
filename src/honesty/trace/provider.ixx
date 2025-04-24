@@ -26,7 +26,6 @@ namespace honesty::trace
 		{
 			for (const Tracer& tracer: tracers_)
 			{
-				// Assuming Tracer has a method or member to get its label for comparison
 				if (tracer.Label() == name)
 				{
 					return tracer;

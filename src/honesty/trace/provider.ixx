@@ -16,9 +16,9 @@ namespace honesty::trace
 	{
 	public:
 		template<typename... Names>
-		explicit consteval Provider(Names... names)
-			requires ((std::same_as<Names, std::zstring_view> && ...)) :
-			tracers_{Tracer(names)...}
+		explicit consteval Provider(const std::zstring_view rootName, Names... names)
+			requires std::conjunction_v<std::is_same<Names, std::zstring_view>...>:
+			tracers_{Tracer(rootName) ,Tracer(names)...}
 		{
 		}
 
@@ -30,4 +30,10 @@ namespace honesty::trace
 	export
 	template<typename... Names>
 	Provider(Names...) -> Provider<sizeof...(Names)>;
+}
+
+namespace honesty
+{
+	//export
+	//using Tracer = 
 }

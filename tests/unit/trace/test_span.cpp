@@ -13,7 +13,6 @@ namespace
 		{
 			co_yield "root_span"_test = [](const Requirements& requirements)
 			{
-				honesty::trace::Tracer::Get("root");
 			};
 
 			co_yield "attach_span"_test = [](const Requirements& requirements)

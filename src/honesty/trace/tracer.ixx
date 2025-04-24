@@ -80,11 +80,7 @@ namespace honesty::trace
 	export class Tracer
 	{
 	public:
-		static consteval Tracer Get(const std::zstring_view label)
-		{
-			// TODO: Replace with a retrieval
-			return Tracer(label);
-		}
+
 
 	private:
 		template<std::uint8_t N>

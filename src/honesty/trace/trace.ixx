@@ -1,6 +1,6 @@
 export module synodic.honesty.trace:trace;
 
-import :span
+import :span;
 
 namespace synodic::honesty::trace
 {

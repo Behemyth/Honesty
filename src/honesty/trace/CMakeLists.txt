@@ -5,7 +5,7 @@ target_sources(honesty
 		FILES
 			context.ixx
 			trace.ixx
-			trace_module.ixx
+			module.ixx
 			tracer.ixx
 			types.ixx
 			zone.ixx

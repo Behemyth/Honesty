@@ -7,7 +7,7 @@ namespace synodic::honesty::trace
 	/**
 	 * @brief A top-level span
 	 */
-	class Trace : public Span
+	export class Trace : public Span
 	{
 	public:
 

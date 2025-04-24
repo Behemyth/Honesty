@@ -87,11 +87,14 @@ namespace honesty::trace
 		}
 
 	private:
+		template<std::uint8_t N>
+		friend class Provider;
+
 		constexpr explicit Tracer(std::zstring_view label)
 		{
 		}
 
 		static Tracer tracer_;
-		static thread_local SpanRingBuffer<64> storage_;
+		static thread_local SpanRingBuffer<256> storage_;
 	};
 }

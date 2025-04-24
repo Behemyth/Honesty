@@ -11,9 +11,20 @@ namespace
 		"provider",
 		[]() -> Generator
 		{
-			co_yield "empty_construction"_test = [](const Requirements& requirements)
+			co_yield "construction"_test = [](const Requirements& requirements)
 			{
-				honesty::trace::Provider provider("name");
+				honesty::trace::Provider one("one");
+				honesty::trace::Provider two("one", "two");
+				honesty::trace::Provider three("one", "two", "three");
+			};
+
+			co_yield "get"_test = [](const Requirements& requirements)
+			{
+				constexpr honesty::trace::Provider three("one", "two", "three");
+
+				const honesty::trace::Tracer& success = three.Get("three");
+
+				const honesty::trace::Tracer& failure = three.Get("four");
 			};
 
 		});

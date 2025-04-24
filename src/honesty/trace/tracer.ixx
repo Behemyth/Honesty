@@ -80,15 +80,21 @@ namespace honesty::trace
 	export class Tracer
 	{
 	public:
-
+		consteval std::zstring_view Label() const
+		{
+			return label_;
+		}
 
 	private:
 		template<std::uint8_t N>
 		friend class Provider;
 
-		constexpr explicit Tracer(std::zstring_view label)
+		consteval explicit Tracer(const std::zstring_view label) :
+			label_(label)
 		{
 		}
+
+		std::zstring_view label_;
 
 		static Tracer tracer_;
 		static thread_local SpanRingBuffer<256> storage_;

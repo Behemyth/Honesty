@@ -35,7 +35,7 @@ namespace honesty::trace
 		friend class Tracer;
 
 
-		Span(Context& context, const Zone& zone) :
+		Span(Context& context, const Scope& zone) :
 			context_(context), labelID_(0)
 		{
 			startTime_ = std::chrono::high_resolution_clock::now();

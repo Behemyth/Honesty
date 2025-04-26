@@ -9,7 +9,7 @@ target_sources(honesty
 			provider.ixx
 			tracer.ixx
 			types.ixx
-			zone.ixx
+			scope.ixx
 			span.ixx
 	PRIVATE
 		FILE_SET trace_private

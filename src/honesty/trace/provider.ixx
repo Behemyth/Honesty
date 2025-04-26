@@ -47,6 +47,11 @@ namespace honesty::trace
 			throw std::runtime_error("Tracer with the given name not found");
 		}
 
+		static constexpr std::uint8_t Size()
+		{
+			return N;
+		}
+
 	private:
 		std::array<Tracer, N> tracers_;
 	};

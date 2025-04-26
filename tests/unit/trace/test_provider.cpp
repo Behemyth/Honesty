@@ -13,9 +13,13 @@ namespace
 		{
 			co_yield "construction"_test = [](const Requirements& requirements)
 			{
-				honesty::trace::Provider one("one");
-				honesty::trace::Provider two("one", "two");
-				honesty::trace::Provider three("one", "two", "three");
+				constexpr honesty::trace::Provider one("one");
+				constexpr honesty::trace::Provider two("one", "two");
+				constexpr honesty::trace::Provider three("one", "two", "three");
+
+				requirements.ExpectEquals(one.Size(), 1);
+				requirements.ExpectEquals(two.Size(), 2);
+				requirements.ExpectEquals(three.Size(), 3);
 			};
 
 			co_yield "validate"_test = [](const Requirements& requirements)
@@ -24,6 +28,13 @@ namespace
 
 				static_assert(three.ValidateName("three"));
 				static_assert(!three.ValidateName("four"));
+			};
+
+			co_yield "get"_test = [](const Requirements& requirements)
+			{
+				constexpr honesty::trace::Provider provider("one", "two", "three");
+
+				constexpr honesty::trace::Tracer one = provider.Get("one");
 			};
 
 		});

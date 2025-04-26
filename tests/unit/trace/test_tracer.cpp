@@ -16,6 +16,16 @@ namespace
 				constexpr honesty::trace::Provider provider("one", "two", "three");
 
 				constexpr honesty::trace::Tracer one = provider.Get("one");
+
+				requirements.ExpectEquals(one.Label(), "one");
+			};
+
+			co_yield "span_creation"_test = [](const Requirements& requirements)
+			{
+				constexpr honesty::trace::Provider provider("tracer");
+
+				constexpr honesty::trace::Tracer tracer = provider.Get("tracer");
+
 			};
 		});
 	SuiteRegistrar _(SUITE);

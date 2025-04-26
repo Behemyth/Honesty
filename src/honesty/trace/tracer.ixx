@@ -3,14 +3,13 @@ export module synodic.honesty.trace:tracer;
 import std;
 
 import :context;
-import :span;
 import zstring_view;
 
 namespace honesty::trace
 {
 
 	/**
-	 * @brief A tracer generates and provides Trace objects.
+	 * @brief A tracer is a tag for Trace objects.
 	 */
 	export class Tracer
 	{
@@ -21,7 +20,6 @@ namespace honesty::trace
 		}
 
 	private:
-		template<std::uint8_t N>
 		friend class Provider;
 
 		consteval explicit Tracer(const std::zstring_view label) :

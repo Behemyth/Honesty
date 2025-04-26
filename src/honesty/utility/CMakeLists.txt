@@ -6,7 +6,7 @@ target_sources(honesty
 			exception.ixx
 			hash.ixx
 			json.ixx
-			utility.ixx
+			module.ixx
 			inplace_vector.ixx
 			inplace_string.ixx
 			function_ref.ixx

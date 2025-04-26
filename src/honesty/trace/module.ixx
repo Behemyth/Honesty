@@ -4,8 +4,13 @@ export import :trace;
 export import :tracer;
 export import :types;
 export import :span;
-export import :zone;
+export import :scope;
 export import :provider;
 
 export import :sink.log;
 export import :sink.scatter;
+
+namespace honesty
+{
+	export using Span = trace::Span;
+}

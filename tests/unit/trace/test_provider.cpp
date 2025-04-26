@@ -37,6 +37,13 @@ namespace
 				constexpr honesty::trace::Tracer one = provider.Get("one");
 			};
 
+			co_yield "global"_test = [](const Requirements& requirements)
+			{
+				//const honesty::Tracer& tracer = honesty::GetTracer("test");
+
+
+			};
+
 		});
 	SuiteRegistrar _(SUITE);
 }

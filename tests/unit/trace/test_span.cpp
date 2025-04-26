@@ -11,17 +11,9 @@ namespace
 		"span",
 		[]() -> Generator
 		{
-			co_yield "root_span"_test = [](const Requirements& requirements)
+			co_yield "span"_test = [](const Requirements& requirements)
 			{
-			};
-
-			co_yield "attach_span"_test = [](const Requirements& requirements)
-			{
-				/*honesty::trace::Tracer tracer;
-
-				{
-					auto span = tracer.AttachSpan();
-				}*/
+					//honesty::Span span("span");
 			};
 		});
 	SuiteRegistrar _(SUITE);

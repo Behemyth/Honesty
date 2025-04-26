@@ -20,12 +20,15 @@ namespace
 				requirements.ExpectEquals(one.Label(), "one");
 			};
 
-			co_yield "span_creation"_test = [](const Requirements& requirements)
+			co_yield "span"_test = [](const Requirements& requirements)
 			{
 				constexpr honesty::trace::Provider provider("tracer");
 
 				constexpr honesty::trace::Tracer tracer = provider.Get("tracer");
 
+				{
+					//honesty::Span("test_span");
+				}
 			};
 		});
 	SuiteRegistrar _(SUITE);

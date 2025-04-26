@@ -3,10 +3,13 @@ export module synodic.honesty.trace:span;
 import std;
 
 import :context;
-import :zone;
+import :scope;
+import :tracer;
 
 namespace honesty::trace
 {
+	constexpr bool ENABLED = true;
+
 	/**
 	 * @brief The collected data of a span. Meant to be a small size and efficient to process in bulk numbers
 	 */
@@ -14,12 +17,23 @@ namespace honesty::trace
 	{
 		std::chrono::high_resolution_clock::time_point startTime;
 		std::chrono::high_resolution_clock::duration duration;
+		std::uint32_t spanID;
+		std::uint32_t parentSpanID;
+		std::uint32_t metadataID;
+	};
+
+	class DisabledSpan
+	{
+	};
+
+	class EnabledSpan
+	{
 	};
 
 	/**
 	 * @brief The public interface for recording a span of time
 	 */
-	export class Span
+	export class Span : public std::conditional_t<ENABLED, EnabledSpan, DisabledSpan>
 	{
 	public:
 		~Span()
@@ -27,27 +41,24 @@ namespace honesty::trace
 			const auto endTime = std::chrono::high_resolution_clock::now();
 
 			auto duration = endTime - startTime_;
-
-			//context_->
 		}
 
 	private:
 		friend class Tracer;
 
-
-		Span(Context& context, const Scope& zone) :
-			context_(context), labelID_(0)
-		{
-			startTime_ = std::chrono::high_resolution_clock::now();
-		}
-
-		Span(Context& context, std::string_view label) :
-			context_(context), labelID_(0)
+		explicit Span(const Scope& scope) :
+			startTime_(std::chrono::high_resolution_clock::now())
 		{
 		}
 
-		std::reference_wrapper<Context> context_;
+		explicit Span(std::string_view label)
+		{
+		}
+
+		Span(std::string_view label, Tracer tracer)
+		{
+		}
+
 		std::chrono::high_resolution_clock::time_point startTime_;
-		std::uint64_t labelID_;
 	};
 }

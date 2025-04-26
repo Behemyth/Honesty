@@ -1,4 +1,4 @@
-export module synodic.honesty.trace:zone;
+export module synodic.honesty.trace:scope;
 
 import std;
 import zstring_view;

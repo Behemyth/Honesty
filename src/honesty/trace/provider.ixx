@@ -88,7 +88,7 @@ namespace honesty::trace
 		// TODO: Require a configuration for each EnumType, C++26
 		// TODO: Constrain the enum type MAX_TRACER value
 		template<typename EnumType, typename... Configuration>
-		explicit consteval Provider(Configuration... configurations)
+		explicit consteval Provider(const Configuration&... configurations)
 			requires (std::is_scoped_enum_v<EnumType> &&
 			          sizeof...(Configuration) >= 1 &&
 			          std::conjunction_v<std::is_same<Configuration, Tracer::Configuration>...>):
@@ -96,6 +96,11 @@ namespace honesty::trace
 			tracers_{Tracer(configurations)...}
 		{
 		}
+
+		Provider(const Provider& other)                = delete;
+		Provider(Provider&& other) noexcept            = delete;
+		Provider& operator=(const Provider& other)     = delete;
+		Provider& operator=(Provider&& other) noexcept = delete;
 
 		template<typename EnumType, EnumType EnumValue = 0>
 			requires std::is_scoped_enum_v<EnumType>
@@ -132,5 +137,7 @@ namespace honesty::trace
 		std::inplace_vector<Tracer, MAX_TRACERS> tracers_;
 
 		static thread_local SpanRingBuffer<256> storage_;
+
+		constinit static Provider singleton_;
 	};
 }

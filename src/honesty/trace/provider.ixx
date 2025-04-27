@@ -6,7 +6,6 @@ import :tracer;
 import :span;
 import zstring_view;
 import inplace_vector;
-import synodic.honesty.utility;
 
 namespace honesty::trace
 {
@@ -76,10 +75,19 @@ namespace honesty::trace
 		std::size_t size_ = 0;
 	};
 
+	export template<typename Enum>
+	concept group_enum =
+		std::is_scoped_enum_v<Enum>
+		&& requires
+		{
+			{ Enum::COUNT } -> std::convertible_to<Enum>; // TODO: Replace with reflection, C++26
+		};
+
 	/**
 	 * @brief Entrypoint for creating Tracers
 	 */
 	export
+	template<group_enum EnumType>
 	class Provider
 	{
 	public:
@@ -87,7 +95,7 @@ namespace honesty::trace
 
 		// TODO: Require a configuration for each EnumType, C++26
 		// TODO: Constrain the enum type MAX_TRACER value
-		template<typename EnumType, typename... Configuration>
+		template<typename... Configuration>
 		explicit consteval Provider(const Configuration&... configurations)
 			requires (std::is_scoped_enum_v<EnumType> &&
 			          sizeof...(Configuration) >= 1 &&
@@ -102,7 +110,7 @@ namespace honesty::trace
 		Provider& operator=(const Provider& other)     = delete;
 		Provider& operator=(Provider&& other) noexcept = delete;
 
-		template<typename EnumType, EnumType EnumValue = 0>
+		template<EnumType EnumValue = 0>
 			requires std::is_scoped_enum_v<EnumType>
 		consteval bool IsTracerEnabled() const
 		{
@@ -114,7 +122,7 @@ namespace honesty::trace
 			return tracers_[static_cast<std::size_t>(EnumValue)].GetConfiguration().enabled;
 		}
 
-		template<typename EnumType, EnumType EnumValue>
+		template<EnumType EnumValue>
 			requires std::is_scoped_enum_v<EnumType>
 		consteval const Tracer& Get() const
 		{
@@ -137,7 +145,5 @@ namespace honesty::trace
 		std::inplace_vector<Tracer, MAX_TRACERS> tracers_;
 
 		static thread_local SpanRingBuffer<256> storage_;
-
-		constinit static Provider singleton_;
 	};
 }

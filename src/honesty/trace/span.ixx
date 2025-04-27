@@ -8,8 +8,6 @@ import :tracer;
 
 namespace honesty::trace
 {
-	constexpr bool ENABLED = true;
-
 	/**
 	 * @brief The collected data of a span. Meant to be a small size and efficient to process in bulk numbers
 	 */
@@ -33,7 +31,7 @@ namespace honesty::trace
 	/**
 	 * @brief The public interface for recording a span of time
 	 */
-	export class Span : public std::conditional_t<ENABLED, EnabledSpan, DisabledSpan>
+	export class Span
 	{
 	public:
 		~Span()

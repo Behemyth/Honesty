@@ -83,40 +83,42 @@ namespace honesty::trace
 	class Provider
 	{
 	public:
+		static constexpr std::size_t MAX_TRACERS = 32;
 
-		static constexpr std::uint8_t MAX_TRACERS = 32;
-
-		template<typename... Names>
-		explicit consteval Provider(const std::zstring_view rootName, Names... names)
-			requires std::conjunction_v<std::is_convertible<Names, std::zstring_view>...>:
-			tracers_{Tracer(rootName), Tracer(names)...}
+		// TODO: Require a configuration for each EnumType, C++26
+		// TODO: Constrain the enum type MAX_TRACER value
+		template<typename EnumType, typename... Configuration>
+		explicit consteval Provider(Configuration... configurations)
+			requires (std::is_scoped_enum_v<EnumType> &&
+			          sizeof...(Configuration) >= 1 &&
+			          std::conjunction_v<std::is_same<Configuration, Tracer::Configuration>...>):
+			enumTypeHash_(typeid(EnumType).hash_code()),
+			tracers_{Tracer(configurations)...}
 		{
 		}
 
-		consteval bool ValidateName(const std::zstring_view name) const
+		template<typename EnumType, EnumType EnumValue = 0>
+			requires std::is_scoped_enum_v<EnumType>
+		consteval bool IsTracerEnabled() const
 		{
-			for (const Tracer& tracer: tracers_)
+			if constexpr (typeid(EnumType).hash_code() != enumTypeHash_)
 			{
-				if (tracer.Label() == name)
-				{
-					return true;
-				}
+				return false;
 			}
 
-			return false;
+			return tracers_[static_cast<std::size_t>(EnumValue)].GetConfiguration().enabled;
 		}
 
-		consteval const Tracer& Get(const std::zstring_view name) const
+		template<typename EnumType, EnumType EnumValue>
+			requires std::is_scoped_enum_v<EnumType>
+		consteval const Tracer& Get() const
 		{
-			static int counter = 0;
-			for (const Tracer& tracer: tracers_)
+			if constexpr (typeid(EnumType).hash_code() != enumTypeHash_)
 			{
-				if (tracer.Label() == name)
-				{
-					return tracer;
-				}
+				return tracers_[0];
 			}
-			throw std::runtime_error("Tracer with the given name not found");
+
+			return tracers_[static_cast<std::size_t>(EnumValue)];
 		}
 
 		constexpr std::uint8_t Size() const
@@ -125,7 +127,7 @@ namespace honesty::trace
 		}
 
 	private:
-		static constexpr Provider PROVIDER;
+		std::uint64_t enumTypeHash_;
 
 		std::inplace_vector<Tracer, MAX_TRACERS> tracers_;
 

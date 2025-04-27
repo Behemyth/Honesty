@@ -7,26 +7,40 @@ import zstring_view;
 
 namespace honesty::trace
 {
-
 	/**
 	 * @brief A tracer is a tag for Trace objects.
 	 */
-	export class Tracer
+	export
+	class Tracer
 	{
 	public:
-		consteval std::zstring_view Label() const
+		/**
+		 * @brief The compile-time configuration for a tracer.
+		 */
+		struct Configuration
 		{
-			return label_;
+			consteval Configuration(const bool enabled = false) :
+				enabled(enabled)
+			{
+			}
+
+			bool enabled;
+		};
+
+
+		consteval const Configuration& GetConfiguration() const
+		{
+			return configuration_;
 		}
 
 	private:
 		friend class Provider;
 
-		consteval explicit Tracer(const std::zstring_view label) :
-			label_(label)
+		consteval explicit Tracer(const Configuration& configuration) :
+			configuration_(configuration)
 		{
 		}
 
-		std::zstring_view label_;
+		Configuration configuration_;
 	};
 }

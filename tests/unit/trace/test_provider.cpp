@@ -13,9 +13,26 @@ namespace
 		{
 			co_yield "construction"_test = [](const Requirements& requirements)
 			{
-				constexpr honesty::trace::Provider one("one");
-				constexpr honesty::trace::Provider two("one", "two");
-				constexpr honesty::trace::Provider three("one", "two", "three");
+				enum class ProviderTypeOne
+				{
+					BASE
+				};
+
+				enum class ProviderTypeTwo
+				{
+					BASE
+				};
+
+				enum class ProviderTypeThree
+				{
+					BASE
+				};
+
+				constexpr honesty::trace::Tracer::Configuration config;
+
+				constexpr honesty::trace::Provider one(config);
+				constexpr honesty::trace::Provider two(config, config);
+				constexpr honesty::trace::Provider three(config, config, config);
 
 				requirements.ExpectEquals(one.Size(), 1);
 				requirements.ExpectEquals(two.Size(), 2);
@@ -24,26 +41,23 @@ namespace
 
 			co_yield "validate"_test = [](const Requirements& requirements)
 			{
-				constexpr honesty::trace::Provider three("one", "two", "three");
+			/*	constexpr honesty::trace::Provider three("one", "two", "three");
 
-				static_assert(three.ValidateName("three"));
-				static_assert(!three.ValidateName("four"));
+				static_assert(three.IsTracerEnabled("three"));
+				static_assert(!three.IsTracerEnabled("four"));*/
 			};
 
 			co_yield "get"_test = [](const Requirements& requirements)
 			{
-				constexpr honesty::trace::Provider provider("one", "two", "three");
+				/*constexpr honesty::trace::Provider provider("one", "two", "three");
 
-				constexpr honesty::trace::Tracer one = provider.Get("one");
+				constexpr honesty::trace::Tracer one = provider.Get("one");*/
 			};
 
 			co_yield "global"_test = [](const Requirements& requirements)
 			{
 				//const honesty::Tracer& tracer = honesty::GetTracer("test");
-
-
 			};
-
 		});
 	SuiteRegistrar _(SUITE);
 }

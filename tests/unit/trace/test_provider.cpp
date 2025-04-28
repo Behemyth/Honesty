@@ -13,8 +13,14 @@ namespace
 		{
 			co_yield "construction"_test = [](const Requirements& requirements)
 			{
+				enum class ProviderTypeNone
+				{
+					COUNT
+				};
+
 				enum class ProviderTypeOne
 				{
+					BASE,
 					COUNT
 				};
 
@@ -30,14 +36,20 @@ namespace
 					COUNT
 				};
 
-				constexpr honesty::trace::Provider one =
-					honesty::trace::ProviderBuilder<ProviderTypeOne>(false)
-					.Build();
+	/*			constexpr honesty::trace::Provider none =
+					honesty::trace::ProviderBuilder<ProviderTypeNone>(false)
+					.Build();*/
+
+				constexpr auto builderOne = honesty::trace::ProviderBuilder<ProviderTypeOne>(true)
+				                         .AddConfiguration<ProviderTypeOne::BASE>(true);
+
+				constexpr auto providerOne = builderOne.Build();
 
 				//constexpr honesty::trace::Provider two(config, config);
 				//constexpr honesty::trace::Provider three(config, config, config);
 
-				//requirements.ExpectEquals(one.Size(), 1);
+				//requirements.ExpectEquals(none.Size(), 0);
+				requirements.ExpectEquals(providerOne.Size(), 1);
 				//requirements.ExpectEquals(two.Size(), 2);
 				//requirements.ExpectEquals(three.Size(), 3);
 			};

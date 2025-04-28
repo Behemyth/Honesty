@@ -77,7 +77,7 @@ namespace honesty::trace
 
 
 	export
-	template<group_enum T>
+	template<group_enum T, typename Configurations>
 	class ProviderBuilder;
 
 	/**
@@ -111,11 +111,11 @@ namespace honesty::trace
 		}
 
 	private:
-		template<group_enum T>
+		template<group_enum T, typename Configurations>
 		friend class ProviderBuilder;
 
 		explicit consteval Provider(const std::array<Tracer, COUNT> tracers) :
-			tracers_(tracers)
+			tracers_(std::move(tracers))
 		{
 		}
 
@@ -123,6 +123,7 @@ namespace honesty::trace
 
 		static thread_local SpanRingBuffer<256> storage_;
 	};
+
 
 	/**
 	 * @brief Builder for creating a Tracer Provider.
@@ -138,39 +139,28 @@ namespace honesty::trace
 		{
 		}
 
-		consteval ProviderBuilder& AddConfiguration(EnumType value, const bool enabled)
+		template<EnumType Value>
+		consteval auto AddConfiguration(bool enabled) const
 		{
-			auto index = std::to_underlying(value);
-			if (index >= COUNT)
-			{
-				throw "Invalid enum value";
-			}
 
-			TracerConfiguration config;
-			config.enabled = enabled;
+			constexpr TracerConfiguration config{enabled};
+			using NewConfigurations = ConfigSet<ConfigEntry<Value, config>, Configurations>;
 
-			configurations_[index] = config;
-			return *this;
+			return ProviderBuilder<EnumType, NewConfigurations>(enabled_);
 		}
 
 		consteval Provider<EnumType> Build() const
 		{
-			for (size_t i = 0; i < COUNT; ++i)
+
+			auto make_tracers = [&]<std::size_t... Indices>(std::index_sequence<Indices...>) consteval
 			{
-				if (!configurations_[i].has_value())
-				{
-					throw "Missing configuration for some enum values";
-				}
-			}
+				return std::array<Tracer, COUNT>{
+					Tracer(FindConfig<static_cast<EnumType>(Indices), Configurations>::type::config)...
+				};
+			};
 
-			std::array<Tracer, COUNT> tracers = std::apply(
-				[](const auto&... configurations)
-				{
-					return std::array<Tracer, COUNT>{Tracer(configurations.value())...};
-				},
-				configurations_);
-
-			return Provider<EnumType>(tracers);
+			auto tracers = make_tracers(std::make_index_sequence<COUNT>{});
+			return Provider<EnumType>(std::move(tracers));
 		}
 
 	private:

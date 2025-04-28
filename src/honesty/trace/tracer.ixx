@@ -25,10 +25,10 @@ namespace honesty::trace
 		Tracer& operator=(const Tracer& other)     = delete;
 		Tracer& operator=(Tracer&& other) noexcept = delete;
 	private:
-		template<group_enum T>
+		template<group_enum T, typename Configurations>
 		friend class ProviderBuilder;
 
-		consteval explicit Tracer(const TracerConfiguration& configuration)
+		constexpr explicit Tracer(const TracerConfiguration& configuration)
 		{
 		}
 	};

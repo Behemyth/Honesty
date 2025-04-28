@@ -15,7 +15,6 @@ namespace
 			{
 				enum class ProviderTypeOne
 				{
-					BASE,
 					COUNT
 				};
 
@@ -32,7 +31,7 @@ namespace
 				};
 
 				constexpr honesty::trace::Provider one =
-					honesty::trace::ProviderBuilder(ProviderTypeOne::BASE, false)
+					honesty::trace::ProviderBuilder<ProviderTypeOne>(false)
 					.Build();
 
 				//constexpr honesty::trace::Provider two(config, config);

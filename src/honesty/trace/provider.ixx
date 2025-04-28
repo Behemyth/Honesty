@@ -133,7 +133,8 @@ namespace honesty::trace
 		static constexpr auto COUNT = std::to_underlying(EnumType::COUNT);
 
 	public:
-		consteval ProviderBuilder(EnumType value, const bool enabled)
+		explicit consteval ProviderBuilder(const bool enabled) :
+			enabled_(enabled)
 		{
 		}
 
@@ -163,9 +164,9 @@ namespace honesty::trace
 			}
 
 			std::array<Tracer, COUNT> tracers = std::apply(
-				[](const auto&... configurations) consteval
+				[](const auto&... configurations)
 				{
-					return std::array{Tracer(configurations.value())...};
+					return std::array<Tracer, COUNT>{Tracer(configurations.value())...};
 				},
 				configurations_);
 
@@ -173,6 +174,7 @@ namespace honesty::trace
 		}
 
 	private:
+		bool enabled_;
 		std::array<std::optional<TracerConfiguration>, COUNT> configurations_;
 	};
 }

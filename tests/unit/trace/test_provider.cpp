@@ -32,8 +32,7 @@ namespace
 				};
 
 				constexpr honesty::trace::Provider one =
-					honesty::trace::ProviderBuilder<ProviderTypeOne>()
-					.AddConfiguration(ProviderTypeOne::BASE, false)
+					honesty::trace::ProviderBuilder(ProviderTypeOne::BASE, false)
 					.Build();
 
 				//constexpr honesty::trace::Provider two(config, config);

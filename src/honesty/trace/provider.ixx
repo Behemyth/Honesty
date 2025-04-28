@@ -114,8 +114,8 @@ namespace honesty::trace
 		template<group_enum T>
 		friend class ProviderBuilder;
 
-		explicit consteval Provider(const std::array<TracerConfiguration, COUNT> configurations) :
-			tracers_(Tracer(configs)...)
+		explicit consteval Provider(const std::array<Tracer, COUNT> tracers) :
+			tracers_(tracers)
 		{
 		}
 
@@ -133,7 +133,9 @@ namespace honesty::trace
 		static constexpr auto COUNT = std::to_underlying(EnumType::COUNT);
 
 	public:
-		ProviderBuilder() = default;
+		consteval ProviderBuilder(EnumType value, const bool enabled)
+		{
+		}
 
 		consteval ProviderBuilder& AddConfiguration(EnumType value, const bool enabled)
 		{
@@ -160,13 +162,14 @@ namespace honesty::trace
 				}
 			}
 
-			std::array<TracerConfiguration, COUNT> finalizedConfigs;
-			for (size_t i = 0; i < COUNT; ++i)
-			{
-				finalizedConfigs[i] = configurations_[i].value();
-			}
+			std::array<Tracer, COUNT> tracers = std::apply(
+				[](const auto&... configurations) consteval
+				{
+					return std::array{Tracer(configurations.value())...};
+				},
+				configurations_);
 
-			return Provider<EnumType>(finalizedConfigs);
+			return Provider<EnumType>(tracers);
 		}
 
 	private:

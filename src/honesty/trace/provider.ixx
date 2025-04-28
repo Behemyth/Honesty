@@ -75,6 +75,10 @@ namespace honesty::trace
 		std::size_t size_ = 0;
 	};
 
+	class Configuration
+	{
+	};
+
 	/**
 	 * @brief Entrypoint for creating Tracers
 	 */
@@ -82,17 +86,9 @@ namespace honesty::trace
 	template<group_enum EnumType>
 	class Provider
 	{
-	public:
-		// TODO: Require a configuration for each EnumType, C++26
-		template<typename... Configuration>
-		explicit consteval Provider(const Configuration&... configurations)
-			requires (std::is_scoped_enum_v<EnumType> &&
-			          sizeof...(Configuration) >= 1 &&
-			          std::conjunction_v<std::is_same<Configuration, Tracer::Configuration>...>):
-			tracers_{Tracer(configurations)...}
-		{
-		}
+		static constexpr auto COUNT = std::to_underlying(EnumType::COUNT);
 
+	public:
 		Provider(const Provider& other)                = delete;
 		Provider(Provider&& other) noexcept            = delete;
 		Provider& operator=(const Provider& other)     = delete;
@@ -114,8 +110,65 @@ namespace honesty::trace
 		}
 
 	private:
-		std::array<Tracer, std::underlying_type_t<EnumType>(EnumType::COUNT)> tracers_;
+		template<typename... Configuration>
+		explicit consteval Provider(const Configuration&... configurations)
+			requires (
+				sizeof...(Configuration) == COUNT &&
+				std::conjunction_v<std::is_same<Configuration, Configuration>...>):
+			tracers_{Tracer(configurations)...}
+		{
+		}
+
+		std::array<Tracer, COUNT> tracers_;
 
 		static thread_local SpanRingBuffer<256> storage_;
+	};
+
+	/**
+	 * @brief Builder for creating a Tracer Provider.
+	 */
+	export
+	template<group_enum EnumType>
+	class ProviderBuilder
+	{
+
+		static constexpr auto COUNT = std::to_underlying(EnumType::COUNT);
+
+	public:
+
+		ProviderBuilder() = default;
+
+		consteval ProviderBuilder& AddConfiguration(EnumType value, const Configuration& config)
+		{
+			size_t index = static_cast<size_t>(value);
+			if constexpr (index >= COUNT)
+			{
+				throw "Invalid enum value";
+			}
+			configurations_[index] = config;
+			return *this;
+		}
+
+		consteval Provider<EnumType> Build() const
+		{
+			for (size_t i = 0; i < COUNT; ++i)
+			{
+				if (!configs_[i].has_value())
+				{
+					throw "Missing configuration for some enum values";
+				}
+			}
+
+			std::array<Configuration, COUNT> finalizedConfigs;
+			for (size_t i = 0; i < COUNT; ++i)
+			{
+				finalizedConfigs[i] = configurations_[i].value();
+			}
+
+			return Provider<EnumType>(finalizedConfigs);
+		}
+
+	private:
+		std::array<Configuration, COUNT> configurations_;
 	};
 }

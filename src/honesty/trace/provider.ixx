@@ -75,10 +75,10 @@ namespace honesty::trace
 		std::size_t size_ = 0;
 	};
 
-	struct Configuration
-	{
-		bool enabled;
-	};
+
+	export
+	template<group_enum T>
+	class ProviderBuilder;
 
 	/**
 	 * @brief Entrypoint for creating Tracers
@@ -111,8 +111,11 @@ namespace honesty::trace
 		}
 
 	private:
-		explicit consteval Provider(const std::array<Configuration, COUNT>& configurations) :
-			tracers_{Tracer(configurations)...}
+		template<group_enum T>
+		friend class ProviderBuilder;
+
+		explicit consteval Provider(const std::array<TracerConfiguration, COUNT> configurations) :
+			tracers_(Tracer(configs)...)
 		{
 		}
 
@@ -124,15 +127,12 @@ namespace honesty::trace
 	/**
 	 * @brief Builder for creating a Tracer Provider.
 	 */
-	export
 	template<group_enum EnumType>
 	class ProviderBuilder
 	{
-
 		static constexpr auto COUNT = std::to_underlying(EnumType::COUNT);
 
 	public:
-
 		ProviderBuilder() = default;
 
 		consteval ProviderBuilder& AddConfiguration(EnumType value, const bool enabled)
@@ -143,7 +143,7 @@ namespace honesty::trace
 				throw "Invalid enum value";
 			}
 
-			Configuration config;
+			TracerConfiguration config;
 			config.enabled = enabled;
 
 			configurations_[index] = config;
@@ -160,7 +160,7 @@ namespace honesty::trace
 				}
 			}
 
-			std::array<Configuration, COUNT> finalizedConfigs;
+			std::array<TracerConfiguration, COUNT> finalizedConfigs;
 			for (size_t i = 0; i < COUNT; ++i)
 			{
 				finalizedConfigs[i] = configurations_[i].value();
@@ -170,6 +170,6 @@ namespace honesty::trace
 		}
 
 	private:
-		std::array<std::optional<Configuration>, COUNT> configurations_;
+		std::array<std::optional<TracerConfiguration>, COUNT> configurations_;
 	};
 }

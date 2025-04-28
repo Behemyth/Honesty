@@ -8,6 +8,11 @@ import zstring_view;
 
 namespace honesty::trace
 {
+	struct TracerConfiguration
+	{
+		bool enabled;
+	};
+
 	/**
 	 * @brief A tracer is a tag for Trace objects.
 	 */
@@ -16,12 +21,11 @@ namespace honesty::trace
 	{
 	public:
 
-
 	private:
 		template<group_enum T>
 		friend class Provider;
 
-		consteval explicit Tracer()
+		consteval explicit Tracer(const TracerConfiguration& configuration)
 		{
 		}
 	};

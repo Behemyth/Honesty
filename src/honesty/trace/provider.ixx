@@ -75,8 +75,9 @@ namespace honesty::trace
 		std::size_t size_ = 0;
 	};
 
-	class Configuration
+	struct Configuration
 	{
+		bool enabled;
 	};
 
 	/**
@@ -110,11 +111,7 @@ namespace honesty::trace
 		}
 
 	private:
-		template<typename... Configuration>
-		explicit consteval Provider(const Configuration&... configurations)
-			requires (
-				sizeof...(Configuration) == COUNT &&
-				std::conjunction_v<std::is_same<Configuration, Configuration>...>):
+		explicit consteval Provider(const std::array<Configuration, COUNT>& configurations) :
 			tracers_{Tracer(configurations)...}
 		{
 		}
@@ -138,13 +135,17 @@ namespace honesty::trace
 
 		ProviderBuilder() = default;
 
-		consteval ProviderBuilder& AddConfiguration(EnumType value, const Configuration& config)
+		consteval ProviderBuilder& AddConfiguration(EnumType value, const bool enabled)
 		{
-			size_t index = static_cast<size_t>(value);
-			if constexpr (index >= COUNT)
+			auto index = std::to_underlying(value);
+			if (index >= COUNT)
 			{
 				throw "Invalid enum value";
 			}
+
+			Configuration config;
+			config.enabled = enabled;
+
 			configurations_[index] = config;
 			return *this;
 		}
@@ -153,7 +154,7 @@ namespace honesty::trace
 		{
 			for (size_t i = 0; i < COUNT; ++i)
 			{
-				if (!configs_[i].has_value())
+				if (!configurations_[i].has_value())
 				{
 					throw "Missing configuration for some enum values";
 				}
@@ -169,6 +170,6 @@ namespace honesty::trace
 		}
 
 	private:
-		std::array<Configuration, COUNT> configurations_;
+		std::array<std::optional<Configuration>, COUNT> configurations_;
 	};
 }

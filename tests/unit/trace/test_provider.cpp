@@ -31,9 +31,11 @@ namespace
 					COUNT
 				};
 
-				constexpr honesty::trace::Tracer::Configuration config;
+				constexpr honesty::trace::Provider one =
+					honesty::trace::ProviderBuilder<ProviderTypeOne>()
+					.AddConfiguration(ProviderTypeOne::BASE, false)
+					.Build();
 
-				constexpr honesty::trace::Provider<ProviderTypeOne> one(config);
 				//constexpr honesty::trace::Provider two(config, config);
 				//constexpr honesty::trace::Provider three(config, config, config);
 

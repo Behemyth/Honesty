@@ -15,22 +15,25 @@ namespace
 			{
 				enum class ProviderTypeOne
 				{
-					BASE
+					BASE,
+					COUNT
 				};
 
 				enum class ProviderTypeTwo
 				{
-					BASE
+					BASE,
+					COUNT
 				};
 
 				enum class ProviderTypeThree
 				{
-					BASE
+					BASE,
+					COUNT
 				};
 
 				constexpr honesty::trace::Tracer::Configuration config;
 
-				constexpr honesty::trace::Provider one(config);
+				constexpr honesty::trace::Provider<ProviderTypeOne> one(config);
 				//constexpr honesty::trace::Provider two(config, config);
 				//constexpr honesty::trace::Provider three(config, config, config);
 

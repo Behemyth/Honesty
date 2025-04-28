@@ -83,16 +83,12 @@ namespace honesty::trace
 	class Provider
 	{
 	public:
-		static constexpr std::size_t MAX_TRACERS = 32;
-
 		// TODO: Require a configuration for each EnumType, C++26
-		// TODO: Constrain the enum type MAX_TRACER value
 		template<typename... Configuration>
 		explicit consteval Provider(const Configuration&... configurations)
 			requires (std::is_scoped_enum_v<EnumType> &&
 			          sizeof...(Configuration) >= 1 &&
 			          std::conjunction_v<std::is_same<Configuration, Tracer::Configuration>...>):
-			enumTypeHash_(typeid(EnumType).hash_code()),
 			tracers_{Tracer(configurations)...}
 		{
 		}
@@ -102,28 +98,14 @@ namespace honesty::trace
 		Provider& operator=(const Provider& other)     = delete;
 		Provider& operator=(Provider&& other) noexcept = delete;
 
-		template<EnumType EnumValue = 0>
-			requires std::is_scoped_enum_v<EnumType>
-		consteval bool IsTracerEnabled() const
+		consteval bool IsTracerEnabled(EnumType value) const
 		{
-			if constexpr (typeid(EnumType).hash_code() != enumTypeHash_)
-			{
-				return false;
-			}
-
-			return tracers_[static_cast<std::size_t>(EnumValue)].GetConfiguration().enabled;
+			return tracers_[static_cast<std::size_t>(value)].GetConfiguration().enabled;
 		}
 
-		template<EnumType EnumValue>
-			requires std::is_scoped_enum_v<EnumType>
-		consteval const Tracer& Get() const
+		consteval const Tracer& Get(EnumType value) const
 		{
-			if constexpr (typeid(EnumType).hash_code() != enumTypeHash_)
-			{
-				return tracers_[0];
-			}
-
-			return tracers_[static_cast<std::size_t>(EnumValue)];
+			return tracers_[static_cast<std::size_t>(value)];
 		}
 
 		constexpr std::uint8_t Size() const
@@ -132,9 +114,7 @@ namespace honesty::trace
 		}
 
 	private:
-		std::uint64_t enumTypeHash_;
-
-		std::inplace_vector<Tracer, MAX_TRACERS> tracers_;
+		std::array<Tracer, std::underlying_type_t<EnumType>(EnumType::COUNT)> tracers_;
 
 		static thread_local SpanRingBuffer<256> storage_;
 	};

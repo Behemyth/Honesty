@@ -140,26 +140,15 @@ namespace honesty::trace
 		}
 
 		template<EnumType Value>
-		consteval auto AddConfiguration(bool enabled) const
+		consteval auto AddConfiguration(const bool enabled) const
 		{
 
-			constexpr TracerConfiguration config{enabled};
-			using NewConfigurations = ConfigSet<ConfigEntry<Value, config>, Configurations>;
-
-			return ProviderBuilder<EnumType, NewConfigurations>(enabled_);
 		}
 
 		consteval Provider<EnumType> Build() const
 		{
 
-			auto make_tracers = [&]<std::size_t... Indices>(std::index_sequence<Indices...>) consteval
-			{
-				return std::array<Tracer, COUNT>{
-					Tracer(FindConfig<static_cast<EnumType>(Indices), Configurations>::type::config)...
-				};
-			};
-
-			auto tracers = make_tracers(std::make_index_sequence<COUNT>{});
+			
 			return Provider<EnumType>(std::move(tracers));
 		}
 

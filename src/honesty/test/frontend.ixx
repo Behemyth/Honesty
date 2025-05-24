@@ -28,14 +28,14 @@ namespace honesty::test
 		{
 		}
 
-		TestLiteral(const TestLiteral& other)						   = delete;
-		consteval TestLiteral(TestLiteral&& other) noexcept			   = default;
-		TestLiteral& operator=(const TestLiteral& other)			   = delete;
+		TestLiteral(const TestLiteral& other)                          = delete;
+		consteval TestLiteral(TestLiteral&& other) noexcept            = default;
+		TestLiteral& operator=(const TestLiteral& other)               = delete;
 		consteval TestLiteral& operator=(TestLiteral&& other) noexcept = default;
 
 		template<typename Fn>
 			requires std::invocable<Fn, const Requirements&> &&
-					 std::same_as<void, std::invoke_result_t<Fn, const Requirements&>>
+			         std::same_as<void, std::invoke_result_t<Fn, const Requirements&>>
 		inline Test operator=(const Fn& test) const
 		{
 			return Test(name_, tag_, std::function_ref<void(const Requirements&)>(test));
@@ -43,7 +43,7 @@ namespace honesty::test
 
 		template<typename Fn>
 			requires std::invocable<Fn> &&
-					 std::same_as<Generator, std::invoke_result_t<Fn>>
+			         std::same_as<Generator, std::invoke_result_t<Fn>>
 		inline Test operator=(const Fn& test) const
 		{
 			return Test(name_, tag_, std::function_ref<Generator()>(test));
@@ -83,23 +83,24 @@ namespace honesty::test
 	}
 
 	export template<typename Fn, typename... Types>
-		requires(std::regular_invocable<Fn&, const Requirements&, Types &&> && ...)
+		requires(std::regular_invocable<Fn&, const Requirements&, Types&&> && ...)
 	Generator operator|(Fn&& function, std::tuple<Types...>&& tuple)
 	{
-		co_yield std::ranges::elements_of(std::apply(
-			[&function](auto&&... args) -> Generator
-			{
-				int index = 0;
-				(co_yield Test(
-					 std::format("{}", index++),
-					 Tag(),
-					 [&function, &args](const Requirements& requirements)
-					 {
-						 function(requirements, args);
-					 }),
-				 ...);
-			},
-			std::forward<std::tuple<Types...>>(tuple)));
+		co_yield std::ranges::elements_of(
+			std::apply(
+				[&function](auto&&... args) -> Generator
+				{
+					int index = 0;
+					(co_yield Test(
+							std::format("{}", index++),
+							Tag(),
+							[&function, &args](const Requirements& requirements)
+							{
+								function(requirements, args);
+							}),
+						...);
+				},
+				std::forward<std::tuple<Types...>>(tuple)));
 	}
 
 	export namespace literals

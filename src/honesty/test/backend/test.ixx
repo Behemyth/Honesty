@@ -59,7 +59,8 @@ namespace honesty::test
 		constexpr Test(
 			const std::string_view name,
 			const Tag& tag,
-			const std::function_ref<void(const Requirements&)>& test) :
+			const std::function_ref<void(const Requirements&)>& test,
+			std::string_view description = "") :
 			name_(name),
 			test_(test),
 			tag_(tag)
@@ -67,7 +68,11 @@ namespace honesty::test
 			VerifyTestName(name);
 		}
 
-		constexpr Test(const std::string_view name, const Tag& tag, const std::function_ref<Generator()>& test) :
+		constexpr Test(
+			const std::string_view name,
+			const Tag& tag,
+			const std::function_ref<Generator()>& test,
+			std::string_view description = "") :
 			name_(name),
 			test_(test),
 			tag_(tag)
@@ -75,10 +80,10 @@ namespace honesty::test
 			VerifyTestName(name);
 		}
 
-		Test(const Test& other)                = delete;
-		Test(Test&& other) noexcept            = delete;
-		Test& operator=(const Test& other)     = delete;
-		Test& operator=(Test&& other) noexcept = delete;
+		constexpr Test(const Test& other)                = delete;
+		constexpr Test(Test&& other) noexcept            = delete;
+		constexpr Test& operator=(const Test& other)     = delete;
+		constexpr Test& operator=(Test&& other) noexcept = delete;
 
 		std::string_view Name() const
 		{
@@ -88,6 +93,12 @@ namespace honesty::test
 		std::span<const Tag::value_type> Tags() const
 		{
 			return tag_.View();
+		}
+
+
+		constexpr Test operator<<(std::string_view description) const
+		{
+			return Test(name_, test_, tag_, description);
 		}
 
 	private:

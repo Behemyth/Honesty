@@ -3,7 +3,7 @@ target_sources(honesty
 		FILE_SET test_public
 		TYPE CXX_MODULES
 		FILES
-			test.ixx
+			module.ixx
 			reporter.ixx
 			runner.ixx
 			frontend.ixx

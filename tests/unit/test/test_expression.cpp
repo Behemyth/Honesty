@@ -15,7 +15,7 @@ namespace
 		{
 			const std::stringstream& stream = fixture.AttachListener(honesty::log::LevelType::TRACE);
 
-			co_yield "error_description"_test = [&]() -> Generator
+			co_yield FAIL / "error_description"_test = [&]() -> Generator
 			{
 				// Tests callable for error message        
 				const auto description = []() -> std::string
@@ -23,10 +23,12 @@ namespace
 					return "This outputs only on error";
 				};
 
-				co_yield TODO / "stream_operator"_test = [&](const Requirements&)
+				co_yield "stream_operator"_test = [&](const Requirements& requirements)
 				{
-					//<< "message on failure"
-				};
+					requirements.Expect(
+						false,
+						"This test will always fail, triggering the message.");
+				} << "message on failure";
 
 				// Assert
 				{

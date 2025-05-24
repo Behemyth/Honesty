@@ -48,7 +48,8 @@ namespace honesty::test
 	}
 
 	// Forward declaration
-	export class TestData;
+	export
+	class TestData;
 
 	class Test final
 	{
@@ -74,9 +75,9 @@ namespace honesty::test
 			VerifyTestName(name);
 		}
 
-		Test(const Test& other)				   = delete;
-		Test(Test&& other) noexcept			   = delete;
-		Test& operator=(const Test& other)	   = delete;
+		Test(const Test& other)                = delete;
+		Test(Test&& other) noexcept            = delete;
+		Test& operator=(const Test& other)     = delete;
 		Test& operator=(Test&& other) noexcept = delete;
 
 		std::string_view Name() const
@@ -127,5 +128,4 @@ namespace honesty::test
 	private:
 		const Test& test_;
 	};
-
 }

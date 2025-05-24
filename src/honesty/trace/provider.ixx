@@ -91,10 +91,10 @@ namespace honesty::trace
 		static constexpr auto COUNT = std::to_underlying(EnumType::COUNT);
 
 	public:
-		Provider(const Provider& other)                = delete;
-		Provider(Provider&& other) noexcept            = delete;
-		Provider& operator=(const Provider& other)     = delete;
-		Provider& operator=(Provider&& other) noexcept = delete;
+		consteval Provider(const Provider& other)                = delete;
+		consteval Provider(Provider&& other) noexcept            = delete;
+		consteval Provider& operator=(const Provider& other)     = delete;
+		consteval Provider& operator=(Provider&& other) noexcept = delete;
 
 		consteval bool IsTracerEnabled(EnumType value) const
 		{

@@ -11,20 +11,16 @@ namespace
 		"tracer",
 		[]() -> Generator
 		{
-			co_yield "construction"_test = [](const Requirements& requirements)
+			co_yield "global"_test = [](const Requirements& requirements)
 			{
-				/*constexpr honesty::trace::Provider provider("one", "two", "three");
-
-				constexpr honesty::trace::Tracer one = provider.Get("one");
-
-				requirements.ExpectEquals(one.Label(), "one");*/
+				//const honesty::trace::Tracer& tracer = honesty::trace::GetTracer();
 			};
 
 			co_yield "span"_test = [](const Requirements& requirements)
 			{
-			/*	constexpr honesty::trace::Provider provider("tracer");
-
-				constexpr honesty::trace::Tracer tracer = provider.Get("tracer");*/
+				/*	constexpr honesty::trace::Provider provider("tracer");
+	
+					constexpr honesty::trace::Tracer tracer = provider.Get("tracer");*/
 
 				{
 					//honesty::Span("test_span");

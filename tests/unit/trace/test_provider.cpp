@@ -31,14 +31,6 @@ namespace
 					COUNT
 				};
 
-				enum class ProviderTypeThree
-				{
-					BASE,
-					SECOND,
-					THIRD,
-					COUNT
-				};
-
 				constexpr honesty::trace::TracerConfiguration config(true);
 
 				// None
@@ -58,34 +50,57 @@ namespace
 				                            .AddConfiguration<ProviderTypeTwo::SECOND>(config);
 				constexpr auto providerTwo = builderTwo.Build();
 				requirements.ExpectEquals(providerTwo.Size(), 2);
-
-				// Three
-				constexpr auto builderThree = honesty::trace::ProviderBuilder<ProviderTypeThree>(true)
-				                              .AddConfiguration<ProviderTypeThree::BASE>(config)
-				                              .AddConfiguration<ProviderTypeThree::SECOND>(config)
-				                              .AddConfiguration<ProviderTypeThree::THIRD>(config);
-				constexpr auto providerThree = builderThree.Build();
-				requirements.ExpectEquals(providerThree.Size(), 3);
 			};
 
 			co_yield "validate"_test = [](const Requirements& requirements)
 			{
-				/*	constexpr honesty::trace::Provider three("one", "two", "three");
-	
-					static_assert(three.IsTracerEnabled("three"));
-					static_assert(!three.IsTracerEnabled("four"));*/
+				enum class ProviderType
+				{
+					BASE,
+					SECOND,
+					COUNT
+				};
+
+				constexpr honesty::trace::TracerConfiguration enabledConfig(true);
+				constexpr honesty::trace::TracerConfiguration disabledConfig(false);
+
+				// Provider with BASE enabled, SECOND disabled
+				constexpr auto builder = honesty::trace::ProviderBuilder<ProviderType>(true)
+				                         .AddConfiguration<ProviderType::BASE>(enabledConfig)
+				                         .AddConfiguration<ProviderType::SECOND>(disabledConfig);
+				constexpr auto provider = builder.Build();
+
+				requirements.Expect(provider.IsTracerEnabled(ProviderType::BASE));
+				requirements.Expect(!provider.IsTracerEnabled(ProviderType::SECOND));
 			};
 
 			co_yield "get"_test = [](const Requirements& requirements)
 			{
-				/*constexpr honesty::trace::Provider provider("one", "two", "three");
+				enum class ProviderType
+				{
+					BASE,
+					SECOND,
+					COUNT
+				};
 
-				constexpr honesty::trace::Tracer one = provider.Get("one");*/
+				constexpr honesty::trace::TracerConfiguration baseConfig(true);
+				constexpr honesty::trace::TracerConfiguration secondConfig(false);
+
+				constexpr auto builder = honesty::trace::ProviderBuilder<ProviderType>(true)
+				                         .AddConfiguration<ProviderType::BASE>(baseConfig)
+				                         .AddConfiguration<ProviderType::SECOND>(secondConfig);
+				constexpr auto provider = builder.Build();
+
+				const auto& baseTracer   = provider.Get(ProviderType::BASE);
+				const auto& secondTracer = provider.Get(ProviderType::SECOND);
+
+				requirements.ExpectEquals(baseTracer.GetConfiguration().enabled, true);
+				requirements.ExpectEquals(secondTracer.GetConfiguration().enabled, false);
 			};
 
 			co_yield "global"_test = [](const Requirements& requirements)
 			{
-				//const honesty::Tracer& tracer = honesty::GetTracer("test");
+				//const honesty::trace::Tracer& tracer = honesty::trace::GetTracer();
 			};
 		}
 		);

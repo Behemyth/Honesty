@@ -27,31 +27,45 @@ namespace
 				enum class ProviderTypeTwo
 				{
 					BASE,
+					SECOND,
 					COUNT
 				};
 
 				enum class ProviderTypeThree
 				{
 					BASE,
+					SECOND,
+					THIRD,
 					COUNT
 				};
 
-	/*			constexpr honesty::trace::Provider none =
-					honesty::trace::ProviderBuilder<ProviderTypeNone>(false)
-					.Build();*/
+				constexpr honesty::trace::TracerConfiguration config(true);
 
+				// None
+				constexpr auto builderNone  = honesty::trace::ProviderBuilder<ProviderTypeNone>(true);
+				constexpr auto providerNone = builderNone.Build();
+				requirements.ExpectEquals(providerNone.Size(), 0);
+
+				// One
 				constexpr auto builderOne = honesty::trace::ProviderBuilder<ProviderTypeOne>(true)
-				                         .AddConfiguration<ProviderTypeOne::BASE>(true);
-
+					.AddConfiguration<ProviderTypeOne::BASE>(config);
 				constexpr auto providerOne = builderOne.Build();
-
-				//constexpr honesty::trace::Provider two(config, config);
-				//constexpr honesty::trace::Provider three(config, config, config);
-
-				//requirements.ExpectEquals(none.Size(), 0);
 				requirements.ExpectEquals(providerOne.Size(), 1);
-				//requirements.ExpectEquals(two.Size(), 2);
-				//requirements.ExpectEquals(three.Size(), 3);
+
+				// Two
+				constexpr auto builderTwo = honesty::trace::ProviderBuilder<ProviderTypeTwo>(true)
+				                            .AddConfiguration<ProviderTypeTwo::BASE>(config)
+				                            .AddConfiguration<ProviderTypeTwo::SECOND>(config);
+				constexpr auto providerTwo = builderTwo.Build();
+				requirements.ExpectEquals(providerTwo.Size(), 2);
+
+				// Three
+				constexpr auto builderThree = honesty::trace::ProviderBuilder<ProviderTypeThree>(true)
+				                              .AddConfiguration<ProviderTypeThree::BASE>(config)
+				                              .AddConfiguration<ProviderTypeThree::SECOND>(config)
+				                              .AddConfiguration<ProviderTypeThree::THIRD>(config);
+				constexpr auto providerThree = builderThree.Build();
+				requirements.ExpectEquals(providerThree.Size(), 3);
 			};
 
 			co_yield "validate"_test = [](const Requirements& requirements)
@@ -73,6 +87,7 @@ namespace
 			{
 				//const honesty::Tracer& tracer = honesty::GetTracer("test");
 			};
-		});
+		}
+		);
 	SuiteRegistrar _(SUITE);
 }

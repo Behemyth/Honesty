@@ -3,6 +3,7 @@ export module synodic.honesty.trace:provider;
 import std;
 
 import :tracer;
+import :types;
 import :span;
 import zstring_view;
 import inplace_vector;
@@ -77,7 +78,7 @@ namespace honesty::trace
 
 
 	export
-	template<group_enum T, typename Configurations>
+	template<group_enum T>
 	class ProviderBuilder;
 
 	/**
@@ -111,11 +112,14 @@ namespace honesty::trace
 		}
 
 	private:
-		template<group_enum T, typename Configurations>
+		template<group_enum T>
 		friend class ProviderBuilder;
 
-		explicit consteval Provider(const std::array<Tracer, COUNT> tracers) :
-			tracers_(std::move(tracers))
+		template<typename... Tracers>
+		consteval explicit Provider(Tracers&&... tracers)
+			requires (sizeof...(Tracers) == COUNT) &&
+			         (std::same_as<std::remove_cvref_t<Tracers>, Tracer> && ...)
+			: tracers_(std::forward<Tracers>(tracers)...)
 		{
 		}
 
@@ -140,20 +144,40 @@ namespace honesty::trace
 		}
 
 		template<EnumType Value>
-		consteval auto AddConfiguration(const bool enabled) const
+		consteval auto AddConfiguration(const TracerConfiguration& config) const
 		{
-
+			auto newConfigs                             = configurations_;
+			newConfigs[static_cast<std::size_t>(Value)] = config;
+			return ProviderBuilder(enabled_, newConfigs);
 		}
 
 		consteval Provider<EnumType> Build() const
 		{
+			// Ensure all configurations are set at compile time
+			for (std::size_t i = 0; i < COUNT; ++i)
+			{
+				if (!configurations_[i].has_value())
+				{
+					throw "All configurations must be set at compile time!";
+				}
+			}
 
-			
-			return Provider<EnumType>(std::move(tracers));
+			auto createProvider = [&]<std::size_t... I>(std::index_sequence<I...>) consteval
+			{
+				return Provider<EnumType>(Tracer(configurations_[I].value())...);
+			};
+
+			return createProvider(std::make_index_sequence<COUNT>{});
 		}
 
 	private:
 		bool enabled_;
 		std::array<std::optional<TracerConfiguration>, COUNT> configurations_;
+
+		// Add a private constructor to allow AddConfiguration to return a new builder
+		consteval ProviderBuilder(const bool enabled, std::array<std::optional<TracerConfiguration>, COUNT> configs)
+			: enabled_(enabled), configurations_(configs)
+		{
+		}
 	};
 }

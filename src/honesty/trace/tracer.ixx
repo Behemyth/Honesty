@@ -8,8 +8,13 @@ import zstring_view;
 
 namespace honesty::trace
 {
-	struct TracerConfiguration
+	export struct TracerConfiguration
 	{
+		explicit constexpr TracerConfiguration(const bool enabled) :
+			enabled(enabled)
+		{
+		}
+
 		bool enabled;
 	};
 
@@ -20,12 +25,13 @@ namespace honesty::trace
 	class Tracer
 	{
 	public:
-		Tracer(const Tracer& other)                = delete;
-		Tracer(Tracer&& other) noexcept            = delete;
-		Tracer& operator=(const Tracer& other)     = delete;
-		Tracer& operator=(Tracer&& other) noexcept = delete;
+		constexpr Tracer(const Tracer& other)                = delete;
+		constexpr Tracer(Tracer&& other) noexcept            = default;
+		constexpr Tracer& operator=(const Tracer& other)     = delete;
+		constexpr Tracer& operator=(Tracer&& other) noexcept = default;
+
 	private:
-		template<group_enum T, typename Configurations>
+		template<group_enum T>
 		friend class ProviderBuilder;
 
 		constexpr explicit Tracer(const TracerConfiguration& configuration)

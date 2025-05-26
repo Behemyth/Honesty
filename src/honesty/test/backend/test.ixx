@@ -63,7 +63,8 @@ namespace honesty::test
 			std::string_view description = "") :
 			name_(name),
 			test_(test),
-			tag_(tag)
+			tag_(tag),
+			description_(description)
 		{
 			VerifyTestName(name);
 		}
@@ -75,7 +76,8 @@ namespace honesty::test
 			std::string_view description = "") :
 			name_(name),
 			test_(test),
-			tag_(tag)
+			tag_(tag),
+			description_(description)
 		{
 			VerifyTestName(name);
 		}
@@ -101,6 +103,11 @@ namespace honesty::test
 			return Test(name_, test_, tag_, description);
 		}
 
+		constexpr Test operator<<(std::function_ref<std::string_view()> descriptionGenerator) const
+		{
+			return Test(name_, test_, tag_, descriptionGenerator());
+		}
+
 	private:
 		friend TestData;
 
@@ -111,7 +118,8 @@ namespace honesty::test
 			std::string_view description = "") :
 			name_(name),
 			test_(test),
-			tag_(tag)
+			tag_(tag),
+			description_(description)
 		{
 			VerifyTestName(name);
 		}
@@ -120,6 +128,9 @@ namespace honesty::test
 		VariantType test_;
 
 		Tag tag_;
+
+		// TODO: We shouldn't store the description. It should only be evaluated on error
+		std::string_view description_;
 	};
 
 	/**

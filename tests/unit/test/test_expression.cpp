@@ -2,8 +2,6 @@ import synodic.honesty.test;
 
 import std;
 
-// TODO: Report compile-time tests
-
 using namespace honesty::test;
 using namespace honesty::test::literals;
 
@@ -15,7 +13,7 @@ namespace
 		{
 			const std::stringstream& stream = fixture.AttachListener(honesty::log::LevelType::TRACE);
 
-			co_yield FAIL / "error_description"_test = [&]() -> Generator
+			co_yield "error_description"_test = [&]() -> Generator
 			{
 				// Tests callable for error message        
 				const auto description = []() -> std::string
@@ -23,38 +21,37 @@ namespace
 					return "This outputs only on error";
 				};
 
-				co_yield "stream_operator"_test = [&](const Requirements& requirements)
+				co_yield FAIL / "stream_operator"_test = [&](const Requirements& requirements)
 				{
 					requirements.Expect(
 						false,
 						"This test will always fail, triggering the message.");
 				} << "message on failure";
 
-				// Assert
+				co_yield FAIL / "stream_operator"_test = [&](const Requirements& requirements)
 				{
-					// TODO: Enable when the "Fail" tag works
-					//requirements.Assert(false, "This outputs only on error");
+					requirements.Expect(
+						false,
+						"This test will always fail, triggering the message.");
+				} << dsecription;
 
-					//requirements.Assert(true, "This outputs only on error");
-
-					// TODO: Enable when the "Fail" tag works
-					//requirements.Assert(false, description);
-				}
-
-				co_yield FAIL / "inner"_test = [&](const Requirements&)
+				co_yield FAIL/ "assert"_test = [&](const Requirements& requirements)
 				{
+					requirements.Assert(false, "This outputs only on error");
+
+					requirements.Assert(true, "This outputs only on error");
+
+					requirements.Assert(false, description);
 				};
 
-				// Expect
+				co_yield FAIL / "expect"_test = [&](const Requirements& requirements)
 				{
-					// TODO: Enable when the "Fail" tag works
-					//requirements.Expect(false, "This outputs only on error");
+					requirements.Expect(false, "This outputs only on error");
 
-					//requirements.Expect(true, "This outputs only on error");
+					requirements.Expect(true, "This outputs only on error");
 
-					// TODO: Enable when the "Fail" tag works
-					//requirements.Expect(false, description);
-				}
+					requirements.Expect(false, description);
+				};
 			};
 		});
 

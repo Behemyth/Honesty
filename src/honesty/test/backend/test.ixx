@@ -96,13 +96,25 @@ namespace honesty::test
 		}
 
 
-		constexpr Test operator<<(std::string_view description) const
+		constexpr Test operator<<(const std::string_view description) const
 		{
 			return Test(name_, test_, tag_, description);
 		}
 
 	private:
 		friend TestData;
+
+		constexpr Test(
+			const std::string_view name,
+			const VariantType& test,
+			const Tag& tag,
+			std::string_view description = "") :
+			name_(name),
+			test_(test),
+			tag_(tag)
+		{
+			VerifyTestName(name);
+		}
 
 		std::string_view name_;
 		VariantType test_;

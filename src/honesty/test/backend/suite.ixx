@@ -64,7 +64,7 @@ namespace honesty::test
 	public:
 
 		template<size_t LiteralSize>
-		explicit constexpr SuiteData(
+		explicit(false) constexpr SuiteData(
 			const Suite<LiteralSize>& suite) :
 			nameView_(suite.name_),
 			generator_(suite.generator_)

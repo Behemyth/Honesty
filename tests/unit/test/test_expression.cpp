@@ -21,18 +21,6 @@ namespace
 					return "This outputs only on error";
 				};
 
-				co_yield FAIL / "stream_operator"_test = [&](const Requirements& requirements)
-				{
-					requirements.Expect(
-						false) << "message on failure";
-				};
-
-				co_yield FAIL / "stream_operator"_test = [&](const Requirements& requirements)
-				{
-					requirements.Expect(
-						false) << dsecription;
-				};
-
 				co_yield FAIL / "assert"_test = [&](const Requirements& requirements)
 				{
 					requirements.Assert(false, "This outputs only on error");

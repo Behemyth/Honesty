@@ -6,7 +6,9 @@ import function_ref;
 
 import synodic.honesty.test;
 
-export class MockReporter final : public honesty::test::StreamingAdapter
+using namespace honesty::test;
+
+export class MockReporter final : public StreamingAdapter
 {
 public:
 	explicit MockReporter(const honesty::log::Logger& logger) :
@@ -20,7 +22,7 @@ public:
 	}
 };
 
-export class MockRunner final : public honesty::test::Runner
+export class MockRunner final : public Runner
 {
 public:
 	explicit MockRunner(const honesty::log::Logger& logger) :
@@ -33,22 +35,28 @@ public:
 		return "mock";
 	}
 
-	void
-		Run(const honesty::test::Requirements& requirements,
-			const std::function_ref<void(const honesty::test::Requirements&)> function) override
+	void Run(
+		const Requirements& requirements,
+		const std::function_ref<void(const Requirements&)> function) override
 	{
 		function(requirements);
 	}
 
-	honesty::test::Generator
-		Run(const std::function_ref<honesty::test::Generator()> function) override
+	Generator Run(
+		const Requirements& requirements,
+		const std::function_ref<Generator(const Requirements&)> function) override
+	{
+		return function(requirements);
+	}
+
+	Generator Run(const std::function_ref<Generator()> function) override
 	{
 		return function();
 	}
 
-	honesty::test::Generator Run(
-		honesty::test::Fixture& fixture,
-		const std::function_ref<honesty::test::Generator(honesty::test::Fixture&)> function) override
+	Generator Run(
+		Fixture& fixture,
+		const std::function_ref<Generator(Fixture&)> function) override
 	{
 		return function(fixture);
 	}
@@ -56,6 +64,6 @@ public:
 
 namespace
 {
-	honesty::test::RunnerRegistrar<MockRunner> RUNNER_REGISTRAR;
-	honesty::test::ReporterRegistrar<MockReporter> REPORTER_REGISTRAR;
+	RunnerRegistrar<MockRunner> RUNNER_REGISTRAR;
+	ReporterRegistrar<MockReporter> REPORTER_REGISTRAR;
 }

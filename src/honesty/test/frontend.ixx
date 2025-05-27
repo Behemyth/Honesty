@@ -8,30 +8,39 @@ import function_ref;
 
 namespace honesty::test
 {
-	// Built-in tags
+	// An explicit tage for the default test state. 
 	export constexpr Tag RUN("run");
+
+	// Skips a test, recording it as skipped
 	export constexpr Tag SKIP("skip");
+
+	// Marks a test as expected to fail, records a failure if it passes or partially passes
 	export constexpr Tag FAIL("fail");
+
+	// Registers the test as incomplete, recording it as such
 	export constexpr Tag TODO("todo");
 
-	class TestLiteral
+	/**
+	 * @brief Represents a test case without an implementation
+	 */
+	class TestDescriptor
 	{
 	public:
-		explicit(false) consteval TestLiteral(const std::string_view name) :
+		explicit(false) consteval TestDescriptor(const std::string_view name) :
 			name_(name)
 		{
 		}
 
-		consteval TestLiteral(const std::string_view name, const Tag& tag) :
+		consteval TestDescriptor(const std::string_view name, const Tag& tag) :
 			name_(name),
 			tag_(tag)
 		{
 		}
 
-		TestLiteral(const TestLiteral& other)                          = delete;
-		consteval TestLiteral(TestLiteral&& other) noexcept            = default;
-		TestLiteral& operator=(const TestLiteral& other)               = delete;
-		consteval TestLiteral& operator=(TestLiteral&& other) noexcept = default;
+		TestDescriptor(const TestDescriptor& other)                          = delete;
+		consteval TestDescriptor(TestDescriptor&& other) noexcept            = default;
+		TestDescriptor& operator=(const TestDescriptor& other)               = delete;
+		consteval TestDescriptor& operator=(TestDescriptor&& other) noexcept = default;
 
 		template<typename Fn>
 			requires std::invocable<Fn, const Requirements&> &&
@@ -41,6 +50,11 @@ namespace honesty::test
 			return Test(name_, tag_, std::function_ref<void(const Requirements&)>(test));
 		}
 
+		/**
+		 * @brief Assigns a pure generator test function to the test descriptor. You may find it useful to
+		 *	use this to label multiple children tests with a common tag without setting up any additional
+		 *	requirements
+		 */
 		template<typename Fn>
 			requires std::invocable<Fn> &&
 			         std::same_as<Generator, std::invoke_result_t<Fn>>
@@ -49,14 +63,22 @@ namespace honesty::test
 			return Test(name_, tag_, std::function_ref<Generator()>(test));
 		}
 
+		template<typename Fn>
+			requires std::invocable<Fn, const Requirements&> &&
+			         std::same_as<Generator, std::invoke_result_t<Fn, const Requirements&>>
+		inline Test operator=(const Fn& test) const
+		{
+			return Test(name_, tag_, std::function_ref<Generator(const Requirements&)>(test));
+		}
+
 		auto operator=(Generator&& generator) const
 		{
 			return std::ranges::elements_of(std::forward<Generator>(generator));
 		}
 
-		friend consteval TestLiteral operator/(const Tag& tag, const TestLiteral& test)
+		friend consteval TestDescriptor operator/(const Tag& tag, const TestDescriptor& test)
 		{
-			return TestLiteral(test.name_, tag);
+			return TestDescriptor(test.name_, tag);
 		}
 
 	private:
@@ -105,9 +127,9 @@ namespace honesty::test
 
 	export namespace literals
 	{
-		[[nodiscard]] consteval auto operator""_test(const char* const name, const std::size_t size) -> TestLiteral
+		[[nodiscard]] consteval auto operator""_test(const char* const name, const std::size_t size) -> TestDescriptor
 		{
-			return TestLiteral(std::string_view(name, size));
+			return TestDescriptor(std::string_view(name, size));
 		}
 
 		[[nodiscard]] consteval auto operator""_tag(const char* const name, const std::size_t size) -> Tag

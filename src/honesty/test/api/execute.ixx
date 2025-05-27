@@ -61,6 +61,108 @@ namespace honesty::test::api
 		bool success;
 	};
 
+	// Forward declaration for ProcessTest so it can be used in helpers below
+	bool ProcessTest(Runner& runner, const TestData& testData, const TestContext& testContext);
+
+	bool HandleTags(
+		const TestData& testData,
+		const TestContext& testContext)
+	{
+		const bool todo = testData.Tag() == "todo";
+		if (testData.Tag() == "skip" || todo)
+		{
+			event::TestSkip testSkip;
+			testSkip.name = testData.Name();
+			testSkip.todo = todo;
+
+			for (const std::unique_ptr<Reporter>& reporter: testContext.reporters)
+			{
+				reporter->Signal(testSkip);
+			}
+			return true;
+		}
+		return false;
+	}
+
+	bool HandleCallback(
+		Runner& runner,
+		const TestData& testData,
+		const TestContext& testContext,
+		const Requirements& requirements,
+		const std::function_ref<void(const Requirements&)>& testCallback)
+	{
+		if (HandleTags(testData, testContext))
+		{
+			return true;
+		}
+
+		if (not testContext.dryRun)
+		{
+			runner.Run(requirements, testCallback);
+		}
+		return true;
+	}
+
+	bool HandleCallback(
+		Runner& runner,
+		const TestData& testData,
+		const TestContext& testContext,
+		const Requirements& requirements,
+		const std::function_ref<Generator(const Requirements&)>& testCallback)
+	{
+		if (HandleTags(testData, testContext))
+		{
+			return true;
+		}
+
+		if (not testContext.dryRun)
+		{
+			Generator generator = testCallback(requirements);
+
+			for (const Test& test: generator)
+			{
+				TestContext newContext(
+					testContext.reporters,
+					testContext.logger.CreateLogger(test.Name()),
+					testContext.filterViews,
+					testContext.dryRun);
+
+				if (not ProcessTest(runner, static_cast<TestData>(test), newContext))
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	bool HandleCallback(
+		Runner& runner,
+		const TestData& testData,
+		const TestContext& testContext,
+		const std::function_ref<Generator()>& testCallback)
+	{
+		Generator generator = runner.Run(testCallback);
+
+		std::span filter = testContext.filterViews;
+		filter           = filter | std::ranges::views::drop(1);
+
+		for (const Test& test: generator)
+		{
+			TestContext newContext(
+				testContext.reporters,
+				testContext.logger.CreateLogger(test.Name()),
+				filter,
+				testContext.dryRun);
+
+			if (not ProcessTest(runner, static_cast<TestData>(test), newContext))
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+
 	bool ProcessTest(Runner& runner, const TestData& testData, const TestContext& testContext)
 	{
 		bool success = true;
@@ -109,49 +211,35 @@ namespace honesty::test::api
 			auto testExecutor = Overload{
 				[&](const std::function_ref<void(const Requirements&)>& testCallback)
 				{
-					if (const bool todo = testData.Tag() == "todo"; testData.Tag() == "skip" || todo)
-					{
-						event::TestSkip testSkip;
-						testSkip.name = testData.Name();
-						testSkip.todo = todo;
-
-						for (const std::unique_ptr<Reporter>& reporter: testContext.reporters)
-						{
-							reporter->Signal(testSkip);
-						}
-
-						return;
-					}
-
-					if (not testContext.dryRun)
-					{
-						runner.Run(requirements, testCallback);
-					}
+					success = HandleCallback(runner, testData, testContext, requirements, testCallback);
+				},
+				[&](const std::function_ref<Generator(const Requirements&)>& testCallback)
+				{
+					success = HandleCallback(
+						runner,
+						testData,
+						testContext,
+						requirements,
+						testCallback);
 				},
 				[&](const std::function_ref<Generator()>& testCallback)
 				{
-					Generator generator = runner.Run(testCallback);
+					success = HandleCallback(runner, testData, testContext, testCallback);
+				},
+				[&](std::monostate)
+				{
+					// No test callback provided; treat as skipped
+					event::TestSkip testSkip;
+					testSkip.name = testData.Name();
+					testSkip.todo = false;
 
-					std::span filter = testContext.filterViews;
-
-					// Move to the next filter part
-					filter = filter | std::ranges::views::drop(1);
-
-					for (const Test& test: generator)
+					for (const std::unique_ptr<Reporter>& reporter: testContext.reporters)
 					{
-						TestContext newContext(
-							testContext.reporters,
-							testContext.logger.CreateLogger(test.Name()),
-							filter,
-							testContext.dryRun);
-
-						if (not ProcessTest(runner, static_cast<TestData>(test), newContext))
-						{
-							success = false;
-							break;
-						}
+						reporter->Signal(testSkip);
 					}
-				}};
+					success = true;
+				}
+			};
 
 			// Start the recursive test execution
 			std::visit(testExecutor, testData.Variant());

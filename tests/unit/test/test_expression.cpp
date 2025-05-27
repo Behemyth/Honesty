@@ -11,7 +11,7 @@ namespace
 		"expectation",
 		[](Fixture& fixture) -> Generator
 		{
-			co_yield "error_description"_test = [&]() -> Generator
+			co_yield "error_description"_test = [&](const Requirements& streamRequirements) -> Generator
 			{
 				const std::stringstream& stream = fixture.AttachListener(honesty::log::LevelType::TRACE);
 
@@ -45,7 +45,7 @@ namespace
 					requirements.Expect(true, description);
 				};
 
-				requirements.Expect(
+				streamRequirements.Expect(
 					stream.view().empty(),
 					"Nothing should be present in the stream.");
 			};

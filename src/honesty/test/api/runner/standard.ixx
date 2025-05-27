@@ -25,6 +25,11 @@ namespace honesty::test
 			function(requirements);
 		}
 
+		Generator Run(const Requirements& requirements, const std::function_ref<Generator(const Requirements&)> function) override
+		{
+			return function(requirements);
+		}
+
 		Generator Run(const std::function_ref<Generator()> function) override
 		{
 			return function();

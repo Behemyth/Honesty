@@ -26,14 +26,12 @@ namespace honesty::test::api
 			const std::string_view applicationName,
 			const std::string_view filter,
 			Runner& runner,
-			const std::span<std::unique_ptr<Reporter>> reporters,
 			const bool dryRun,
 			const std::string_view header,
 			const log::Logger& logger) :
 			applicationName(applicationName),
 			filter(filter),
 			runner(runner),
-			reporters(reporters),
 			dryRun(dryRun),
 			header(header),
 			logger(logger)
@@ -44,7 +42,6 @@ namespace honesty::test::api
 		std::string_view filter;
 
 		std::reference_wrapper<Runner> runner;
-		std::span<std::unique_ptr<Reporter>> reporters;
 
 		bool dryRun;
 		std::string_view header;
@@ -123,7 +120,7 @@ namespace honesty::test::api
 			{
 				TestContext newContext(
 					testContext.reporters,
-					testContext.logger.CreateLogger(test.Name()),
+					testContext.logger,
 					testContext.filterViews,
 					testContext.dryRun);
 
@@ -151,7 +148,7 @@ namespace honesty::test::api
 		{
 			TestContext newContext(
 				testContext.reporters,
-				testContext.logger.CreateLogger(test.Name()),
+				testContext.logger,
 				filter,
 				testContext.dryRun);
 
@@ -320,7 +317,7 @@ namespace honesty::test::api
 
 				TestContext testContext(
 					suiteContext.reporters,
-					suiteContext.logger.CreateLogger(view.Name()),
+					suiteContext.logger,
 					filter,
 					suiteContext.dryRun);
 
@@ -357,7 +354,7 @@ namespace honesty::test::api
 
 		std::vector<std::string_view> filterData = std::ranges::to<std::vector>(splitData);
 
-		std::span filterViews = filterData;
+		const std::span filterViews = filterData;
 
 		bool success = true;
 
@@ -366,8 +363,23 @@ namespace honesty::test::api
 		const std::string threadName = std::format("{}", std::this_thread::get_id());
 		const std::uint64_t seed     = std::random_device()();
 
+		log::Logger threadLogger = logger.CreateLogger(threadName);
+
+		auto registrars = ReporterRegistry::Registrars();
+
+		// TODO: Use user-supplied reporter factories/registrars
+		std::vector<std::unique_ptr<Reporter>> reporters;
+		reporters.reserve(1);
+
+		std::ranges::for_each(
+			registrars,
+			[&reporters, &threadLogger](const auto& registrar)
+			{
+				reporters.push_back(registrar->Create(threadLogger));
+			});
+
 		const event::Initialize initialize(seed, parameters.header);
-		for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
+		for (const std::unique_ptr<Reporter>& reporter: reporters)
 		{
 			reporter->Signal(initialize);
 		}
@@ -378,8 +390,8 @@ namespace honesty::test::api
 			for (const SuiteData& suite: GetSuites())
 			{
 				SuiteContext suiteContext(
-					parameters.reporters,
-					logger.CreateLogger(threadName),
+					reporters,
+					threadLogger,
 					parameters.applicationName,
 					suite.Name(),
 					filterViews,
@@ -392,7 +404,7 @@ namespace honesty::test::api
 		event::Summary summary;
 		summary.duration = duration;
 
-		for (const std::unique_ptr<Reporter>& reporter: parameters.reporters)
+		for (const std::unique_ptr<Reporter>& reporter: reporters)
 		{
 			reporter->Signal(summary);
 		}

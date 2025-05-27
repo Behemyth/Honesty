@@ -16,12 +16,12 @@ namespace honesty::test
 	{
 		explicit SuiteContext(
 			const std::span<std::unique_ptr<Reporter>> reporters,
-			log::Logger logger,
+			log::Logger& logger,
 			const std::string_view applicationName,
 			const std::string_view suiteName,
 			const std::span<std::string_view> filterViews,
 			const bool dryRun) :
-			logger(std::move(logger)),
+			logger(logger),
 			reporters(reporters),
 			applicationName(applicationName),
 			suiteName(suiteName),
@@ -38,7 +38,7 @@ namespace honesty::test
 			return Fixture(reporters, applicationName, suiteName, logger);
 		}
 
-		log::Logger logger;
+		std::reference_wrapper<log::Logger> logger;
 
 		std::span<std::unique_ptr<Reporter>> reporters;
 

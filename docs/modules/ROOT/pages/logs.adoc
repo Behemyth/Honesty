@@ -1,0 +1,20 @@
+= Loggers
+:toc:
+:toclevels: 2
+
+---
+
+== `root` [[root]]
+
+== `root.main` [[main]]
+
+The main tagged logger is seperated from the logger used by `honesty` itself. In our bundled console application we use
+`root.main` to seperate our logging concerns
+
+== `root.honesty` [[honesty]]
+
+
+== `root.honesty.<thread id>` [[thread]]
+
+This is the logger used for each suite, and ultimitly each test. It is associated with the thread that
+is running the test.

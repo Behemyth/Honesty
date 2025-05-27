@@ -53,9 +53,9 @@ namespace honesty::test
 			logger.RemoveSink();
 		}
 
-		Fixture(const Fixture& other)				 = delete;
-		Fixture(Fixture&& other) noexcept			 = delete;
-		Fixture& operator=(const Fixture& other)	 = delete;
+		Fixture(const Fixture& other)                = delete;
+		Fixture(Fixture&& other) noexcept            = delete;
+		Fixture& operator=(const Fixture& other)     = delete;
 		Fixture& operator=(Fixture&& other) noexcept = delete;
 
 		/**
@@ -85,15 +85,21 @@ namespace honesty::test
 			return GenerateName(applicationName_) + ".tmp";
 		}
 
+		/**
+		 * @brief A temporary logger is added to the thread's root logger and not the application's logger
+		 */
 		auto TempLog(std::ostream& stream) const -> TempLogger
 		{
 			const std::string name = GenerateName(suiteName_);
 
-			// The temporary logger is added to the thread's logger and not the application's logger
 			log::Logger logger = log::RootLogger().CreateLogger(name);
 			return TempLogger(std::move(logger), stream);
 		}
 
+		/**
+		 * @brief Attaches a listener to the application's logger.
+		 * @param level The log level to listen to.
+		 */
 		std::stringstream& AttachListener(const log::LevelType level = log::LevelType::INFO)
 		{
 			log::Logger& logger = logger_.get();
@@ -138,7 +144,11 @@ namespace honesty::test
 		 * @param suiteName 
 		 * @param logger A new logger object to take ownership of.
 		 */
-		Fixture(const std::span<std::unique_ptr<Reporter>> reporters, const std::string_view applicationName, const std::string_view suiteName, log::Logger& logger) :
+		Fixture(
+			const std::span<std::unique_ptr<Reporter>> reporters,
+			const std::string_view applicationName,
+			const std::string_view suiteName,
+			log::Logger& logger) :
 			applicationName_(applicationName),
 			suiteName_(suiteName),
 			logger_(logger),
@@ -160,5 +170,4 @@ namespace honesty::test
 		log::OStream<std::mutex> streamSink_;
 		std::stringstream stream_;
 	};
-
 }

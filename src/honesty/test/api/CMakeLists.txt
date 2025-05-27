@@ -6,7 +6,7 @@ target_sources(honesty
 			execute.ixx
 			list.ixx
 			types.ixx
-			api.ixx
+			module.ixx
 	PRIVATE
 		FILE_SET test_api_private
 		TYPE CXX_MODULES

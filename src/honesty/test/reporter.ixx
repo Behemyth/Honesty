@@ -8,7 +8,7 @@ import std;
 namespace honesty::test
 {
 	/**
-	 * @brief TODO: Comment
+	 * @brief Reports events immediately as they are signaled.
 	 */
 	export class StreamingAdapter : public Reporter
 	{
@@ -74,7 +74,7 @@ namespace honesty::test
 	};
 
 	/**
-	 * @brief TODO: Comment
+	 * @brief Collects test data in a cumulative manner then reports it when the test suite is complete.
 	 */
 	export class CumulativeAdapter : public Reporter
 	{

@@ -99,7 +99,6 @@ namespace honesty::test::api
 			parameters.applicationName,
 			"",
 			parameters.runner,
-			reporters,
 			true,
 			parameters.header,
 			parameters.logger);

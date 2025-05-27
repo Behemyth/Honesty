@@ -26,10 +26,10 @@ namespace honesty::test
 
 		explicit TestContext(
 			const std::span<std::unique_ptr<Reporter>> reporters,
-			log::Logger logger,
+			log::Logger& logger,
 			const std::span<std::string_view> filterViews,
 			const bool dryRun) :
-			logger(std::move(logger)),
+			logger(logger),
 			reporters(reporters),
 			filterViews(filterViews),
 			dryRun(dryRun)
@@ -53,7 +53,7 @@ namespace honesty::test
 			return OutputData(output);
 		}
 
-		log::Logger logger;
+		std::reference_wrapper<log::Logger> logger;
 
 		std::span<std::unique_ptr<Reporter>> reporters;
 

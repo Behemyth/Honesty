@@ -21,25 +21,25 @@ namespace
 					return "ERROR";
 				};
 
-				co_yield FAIL / "assert_fails"_test = [&](const Requirements& requirements)
+				co_yield FAIL / "assert_fail"_test = [&](const Requirements& requirements)
 				{
 					requirements.Assert(false, "ERROR");
 					requirements.Assert(false, description);
 				};
 
-				co_yield "assert_succeeds"_test = [&](const Requirements& requirements)
+				co_yield "assert_success"_test = [&](const Requirements& requirements)
 				{
 					requirements.Assert(true, "ERROR");
 					requirements.Assert(true, description);
 				};
 
-				co_yield FAIL / "expect_fails"_test = [&](const Requirements& requirements)
+				co_yield FAIL / "expect_fail"_test = [&](const Requirements& requirements)
 				{
 					requirements.Expect(false, "ERROR");
 					requirements.Expect(false, description);
 				};
 
-				co_yield "expect_succeeds"_test = [&](const Requirements& requirements)
+				co_yield "assert_success"_test = [&](const Requirements& requirements)
 				{
 					requirements.Expect(true, "ERROR");
 					requirements.Expect(true, description);

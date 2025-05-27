@@ -2,6 +2,7 @@ import std;
 
 import synodic.honesty.log;
 import synodic.honesty.test.api;
+import synodic.honesty.test;
 
 auto main(const int argc, const char* argv[]) -> int
 {
@@ -16,6 +17,8 @@ auto main(const int argc, const char* argv[]) -> int
 	// Convert the lazy view to contiguous data
 	auto arguments = std::ranges::to<std::vector>(view);
 
+	// TODO: Use arguments to configure the test runner
+
 	honesty::log::Console sink;
 
 	honesty::log::Logger logger = honesty::log::RootLogger().CreateLogger("main");
@@ -24,13 +27,13 @@ auto main(const int argc, const char* argv[]) -> int
 	logger.SetLevel(honesty::log::LevelType::INFO);
 
 	honesty::test::StandardRunner runner(logger);
-
-	std::array<std::unique_ptr<honesty::test::Reporter>, 1> reporters{
-		std::make_unique<honesty::test::StandardReporter>(logger)};
+	
+	honesty::test::ReporterRegistrar<honesty::test::StandardReporter> standardReporter;
 
 	const honesty::test::api::ExecuteParameters
-		configuration("honesty", "", runner, reporters, false, {}, logger);
-	honesty::test::api::ExecuteResult result = Execute(configuration);
+		configuration("honesty", "", runner, false, {}, logger);
 
-	return 0;
+	const honesty::test::api::ExecuteResult result = Execute(configuration);
+
+	return !result.success;
 }

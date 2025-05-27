@@ -20,14 +20,11 @@ namespace
 
 			MockRunner runner(logger);
 
-			std::vector<std::unique_ptr<Reporter>> reporters;
-			reporters.push_back(std::make_unique<MockReporter>(logger));
-
 			co_yield "execute"_test = [&]() -> Generator
 			{
 				const std::string header;
 				const api::ExecuteParameters
-					baseParameters("execute_test", "", runner, reporters, false, header, logger);
+					baseParameters("execute_test", "", runner, false, header, logger);
 
 				co_yield "dry_run"_test = [&](const Requirements& requirements)
 				{

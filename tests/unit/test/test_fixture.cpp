@@ -10,7 +10,7 @@ namespace
 		"fixture",
 		[](Fixture& fixture) -> Generator
 		{
-			co_yield "log"_test = [&](const Requirements& requirements)
+			co_yield "temp_logger"_test = [&](const Requirements& requirements)
 			{
 				std::stringstream stream;
 				const TempLogger logger = fixture.TempLog(stream);

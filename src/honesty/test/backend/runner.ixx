@@ -26,7 +26,7 @@ namespace honesty::test
 	{
 	public:
 		/**
-		 * @brief
+		 * @brief Creates a runner. The given logger is used for internal logging, and not user test logging
 		 */
 		explicit constexpr Runner(const log::Logger& logger) :
 			logger_(logger)

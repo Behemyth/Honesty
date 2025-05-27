@@ -24,18 +24,16 @@ namespace
 				co_yield FAIL / "stream_operator"_test = [&](const Requirements& requirements)
 				{
 					requirements.Expect(
-						false,
-						"This test will always fail, triggering the message.");
-				} << "message on failure";
+						false) << "message on failure";
+				};
 
 				co_yield FAIL / "stream_operator"_test = [&](const Requirements& requirements)
 				{
 					requirements.Expect(
-						false,
-						"This test will always fail, triggering the message.");
-				} << dsecription;
+						false) << dsecription;
+				};
 
-				co_yield FAIL/ "assert"_test = [&](const Requirements& requirements)
+				co_yield FAIL / "assert"_test = [&](const Requirements& requirements)
 				{
 					requirements.Assert(false, "This outputs only on error");
 

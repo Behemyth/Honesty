@@ -5,14 +5,16 @@ import synodic.honesty.test;
 import synodic.honesty.utility;
 import std;
 
-// TODO: Make constexpr when
-//	'https://developercommunity.visualstudio.com/t/Inexplicable-ICE-when-using-modules/1593396' is fixed
-// static const inline auto
-//	HIGHLIGHT_STYLE(honesty::log::TextStyle(honesty::log::Colour24(255, 255, 0)));
+namespace
+{
+	constexpr auto HIGHLIGHT_STYLE(honesty::log::TextStyle(honesty::log::Colour24(255, 255, 0)));
+	constexpr auto SUCCESS_STYLE(honesty::log::TextStyle(honesty::log::Colour24(0, 255, 0)));
+	constexpr auto FAILURE_STYLE(honesty::log::TextStyle(honesty::log::Colour24(255, 0, 0)));
+	constexpr auto SKIP_STYLE(honesty::log::TextStyle(honesty::log::Colour24(128, 128, 128)));
+}
 
 namespace honesty::test
 {
-
 	/**
 	 * @brief The state required for the lifetime of a test
 	 */
@@ -21,8 +23,8 @@ namespace honesty::test
 	public:
 		struct Output
 		{
-			std::size_t passedAssertions		  = 0;
-			std::size_t failedAssertions		  = 0;
+			std::size_t passedAssertions          = 0;
+			std::size_t failedAssertions          = 0;
 			std::size_t undefinedPassedAssertions = 0;
 			std::size_t undefinedFailedAssertions = 0;
 		};
@@ -106,8 +108,6 @@ namespace honesty::test
 				throw utility::NotImplemented();
 			}
 
-			const auto HIGHLIGHT_STYLE(log::TextStyle(log::Colour24(255, 255, 0)));
-
 			const std::string introduction = format("{}Expected:", indent);
 			const std::string expected     = format(HIGHLIGHT_STYLE, "{}{}'{}'", indent, indent, a);
 			const std::string relationText = format("{}{}{}{}", indent, indent, indent, relation);
@@ -125,14 +125,14 @@ namespace honesty::test
 			const log::Logger& logger = logger_.get();
 			switch (testOutcome_)
 			{
-				case ExpectedAssertOutcome::PASS :
+				case ExpectedAssertOutcome::PASS:
 				{
 					++output_.passedAssertions;
 					break;
 				}
-				case ExpectedAssertOutcome::FAIL :
+				case ExpectedAssertOutcome::FAIL:
 				{
-					std::string styledResult = format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
+					std::string styledResult = format(FAILURE_STYLE, "Failed");
 					logger.Info(
 						"Test {}: File({}), Line({})",
 						styledResult,
@@ -142,7 +142,7 @@ namespace honesty::test
 					++output_.failedAssertions;
 					break;
 				}
-				case ExpectedAssertOutcome::TODO :
+				case ExpectedAssertOutcome::TODO:
 				{
 					++output_.undefinedPassedAssertions;
 					break;
@@ -159,9 +159,9 @@ namespace honesty::test
 			const log::Logger& logger = logger_.get();
 			switch (testOutcome_)
 			{
-				case ExpectedAssertOutcome::PASS :
+				case ExpectedAssertOutcome::PASS:
 				{
-					std::string styledResult = format(log::TextStyle(log::Colour24(255, 0, 0)), "Failed");
+					std::string styledResult = format(FAILURE_STYLE, "Failed");
 					logger.Info(
 						"Test {}: File({}), Line({})",
 						styledResult,
@@ -175,13 +175,13 @@ namespace honesty::test
 
 					break;
 				}
-				case ExpectedAssertOutcome::FAIL :
+				case ExpectedAssertOutcome::FAIL:
 				{
 					++output_.passedAssertions;
 
 					break;
 				}
-				case ExpectedAssertOutcome::TODO :
+				case ExpectedAssertOutcome::TODO:
 				{
 					++output_.undefinedFailedAssertions;
 					break;
@@ -202,13 +202,13 @@ namespace honesty::test
 	public:
 		struct Output
 		{
-			std::size_t passedAssertions		  = 0;
-			std::size_t failedAssertions		  = 0;
+			std::size_t passedAssertions          = 0;
+			std::size_t failedAssertions          = 0;
 			std::size_t undefinedPassedAssertions = 0;
 			std::size_t undefinedFailedAssertions = 0;
 
 			std::size_t skippedTests = 0;
-			std::size_t todoTests	 = 0;
+			std::size_t todoTests    = 0;
 		};
 
 		SuiteState(const event::SuiteBegin& event, const log::Logger& logger) :
@@ -228,8 +228,8 @@ namespace honesty::test
 			const auto [passedAssertions, failedAssertions, undefinedPassedAssertions, undefinedFailedAssertions] =
 				state.Summarize(event);
 
-			output_.passedAssertions		  += passedAssertions;
-			output_.failedAssertions		  += failedAssertions;
+			output_.passedAssertions += passedAssertions;
+			output_.failedAssertions += failedAssertions;
 			output_.undefinedPassedAssertions += undefinedPassedAssertions;
 			output_.undefinedFailedAssertions += undefinedFailedAssertions;
 
@@ -250,8 +250,8 @@ namespace honesty::test
 					name.append(test.Name());
 				}
 
-				std::string styledToDo = format(log::TextStyle(log::Colour24(255, 255, 0)), "TODO");
-				std::string styledName = format(log::TextStyle(log::Colour24(255, 255, 0)), "{}", name);
+				std::string styledToDo = format(HIGHLIGHT_STYLE, "TODO");
+				std::string styledName = format(HIGHLIGHT_STYLE, "{}", name);
 
 				logger.Info("{}: Implement '{}' test", styledToDo, styledName);
 
@@ -335,17 +335,17 @@ namespace honesty::test
 		{
 			SuiteState& state = currentSuiteState_.value();
 			const auto
-				[passedAssertions,
-				 failedAssertions,
-				 undefinedPassedAssertions,
-				 undefinedFailedAssertions,
-				 skippedTests,
-				 todoTests] = state.Summarize(event);
+			[passedAssertions,
+				failedAssertions,
+				undefinedPassedAssertions,
+				undefinedFailedAssertions,
+				skippedTests,
+				todoTests] = state.Summarize(event);
 
 			assertionsPassedCount_ += passedAssertions;
-			assertionFailedCount_  += failedAssertions;
-			skippedTestsCount_	   += skippedTests;
-			todoTestsCount_		   += todoTests;
+			assertionFailedCount_ += failedAssertions;
+			skippedTestsCount_ += skippedTests;
+			todoTestsCount_ += todoTests;
 
 			currentSuiteState_.reset();
 		}
@@ -389,15 +389,10 @@ namespace honesty::test
 		{
 			const log::Logger& logger = Logger();
 
-			const auto SUCCESS_STYLE(log::TextStyle(log::Colour24(0, 255, 0)));
-			const auto FAILURE_STYLE(log::TextStyle(log::Colour24(255, 0, 0)));
-			const auto SKIP_STYLE(log::TextStyle(log::Colour24(128, 128, 128)));
-			const auto TODO_STYLE(log::TextStyle(log::Colour24(255, 255, 0)));
-
 			std::string passedStyled = format(SUCCESS_STYLE, "Passed");
 			std::string failedStyled = format(FAILURE_STYLE, "Failed");
-			std::string skipStyled	 = format(SKIP_STYLE, "Skipped");
-			std::string todoStyled	 = format(TODO_STYLE, "TODO");
+			std::string skipStyled   = format(SKIP_STYLE, "Skipped");
+			std::string todoStyled   = format(HIGHLIGHT_STYLE, "TODO");
 
 			logger.Info("{} Assertions {}", assertionsPassedCount_, passedStyled);
 
@@ -420,10 +415,9 @@ namespace honesty::test
 	private:
 		std::size_t assertionsPassedCount_ = 0;
 		std::size_t assertionFailedCount_  = 0;
-		std::size_t skippedTestsCount_	   = 0;
-		std::size_t todoTestsCount_		   = 0;
+		std::size_t skippedTestsCount_     = 0;
+		std::size_t todoTestsCount_        = 0;
 
 		std::optional<SuiteState> currentSuiteState_;
 	};
-
 }

@@ -34,21 +34,27 @@ namespace
 				constexpr honesty::trace::TracerConfiguration config(true);
 
 				// None
-				constexpr auto builderNone  = honesty::trace::ProviderBuilder<ProviderTypeNone>(true);
+				constexpr auto builderNone = honesty::trace::ProviderBuilder<ProviderTypeNone>(true);
+
 				constexpr auto providerNone = builderNone.Build();
+
 				requirements.ExpectEquals(providerNone.Size(), 0);
 
 				// One
 				constexpr auto builderOne = honesty::trace::ProviderBuilder<ProviderTypeOne>(true)
 					.AddConfiguration<ProviderTypeOne::BASE>(config);
+
 				constexpr auto providerOne = builderOne.Build();
+
 				requirements.ExpectEquals(providerOne.Size(), 1);
 
 				// Two
 				constexpr auto builderTwo = honesty::trace::ProviderBuilder<ProviderTypeTwo>(true)
 				                            .AddConfiguration<ProviderTypeTwo::BASE>(config)
 				                            .AddConfiguration<ProviderTypeTwo::SECOND>(config);
+
 				constexpr auto providerTwo = builderTwo.Build();
+
 				requirements.ExpectEquals(providerTwo.Size(), 2);
 			};
 
@@ -68,6 +74,7 @@ namespace
 				constexpr auto builder = honesty::trace::ProviderBuilder<ProviderType>(true)
 				                         .AddConfiguration<ProviderType::BASE>(enabledConfig)
 				                         .AddConfiguration<ProviderType::SECOND>(disabledConfig);
+
 				constexpr auto provider = builder.Build();
 
 				requirements.Expect(provider.IsTracerEnabled(ProviderType::BASE));
@@ -89,6 +96,7 @@ namespace
 				constexpr auto builder = honesty::trace::ProviderBuilder<ProviderType>(true)
 				                         .AddConfiguration<ProviderType::BASE>(baseConfig)
 				                         .AddConfiguration<ProviderType::SECOND>(secondConfig);
+
 				constexpr auto provider = builder.Build();
 
 				const auto& baseTracer   = provider.Get(ProviderType::BASE);

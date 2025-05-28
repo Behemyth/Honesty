@@ -10,7 +10,7 @@ namespace honesty::trace
 {
 	export struct TracerConfiguration
 	{
-		explicit constexpr TracerConfiguration(const bool enabled) :
+		explicit consteval TracerConfiguration(const bool enabled) :
 			enabled(enabled)
 		{
 		}
@@ -39,7 +39,7 @@ namespace honesty::trace
 		template<group_enum T>
 		friend class ProviderBuilder;
 
-		constexpr explicit Tracer(const TracerConfiguration& configuration) :
+		consteval explicit Tracer(const TracerConfiguration& configuration) :
 			configuration_(configuration)
 		{
 		}

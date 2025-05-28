@@ -130,7 +130,7 @@ namespace honesty::trace
 
 
 	/**
-	 * @brief Builder for creating a Tracer Provider.
+	 * @brief Builder for creating a Tracer Provider
 	 */
 	template<group_enum EnumType>
 	class ProviderBuilder

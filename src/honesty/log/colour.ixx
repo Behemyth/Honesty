@@ -148,19 +148,19 @@ namespace honesty::log
 	export class TextStyle
 	{
 	public:
-		explicit constexpr TextStyle(TerminalColor color, const Attribute attribute = Attribute::NONE) :
+		explicit constexpr TextStyle(const TerminalColor color, const Attribute attribute = Attribute::NONE) :
 			foreground_(Colour8(color)),
 			attributeMask_(std::to_underlying(attribute))
 		{
 		}
 
-		explicit constexpr TextStyle(Colour8 color, const Attribute attribute = Attribute::NONE) :
+		explicit constexpr TextStyle(const Colour8 color, const Attribute attribute = Attribute::NONE) :
 			foreground_(color),
 			attributeMask_(std::to_underlying(attribute))
 		{
 		}
 
-		explicit constexpr TextStyle(Colour24 color, const Attribute attribute = Attribute::NONE) :
+		explicit constexpr TextStyle(const Colour24 color, const Attribute attribute = Attribute::NONE) :
 			foreground_(color),
 			attributeMask_(std::to_underlying(attribute))
 		{

@@ -11,12 +11,12 @@ namespace
 		"tracer",
 		[]() -> Generator
 		{
-			co_yield "global"_test = [](const Requirements& requirements)
+			co_yield TODO / "global"_test = [](const Requirements& requirements)
 			{
 				//const honesty::trace::Tracer& tracer = honesty::trace::GetTracer();
 			};
 
-			co_yield "span"_test = [](const Requirements& requirements)
+			co_yield TODO / "span"_test = [](const Requirements& requirements)
 			{
 				/*	constexpr honesty::trace::Provider provider("tracer");
 	

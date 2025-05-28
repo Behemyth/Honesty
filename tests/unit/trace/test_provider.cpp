@@ -98,7 +98,7 @@ namespace
 				requirements.ExpectEquals(secondTracer.GetConfiguration().enabled, false);
 			};
 
-			co_yield "global"_test = [](const Requirements& requirements)
+			co_yield TODO / "global"_test = [](const Requirements& requirements)
 			{
 				//const honesty::trace::Tracer& tracer = honesty::trace::GetTracer();
 			};

@@ -25,27 +25,21 @@ namespace honesty::test::api
 		ExecuteParameters(
 			const std::string_view applicationName,
 			const std::string_view filter,
-			Runner& runner,
 			const bool dryRun,
-			const std::string_view header,
-			const log::Logger& logger) :
+			const std::string_view header
+			) :
 			applicationName(applicationName),
 			filter(filter),
-			runner(runner),
 			dryRun(dryRun),
-			header(header),
-			logger(logger)
+			header(header)
 		{
 		}
 
 		std::string_view applicationName;
 		std::string_view filter;
 
-		std::reference_wrapper<Runner> runner;
-
 		bool dryRun;
 		std::string_view header;
-		std::reference_wrapper<const log::Logger> logger;
 	};
 
 	export struct ExecuteResult
@@ -72,7 +66,7 @@ namespace honesty::test::api
 			testSkip.name = testData.Name();
 			testSkip.todo = todo;
 
-			for (const std::unique_ptr<Reporter>& reporter: testContext.reporters)
+			for (Reporter* reporter: testContext.reporters)
 			{
 				reporter->Signal(testSkip);
 			}
@@ -193,7 +187,7 @@ namespace honesty::test::api
 
 		const event::TestBegin testBegin(testData.Name(), assertOutcome);
 
-		for (const std::unique_ptr<Reporter>& reporter: testContext.reporters)
+		for (Reporter* reporter: testContext.reporters)
 		{
 			reporter->Signal(testBegin);
 		}
@@ -230,7 +224,7 @@ namespace honesty::test::api
 					testSkip.name = testData.Name();
 					testSkip.todo = false;
 
-					for (const std::unique_ptr<Reporter>& reporter: testContext.reporters)
+					for (Reporter* reporter: testContext.reporters)
 					{
 						reporter->Signal(testSkip);
 					}
@@ -254,7 +248,7 @@ namespace honesty::test::api
 		testEnd.name     = testData.Name();
 		testEnd.duration = duration;
 
-		for (const std::unique_ptr<Reporter>& reporter: testContext.reporters)
+		for (Reporter* reporter: testContext.reporters)
 		{
 			reporter->Signal(testEnd);
 		}
@@ -284,7 +278,7 @@ namespace honesty::test::api
 		event::SuiteBegin suiteBegin;
 		suiteBegin.name = suite.Name();
 
-		for (std::unique_ptr<Reporter>& reporter: suiteContext.reporters)
+		for (Reporter* reporter: suiteContext.reporters)
 		{
 			reporter->Signal(suiteBegin);
 		}
@@ -334,7 +328,7 @@ namespace honesty::test::api
 		end.name     = suite.Name();
 		end.duration = duration;
 
-		for (const std::unique_ptr<Reporter>& reporter: suiteContext.reporters)
+		for (Reporter* reporter: suiteContext.reporters)
 		{
 			reporter->Signal(end);
 		}
@@ -342,7 +336,11 @@ namespace honesty::test::api
 		return success;
 	}
 
-	export auto Execute(const ExecuteParameters& parameters) -> ExecuteResult
+	export auto Execute(
+		const ExecuteParameters& parameters,
+		Runner& runner,
+		std::span<Reporter*> reporters = {},
+		const log::Logger& logger      = log::RootLogger()) -> ExecuteResult
 	{
 		// Break down the filter into individual views
 		auto splitData = parameters.filter | std::ranges::views::split('.') |
@@ -358,28 +356,37 @@ namespace honesty::test::api
 
 		bool success = true;
 
-		const log::Logger& logger = parameters.logger.get();
-
 		const std::string threadName = std::format("{}", std::this_thread::get_id());
 		const std::uint64_t seed     = std::random_device()();
 
 		log::Logger threadLogger = logger.CreateLogger(threadName);
 
-		auto registrars = ReporterRegistry::Registrars();
+		std::vector<Reporter*> resolvedReporters;
+		std::vector<std::unique_ptr<Reporter>> reporterStorage;
 
-		// TODO: Use user-supplied reporter factories/registrars
-		std::vector<std::unique_ptr<Reporter>> reporters;
-		reporters.reserve(1);
+		if (reporters.empty())
+		{
+			auto registrars = ReporterRegistry::Registrars();
 
-		std::ranges::for_each(
-			registrars,
-			[&reporters, &threadLogger](const auto& registrar)
-			{
-				reporters.push_back(registrar->Create(threadLogger));
-			});
+			resolvedReporters.reserve(reporters.size());
+			reporterStorage.reserve(reporters.size());
+
+			std::ranges::for_each(
+				registrars,
+				[&](const auto& registrar)
+				{
+					reporterStorage.push_back(registrar->Create(threadLogger));
+					resolvedReporters.push_back(reporterStorage.back().get());
+				});
+		}
+		else
+		{
+			// An extra copy is done
+			resolvedReporters = reporters | std::ranges::to<std::vector>();
+		}
 
 		const event::Initialize initialize(seed, parameters.header);
-		for (const std::unique_ptr<Reporter>& reporter: reporters)
+		for (Reporter* reporter: resolvedReporters)
 		{
 			reporter->Signal(initialize);
 		}
@@ -390,24 +397,28 @@ namespace honesty::test::api
 			for (const SuiteData& suite: GetSuites())
 			{
 				SuiteContext suiteContext(
-					reporters,
+					resolvedReporters,
 					threadLogger,
 					parameters.applicationName,
 					suite.Name(),
 					filterViews,
 					parameters.dryRun);
 
-				success |= ProcessSuite(parameters.runner, suite, suiteContext);
+				success |= ProcessSuite(runner, suite, suiteContext);
 			}
 		}
 
 		event::Summary summary;
 		summary.duration = duration;
 
-		for (const std::unique_ptr<Reporter>& reporter: reporters)
+		for (Reporter* reporter: resolvedReporters)
 		{
 			reporter->Signal(summary);
 		}
+
+		// Manually clear for static analysis
+		resolvedReporters.clear();
+		reporterStorage.clear();
 
 		return ExecuteResult(success);
 	}

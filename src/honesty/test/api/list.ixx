@@ -44,23 +44,16 @@ namespace honesty::test::api
 	{
 		explicit ListParameters(
 			const std::string_view applicationName,
-			Runner& runner,
-			const std::string_view header,
-			const log::Logger& logger) :
+			const std::string_view header
+			) :
 			applicationName(applicationName),
-			runner(runner),
-			header(header),
-			logger(logger)
+			header(header)
 		{
 		}
 
 		std::string_view applicationName;
 
-		std::reference_wrapper<Runner> runner;
-
 		std::string_view header;
-
-		std::reference_wrapper<const log::Logger> logger;
 	};
 
 	export struct ListResult
@@ -70,48 +63,30 @@ namespace honesty::test::api
 		std::vector<SuiteDescription> suites;
 	};
 
-	export auto List(const ListParameters& parameters) -> ListResult
+	export auto List(const ListParameters& parameters, Runner& runner, const log::Logger& logger) -> ListResult
 	{
 		// Register the list reporters and immediately grab it from the registration list
 		{
 			static ReporterRegistrar<ListReporter> listReporterRegistrar;
 		}
 
-		std::vector<std::unique_ptr<Reporter>> reporters;
-
-		// TODO: Create a path for direct initialization
-		{
-			const std::span<ReporterRegistry*> reporterRegistrars = ReporterRegistry::Registrars();
-			auto iterator										  = std::ranges::find_if(
-				reporterRegistrars,
-				[&](const ReporterRegistry* registry) -> bool
-				{
-					return registry->Name() == "list";
-				});
-
-			const ReporterRegistry* registry = *iterator;
-
-			reporters.push_back(registry->Create(parameters.logger));
-		}
+		ListReporter reporter(logger);
 
 		// TODO: Filter with list command
 		const ExecuteParameters executeParameters(
 			parameters.applicationName,
 			"",
-			parameters.runner,
 			true,
-			parameters.header,
-			parameters.logger);
+			parameters.header);
 
-		ExecuteResult executeResult = Execute(executeParameters);
+		std::array<Reporter*, 1> reporters{ &reporter };
+
+		ExecuteResult executeResult = Execute(executeParameters, runner, reporters, logger);
 
 		ListResult result;
 
-		// Grab the list reporter and extract the data
-		std::unique_ptr<Reporter>& abstractReporter = reporters.front();
-		ListReporter& listReporter					= dynamic_cast<ListReporter&>(*abstractReporter);
 
-		const CumulativeAdapter::CumulativeData& data = listReporter.Data();
+		const CumulativeAdapter::CumulativeData& data = reporter.Data();
 
 		for (const auto& [name, tests]: data.suites)
 		{

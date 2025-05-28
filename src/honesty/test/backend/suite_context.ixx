@@ -15,7 +15,7 @@ namespace honesty::test
 	export struct SuiteContext
 	{
 		explicit SuiteContext(
-			const std::span<std::unique_ptr<Reporter>> reporters,
+			const std::span<Reporter*> reporters,
 			log::Logger& logger,
 			const std::string_view applicationName,
 			const std::string_view suiteName,
@@ -33,14 +33,14 @@ namespace honesty::test
 		/**
 		 * @brief Creates a Fixture object to be passed to an executing suite
 		 */
-		Fixture CreateFixture()
+		Fixture CreateFixture() const
 		{
 			return Fixture(reporters, applicationName, suiteName, logger);
 		}
 
 		std::reference_wrapper<log::Logger> logger;
 
-		std::span<std::unique_ptr<Reporter>> reporters;
+		std::span<Reporter*> reporters;
 
 		std::string_view applicationName;
 		std::string_view suiteName;

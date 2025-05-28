@@ -145,7 +145,7 @@ namespace honesty::test
 		 * @param logger A new logger object to take ownership of.
 		 */
 		Fixture(
-			const std::span<std::unique_ptr<Reporter>> reporters,
+			const std::span<Reporter*> reporters,
 			const std::string_view applicationName,
 			const std::string_view suiteName,
 			log::Logger& logger) :

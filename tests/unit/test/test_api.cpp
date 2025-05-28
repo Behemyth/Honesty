@@ -15,23 +15,26 @@ namespace
 		"api",
 		[](const Fixture& fixture) -> Generator
 		{
-			const honesty::log::Logger& root = honesty::log::RootLogger();
-			honesty::log::Logger logger = root.CreateLogger("test");
+			const honesty::log::Logger& root  = honesty::log::RootLogger();
+			const honesty::log::Logger logger = root.CreateLogger("test");
 
 			MockRunner runner(logger);
+			MockReporter reporter(logger);
+
+			std::array<Reporter*, 1> reporters{&reporter};
 
 			co_yield "execute"_test = [&]() -> Generator
 			{
 				const std::string header;
 				const api::ExecuteParameters
-					baseParameters("execute_test", "", runner, false, header, logger);
+					baseParameters("execute_test", "", false, header);
 
 				co_yield "dry_run"_test = [&](const Requirements& requirements)
 				{
 					api::ExecuteParameters parameters = baseParameters;
-					parameters.dryRun = true;
+					parameters.dryRun                 = true;
 
-					const auto result = Execute(parameters);
+					const auto result = Execute(parameters, runner, reporters, logger);
 
 					requirements.Expect(result.success);
 				};
@@ -47,9 +50,9 @@ namespace
 			co_yield "list"_test = [&](const Requirements& requirements)
 			{
 				const std::string header;
-				const api::ListParameters parameters("list_test", runner, header, logger);
+				const api::ListParameters parameters("list_test", header);
 
-				const auto result = List(parameters);
+				const auto result = List(parameters, runner, logger);
 
 				requirements.Expect(not result.suites.empty());
 

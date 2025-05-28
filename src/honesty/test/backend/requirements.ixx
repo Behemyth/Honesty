@@ -15,9 +15,9 @@ namespace honesty::test
 		friend TestContext;
 
 	public:
-		Requirements(const Requirements& other)				   = delete;
-		Requirements(Requirements&& other) noexcept			   = delete;
-		Requirements& operator=(const Requirements& other)	   = delete;
+		Requirements(const Requirements& other)                = delete;
+		Requirements(Requirements&& other) noexcept            = delete;
+		Requirements& operator=(const Requirements& other)     = delete;
 		Requirements& operator=(Requirements&& other) noexcept = delete;
 
 		/**
@@ -100,7 +100,7 @@ namespace honesty::test
 		 */
 		inline void Expect(
 			const bool expression,
-			const std::string_view description	 = "",
+			const std::string_view description   = "",
 			const std::source_location& location = std::source_location::current()) const
 		{
 			Expect(
@@ -124,7 +124,7 @@ namespace honesty::test
 		template<std::convertible_to<bool> T>
 		inline void Assert(
 			const T& expression,
-			const std::string_view description	 = "",
+			const std::string_view description   = "",
 			const std::source_location& location = std::source_location::current()) const
 		{
 			return Assert(static_cast<bool>(expression), description, location);
@@ -142,7 +142,7 @@ namespace honesty::test
 		template<std::convertible_to<bool> T>
 		inline void Expect(
 			const T& expression,
-			const std::string_view description	 = "",
+			const std::string_view description   = "",
 			const std::source_location& location = std::source_location::current()) const
 		{
 			return Expect(static_cast<bool>(expression), description, location);
@@ -181,7 +181,7 @@ namespace honesty::test
 		template<std::derived_from<std::exception> Exception = std::exception, std::invocable Fn>
 		inline void AssertThrow(
 			Fn&& function,
-			const std::string_view description	 = "",
+			const std::string_view description   = "",
 			const std::source_location& location = std::source_location::current()) const
 		{
 			AssertThrow<Exception>(
@@ -218,7 +218,7 @@ namespace honesty::test
 		template<std::invocable Fn>
 		inline void AssertNotThrow(
 			Fn&& function,
-			const std::string_view description	 = "",
+			const std::string_view description   = "",
 			const std::source_location& location = std::source_location::current()) const
 		{
 			AssertNotThrow(
@@ -267,7 +267,7 @@ namespace honesty::test
 		template<std::derived_from<std::exception> Exception = std::exception, std::invocable Fn>
 		inline void ExpectThrow(
 			Fn&& function,
-			const std::string_view description	 = "",
+			const std::string_view description   = "",
 			const std::source_location& location = std::source_location::current()) const
 		{
 			ExpectThrow<Exception>(
@@ -304,7 +304,7 @@ namespace honesty::test
 		template<std::invocable Fn>
 		inline void ExpectNotThrow(
 			Fn&& function,
-			const std::string_view description	 = "",
+			const std::string_view description   = "",
 			const std::source_location& location = std::source_location::current()) const
 		{
 			ExpectNotThrow(
@@ -345,7 +345,7 @@ namespace honesty::test
 		inline void AssertEquals(
 			const T& a,
 			const U& b,
-			const std::string_view description	 = "",
+			const std::string_view description   = "",
 			const std::source_location& location = std::source_location::current()) const
 		{
 			AssertEquals(
@@ -387,7 +387,7 @@ namespace honesty::test
 		inline void AssertNotEquals(
 			const T& a,
 			const U& b,
-			const std::string_view description	 = "",
+			const std::string_view description   = "",
 			const std::source_location& location = std::source_location::current()) const
 		{
 			AssertNotEquals(
@@ -433,7 +433,7 @@ namespace honesty::test
 		inline void ExpectEquals(
 			const T& a,
 			const U& b,
-			const std::string_view description	 = "",
+			const std::string_view description   = "",
 			const std::source_location& location = std::source_location::current()) const
 		{
 			ExpectEquals(
@@ -475,7 +475,7 @@ namespace honesty::test
 		inline void ExpectNotEquals(
 			const T& a,
 			const U& b,
-			const std::string_view description	 = "",
+			const std::string_view description   = "",
 			const std::source_location& location = std::source_location::current()) const
 		{
 			ExpectNotEquals(
@@ -490,7 +490,7 @@ namespace honesty::test
 
 		template<typename T, typename U>
 			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
-					 std::formattable<U, char>
+			         std::formattable<U, char>
 		void AssertGreater(
 			const T& a,
 			const U& b,
@@ -515,11 +515,11 @@ namespace honesty::test
 
 		template<typename T, typename U>
 			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
-					 std::formattable<U, char>
+			         std::formattable<U, char>
 		inline void AssertGreater(
 			const T& a,
 			const U& b,
-			const std::string_view description	 = "",
+			const std::string_view description   = "",
 			const std::source_location& location = std::source_location::current()) const
 		{
 			AssertGreater(
@@ -534,7 +534,7 @@ namespace honesty::test
 
 		template<typename T, typename U>
 			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
-					 std::formattable<U, char>
+			         std::formattable<U, char>
 		void AssertLess(
 			const T& a,
 			const U& b,
@@ -559,11 +559,11 @@ namespace honesty::test
 
 		template<typename T, typename U>
 			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
-					 std::formattable<U, char>
+			         std::formattable<U, char>
 		inline void AssertLess(
 			const T& a,
 			const U& b,
-			const std::string_view description	 = "",
+			const std::string_view description   = "",
 			const std::source_location& location = std::source_location::current()) const
 		{
 			AssertLess(
@@ -578,7 +578,7 @@ namespace honesty::test
 
 		template<typename T, typename U>
 			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
-					 std::formattable<U, char>
+			         std::formattable<U, char>
 		void AssertGreaterEqual(
 			const T& a,
 			const U& b,
@@ -604,11 +604,11 @@ namespace honesty::test
 
 		template<typename T, typename U>
 			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
-					 std::formattable<U, char>
+			         std::formattable<U, char>
 		inline void AssertGreaterEqual(
 			const T& a,
 			const U& b,
-			const std::string_view description	 = "",
+			const std::string_view description   = "",
 			const std::source_location& location = std::source_location::current()) const
 		{
 			AssertGreaterEqual(
@@ -623,7 +623,7 @@ namespace honesty::test
 
 		template<typename T, typename U>
 			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
-					 std::formattable<U, char>
+			         std::formattable<U, char>
 		void AssertLessEqual(
 			const T& a,
 			const U& b,
@@ -648,11 +648,11 @@ namespace honesty::test
 
 		template<typename T, typename U>
 			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
-					 std::formattable<U, char>
+			         std::formattable<U, char>
 		inline void AssertLessEqual(
 			const T& a,
 			const U& b,
-			const std::string_view description	 = "",
+			const std::string_view description   = "",
 			const std::source_location& location = std::source_location::current()) const
 		{
 			AssertLessEqual(
@@ -667,7 +667,7 @@ namespace honesty::test
 
 		template<typename T, typename U>
 			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
-					 std::formattable<U, char>
+			         std::formattable<U, char>
 		void ExpectGreater(
 			const T& a,
 			const U& b,
@@ -692,11 +692,11 @@ namespace honesty::test
 
 		template<typename T, typename U>
 			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
-					 std::formattable<U, char>
+			         std::formattable<U, char>
 		inline void ExpectGreater(
 			const T& a,
 			const U& b,
-			const std::string_view description	 = "",
+			const std::string_view description   = "",
 			const std::source_location& location = std::source_location::current()) const
 		{
 			ExpectGreater(
@@ -711,7 +711,7 @@ namespace honesty::test
 
 		template<typename T, typename U>
 			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
-					 std::formattable<U, char>
+			         std::formattable<U, char>
 		void ExpectLess(
 			const T& a,
 			const U& b,
@@ -736,11 +736,11 @@ namespace honesty::test
 
 		template<typename T, typename U>
 			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
-					 std::formattable<U, char>
+			         std::formattable<U, char>
 		inline void ExpectLess(
 			const T& a,
 			const U& b,
-			const std::string_view description	 = "",
+			const std::string_view description   = "",
 			const std::source_location& location = std::source_location::current()) const
 		{
 			ExpectLess(
@@ -755,7 +755,7 @@ namespace honesty::test
 
 		template<typename T, typename U>
 			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
-					 std::formattable<U, char>
+			         std::formattable<U, char>
 		void ExpectGreaterEqual(
 			const T& a,
 			const U& b,
@@ -781,11 +781,11 @@ namespace honesty::test
 
 		template<typename T, typename U>
 			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
-					 std::formattable<U, char>
+			         std::formattable<U, char>
 		inline void ExpectGreaterEqual(
 			const T& a,
 			const U& b,
-			const std::string_view description	 = "",
+			const std::string_view description   = "",
 			const std::source_location& location = std::source_location::current()) const
 		{
 			ExpectGreaterEqual(
@@ -800,7 +800,7 @@ namespace honesty::test
 
 		template<typename T, typename U>
 			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
-					 std::formattable<U, char>
+			         std::formattable<U, char>
 		void ExpectLessEqual(
 			const T& a,
 			const U& b,
@@ -825,11 +825,11 @@ namespace honesty::test
 
 		template<typename T, typename U>
 			requires std::three_way_comparable_with<T, U, std::strong_ordering> && std::formattable<T, char> &&
-					 std::formattable<U, char>
+			         std::formattable<U, char>
 		inline void ExpectLessEqual(
 			const T& a,
 			const U& b,
-			const std::string_view description	 = "",
+			const std::string_view description   = "",
 			const std::source_location& location = std::source_location::current()) const
 		{
 			ExpectLessEqual(
@@ -849,7 +849,6 @@ namespace honesty::test
 
 		inline void Benchmark(std::string_view name, std::function_ref<void()> metric) const
 		{
-
 		}
 
 	private:
@@ -880,11 +879,11 @@ namespace honesty::test
 			{
 			}
 
-			bool success;  // True if the test passed, false if it failed
+			bool success; // True if the test passed, false if it failed
 		};
 
 		Requirements(
-			const std::span<std::unique_ptr<Reporter>> reporters,
+			const std::span<Reporter*> reporters,
 			const Parameters& parameters,
 			const log::Logger& logger) :
 			parameters_(parameters),
@@ -899,7 +898,7 @@ namespace honesty::test
 		 */
 		void Signal(const event::AssertionPass& passed) const
 		{
-			for (const std::unique_ptr<Reporter>& reporter: reporters_)
+			for (Reporter* reporter: reporters_)
 			{
 				reporter->Signal(passed);
 			}
@@ -916,7 +915,7 @@ namespace honesty::test
 		 */
 		void Signal(const event::AssertionFail& failed) const
 		{
-			for (const std::unique_ptr<Reporter>& reporter: reporters_)
+			for (Reporter* reporter: reporters_)
 			{
 				reporter->Signal(failed);
 			}
@@ -933,7 +932,7 @@ namespace honesty::test
 		 */
 		void Signal(const event::EqualityFail& failed) const
 		{
-			for (const std::unique_ptr<Reporter>& reporter: reporters_)
+			for (Reporter* reporter: reporters_)
 			{
 				reporter->Signal(failed);
 			}
@@ -950,7 +949,7 @@ namespace honesty::test
 		 */
 		void Signal(const event::ComparisonFail& failed) const
 		{
-			for (const std::unique_ptr<Reporter>& reporter: reporters_)
+			for (Reporter* reporter: reporters_)
 			{
 				reporter->Signal(failed);
 			}
@@ -964,10 +963,9 @@ namespace honesty::test
 		mutable Output output_;
 		Parameters parameters_;
 
-		std::span<std::unique_ptr<Reporter>> reporters_;
+		std::span<Reporter*> reporters_;
 		std::reference_wrapper<const log::Logger> logger_;
 	};
 
 	export using Req = Requirements;
-
 }

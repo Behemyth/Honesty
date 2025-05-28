@@ -27,13 +27,13 @@ auto main(const int argc, const char* argv[]) -> int
 	logger.SetLevel(honesty::log::LevelType::INFO);
 
 	honesty::test::StandardRunner runner(logger);
-	
+
 	honesty::test::ReporterRegistrar<honesty::test::StandardReporter> standardReporter;
 
 	const honesty::test::api::ExecuteParameters
-		configuration("honesty", "", runner, false, {}, logger);
+		configuration("honesty", "", false, {});
 
-	const honesty::test::api::ExecuteResult result = Execute(configuration);
+	const honesty::test::api::ExecuteResult result = Execute(configuration, runner, {}, logger);
 
 	return !result.success;
 }

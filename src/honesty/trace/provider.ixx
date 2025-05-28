@@ -106,6 +106,14 @@ namespace honesty::trace
 			return tracers_[static_cast<std::size_t>(value)];
 		}
 
+		/**
+		 * @brief Retrieves the default tracer
+		 */
+		consteval const Tracer& Get() const
+		{
+			return tracers_[0];
+		}
+
 		constexpr std::uint8_t Size() const
 		{
 			return tracers_.size();
@@ -135,6 +143,7 @@ namespace honesty::trace
 	template<group_enum EnumType>
 	class ProviderBuilder
 	{
+		// TODO: Use reflection instead of a hard-coded count type
 		static constexpr auto COUNT = std::to_underlying(EnumType::COUNT);
 
 	public:

@@ -7,24 +7,36 @@ using namespace honesty::test::literals;
 
 namespace
 {
+	consteval const honesty::trace::Tracer& GetTracer()
+	{
+		enum class ProviderType
+		{
+			BASE,
+			COUNT
+		};
+
+		constexpr honesty::trace::TracerConfiguration baseConfig(true);
+
+		constexpr auto builder = honesty::trace::ProviderBuilder<ProviderType>(true)
+			.AddConfiguration<ProviderType::BASE>(baseConfig);
+
+		constexpr auto provider = builder.Build();
+
+		return provider.Get();
+	}
+
 	Suite SUITE(
 		"tracer",
 		[]() -> Generator
 		{
-			co_yield TODO / "global"_test = [](const Requirements& requirements)
+			co_yield "span"_test = [](const Requirements& requirements)
 			{
-				//const honesty::trace::Tracer& tracer = honesty::trace::GetTracer();
-			};
-
-			co_yield TODO / "span"_test = [](const Requirements& requirements)
-			{
-				/*	constexpr honesty::trace::Provider provider("tracer");
-	
-					constexpr honesty::trace::Tracer tracer = provider.Get("tracer");*/
-
+				const auto& tracer = GetTracer();
 				{
-					//honesty::Span("test_span");
+					auto span = tracer.Span("test_span");
 				}
+
+				requirements.Expect(tracer.GetConfiguration().enabled);
 			};
 		});
 	SuiteRegistrar _(SUITE);

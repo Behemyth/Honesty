@@ -4,6 +4,7 @@ import std;
 
 import :context;
 import :types;
+import :span;
 import zstring_view;
 
 namespace honesty::trace
@@ -35,6 +36,16 @@ namespace honesty::trace
 			return configuration_;
 		}
 
+		consteval auto Span(const std::string_view label) const
+		{
+			if constexpr (configuration_.enabled)
+			{
+				return Span(label);
+			}
+
+			return Span(label);
+		}
+
 	private:
 		template<group_enum T>
 		friend class ProviderBuilder;
@@ -43,6 +54,7 @@ namespace honesty::trace
 			configuration_(configuration)
 		{
 		}
+
 
 		TracerConfiguration configuration_;
 	};

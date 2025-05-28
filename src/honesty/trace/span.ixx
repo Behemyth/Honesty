@@ -4,7 +4,6 @@ import std;
 
 import :context;
 import :scope;
-import :tracer;
 
 namespace honesty::trace
 {
@@ -18,14 +17,6 @@ namespace honesty::trace
 		std::uint32_t spanID;
 		std::uint32_t parentSpanID;
 		std::uint32_t metadataID;
-	};
-
-	class DisabledSpan
-	{
-	};
-
-	class EnabledSpan
-	{
 	};
 
 	/**
@@ -49,14 +40,12 @@ namespace honesty::trace
 		{
 		}
 
-		explicit Span(std::string_view label)
+		consteval explicit Span(std::string_view label)
 		{
 		}
 
-		Span(std::string_view label, Tracer tracer)
-		{
-		}
 
 		std::chrono::high_resolution_clock::time_point startTime_;
+		bool enabled_;
 	};
 }

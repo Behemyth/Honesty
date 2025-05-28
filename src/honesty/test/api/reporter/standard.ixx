@@ -42,13 +42,11 @@ namespace honesty::test
 		void Signal(const event::AssertionFail& event)
 		{
 			ReportFailure(event);
-			ReportDescription(event);
 		}
 
 		void Signal(const event::EqualityFail& event)
 		{
 			ReportFailure(event);
-			ReportDescription(event);
 
 			const std::string_view relation = event.equal ? "==" : "!=";
 
@@ -58,7 +56,6 @@ namespace honesty::test
 		void Signal(const event::ComparisonFail& event)
 		{
 			ReportFailure(event);
-			ReportDescription(event);
 
 			const std::string_view relation = [](const std::strong_ordering ordering) -> std::string_view
 			{
@@ -108,17 +105,15 @@ namespace honesty::test
 			{
 				throw utility::NotImplemented();
 			}
-			else
-			{
-				const auto HIGHLIGHT_STYLE(log::TextStyle(log::Colour24(255, 255, 0)));
 
-				const std::string introduction = format("{}Expected:", indent);
-				const std::string expected	   = format(HIGHLIGHT_STYLE, "{}{}'{}'", indent, indent, a);
-				const std::string relationText = format("{}{}{}{}", indent, indent, indent, relation);
-				const std::string actual	   = format(HIGHLIGHT_STYLE, "{}{}'{}'", indent, indent, b);
+			const auto HIGHLIGHT_STYLE(log::TextStyle(log::Colour24(255, 255, 0)));
 
-				logger.Info("{}\n{}\n{}\n{}", introduction, expected, relationText, actual);
-			}
+			const std::string introduction = format("{}Expected:", indent);
+			const std::string expected     = format(HIGHLIGHT_STYLE, "{}{}'{}'", indent, indent, a);
+			const std::string relationText = format("{}{}{}{}", indent, indent, indent, relation);
+			const std::string actual       = format(HIGHLIGHT_STYLE, "{}{}'{}'", indent, indent, b);
+
+			logger.Info("{}\n{}\n{}\n{}", introduction, expected, relationText, actual);
 		}
 
 		/**
@@ -173,6 +168,9 @@ namespace honesty::test
 						event.location.file_name(),
 						event.location.line());
 
+					constexpr std::string_view indent("  ");
+					logger.Info("{}Description: {}", indent, event.message);
+
 					++output_.failedAssertions;
 
 					break;
@@ -188,22 +186,6 @@ namespace honesty::test
 					++output_.undefinedFailedAssertions;
 					break;
 				}
-			}
-		}
-
-		/**
-		 * @brief Reports the description of the event.
-		 * @param event The assertion event.
-		 */
-		void ReportDescription(const event::AssertionFail& event) const
-		{
-			if (not event.message.empty())
-			{
-				const log::Logger& logger = logger_.get();
-
-				constexpr std::string_view indent("  ");
-
-				logger.Info("{}Description: {}", indent, event.message);
 			}
 		}
 

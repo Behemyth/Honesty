@@ -44,7 +44,6 @@ namespace honesty::test
 		Suite& operator=(const Suite& other)	 = delete;
 		Suite& operator=(Suite&& other) noexcept = delete;
 
-		// TODO: Make consteval when MSVC supports it
 		constexpr std::string_view Name() const
 		{
 			return {name_.data(), name_.size()};
@@ -71,7 +70,6 @@ namespace honesty::test
 		{
 		}
 
-		// TODO: Make consteval when MSVC supports it
 		constexpr std::string_view Name() const
 		{
 			return nameView_;

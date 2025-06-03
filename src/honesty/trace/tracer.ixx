@@ -36,13 +36,8 @@ namespace honesty::trace
 			return configuration_;
 		}
 
-		consteval auto Span(const std::string_view label) const
+		constexpr Span Span(const std::string_view label) const
 		{
-			if constexpr (configuration_.enabled)
-			{
-				return Span(label);
-			}
-
 			return Span(label);
 		}
 

@@ -9,6 +9,9 @@ import zstring_view;
 
 namespace honesty::trace
 {
+	/**
+	 * @brief Compile-time options for a tracer.
+	 */
 	export struct TracerConfiguration
 	{
 		explicit consteval TracerConfiguration(const bool enabled) :
@@ -20,9 +23,19 @@ namespace honesty::trace
 	};
 
 	/**
-	 * @brief A tracer is a tag for Trace objects.
+	 * @brief Run-time options for a tracer.
+	 */
+	export struct TracerOptions
+	{
+		
+	};
+
+	/**
+	 * @brief A tracer generates and manages spans.
 	 */
 	export
+	template<typename Configuration>
+		requires std::is_same_v<Configuration, TracerConfiguration>
 	class Tracer
 	{
 	public:
@@ -30,11 +43,6 @@ namespace honesty::trace
 		consteval Tracer(Tracer&& other) noexcept            = default;
 		consteval Tracer& operator=(const Tracer& other)     = delete;
 		consteval Tracer& operator=(Tracer&& other) noexcept = default;
-
-		constexpr const TracerConfiguration& GetConfiguration() const
-		{
-			return configuration_;
-		}
 
 		constexpr Span Span(const std::string_view label) const
 		{
@@ -45,12 +53,11 @@ namespace honesty::trace
 		template<group_enum T>
 		friend class ProviderBuilder;
 
-		consteval explicit Tracer(const TracerConfiguration& configuration) :
-			configuration_(configuration)
+		consteval explicit Tracer()
 		{
 		}
 
 
-		TracerConfiguration configuration_;
+		TracerOptions options_;
 	};
 }

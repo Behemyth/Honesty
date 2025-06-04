@@ -33,8 +33,6 @@ namespace honesty::trace
 		}
 
 	private:
-		friend class Tracer;
-
 		explicit Span(const Scope& scope) :
 			startTime_(std::chrono::high_resolution_clock::now())
 		{

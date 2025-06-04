@@ -140,7 +140,7 @@ namespace honesty::trace
 	/**
 	 * @brief Builder for creating a Tracer Provider
 	 */
-	template<group_enum EnumType>
+	template<group_enum EnumType, typename... TracerConfigurations>
 	class ProviderBuilder
 	{
 		// TODO: Use reflection instead of a hard-coded count type

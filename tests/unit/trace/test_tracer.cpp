@@ -7,7 +7,7 @@ using namespace honesty::test::literals;
 
 namespace
 {
-	consteval const honesty::trace::Tracer& GetTracer()
+	consteval const auto& GetTracer()
 	{
 		enum class ProviderType
 		{

@@ -85,7 +85,7 @@ namespace honesty::trace
 	 * @brief Entrypoint for creating Tracers
 	 */
 	export
-	template<group_enum EnumType>
+	template<group_enum EnumType, typename... Configurations>
 	class Provider
 	{
 		static constexpr auto COUNT = std::to_underlying(EnumType::COUNT);
@@ -101,7 +101,7 @@ namespace honesty::trace
 			return tracers_[static_cast<std::size_t>(value)].GetConfiguration().enabled;
 		}
 
-		consteval const Tracer& Get(EnumType value) const
+		consteval const auto& Get(EnumType value) const
 		{
 			return tracers_[static_cast<std::size_t>(value)];
 		}
@@ -109,7 +109,7 @@ namespace honesty::trace
 		/**
 		 * @brief Retrieves the default tracer
 		 */
-		consteval const Tracer& Get() const
+		consteval const auto& Get() const
 		{
 			return tracers_[0];
 		}
@@ -131,7 +131,7 @@ namespace honesty::trace
 		{
 		}
 
-		std::array<Tracer, COUNT> tracers_;
+		std::tuple<Tracer<Configurations>...> tracers_;
 
 		static thread_local SpanRingBuffer<256> storage_;
 	};
@@ -181,7 +181,7 @@ namespace honesty::trace
 
 	private:
 		bool enabled_;
-		std::array<std::optional<TracerConfiguration>, COUNT> configurations_;
+		std::tuple<TracerConfigurations...> configurations_;
 
 		// Add a private constructor to allow AddConfiguration to return a new builder
 		consteval ProviderBuilder(const bool enabled, std::array<std::optional<TracerConfiguration>, COUNT> configs)

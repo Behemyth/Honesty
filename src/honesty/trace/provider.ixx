@@ -88,20 +88,22 @@ namespace honesty::trace
 		}
 	};
 
-	export
-	template<group_enum EnumType, TracerConfigEntry<EnumType>... Entries>
-	class ProviderBuilder;
-
 	/**
 	 * @brief Entrypoint for creating Tracers
 	 */
 	export
-	template<group_enum EnumType, typename... Configurations>
+	template<group_enum EnumType, TracerConfiguration... Configurations>
 	class Provider
 	{
 		static constexpr auto COUNT = std::to_underlying(EnumType::COUNT);
 
 	public:
+		template<TracerConfiguration... TracerConfigurations>
+		consteval explicit Provider(Tracer<TracerConfigurations>&&... tracers)
+			: tracers_(std::move(tracers)...)
+		{
+		}
+
 		consteval Provider(const Provider& other)                = delete;
 		consteval Provider(Provider&& other) noexcept            = delete;
 		consteval Provider& operator=(const Provider& other)     = delete;
@@ -109,12 +111,12 @@ namespace honesty::trace
 
 		consteval bool IsTracerEnabled(EnumType value) const
 		{
-			return tracers_[static_cast<std::size_t>(value)].GetConfiguration().enabled;
+			return Get(value).GetConfiguration().enabled;
 		}
 
 		consteval const auto& Get(EnumType value) const
 		{
-			return tracers_[static_cast<std::size_t>(value)];
+			return std::get<0>(tracers_);
 		}
 
 		/**
@@ -122,24 +124,15 @@ namespace honesty::trace
 		 */
 		consteval const auto& Get() const
 		{
-			return tracers_[0];
+			return std::get<0>(tracers_);
 		}
 
 		constexpr std::uint8_t Size() const
 		{
-			return tracers_.size();
+			return sizeof...(Configurations);
 		}
 
 	private:
-		template<group_enum T, TracerConfigEntry<T>... Entries>
-		friend class ProviderBuilder;
-
-		template<typename... TracerConfigurations>
-		consteval explicit Provider(Tracer<TracerConfigurations>&&... tracers)
-			: tracers_(std::forward<Tracer<TracerConfigurations>>(tracers)...)
-		{
-		}
-
 		std::tuple<Tracer<Configurations>...> tracers_;
 
 		static thread_local SpanRingBuffer<256> storage_;
@@ -149,6 +142,7 @@ namespace honesty::trace
 	/**
 	 * @brief Builder for creating a Tracer Provider
 	 */
+	export
 	template<group_enum EnumType, TracerConfigEntry<EnumType>... Entries>
 	class ProviderBuilder
 	{
@@ -176,9 +170,8 @@ namespace honesty::trace
 		template<std::size_t... Is>
 		consteval auto buildProvider(std::index_sequence<Is...>) const
 		{
-			// Helper to extract config from each entry
-			return Provider<EnumType, decltype(std::get<Is>(std::tuple{Entries...}).config)...>(
-				Tracer<decltype(std::get<Is>(std::tuple{Entries...}).config)>{}...
+			return Provider<EnumType, std::get<Is>(std::tuple{Entries...}).config...>(
+				Tracer<std::get<Is>(std::tuple{Entries...}).config>{}...
 				);
 		}
 	};

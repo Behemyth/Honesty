@@ -34,24 +34,24 @@ namespace
 				constexpr honesty::trace::TracerConfiguration config(true);
 
 				// None
-				constexpr auto builderNone = honesty::trace::ProviderBuilder<ProviderTypeNone>(true);
+				constexpr auto builderNone = honesty::trace::ProviderBuilder<ProviderTypeNone>();
 
 				constexpr auto providerNone = builderNone.Build();
 
 				requirements.ExpectEquals(providerNone.Size(), 0);
 
 				// One
-				constexpr auto builderOne = honesty::trace::ProviderBuilder<ProviderTypeOne>(true)
-					.AddConfiguration<ProviderTypeOne::BASE>(config);
+				constexpr auto builderOne = honesty::trace::ProviderBuilder<ProviderTypeOne>()
+					.AddConfiguration<ProviderTypeOne::BASE, config>();
 
 				constexpr auto providerOne = builderOne.Build();
 
 				requirements.ExpectEquals(providerOne.Size(), 1);
 
 				// Two
-				constexpr auto builderTwo = honesty::trace::ProviderBuilder<ProviderTypeTwo>(true)
-				                            .AddConfiguration<ProviderTypeTwo::BASE>(config)
-				                            .AddConfiguration<ProviderTypeTwo::SECOND>(config);
+				constexpr auto builderTwo = honesty::trace::ProviderBuilder<ProviderTypeTwo>()
+				                            .AddConfiguration<ProviderTypeTwo::BASE, config>()
+				                            .AddConfiguration<ProviderTypeTwo::SECOND, config>();
 
 				constexpr auto providerTwo = builderTwo.Build();
 
@@ -71,9 +71,9 @@ namespace
 				constexpr honesty::trace::TracerConfiguration disabledConfig(false);
 
 				// Provider with BASE enabled, SECOND disabled
-				constexpr auto builder = honesty::trace::ProviderBuilder<ProviderType>(true)
-				                         .AddConfiguration<ProviderType::BASE>(enabledConfig)
-				                         .AddConfiguration<ProviderType::SECOND>(disabledConfig);
+				constexpr auto builder = honesty::trace::ProviderBuilder<ProviderType>()
+				                         .AddConfiguration<ProviderType::BASE, enabledConfig>()
+				                         .AddConfiguration<ProviderType::SECOND, disabledConfig>();
 
 				constexpr auto provider = builder.Build();
 
@@ -93,9 +93,9 @@ namespace
 				constexpr honesty::trace::TracerConfiguration baseConfig(true);
 				constexpr honesty::trace::TracerConfiguration secondConfig(false);
 
-				constexpr auto builder = honesty::trace::ProviderBuilder<ProviderType>(true)
-				                         .AddConfiguration<ProviderType::BASE>(baseConfig)
-				                         .AddConfiguration<ProviderType::SECOND>(secondConfig);
+				constexpr auto builder = honesty::trace::ProviderBuilder<ProviderType>()
+				                         .AddConfiguration<ProviderType::BASE, baseConfig>()
+				                         .AddConfiguration<ProviderType::SECOND, secondConfig>();
 
 				constexpr auto provider = builder.Build();
 

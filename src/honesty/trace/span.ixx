@@ -25,6 +25,15 @@ namespace honesty::trace
 	export class Span
 	{
 	public:
+		explicit Span(const Scope& scope) :
+			startTime_(std::chrono::high_resolution_clock::now())
+		{
+		}
+
+		constexpr explicit Span(std::string_view label)
+		{
+		}
+
 		~Span()
 		{
 			const auto endTime = std::chrono::high_resolution_clock::now();
@@ -33,16 +42,6 @@ namespace honesty::trace
 		}
 
 	private:
-		explicit Span(const Scope& scope) :
-			startTime_(std::chrono::high_resolution_clock::now())
-		{
-		}
-
-		consteval explicit Span(std::string_view label)
-		{
-		}
-
-
 		std::chrono::high_resolution_clock::time_point startTime_;
 		bool enabled_;
 	};

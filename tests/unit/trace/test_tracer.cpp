@@ -29,11 +29,19 @@ namespace
 		"tracer",
 		[]() -> Generator
 		{
+			co_yield "is_trivially_constructible"_test = [](const Requirements& requirements)
+			{
+				constexpr auto configuration = honesty::trace::TracerConfiguration(true);
+
+				static_assert(
+					std::is_trivially_constructible_v<honesty::trace::Tracer<configuration>>);
+			};
+
 			co_yield "span"_test = [](const Requirements& requirements)
 			{
 				const auto& tracer = GetTracer();
 				{
-					auto span = tracer.Span("test_span");
+					auto span = tracer.CreateSpan("test_span");
 				}
 
 				requirements.Expect(tracer.GetConfiguration().enabled);

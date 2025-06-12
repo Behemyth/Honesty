@@ -27,35 +27,35 @@ namespace honesty::trace
 	 */
 	export struct TracerOptions
 	{
-		
+		constexpr TracerOptions() = default;
 	};
 
 	/**
 	 * @brief A tracer generates and manages spans.
 	 */
 	export
-	template<typename Configuration>
-		requires std::is_same_v<Configuration, TracerConfiguration>
+	template<TracerConfiguration Configuration>
 	class Tracer
 	{
 	public:
-		consteval Tracer(const Tracer& other)                = delete;
-		consteval Tracer(Tracer&& other) noexcept            = default;
-		consteval Tracer& operator=(const Tracer& other)     = delete;
-		consteval Tracer& operator=(Tracer&& other) noexcept = default;
+		constexpr Tracer() = default;
 
-		constexpr Span Span(const std::string_view label) const
+		consteval Tracer(const Tracer& other)                = delete;
+		constexpr Tracer(Tracer&& other) noexcept            = default;
+		consteval Tracer& operator=(const Tracer& other)     = delete;
+		constexpr Tracer& operator=(Tracer&& other) noexcept = default;
+
+		constexpr Span CreateSpan(const std::string_view label) const
 		{
 			return Span(label);
 		}
 
-	private:
-
-		consteval explicit Tracer()
+		constexpr TracerConfiguration GetConfiguration() const
 		{
+			return Configuration;
 		}
 
-
+	private:
 		TracerOptions options_;
 	};
 }

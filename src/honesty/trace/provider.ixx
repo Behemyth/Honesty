@@ -77,8 +77,19 @@ namespace honesty::trace
 	};
 
 
+	template<typename EnumType>
+	struct TracerConfigEntry
+	{
+		EnumType key;
+		TracerConfiguration config;
+
+		consteval TracerConfigEntry(EnumType k, TracerConfiguration c) : key(k), config(c)
+		{
+		}
+	};
+
 	export
-	template<group_enum T>
+	template<group_enum EnumType, TracerConfigEntry<EnumType>... Entries>
 	class ProviderBuilder;
 
 	/**
@@ -120,14 +131,12 @@ namespace honesty::trace
 		}
 
 	private:
-		template<group_enum T>
+		template<group_enum T, TracerConfigEntry<T>... Entries>
 		friend class ProviderBuilder;
 
-		template<typename... Tracers>
-		consteval explicit Provider(Tracers&&... tracers)
-			requires (sizeof...(Tracers) == COUNT) &&
-			         (std::same_as<std::remove_cvref_t<Tracers>, Tracer> && ...)
-			: tracers_(std::forward<Tracers>(tracers)...)
+		template<typename... TracerConfigurations>
+		consteval explicit Provider(Tracer<TracerConfigurations>&&... tracers)
+			: tracers_(std::forward<Tracer<TracerConfigurations>>(tracers)...)
 		{
 		}
 
@@ -140,53 +149,37 @@ namespace honesty::trace
 	/**
 	 * @brief Builder for creating a Tracer Provider
 	 */
-	template<group_enum EnumType, typename... TracerConfigurations>
+	template<group_enum EnumType, TracerConfigEntry<EnumType>... Entries>
 	class ProviderBuilder
 	{
 		// TODO: Use reflection instead of a hard-coded count type
 		static constexpr auto COUNT = std::to_underlying(EnumType::COUNT);
 
 	public:
-		explicit consteval ProviderBuilder(const bool enabled) :
-			enabled_(enabled)
+		explicit consteval ProviderBuilder() = default;
+
+		template<EnumType Key, TracerConfiguration Config>
+		consteval auto AddConfiguration() const
 		{
+			return ProviderBuilder<EnumType, Entries..., TracerConfigEntry<EnumType>{Key, Config}>();
 		}
 
-		template<EnumType Value>
-		consteval auto AddConfiguration(const TracerConfiguration& config) const
+		consteval auto Build() const
 		{
-			auto newConfigs                             = configurations_;
-			newConfigs[static_cast<std::size_t>(Value)] = config;
-			return ProviderBuilder(enabled_, newConfigs);
-		}
-
-		consteval Provider<EnumType> Build() const
-		{
-			// Ensure all configurations are set at compile time
-			for (std::size_t i = 0; i < COUNT; ++i)
-			{
-				if (!configurations_[i].has_value())
-				{
-					throw "All configurations must be set at compile time!";
-				}
-			}
-
-			auto createProvider = [&]<std::size_t... I>(std::index_sequence<I...>) consteval
-			{
-				return Provider<EnumType>(Tracer(configurations_[I].value())...);
-			};
-
-			return createProvider(std::make_index_sequence<COUNT>{});
+			static_assert(
+				sizeof...(Entries) == std::to_underlying(EnumType::COUNT),
+				"All enum values must have a configuration.");
+			return buildProvider(std::make_index_sequence<sizeof...(Entries)>{});
 		}
 
 	private:
-		bool enabled_;
-		std::tuple<TracerConfigurations...> configurations_;
-
-		// Add a private constructor to allow AddConfiguration to return a new builder
-		consteval ProviderBuilder(const bool enabled, std::array<std::optional<TracerConfiguration>, COUNT> configs)
-			: enabled_(enabled), configurations_(configs)
+		template<std::size_t... Is>
+		consteval auto buildProvider(std::index_sequence<Is...>) const
 		{
+			// Helper to extract config from each entry
+			return Provider<EnumType, decltype(std::get<Is>(std::tuple{Entries...}).config)...>(
+				Tracer<decltype(std::get<Is>(std::tuple{Entries...}).config)>{}...
+				);
 		}
 	};
 }

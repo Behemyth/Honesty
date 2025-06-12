@@ -50,8 +50,6 @@ namespace honesty::trace
 		}
 
 	private:
-		template<group_enum T>
-		friend class ProviderBuilder;
 
 		consteval explicit Tracer()
 		{

@@ -17,8 +17,8 @@ namespace
 
 		constexpr honesty::trace::TracerConfiguration baseConfig(true);
 
-		constexpr auto builder = honesty::trace::ProviderBuilder<ProviderType>(true)
-			.AddConfiguration<ProviderType::BASE>(baseConfig);
+		constexpr auto builder = honesty::trace::ProviderBuilder<ProviderType>()
+			.AddConfiguration<ProviderType::BASE, baseConfig>();
 
 		constexpr auto provider = builder.Build();
 

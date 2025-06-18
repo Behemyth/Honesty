@@ -4,6 +4,7 @@ import std;
 
 import :context;
 import :scope;
+import :types;
 
 namespace honesty::trace
 {
@@ -20,11 +21,34 @@ namespace honesty::trace
 	};
 
 	/**
+     * @brief A no-op span for when tracing is disabled.
+     */
+	class NoopSpan
+	{
+	public:
+		constexpr explicit NoopSpan() noexcept
+		{
+		}
+	};
+
+	/**
 	 * @brief The public interface for recording a span of time
 	 */
 	export class Span
 	{
+		// Only Tracer can construct Span
+		template<TracerConfiguration Configuration>
+		friend class Tracer;
+
 	public:
+		~Span()
+		{
+			const auto endTime = std::chrono::high_resolution_clock::now();
+
+			auto duration = endTime - startTime_;
+		}
+
+	private:
 		explicit Span(const Scope& scope) :
 			startTime_(std::chrono::high_resolution_clock::now())
 		{
@@ -34,14 +58,6 @@ namespace honesty::trace
 		{
 		}
 
-		~Span()
-		{
-			const auto endTime = std::chrono::high_resolution_clock::now();
-
-			auto duration = endTime - startTime_;
-		}
-
-	private:
 		std::chrono::high_resolution_clock::time_point startTime_;
 	};
 }

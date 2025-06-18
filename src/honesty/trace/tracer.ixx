@@ -10,19 +10,6 @@ import zstring_view;
 namespace honesty::trace
 {
 	/**
-	 * @brief Compile-time options for a tracer.
-	 */
-	export struct TracerConfiguration
-	{
-		explicit consteval TracerConfiguration(const bool enabled) :
-			enabled(enabled)
-		{
-		}
-
-		bool enabled;
-	};
-
-	/**
 	 * @brief Run-time options for a tracer.
 	 */
 	export struct TracerOptions
@@ -45,7 +32,7 @@ namespace honesty::trace
 		Tracer& operator=(const Tracer& other)               = delete;
 		constexpr Tracer& operator=(Tracer&& other) noexcept = default;
 
-		constexpr Span CreateSpan(const std::string_view label) const
+		constexpr auto CreateSpan(const std::string_view label) const
 		{
 			if constexpr (Configuration.enabled)
 			{
@@ -53,7 +40,7 @@ namespace honesty::trace
 			}
 			else
 			{
-				return Span(label);
+				return NoopSpan();
 			}
 		}
 

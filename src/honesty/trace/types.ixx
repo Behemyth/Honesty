@@ -11,4 +11,17 @@ namespace honesty::trace
 		{
 			{ Enum::COUNT } -> std::convertible_to<Enum>; // TODO: Replace with reflection, C++26
 		};
+
+	/**
+	 * @brief Compile-time options for a tracer.
+	 */
+	export struct TracerConfiguration
+	{
+		explicit consteval TracerConfiguration(const bool enabled) :
+			enabled(enabled)
+		{
+		}
+
+		bool enabled;
+	};
 }

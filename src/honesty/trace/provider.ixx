@@ -83,7 +83,9 @@ namespace honesty::trace
 		EnumType key;
 		TracerConfiguration config;
 
-		consteval TracerConfigEntry(EnumType k, TracerConfiguration c) : key(k), config(c)
+		consteval TracerConfigEntry(EnumType key, const TracerConfiguration config) :
+			key(key),
+			config(config)
 		{
 		}
 	};

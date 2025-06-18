@@ -33,7 +33,7 @@ namespace
 
 			co_yield "span"_test = [&](const Requirements& requirements)
 			{
-					honesty::Span span = tracer.CreateSpan("span");
+				honesty::Span span = tracer.CreateSpan("span");
 			};
 		});
 	SuiteRegistrar _(SUITE);

@@ -111,27 +111,22 @@ namespace honesty::trace
 		{
 		}
 
-		consteval Provider(const Provider& other)                = delete;
-		consteval Provider(Provider&& other) noexcept            = delete;
-		consteval Provider& operator=(const Provider& other)     = delete;
-		consteval Provider& operator=(Provider&& other) noexcept = delete;
+		Provider(const Provider& other)                = delete;
+		Provider(Provider&& other) noexcept            = delete;
+		Provider& operator=(const Provider& other)     = delete;
+		Provider& operator=(Provider&& other) noexcept = delete;
 
-		consteval bool IsTracerEnabled(EnumType value) const
+		template<EnumType Value>
+		consteval bool IsTracerEnabled() const
 		{
-			return Get(value).GetConfiguration().enabled;
+			return Get<Value>().GetConfiguration().enabled;
 		}
 
-		consteval const auto& Get(EnumType value) const
-		{
-			return std::get<0>(tracers_); // Unreachable, but required for return type
-		}
-
-		/**
-		 * @brief Retrieves the default tracer
-		 */
+		template<EnumType Value>
 		consteval const auto& Get() const
 		{
-			return std::get<0>(tracers_);
+			constexpr auto index = IndexOf(Value);
+			return GetTracerAtIndex<index>();
 		}
 
 		static constexpr std::uint8_t Size()
@@ -140,6 +135,25 @@ namespace honesty::trace
 		}
 
 	private:
+		template<std::size_t Index>
+		consteval const auto& GetTracerAtIndex() const
+		{
+			static_assert(Index < sizeof...(Entries), "Tracer index out of bounds");
+			return std::get<Index>(tracers_);
+		}
+
+		static consteval std::size_t IndexOf(EnumType value)
+		{
+			constexpr auto keys = std::array{Entries.key...};
+			for (std::size_t i = 0; i < keys.size(); ++i)
+			{
+				if (keys[i] == value)
+					return i;
+			}
+			// This will cause a compile error if enum not found
+			return sizeof...(Entries); // Out of bounds - will trigger static_assert
+		}
+
 		using TracerTuple = decltype(std::tuple{Tracer<Entries.config>{}...});
 		TracerTuple tracers_;
 

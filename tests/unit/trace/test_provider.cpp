@@ -77,8 +77,8 @@ namespace
 
 				constexpr auto provider = builder.Build();
 
-				requirements.Expect(provider.IsTracerEnabled(ProviderType::BASE));
-				requirements.Expect(!provider.IsTracerEnabled(ProviderType::SECOND));
+				requirements.Expect(provider.IsTracerEnabled<ProviderType::BASE>());
+				requirements.Expect(!provider.IsTracerEnabled<ProviderType::SECOND>());
 			};
 
 			co_yield "get"_test = [](const Requirements& requirements)
@@ -99,8 +99,8 @@ namespace
 
 				constexpr auto provider = builder.Build();
 
-				const auto& baseTracer   = provider.Get(ProviderType::BASE);
-				const auto& secondTracer = provider.Get(ProviderType::SECOND);
+				const auto& baseTracer   = provider.Get<ProviderType::BASE>();
+				const auto& secondTracer = provider.Get<ProviderType::SECOND>();
 
 				requirements.ExpectEquals(baseTracer.GetConfiguration().enabled, true);
 				requirements.ExpectEquals(secondTracer.GetConfiguration().enabled, false);

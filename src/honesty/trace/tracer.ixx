@@ -38,16 +38,23 @@ namespace honesty::trace
 	class Tracer
 	{
 	public:
-		constexpr Tracer() = default;
+		consteval Tracer() = default;
 
-		consteval Tracer(const Tracer& other)                = delete;
+		Tracer(const Tracer& other)                          = delete;
 		constexpr Tracer(Tracer&& other) noexcept            = default;
-		consteval Tracer& operator=(const Tracer& other)     = delete;
+		Tracer& operator=(const Tracer& other)               = delete;
 		constexpr Tracer& operator=(Tracer&& other) noexcept = default;
 
 		constexpr Span CreateSpan(const std::string_view label) const
 		{
-			return Span(label);
+			if constexpr (Configuration.enabled)
+			{
+				return Span(label);
+			}
+			else
+			{
+				return Span(label);
+			}
 		}
 
 		constexpr TracerConfiguration GetConfiguration() const

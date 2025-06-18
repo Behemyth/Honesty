@@ -13,7 +13,7 @@ namespace
 		{
 			co_yield TODO / "span"_test = [](const Requirements& requirements)
 			{
-					//honesty::Span span("span");
+					honesty::Span span("span");
 			};
 		});
 	SuiteRegistrar _(SUITE);

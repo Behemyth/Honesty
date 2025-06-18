@@ -43,6 +43,5 @@ namespace honesty::trace
 
 	private:
 		std::chrono::high_resolution_clock::time_point startTime_;
-		bool enabled_;
 	};
 }

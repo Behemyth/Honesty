@@ -57,7 +57,7 @@ namespace honesty::trace
 			}
 		}
 
-		constexpr TracerConfiguration GetConfiguration() const
+		static consteval TracerConfiguration GetConfiguration()
 		{
 			return Configuration;
 		}

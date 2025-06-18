@@ -97,13 +97,13 @@ namespace honesty::trace
 	{
 		static constexpr auto COUNT = std::to_underlying(EnumType::COUNT);
 
-		template<typename Entry>
+		template<typename Enum>
 		struct TracerConfigExtractor;
 
-		template<typename EnumType>
-		struct TracerConfigExtractor<TracerConfigEntry<EnumType>>
+		template<typename Enum>
+		struct TracerConfigExtractor<TracerConfigEntry<Enum>>
 		{
-			using type = TracerConfiguration;
+			using Type = TracerConfiguration;
 		};
 
 	public:

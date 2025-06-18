@@ -92,15 +92,22 @@ namespace honesty::trace
 	 * @brief Entrypoint for creating Tracers
 	 */
 	export
-	template<group_enum EnumType, TracerConfiguration... Configurations>
+	template<group_enum EnumType, TracerConfigEntry<EnumType>... Entries>
 	class Provider
 	{
 		static constexpr auto COUNT = std::to_underlying(EnumType::COUNT);
 
+		template<typename Entry>
+		struct TracerConfigExtractor;
+
+		template<typename EnumType>
+		struct TracerConfigExtractor<TracerConfigEntry<EnumType>>
+		{
+			using type = TracerConfiguration;
+		};
+
 	public:
-		template<TracerConfiguration... TracerConfigurations>
-		consteval explicit Provider(Tracer<TracerConfigurations>&&... tracers)
-			: tracers_(std::move(tracers)...)
+		consteval Provider() : tracers_{Tracer<Entries.config>{}...}
 		{
 		}
 
@@ -116,7 +123,7 @@ namespace honesty::trace
 
 		consteval const auto& Get(EnumType value) const
 		{
-			return std::get<0>(tracers_);
+			return std::get<0>(tracers_); // Unreachable, but required for return type
 		}
 
 		/**
@@ -127,13 +134,14 @@ namespace honesty::trace
 			return std::get<0>(tracers_);
 		}
 
-		constexpr std::uint8_t Size() const
+		static constexpr std::uint8_t Size()
 		{
-			return sizeof...(Configurations);
+			return sizeof...(Entries);
 		}
 
 	private:
-		std::tuple<Tracer<Configurations>...> tracers_;
+		using TracerTuple = decltype(std::tuple{Tracer<Entries.config>{}...});
+		TracerTuple tracers_;
 
 		static thread_local SpanRingBuffer<256> storage_;
 	};
@@ -163,16 +171,14 @@ namespace honesty::trace
 			static_assert(
 				sizeof...(Entries) == std::to_underlying(EnumType::COUNT),
 				"All enum values must have a configuration.");
-			return buildProvider(std::make_index_sequence<sizeof...(Entries)>{});
+			return BuildProvider(std::make_index_sequence<sizeof...(Entries)>{});
 		}
 
 	private:
 		template<std::size_t... Is>
-		consteval auto buildProvider(std::index_sequence<Is...>) const
+		consteval auto BuildProvider(std::index_sequence<Is...>) const
 		{
-			return Provider<EnumType, std::get<Is>(std::tuple{Entries...}).config...>(
-				Tracer<std::get<Is>(std::tuple{Entries...}).config>{}...
-				);
+			return Provider<EnumType, Entries...>();
 		}
 	};
 }

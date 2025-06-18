@@ -122,7 +122,7 @@ namespace honesty::trace
 			return Get<Value>().GetConfiguration().enabled;
 		}
 
-		template<EnumType Value>
+		template<EnumType Value = static_cast<EnumType>(0)>
 		consteval const auto& Get() const
 		{
 			constexpr auto index = IndexOf(Value);

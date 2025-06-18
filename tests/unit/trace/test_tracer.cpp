@@ -22,7 +22,7 @@ namespace
 
 		constexpr auto provider = builder.Build();
 
-		return provider.Get<ProviderType::BASE>();
+		return provider.Get();
 	}
 
 	Suite SUITE(

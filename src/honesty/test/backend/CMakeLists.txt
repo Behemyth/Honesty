@@ -14,7 +14,7 @@ target_sources(honesty
 			test_context.ixx
 			requirements.ixx
 			test.ixx
-			
+			tracer.ixx
 			reporter.ixx
 			runner.ixx
 			suite.ixx

@@ -133,7 +133,7 @@ namespace honesty::test::api
 		const TestContext& testContext,
 		const std::function_ref<Generator()>& testCallback)
 	{
-		const Generator generator = runner.Run(testCallback);
+		Generator generator = runner.Run(testCallback);
 
 		std::span filter = testContext.filterViews;
 		filter           = filter | std::ranges::views::drop(1);

@@ -38,7 +38,6 @@ namespace honesty::trace
 	 */
 	export class Span
 	{
-		// Only Tracer can construct Span
 		template<TracerConfiguration Configuration>
 		friend class Tracer;
 

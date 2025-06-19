@@ -2,6 +2,8 @@ export module synodic.honesty.trace:span;
 
 import std;
 
+import synodic.honesty.metric;
+
 import :context;
 import :scope;
 import :types;
@@ -13,8 +15,8 @@ namespace honesty::trace
 	 */
 	struct SpanData
 	{
-		std::chrono::high_resolution_clock::time_point startTime;
-		std::chrono::high_resolution_clock::duration duration;
+		honesty::metric::Clock::time_point startTime;
+		honesty::metric::Duration duration;
 		std::uint32_t spanID;
 		std::uint32_t parentSpanID;
 		std::uint32_t metadataID;
@@ -43,14 +45,13 @@ namespace honesty::trace
 	public:
 		~Span()
 		{
-			const auto endTime = std::chrono::high_resolution_clock::now();
-
-			auto duration = endTime - startTime_;
+			const auto endTime = metric::Clock::now();
+			auto duration      = endTime - startTime_;
 		}
 
 	private:
 		explicit Span(const Scope& scope) :
-			startTime_(std::chrono::high_resolution_clock::now())
+			startTime_(metric::Clock::now())
 		{
 		}
 
@@ -58,6 +59,6 @@ namespace honesty::trace
 		{
 		}
 
-		std::chrono::high_resolution_clock::time_point startTime_;
+		metric::Clock::time_point startTime_;
 	};
 }

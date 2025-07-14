@@ -18,8 +18,8 @@ homepage = "https://github.com/Synodic-Software/Honesty"
 repository = "https://github.com/Synodic-Software/Honesty"
 
 [dependency-groups]
-lint = ["ruff>=0.11.5", "mypy>=1.15.0", "isort>=6.0.1"]
-test = ["pytest-cov>=6.1.1", "pytest-mock>=3.14.0"]
+lint = ["ruff>=0.12.3", "pyrefly>=0.24.0", "isort>=6.0.1"]
+test = ["pytest-cov>=6.2.1", "pytest-mock>=3.14.1"]
 
 [tool.cppython]
 generator-name = "cmake"
@@ -34,11 +34,6 @@ configuration_name = "default"
 log_cli = true
 testpaths = ["tests"]
 
-[tool.mypy]
-exclude = "__pypackages__"
-plugins = ["pydantic.mypy"]
-strict = true
-
 [tool.isort]
 profile = "black"
 
@@ -49,15 +44,15 @@ preview = true
 [tool.ruff.lint]
 ignore = ["D206", "D300", "D415", "E111", "E114", "E117"]
 select = [
-  "D",   # pydocstyle
-  "F",   # Pyflakes
-  "I",   # isort
-  "PL",  # pylint
-  "UP",  # pyupgrade
-  "E",   # pycodestyle
-  "B",   # flake8-bugbear
-  "SIM", # flake8-simplify
-  "PT",  # flake8-pytest-style
+	"D",   # pydocstyle
+	"F",   # Pyflakes
+	"I",   # isort
+	"PL",  # pylint
+	"UP",  # pyupgrade
+	"E",   # pycodestyle
+	"B",   # flake8-bugbear
+	"SIM", # flake8-simplify
+	"PT",  # flake8-pytest-style
 ]
 
 [tool.ruff.lint.pydocstyle]
@@ -73,9 +68,6 @@ skip_empty = true
 
 [tool.pdm]
 plugins = ["cppython[cmake,conan,git]"]
-
-[tool.pdm.options]
-update = ["--update-all"]
 
 [tool.pdm.scripts]
 build = { shell = "cppython build" }

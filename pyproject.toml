@@ -30,6 +30,9 @@ dependencies = ["opentelemetry-cpp>=1.18.0"]
 preset_file = "tool/cmake/platform/common/CMakePresets.json"
 configuration_name = "default"
 
+[tool.cppython.provider]
+remotes = []
+
 [tool.pytest.ini_options]
 log_cli = true
 testpaths = ["tests"]

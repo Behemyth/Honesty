@@ -30,6 +30,9 @@ generator-name = "cmake"
 provider-name = "conan"
 dependencies = ["opentelemetry-cpp>=1.18.0"]
 
+# TODO: Means it a local publish. Use dev server
+remotes = []
+
 [tool.cppython.generator]
 preset_file = "tool/cmake/platform/common/CMakePresets.json"
 configuration_name = "default"

@@ -17,6 +17,10 @@ requires-python = ">=3.13"
 homepage = "https://github.com/Synodic-Software/Honesty"
 repository = "https://github.com/Synodic-Software/Honesty"
 
+[project.optional-dependencies]
+build = [
+    "cppython[cmake,conan,git]>=0.9.3",
+]
 [dependency-groups]
 lint = ["ruff>=0.12.3", "pyrefly>=0.24.0", "isort>=6.0.1"]
 test = ["pytest-cov>=6.2.1", "pytest-mock>=3.14.1"]
@@ -68,9 +72,6 @@ quote-style = "single"
 
 [tool.coverage.report]
 skip_empty = true
-
-[tool.pdm]
-plugins = ["cppython[cmake,conan,git]"]
 
 [tool.pdm.scripts]
 build = { shell = "cppython build" }

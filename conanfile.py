@@ -1,6 +1,6 @@
 
 from conan import ConanFile
-from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
+from conan.tools.cmake import CMake, cmake_layout
 
 
 class MyProject(ConanFile):

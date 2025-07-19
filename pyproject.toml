@@ -19,25 +19,27 @@ repository = "https://github.com/Synodic-Software/Honesty"
 
 [project.optional-dependencies]
 build = [
-    "cppython[cmake,conan,git]>=0.9.3",
+    "cppython[cmake,conan,git]>=0.9.4",
 ]
 [dependency-groups]
-lint = ["ruff>=0.12.3", "pyrefly>=0.24.0", "isort>=6.0.1"]
-test = ["pytest-cov>=6.2.1", "pytest-mock>=3.14.1"]
+lint = [
+    "ruff>=0.12.4",
+    "pyrefly>=0.24.2",
+    "isort>=6.0.1",
+]
+test = [
+    "pytest-cov>=6.2.1",
+    "pytest-mock>=3.14.1",
+]
 
 [tool.cppython]
-generator-name = "cmake"
-provider-name = "conan"
 dependencies = ["opentelemetry-cpp>=1.18.0"]
 
-# TODO: Means it a local publish. Use dev server
-remotes = []
-
-[tool.cppython.generator]
+[tool.cppython.generators.cmake]
 preset_file = "tool/cmake/platform/common/CMakePresets.json"
 configuration_name = "default"
 
-[tool.cppython.provider]
+[tool.cppython.providers.conan]
 remotes = []
 
 [tool.pytest.ini_options]

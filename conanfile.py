@@ -2,6 +2,7 @@ from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 from conan.tools.files import copy
 
+
 class AutoPackage(ConanFile):
 	name = "honesty"
 	version = "1.0"
@@ -16,6 +17,7 @@ class AutoPackage(ConanFile):
 		deps.generate()
 		tc = CMakeToolchain(self)
 		tc.user_presets_path = None
+		tc.variables["BUILD_TESTING"] = "OFF"
 		tc.generate()
 
 	def build(self):

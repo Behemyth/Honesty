@@ -1,6 +1,6 @@
 target_sources(honesty
 	PUBLIC
-		FILE_SET test_commands_reporter_public
+		FILE_SET honesty_public
 		TYPE CXX_MODULES
 		FILES
 			compact.ixx

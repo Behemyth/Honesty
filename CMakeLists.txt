@@ -62,3 +62,7 @@ if(BUILD_TESTING)
 		tests
 	)
 endif()
+
+# Installation
+
+include(install)

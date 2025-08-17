@@ -3,8 +3,7 @@
     "include": [
         "tool/cmake/platform/linux/CMakePresets.json",
         "tool/cmake/platform/mac/CMakePresets.json",
-        "tool/cmake/platform/windows/CMakePresets.json",
-        "tool/cppython/cppython.json"
+        "tool/cmake/platform/windows/CMakePresets.json"
     ],
     "cmakeMinimumRequired": {
         "major": 3,

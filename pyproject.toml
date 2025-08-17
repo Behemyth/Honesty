@@ -19,12 +19,12 @@ repository = "https://github.com/Synodic-Software/Honesty"
 
 [project.optional-dependencies]
 build = [
-    "cppython[cmake,conan,git]>=0.9.4",
+    "cppython[cmake,conan,git]>=0.9.7",
 ]
 [dependency-groups]
 lint = [
-    "ruff>=0.12.4",
-    "pyrefly>=0.24.2",
+    "ruff>=0.12.9",
+    "pyrefly>=0.28.1",
     "isort>=6.0.1",
 ]
 test = [

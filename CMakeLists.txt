@@ -65,4 +65,18 @@ endif()
 
 # Installation
 
-include(install)
+include(GNUInstallDirs)
+
+install(TARGETS honesty honesty_main
+	EXPORT HonestyTargets
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+
+	FILE_SET honesty_public DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(EXPORT HonestyTargets
+	NAMESPACE synodic::
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Honesty
+)

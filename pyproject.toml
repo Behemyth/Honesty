@@ -11,7 +11,7 @@ readme = "README.md"
 dynamic = ["version"]
 
 dependencies = []
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 
 [project.urls]
 homepage = "https://github.com/Synodic-Software/Honesty"
@@ -23,13 +23,13 @@ build = [
 ]
 [dependency-groups]
 lint = [
-    "ruff>=0.12.9",
-    "pyrefly>=0.28.1",
-    "isort>=6.0.1",
+    "ruff>=0.14.3",
+    "pyrefly>=0.39.4",
+    "isort>=7.0.0",
 ]
 test = [
-    "pytest-cov>=6.2.1",
-    "pytest-mock>=3.14.1",
+    "pytest-cov>=7.0.0",
+    "pytest-mock>=3.15.1",
 ]
 
 [tool.cppython]
@@ -38,6 +38,7 @@ dependencies = ["opentelemetry-cpp>=1.21.0"]
 [tool.cppython.generators.cmake]
 preset_file = "tool/cmake/platform/common/CMakePresets.json"
 configuration_name = "default"
+cmake_binary = "C:/Program Files/CMake/bin/cmake.exe"
 
 [tool.cppython.providers.conan]
 remotes = []

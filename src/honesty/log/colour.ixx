@@ -364,7 +364,7 @@ namespace honesty::log
 		}
 		else
 		{
-			std::println(stream, fmt, std::forward<Args>(args...));
+			std::println(stream, fmt, std::forward<Args>(args)...);
 		}
 	}
 

@@ -2,7 +2,6 @@ module;
 
 #include <opentelemetry/logs/provider.h>
 #include <opentelemetry/logs/severity.h>
-#include <opentelemetry/trace/semantic_conventions.h>
 
 // Windows workaround
 #undef ERROR

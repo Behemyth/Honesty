@@ -43,6 +43,7 @@ cmake_binary = "C:/Program Files/CMake/bin/cmake.exe"
 
 [tool.cppython.providers.conan]
 remotes = []
+skip_upload = true
 
 [tool.pytest.ini_options]
 log_cli = true

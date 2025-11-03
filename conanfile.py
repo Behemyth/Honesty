@@ -1,3 +1,5 @@
+import os
+
 from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 from conan.tools.files import copy
@@ -7,7 +9,7 @@ class AutoPackage(ConanFile):
 	name = "honesty"
 	version = "1.0"
 	settings = "os", "compiler", "build_type", "arch"
-	requires = ["opentelemetry-cpp/[>=1.21.0]"]
+	requires = ["opentelemetry-cpp/[>=1.22.0]"]
 
 	def layout(self):
 		cmake_layout(self)
@@ -38,6 +40,8 @@ class AutoPackage(ConanFile):
 		self.cpp_info.components["main"].libs = ["honesty_main"]
 		self.cpp_info.components["main"].set_property("cmake_target_name", "synodic::honesty::main")
 		self.cpp_info.components["main"].requires = ["honesty"]
+
+		self.cpp_info.builddirs.append(os.path.join("lib", "cmake", "honesty"))
 
 	def export_sources(self):
 		copy(self, "CMakeLists.txt", src=self.recipe_folder, dst=self.export_sources_folder)

@@ -4,10 +4,13 @@
  *		utility that are need for JSON interfaces while not depending on other libraries.
  */
 
+module;
+
+#include <cassert>
+
 export module synodic.honesty.utility:json;
 
 import std;
-import <cassert>;
 
 namespace
 {

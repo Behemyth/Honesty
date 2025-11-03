@@ -2,9 +2,6 @@ target_sources(honesty
 	PUBLIC
 		FILE_SET honesty_public
 		TYPE CXX_MODULES
-	PRIVATE
-		FILE_SET test_backend_private
-		TYPE CXX_MODULES
 		FILES
 			module.ixx
 			storage.ixx
@@ -20,4 +17,7 @@ target_sources(honesty
 			suite.ixx
 			fixture.ixx
 			tag.ixx
+	PRIVATE
+		FILE_SET test_backend_private
+		TYPE CXX_MODULES
 )

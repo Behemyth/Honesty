@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.31 FATAL_ERROR)
+cmake_minimum_required(VERSION 4.0 FATAL_ERROR)
 
 # Overwrite possibly existing ${_CTEST_FILE} with empty file
 set(flush_tests_MODE WRITE)

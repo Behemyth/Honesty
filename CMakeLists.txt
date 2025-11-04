@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.31 FATAL_ERROR)
+cmake_minimum_required(VERSION 4.0 FATAL_ERROR)
 
 # Enable std module support for MSVC - MUST be before project()
 set(CMAKE_EXPERIMENTAL_CXX_IMPORT_STD "d0edc3af-4c50-42ea-a356-e2862fe7a444")
@@ -32,6 +32,9 @@ set_target_properties(honesty honesty_main
 	CXX_EXTENSIONS NO
 	FOLDER "honesty"
 )
+
+target_compile_features(honesty PUBLIC cxx_std_23)
+target_compile_features(honesty_main PUBLIC cxx_std_23)
 
 find_package(opentelemetry-cpp CONFIG REQUIRED)
 
@@ -69,19 +72,46 @@ if(BUILD_TESTING)
 endif()
 
 # Installation
-
 include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+# Generate package config files
+write_basic_package_version_file(
+	honestyConfigVersion.cmake
+	VERSION ${PROJECT_VERSION}
+	COMPATIBILITY SameMajorVersion
+)
+
+configure_package_config_file(
+	tool/cmake/honestyConfig.cmake.in
+	honestyConfig.cmake
+	INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/honesty
+)
 
 install(TARGETS honesty honesty_main
-	EXPORT HonestyTargets
+	EXPORT honestyTargets
 	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 
-	FILE_SET honesty_public DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+	FILE_SET honesty_public DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/honesty
+	FILE_SET honesty_private DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/honesty
 )
 
-install(EXPORT HonestyTargets
+# Create empty include directory to satisfy CMake's exported target requirements
+# (module-only library with no headers, but CMake expects the directory to exist)
+install(DIRECTORY DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+# Export and package configuration
+install(EXPORT honestyTargets
+	FILE honestyTargets.cmake
 	NAMESPACE synodic::
-	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/Honesty
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/honesty
+)
+
+install(
+	FILES
+	${CMAKE_CURRENT_BINARY_DIR}/honestyConfig.cmake
+	${CMAKE_CURRENT_BINARY_DIR}/honestyConfigVersion.cmake
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/honesty
 )

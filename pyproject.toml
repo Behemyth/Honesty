@@ -19,13 +19,13 @@ repository = "https://github.com/synodic/Honesty"
 
 [project.optional-dependencies]
 build = [
-    "cppython[cmake,conan,git]>=0.9.7",
+    "cppython[cmake,conan,git]>=0.9.10",
     "ninja>=1.13.0",
 ]
 [dependency-groups]
 lint = [
-    "ruff>=0.14.3",
-    "pyrefly>=0.39.4",
+    "ruff>=0.14.5",
+    "pyrefly>=0.41.3",
     "isort>=7.0.0",
 ]
 test = [
@@ -34,7 +34,7 @@ test = [
 ]
 
 [tool.cppython]
-dependencies = ["opentelemetry-cpp>=1.22.0"]
+dependencies = ["opentelemetry-cpp>=1.22.0", "cppaste>=0.0.1"]
 
 [tool.cppython.generators.cmake]
 preset_file = "tool/cmake/platform/common/CMakePresets.json"

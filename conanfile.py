@@ -1,14 +1,15 @@
 
-from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
 from conan.tools.files import copy
 
+from conanfile_base import CPPythonBase
 
-class AutoPackage(ConanFile):
+
+class AutoPackage(CPPythonBase):
     name = "honesty"
     version = "1.0"
     settings = "os", "compiler", "build_type", "arch"
-    requires = ["opentelemetry-cpp/[>=1.22.0]"]
+    exports = "conanfile_base.py"  # Export the base file
 
     def layout(self):
         cmake_layout(self)
@@ -20,6 +21,14 @@ class AutoPackage(ConanFile):
         tc.user_presets_path = None
         tc.variables["BUILD_TESTING"] = "OFF"
         tc.generate()
+
+    def requirements(self):
+        super().requirements()  # Get CPPython managed dependencies
+        # Add your custom requirements here
+
+    def build_requirements(self):
+        super().build_requirements()  # Get CPPython managed test dependencies
+        # Add your custom build requirements here
 
     def build(self):
         cmake = CMake(self)

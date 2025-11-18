@@ -7,18 +7,8 @@ import std;
 
 namespace honesty::test
 {
-	// TODO: Make this a compile-time check
-	export void VerifySuiteName(const std::string_view name)
+	void DuplicateCheck(const std::string_view name)
 	{
-		// Empty check
-		if (name.empty())
-		{
-			throw std::runtime_error(std::format(
-				"Empty suite name - {}, {}",
-				std::source_location::current().file_name(),
-				std::source_location::current().line()));
-		}
-
 		// Duplicate check
 		if (std::ranges::contains(
 				GetSuites(),
@@ -29,43 +19,11 @@ namespace honesty::test
 				}))
 		{
 			throw std::runtime_error(std::format(
-				"Duplicate suite name - {}, {}",
+				"Duplicate suite name '{}' - {}, {}",
+				name,
 				std::source_location::current().file_name(),
 				std::source_location::current().line()));
 		}
-
-		// Uppercase check
-		std::ranges::for_each(
-			name,
-			[](const char character)
-			{
-				// Uppercase check
-				if (std::isupper(character))
-				{
-					throw std::runtime_error(std::format(
-						"Uppercase suite name - {}, {}",
-						std::source_location::current().file_name(),
-						std::source_location::current().line()));
-				}
-
-				// Space check
-				if (std::isspace(character))
-				{
-					throw std::runtime_error(std::format(
-						"Suite name contains spaces - {}, {}",
-						std::source_location::current().file_name(),
-						std::source_location::current().line()));
-				}
-
-				// Check for non-alphanumeric characters, excluding '_'
-				if (!std::isalnum(character) && character != '_')
-				{
-					throw std::runtime_error(std::format(
-						"Non-alphanumeric suite name - {}, {}",
-						std::source_location::current().file_name(),
-						std::source_location::current().line()));
-				}
-			});
 	}
 
 	export template<size_t... NameSizes>
@@ -74,7 +32,7 @@ namespace honesty::test
 	public:
 		explicit SuiteRegistrar(const Suite<NameSizes>&... suites)
 		{
-			(VerifySuiteName(suites.Name()), ...);
+			(DuplicateCheck(suites.Name()), ...);
 			(AddSuite(suites), ...);
 		}
 	};

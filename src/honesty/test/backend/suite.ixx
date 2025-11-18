@@ -8,6 +8,57 @@ import :test;
 
 namespace honesty::test
 {
+	/**
+	 * @brief Validates a suite name to ensure it meets the criteria
+	 */
+	export consteval bool IsValidSuiteName(const std::string_view name)
+	{
+		if (name.empty())
+		{
+			return false;
+		}
+
+		for (const char character : name)
+		{
+			// Check for uppercase
+			if (character >= 'A' && character <= 'Z')
+			{
+				return false;
+			}
+
+			// Check for spaces
+			if (character == ' ' || character == '\t' || character == '\n' || character == '\r')
+			{
+				return false;
+			}
+
+			// Check for alphanumeric or underscore
+			const bool is_lowercase = character >= 'a' && character <= 'z';
+			const bool is_digit = character >= '0' && character <= '9';
+			const bool is_underscore = character == '_';
+
+			if (!is_lowercase && !is_digit && !is_underscore)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	export consteval void VerifySuiteName(std::string_view name)
+	{
+		if (name.empty())
+		{
+			throw "Suite name cannot be empty";
+		}
+
+		if (!IsValidSuiteName(name))
+		{
+			throw "Suite name must contain only lowercase letters, digits, and underscores";
+		}
+	}
+
 	// Forward declaration for exporting
 	export class SuiteData;
 
@@ -30,12 +81,14 @@ namespace honesty::test
 			generator_(generator)
 		{
 			std::copy(std::begin(name), std::end(name) - 1, std::begin(name_));
+			VerifySuiteName(std::string_view{name_.data(), name_.size()});
 		}
 
 		consteval Suite(const char (&name)[LiteralSize], const std::function_ref<Generator(Fixture&)> generator) :
 			generator_(generator)
 		{
 			std::copy(std::begin(name), std::end(name) - 1, std::begin(name_));
+			VerifySuiteName(std::string_view{name_.data(), name_.size()});
 		}
 
 		Suite(const Suite& other)	  = delete;

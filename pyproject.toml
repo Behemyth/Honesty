@@ -34,7 +34,7 @@ test = [
 ]
 
 [tool.cppython]
-dependencies = ["opentelemetry-cpp>=1.22.0", "cppaste>=0.0.1"]
+dependencies = ["opentelemetry-cpp>=1.22.0"]
 
 [tool.cppython.generators.cmake]
 preset_file = "tool/cmake/platform/common/CMakePresets.json"

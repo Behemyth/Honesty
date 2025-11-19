@@ -13,7 +13,6 @@ class CPPythonBase(ConanFile):
     def requirements(self):
         """CPPython managed requirements."""
         self.requires("opentelemetry-cpp/[>=1.22.0]")
-        self.requires("cppaste/[>=0.0.1]")
 
     def build_requirements(self):
         """CPPython managed build and test requirements."""

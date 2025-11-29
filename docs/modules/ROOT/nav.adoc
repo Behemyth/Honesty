@@ -1,4 +1,0 @@
-* xref:index.adoc[]
-* xref:assertions.adoc[]
-* xref:modules.adoc[]
-* xref:bindings.adoc[]

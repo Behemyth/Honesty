@@ -18,7 +18,7 @@ homepage = "https://github.com/synodic/Honesty"
 repository = "https://github.com/synodic/Honesty"
 
 [project.optional-dependencies]
-build = ["cppython[cmake,conan,git]>=0.9.12", "ninja>=1.13.0"]
+build = ["cppython[cmake,conan,git]>=0.9.14", "ninja>=1.13.0"]
 [dependency-groups]
 lint = ["ruff>=0.14.7", "pyrefly>=0.43.1", "isort>=7.0.0"]
 test = ["pytest-cov>=7.0.0", "pytest-mock>=3.15.1"]

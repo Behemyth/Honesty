@@ -5,7 +5,7 @@
 groups = ["default", "build", "docs", "lint", "test"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:937dc03667f51cce6193dae22c3283b87db0c8936254e5f802ce181a8e36d4e6"
+content_hash = "sha256:2b3c4556a426899acd351239062897934756727a789f2097f4503617535fe114"
 
 [[metadata.targets]]
 requires_python = ">=3.14"
@@ -266,7 +266,7 @@ files = [
 
 [[package]]
 name = "cppython"
-version = "0.9.12"
+version = "0.9.14"
 requires_python = ">=3.14"
 summary = "A Python management solution for C++ dependencies"
 groups = ["build"]
@@ -278,13 +278,13 @@ dependencies = [
     "types-requests>=2.32.4.20250913",
 ]
 files = [
-    {file = "cppython-0.9.12-py3-none-any.whl", hash = "sha256:33227b7892744db683632cc00a80bdd3711c0e3238fbaec0bd811804ad60e29c"},
-    {file = "cppython-0.9.12.tar.gz", hash = "sha256:ff7f5d62acec6a030ced7adea5005b8160eafdb74a37330cdcc75d98d6a3cb3e"},
+    {file = "cppython-0.9.14-py3-none-any.whl", hash = "sha256:d714b94e2a3c23e6de3755da3744b0269f9221dcb6ce8324678491e2ae2db64b"},
+    {file = "cppython-0.9.14.tar.gz", hash = "sha256:0856d60b514d3ff1b22f0e7925275a1854a6466c8ddf710184c8b4636611019a"},
 ]
 
 [[package]]
 name = "cppython"
-version = "0.9.12"
+version = "0.9.14"
 extras = ["cmake", "conan", "git"]
 requires_python = ">=3.14"
 summary = "A Python management solution for C++ dependencies"
@@ -292,12 +292,12 @@ groups = ["build"]
 dependencies = [
     "cmake>=4.2.0",
     "conan>=2.23.0",
-    "cppython==0.9.12",
+    "cppython==0.9.14",
     "dulwich>=0.24.10",
 ]
 files = [
-    {file = "cppython-0.9.12-py3-none-any.whl", hash = "sha256:33227b7892744db683632cc00a80bdd3711c0e3238fbaec0bd811804ad60e29c"},
-    {file = "cppython-0.9.12.tar.gz", hash = "sha256:ff7f5d62acec6a030ced7adea5005b8160eafdb74a37330cdcc75d98d6a3cb3e"},
+    {file = "cppython-0.9.14-py3-none-any.whl", hash = "sha256:d714b94e2a3c23e6de3755da3744b0269f9221dcb6ce8324678491e2ae2db64b"},
+    {file = "cppython-0.9.14.tar.gz", hash = "sha256:0856d60b514d3ff1b22f0e7925275a1854a6466c8ddf710184c8b4636611019a"},
 ]
 
 [[package]]

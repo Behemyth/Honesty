@@ -9,6 +9,9 @@ from conan import ConanFile
 
 class CPPythonBase(ConanFile):
     """Base ConanFile with CPPython managed dependencies."""
+    def configure(self):
+        """CPPython managed configuration."""
+        self.conf.define("tools.cmake:cmake_program", "D:/Synodic/Honesty/.venv/Scripts/cmake.exe")
 
     def requirements(self):
         """CPPython managed requirements."""

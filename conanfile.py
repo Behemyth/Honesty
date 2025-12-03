@@ -18,8 +18,6 @@ class AutoPackage(CPPythonBase):
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
-        tc.user_presets_path = None
-        tc.variables["BUILD_TESTING"] = "OFF"
         tc.generate()
 
     def requirements(self):

@@ -5,7 +5,7 @@
 groups = ["default", "build", "docs", "lint", "test"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:2b3c4556a426899acd351239062897934756727a789f2097f4503617535fe114"
+content_hash = "sha256:9bc3a990230c37b5213011ddec53d0f721c78428dddd7236931e41a3038a5910"
 
 [[metadata.targets]]
 requires_python = ">=3.14"
@@ -266,7 +266,7 @@ files = [
 
 [[package]]
 name = "cppython"
-version = "0.9.14"
+version = "0.9.15.dev1"
 requires_python = ">=3.14"
 summary = "A Python management solution for C++ dependencies"
 groups = ["build"]
@@ -274,17 +274,18 @@ dependencies = [
     "packaging>=25.0",
     "pydantic>=2.12.5",
     "requests>=2.32.5",
+    "scikit-build-core>=0.11.6",
     "typer>=0.20.0",
     "types-requests>=2.32.4.20250913",
 ]
 files = [
-    {file = "cppython-0.9.14-py3-none-any.whl", hash = "sha256:d714b94e2a3c23e6de3755da3744b0269f9221dcb6ce8324678491e2ae2db64b"},
-    {file = "cppython-0.9.14.tar.gz", hash = "sha256:0856d60b514d3ff1b22f0e7925275a1854a6466c8ddf710184c8b4636611019a"},
+    {file = "cppython-0.9.15.dev1-py3-none-any.whl", hash = "sha256:6ac7bcc1797659cccf3f7c24daffb3710b71cb8f223cb2187dce5eae37e57b8f"},
+    {file = "cppython-0.9.15.dev1.tar.gz", hash = "sha256:f740ae1bed83c7f1086175dee6f649f85c8cc8b887b4f7ec18580de0f5251000"},
 ]
 
 [[package]]
 name = "cppython"
-version = "0.9.14"
+version = "0.9.15.dev1"
 extras = ["cmake", "conan", "git"]
 requires_python = ">=3.14"
 summary = "A Python management solution for C++ dependencies"
@@ -292,12 +293,12 @@ groups = ["build"]
 dependencies = [
     "cmake>=4.2.0",
     "conan>=2.23.0",
-    "cppython==0.9.14",
+    "cppython==0.9.15.dev1",
     "dulwich>=0.24.10",
 ]
 files = [
-    {file = "cppython-0.9.14-py3-none-any.whl", hash = "sha256:d714b94e2a3c23e6de3755da3744b0269f9221dcb6ce8324678491e2ae2db64b"},
-    {file = "cppython-0.9.14.tar.gz", hash = "sha256:0856d60b514d3ff1b22f0e7925275a1854a6466c8ddf710184c8b4636611019a"},
+    {file = "cppython-0.9.15.dev1-py3-none-any.whl", hash = "sha256:6ac7bcc1797659cccf3f7c24daffb3710b71cb8f223cb2187dce5eae37e57b8f"},
+    {file = "cppython-0.9.15.dev1.tar.gz", hash = "sha256:f740ae1bed83c7f1086175dee6f649f85c8cc8b887b4f7ec18580de0f5251000"},
 ]
 
 [[package]]
@@ -514,6 +515,17 @@ summary = "Library to parse and apply unified diffs."
 groups = ["build"]
 files = [
     {file = "patch-ng-1.18.1.tar.gz", hash = "sha256:52fd46ee46f6c8667692682c1fd7134edc65a2d2d084ebec1d295a6087fc0291"},
+]
+
+[[package]]
+name = "pathspec"
+version = "0.12.1"
+requires_python = ">=3.8"
+summary = "Utility library for gitignore style pattern matching of file paths."
+groups = ["build"]
+files = [
+    {file = "pathspec-0.12.1-py3-none-any.whl", hash = "sha256:a0d503e138a4c123b27490a4f7beda6a01c6f288df0e4a8b79c7eb0dc7b4cc08"},
+    {file = "pathspec-0.12.1.tar.gz", hash = "sha256:a482d51503a1ab33b1c67a6c3813a26953dbdc71c31dacaef9a838c4e29f5712"},
 ]
 
 [[package]]
@@ -770,6 +782,25 @@ files = [
     {file = "ruff-0.14.7-py3-none-win_amd64.whl", hash = "sha256:e17a20ad0d3fad47a326d773a042b924d3ac31c6ca6deb6c72e9e6b5f661a7c6"},
     {file = "ruff-0.14.7-py3-none-win_arm64.whl", hash = "sha256:be4d653d3bea1b19742fcc6502354e32f65cd61ff2fbdb365803ef2c2aec6228"},
     {file = "ruff-0.14.7.tar.gz", hash = "sha256:3417deb75d23bd14a722b57b0a1435561db65f0ad97435b4cf9f85ffcef34ae5"},
+]
+
+[[package]]
+name = "scikit-build-core"
+version = "0.11.6"
+requires_python = ">=3.8"
+summary = "Build backend for CMake based projects"
+groups = ["build"]
+dependencies = [
+    "exceptiongroup>=1.0; python_version < \"3.11\"",
+    "importlib-resources>=1.3; python_version < \"3.9\"",
+    "packaging>=23.2",
+    "pathspec>=0.10.1",
+    "tomli>=1.2.2; python_version < \"3.11\"",
+    "typing-extensions>=3.10.0; python_version < \"3.9\"",
+]
+files = [
+    {file = "scikit_build_core-0.11.6-py3-none-any.whl", hash = "sha256:ce6d8fe64e6b4c759ea0fb95d2f8a68f60d2df31c2989838633b8ec930736360"},
+    {file = "scikit_build_core-0.11.6.tar.gz", hash = "sha256:5982ccd839735be99cfd3b92a8847c6c196692f476c215da84b79d2ad12f9f1b"},
 ]
 
 [[package]]

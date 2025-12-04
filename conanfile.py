@@ -1,5 +1,5 @@
 
-from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
+from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain
 from conan.tools.files import copy
 
 from conanfile_base import CPPythonBase
@@ -12,7 +12,7 @@ class AutoPackage(CPPythonBase):
     exports = "conanfile_base.py"  # Export the base file
 
     def layout(self):
-        cmake_layout(self)
+        super().layout()  # Use CPPython managed layout
 
     def generate(self):
         deps = CMakeDeps(self)

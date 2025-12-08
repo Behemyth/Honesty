@@ -18,6 +18,7 @@ class AutoPackage(CPPythonBase):
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
+        tc.user_presets_path = None  # Disable user presets
         tc.generate()
 
     def requirements(self):

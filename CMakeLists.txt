@@ -36,17 +36,20 @@ set_target_properties(honesty honesty_main
 target_compile_features(honesty PUBLIC cxx_std_23)
 target_compile_features(honesty_main PUBLIC cxx_std_23)
 
-find_package(opentelemetry-cpp CONFIG REQUIRED)
+find_package(opentelemetry-cpp REQUIRED)
+find_package(synodic-template-library REQUIRED)
 
 target_link_libraries(honesty
 	PRIVATE
 	opentelemetry-cpp::opentelemetry-cpp
+	synodic::synodic-template-library
 )
 
 # Link the main library to the convenience variant
 target_link_libraries(honesty_main
 	PUBLIC
 	synodic::honesty
+	synodic::synodic-template-library
 )
 
 # Gather and define all the project and sub-project sources

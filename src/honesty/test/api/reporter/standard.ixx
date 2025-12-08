@@ -2,7 +2,7 @@ export module synodic.honesty.test.api:reporter.standard;
 
 import synodic.honesty.log;
 import synodic.honesty.test;
-import synodic.honesty.utility;
+import synodic.library;
 import std;
 
 namespace
@@ -105,7 +105,7 @@ namespace honesty::test
 			// Check to see if the compacted summary can fit on a single line
 			if (a.contains("\n") or b.contains("\n") or totalSize >= maxLineLength)
 			{
-				throw utility::NotImplemented();
+				throw synodic::NotImplementedException();
 			}
 
 			const std::string introduction = format("{}Expected:", indent);

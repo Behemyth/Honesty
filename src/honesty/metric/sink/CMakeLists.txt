@@ -3,9 +3,8 @@ target_sources(honesty
 		FILE_SET honesty_public
 		TYPE CXX_MODULES
 		FILES
-			build.ixx
-			platform.ixx
+			otel.ixx
 	PRIVATE
-		FILE_SET platform_private
+		FILE_SET metric_sink_private
 		TYPE CXX_MODULES
 )

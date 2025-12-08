@@ -14,10 +14,6 @@ add_subdirectory(
 )
 
 add_subdirectory(
-	platform
-)
-
-add_subdirectory(
 	trace
 )
 

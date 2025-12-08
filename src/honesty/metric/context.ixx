@@ -5,6 +5,7 @@ import function_ref;
 
 import :types;
 import :timer;
+import :results;
 
 namespace honesty::metric
 {
@@ -14,10 +15,6 @@ namespace honesty::metric
 	export class TimedContext
 	{
 	public:
-		struct Results
-		{
-		};
-
 		explicit(false) TimedContext(const std::chrono::nanoseconds duration) :
 			targetSampleDuration_(duration)
 		{
@@ -27,6 +24,7 @@ namespace honesty::metric
 		{
 			// TODO: Minimize wrapping logic around the executed function
 			State state(targetSampleDuration_);
+			BenchmarkAccumulator accumulator;
 
 			// Each measurement depends on the previous sample.
 			while (true)
@@ -44,6 +42,14 @@ namespace honesty::metric
 					}
 				}
 
+				// Push normalized per-iteration time to accumulator
+				if (state.lastIterationCount > 0)
+				{
+					const double iterationTimeNs =
+						static_cast<double>(duration.count()) / static_cast<double>(state.lastIterationCount);
+					accumulator.Push(iterationTimeNs);
+				}
+
 				if (not state.Push(duration))
 				{
 					break;
@@ -51,6 +57,7 @@ namespace honesty::metric
 			}
 
 			Results results;
+			results.FromAccumulator(accumulator, state.totalIterations, state.totalDuration);
 
 			return results;
 		}
@@ -63,6 +70,8 @@ namespace honesty::metric
 		{
 			explicit State(const std::chrono::nanoseconds targetDuration) :
 				targetIterations(1),
+				lastIterationCount(0),
+				totalIterations(0),
 				totalDuration(0),
 				targetDuration(targetDuration)
 			{
@@ -78,17 +87,23 @@ namespace honesty::metric
 			 */
 			bool Push(const Duration& duration)
 			{
-				const double elapsed  = duration.count();
-				totalDuration		 += duration;
+				const double elapsed = duration.count();
+				totalDuration		+= duration;
+
+				// Track the iteration count for this sample before updating
+				lastIterationCount = targetIterations + 1;	// +1 because we decremented past 0
+				totalIterations	  += lastIterationCount;
 
 				// Set the next sample's iteration count
 				// TODO: Add random variation to the iteration count to avoid aliasing
-				targetIterations = targetDuration.count() / elapsed * targetIterations;
+				targetIterations = static_cast<std::uint32_t>(targetDuration.count() / elapsed * lastIterationCount);
 
 				return targetIterations > 0;
 			}
 
 			std::uint32_t targetIterations;
+			std::uint32_t lastIterationCount;
+			std::size_t totalIterations;
 
 			std::chrono::nanoseconds totalDuration;
 			std::chrono::nanoseconds targetDuration;
@@ -105,10 +120,6 @@ namespace honesty::metric
 	export class RegressionContext : public TimedContext
 	{
 	public:
-		struct Results : TimedContext::Results
-		{
-		};
-
 		/**
 		 * @brief Initializes the context to an estimated minimal fit of iterations/samples
 		 */

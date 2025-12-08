@@ -3,7 +3,7 @@ export module synodic.honesty.test.backend:tag;
 import std;
 import fixed_string;
 import inplace_vector;
-import synodic.honesty.utility;
+import synodic.library;
 
 namespace honesty::test
 {
@@ -20,7 +20,7 @@ namespace honesty::test
 		static constexpr int MAX_NAME_SIZE = 13;
 
 	public:
-		using value_type			 = utility::InplaceString<MAX_NAME_SIZE>;
+		using value_type			 = synodic::InplaceString<MAX_NAME_SIZE>;
 		using pointer				 = value_type*;
 		using const_pointer			 = const value_type*;
 		using reference				 = value_type&;
@@ -116,7 +116,7 @@ namespace honesty::test
 
 	private:
 		std::array<value_type, MAX_TAGS> tags_;
-		utility::MinimalIntegerType<MAX_TAGS> size_;
+		synodic::MinimalIntegerType<MAX_TAGS> size_;
 	};
 
 }

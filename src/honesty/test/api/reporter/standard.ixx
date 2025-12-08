@@ -168,8 +168,11 @@ namespace honesty::test
 						event.location.file_name(),
 						event.location.line());
 
-					constexpr std::string_view indent("  ");
-					logger.Info("{}Description: {}", indent, event.message);
+					if (!event.message.empty())
+					{
+						constexpr std::string_view indent("  ");
+						logger.Info("{}Description: {}", indent, event.message);
+					}
 
 					++output_.failedAssertions;
 

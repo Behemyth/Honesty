@@ -61,7 +61,7 @@ namespace honesty::metric
 		std::map<std::string, std::string> labels = {{"benchmark.name", std::string(benchmarkName)}};
 
 		// Record the mean duration per iteration
-		histogram->Record(results.mean_ns, opentelemetry::common::KeyValueIterableView{labels},
+		histogram->Record(results.mean.count(), opentelemetry::common::KeyValueIterableView{labels},
 			opentelemetry::context::Context{});
 
 		// Record iteration count as counter

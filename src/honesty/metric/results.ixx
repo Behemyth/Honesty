@@ -23,10 +23,15 @@ namespace honesty::metric
 		synodic::statistics::max>;
 
 	/**
+	 * @brief A duration type using double representation for statistical calculations.
+	 */
+	using StatsDuration = std::chrono::duration<double, std::nano>;
+
+	/**
 	 * @brief Statistical results from benchmark measurements.
 	 *
 	 * Populated from BenchmarkAccumulator after measurement completion.
-	 * All timing values are in nanoseconds for consistency with Duration type.
+	 * Uses std::chrono types for type-safe duration representation.
 	 */
 	export struct Results
 	{
@@ -37,12 +42,12 @@ namespace honesty::metric
 		// Total measurement duration
 		Duration totalDuration {};
 
-		// Statistical summary (nanoseconds per iteration)
-		double mean_ns {};
-		double variance_ns {};
-		double stddev_ns {};
-		double min_ns {};
-		double max_ns {};
+		// Statistical summary (per iteration)
+		StatsDuration mean {};
+		StatsDuration variance {};
+		StatsDuration stddev {};
+		StatsDuration min {};
+		StatsDuration max {};
 
 		// Derived metrics
 		double iterations_per_second {};
@@ -63,18 +68,18 @@ namespace honesty::metric
 			samples		  = accumulator.template get<synodic::statistics::count>().result();
 			totalDuration = duration;
 
-			mean_ns		= accumulator.template get<synodic::statistics::mean>().result();
-			variance_ns = accumulator.template get<synodic::statistics::variance>().result();
-			stddev_ns	= accumulator.template get<synodic::statistics::variance>().stddev();
+			mean	 = StatsDuration(accumulator.template get<synodic::statistics::mean>().result());
+			variance = StatsDuration(accumulator.template get<synodic::statistics::variance>().result());
+			stddev	 = StatsDuration(accumulator.template get<synodic::statistics::variance>().stddev());
 
 			if (const auto minResult = accumulator.template get<synodic::statistics::min>().result())
 			{
-				min_ns = *minResult;
+				min = StatsDuration(*minResult);
 			}
 
 			if (const auto maxResult = accumulator.template get<synodic::statistics::max>().result())
 			{
-				max_ns = *maxResult;
+				max = StatsDuration(*maxResult);
 			}
 
 			// Calculate throughput

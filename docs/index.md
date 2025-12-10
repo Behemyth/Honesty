@@ -1,0 +1,17 @@
+# Honesty Documentation
+
+## Honesty
+
+### Suites
+
+Suites are statically tracked and must be created via the `Suite` class. Their input is a callable that in turn must return a generator object to asynchronously generate tests.
+
+```cpp
+auto suiteGenerator = [](){};
+
+Suite suite("Example Suite", suiteGenerator);
+```
+
+### Sets
+
+The top-level suite callable can also host a test section that allows for parameterization of tests.

@@ -60,9 +60,9 @@ namespace
 				}
 			};
 
-			co_yield TODO / "equality"_test = [](const Requirements& requirements)
+			co_yield "equality"_test = [](const Requirements& requirements)
 			{
-				// TODO: We need a way to skip the test without logging it as a skip for debug purposes
+				// Test single tag equality
 				{
 					constexpr auto tag = SKIP;
 
@@ -71,6 +71,7 @@ namespace
 					requirements.Expect(tag != "run");
 				}
 
+				// Test combined tag equality (Tag / Tag)
 				{
 					constexpr auto tag = Tag("test") / Tag("skip");
 
@@ -79,6 +80,7 @@ namespace
 					requirements.Expect(tag != "run");
 				}
 
+				// Test combined tag equality (Tag / predefined)
 				{
 					constexpr auto tag = Tag("test") / SKIP;
 
@@ -87,6 +89,7 @@ namespace
 					requirements.Expect(tag != "run");
 				}
 
+				// Test combined tag equality (predefined / Tag)
 				{
 					constexpr auto tag = SKIP / Tag("test");
 
@@ -95,6 +98,7 @@ namespace
 					requirements.Expect(tag != "run");
 				}
 
+				// Test duplicate tag combination
 				{
 					constexpr auto tag = SKIP / SKIP;
 
@@ -119,17 +123,30 @@ namespace
 				requirements.Expect(false);
 			};
 
-			co_yield TODO / "skip"_test = [](const Requirements&)
+			co_yield "skip"_test = [](const Requirements& requirements)
 			{
-				// TODO: We need a way to skip the test without skipping it in the test runner
+				// Verify SKIP tag has correct value
+				requirements.Expect(SKIP == "skip");
+				requirements.Expect(SKIP.Size() == 1);
 
-				throw std::runtime_error("This test should not be run");
+				// Verify combining with SKIP preserves the skip tag
+				constexpr auto combined = Tag("mytest") / SKIP;
+				requirements.Expect(combined == SKIP);
+				requirements.Expect(combined == "mytest");
+				requirements.ExpectEquals(combined.Size(), 2);
 			};
 
-			co_yield TODO / "todo"_test = [](const Requirements&)
+			co_yield "todo"_test = [](const Requirements& requirements)
 			{
-				// TODO: We need a way to skip the test without skipping it in the test runner
-				throw std::runtime_error("This test should not be run");
+				// Verify TODO tag has correct value
+				requirements.Expect(TODO == "todo");
+				requirements.Expect(TODO.Size() == 1);
+
+				// Verify combining with TODO preserves the todo tag
+				constexpr auto combined = Tag("incomplete") / TODO;
+				requirements.Expect(combined == TODO);
+				requirements.Expect(combined == "incomplete");
+				requirements.ExpectEquals(combined.Size(), 2);
 			};
 		});
 	SuiteRegistrar _(SUITE);

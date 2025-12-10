@@ -4,7 +4,9 @@ target_sources(honesty
 		TYPE CXX_MODULES
 		FILES
 			metric.ixx
+			comparison.ixx
 			context.ixx
+			history.ixx
 			types.ixx
 			timer.ixx
 			results.ixx

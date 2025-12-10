@@ -2,6 +2,7 @@ export module synodic.honesty.test.api:runner.standard;
 
 import std;
 import synodic.honesty.test;
+import synodic.honesty.metric;
 
 import function_ref;
 
@@ -38,6 +39,13 @@ namespace honesty::test
 		Generator Run(Fixture& fixture, const std::function_ref<Generator(Fixture&)> function) override
 		{
 			return function(fixture);
+		}
+
+		metric::Results Run(const std::function_ref<void(metric::RegressionContext&)> function) override
+		{
+			metric::RegressionContext context;
+			function(context);
+			return context.GetResults();
 		}
 	};
 }

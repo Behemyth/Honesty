@@ -1,5 +1,7 @@
 target_sources(tests
 PRIVATE
+	bench_tag.cpp
+	test_benchmark_group.cpp
 	test_expression.cpp
 	test_test.cpp
 	test_runner.cpp
@@ -11,5 +13,4 @@ PRIVATE
 	test_log.cpp
 	test_fixture.cpp
 	test_inplace_string.cpp
-	test_metric.cpp
 )

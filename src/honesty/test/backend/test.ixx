@@ -5,6 +5,8 @@ import std;
 import function_ref;
 import inplace_vector;
 
+import synodic.honesty.metric;
+
 import :requirements;
 import :tag;
 
@@ -12,6 +14,15 @@ namespace honesty::test
 {
 	export class Test;
 	export using Generator = std::generator<Test>;
+
+	// Forward declare Benchmark for BenchmarkGenerator
+	export class Benchmark;
+
+	/**
+	 * @brief Generator that yields only Benchmark cases. Used for benchmark groups to
+	 *	enforce at compile-time that only benchmarks (not tests or subtests) can be yielded.
+	 */
+	export using BenchmarkGenerator = std::generator<Benchmark>;
 
 	// TODO: Make this a compile-time check
 	export constexpr void VerifyTestName(const std::string_view name)
@@ -47,6 +58,54 @@ namespace honesty::test
 			});
 	}
 
+	/**
+	 * @brief A benchmark case that can contain either a single measurement function
+	 *	or a nested benchmark group. Used within BenchmarkGenerator to enforce at
+	 *	compile-time that benchmark groups cannot contain regular tests or subtests.
+	 */
+	export class Benchmark final
+	{
+	public:
+		using FunctionType = std::function_ref<void(metric::RegressionContext&)>;
+		using GroupType = std::function_ref<BenchmarkGenerator()>;
+		using VariantType = std::variant<FunctionType, GroupType>;
+
+		/// Construct a single benchmark case
+		constexpr Benchmark(
+			const std::string_view name,
+			const Tag& tag,
+			const FunctionType& function) :
+			name_(name),
+			tag_(tag),
+			variant_(function)
+		{
+			VerifyTestName(name);
+		}
+
+		/// Construct a nested benchmark group
+		constexpr Benchmark(
+			const std::string_view name,
+			const Tag& tag,
+			const GroupType& group) :
+			name_(name),
+			tag_(tag),
+			variant_(group)
+		{
+			VerifyTestName(name);
+		}
+
+		std::string_view Name() const { return name_; }
+		const Tag& Tags() const { return tag_; }
+		const VariantType& Variant() const { return variant_; }
+
+		bool IsGroup() const { return std::holds_alternative<GroupType>(variant_); }
+
+	private:
+		std::string_view name_;
+		Tag tag_;
+		VariantType variant_;
+	};
+
 	// Forward declaration
 	export
 	class TestData;
@@ -54,9 +113,12 @@ namespace honesty::test
 	class Test final
 	{
 		using VariantType = std::variant<
+			std::monostate,
 			std::function_ref<void(const Requirements&)>,
 			std::function_ref<Generator(const Requirements&)>,
-			std::function_ref<Generator()>
+			std::function_ref<Generator()>,
+			std::function_ref<void(metric::RegressionContext&)>,
+			std::function_ref<BenchmarkGenerator()>
 		>;
 
 	public:
@@ -94,6 +156,54 @@ namespace honesty::test
 			tag_(tag)
 		{
 			VerifyTestName(name);
+		}
+
+		/**
+		 * @brief Constructs a benchmark test with an injected RegressionContext
+		 */
+		constexpr Test(
+			const std::string_view name,
+			const Tag& tag,
+			const std::function_ref<void(metric::RegressionContext&)>& benchmark,
+			std::string_view description = "") :
+			name_(name),
+			test_(benchmark),
+			tag_(tag)
+		{
+			VerifyTestName(name);
+		}
+
+		/**
+		 * @brief Constructs a benchmark group that collects child benchmarks for comparison
+		 */
+		constexpr Test(
+			const std::string_view name,
+			const Tag& tag,
+			const std::function_ref<BenchmarkGenerator()>& benchmarkGroup,
+			std::string_view description = "") :
+			name_(name),
+			test_(benchmarkGroup),
+			tag_(tag)
+		{
+			VerifyTestName(name);
+		}
+
+		/**
+		 * @brief Implicit conversion from Benchmark to Test for suite-level benchmark support.
+		 *	Allows `_bench` to be used at suite level by yielding to Generator.
+		 */
+		Test(const Benchmark& benchmark) :
+			name_(benchmark.Name()),
+			tag_(benchmark.Tags())
+		{
+			if (std::holds_alternative<Benchmark::FunctionType>(benchmark.Variant()))
+			{
+				test_ = std::get<Benchmark::FunctionType>(benchmark.Variant());
+			}
+			else
+			{
+				test_ = std::get<Benchmark::GroupType>(benchmark.Variant());
+			}
 		}
 
 		constexpr Test(const Test& other)                = delete;

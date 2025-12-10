@@ -1,5 +1,9 @@
 target_sources(tests
 PRIVATE
+	bench_accumulator.cpp
+	test_comparison.cpp
 	test_context.cpp
+	test_history.cpp
+	test_results.cpp
 	test_timer.cpp
 )

@@ -160,15 +160,29 @@ void benchmark_example()
 
 ### Integration with Test Framework
 
+The test framework provides first-class benchmark support via the `_benchmark` literal. Benchmarks receive an injected `RegressionContext` and results are automatically reported.
+
 ```cpp
 import synodic.honesty.test;
 import synodic.honesty.metric;
 
 using namespace honesty::test;
+using namespace honesty::test::literals;
 using namespace honesty::metric;
 
 Suite SUITE("benchmarks", []() -> Generator {
-    co_yield "vector_push_back"_test = [](const Requirements& req) {
+    // Dedicated benchmark using _benchmark literal
+    co_yield "vector_push_back"_benchmark = [](RegressionContext& ctx) {
+        ctx.Measure([]() {
+            std::vector<int> v;
+            for (int i = 0; i < 100; ++i) {
+                v.push_back(i);
+            }
+        });
+    };
+
+    // Traditional test with manual benchmarking (for assertions on results)
+    co_yield "vector_with_assertions"_test = [](const Requirements& req) {
         TimedContext context(std::chrono::milliseconds(500));
 
         Results results = context.Measure([]() {
@@ -183,3 +197,11 @@ Suite SUITE("benchmarks", []() -> Generator {
     };
 });
 ```
+
+#### Benchmark Features
+
+- **Automatic reporting**: Results are sent to reporters without manual code
+- **Context injection**: `RegressionContext` auto-calibrates measurement duration
+- **Filterable**: Benchmarks can be skipped via `ExecuteParameters::runBenchmarks = false`
+- **Tag support**: Combine with tags like `SKIP / "slow_benchmark"_benchmark`
+

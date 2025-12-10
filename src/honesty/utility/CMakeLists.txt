@@ -3,6 +3,7 @@ target_sources(honesty
 		FILE_SET honesty_public
 		TYPE CXX_MODULES
 		FILES
+			directory.ixx
 			json.ixx
 			utility.ixx
 	PRIVATE

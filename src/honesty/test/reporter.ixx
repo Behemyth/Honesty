@@ -71,6 +71,14 @@ namespace honesty::test
 		void Signal(const event::Summary& event) override
 		{
 		}
+
+		void Signal(const event::BenchmarkComplete& event) override
+		{
+		}
+
+		void Signal(const event::BenchmarkGroupComplete& event) override
+		{
+		}
 	};
 
 	/**
@@ -164,6 +172,14 @@ namespace honesty::test
 		void Signal(const event::Summary& event) final
 		{
 			Finalize(std::move(data_));
+		}
+
+		void Signal(const event::BenchmarkComplete& event) final
+		{
+		}
+
+		void Signal(const event::BenchmarkGroupComplete& event) final
+		{
 		}
 
 		virtual void Finalize(CumulativeData data) = 0;

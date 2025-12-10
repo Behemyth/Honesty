@@ -70,9 +70,22 @@ namespace
 					requirements.ExpectEquals(output, expected);
 				};
 
-				co_yield TODO / "print"_test = [](const Requirements& requirements)
+				co_yield "print"_test = [](const Requirements& requirements)
 				{
-					// TODO: How do we capture the output?
+					// Test that format produces expected ANSI escape sequences
+					constexpr log::Colour24 red(255, 0, 0);
+					constexpr log::TextStyle redStyle(red);
+
+					std::string output = format(redStyle, "error");
+					std::string expected = std::format("\x1b[38;2;255;000;000m{}\x1b[0m", "error");
+
+					requirements.ExpectEquals(output, expected);
+
+					// Test with format arguments
+					std::string output2 = format(redStyle, "value: {}", 42);
+					std::string expected2 = std::format("\x1b[38;2;255;000;000m{}\x1b[0m", "value: 42");
+
+					requirements.ExpectEquals(output2, expected2);
 				};
 			}
 		});

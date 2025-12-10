@@ -20,13 +20,15 @@ namespace honesty::test
 			const std::string_view applicationName,
 			const std::string_view suiteName,
 			const std::span<std::string_view> filterViews,
-			const bool dryRun) :
+			const bool dryRun,
+			const bool runBenchmarks = true) :
 			logger(logger),
 			reporters(reporters),
 			applicationName(applicationName),
 			suiteName(suiteName),
 			filterViews(filterViews),
-			dryRun(dryRun)
+			dryRun(dryRun),
+			runBenchmarks(runBenchmarks)
 		{
 		}
 
@@ -48,5 +50,8 @@ namespace honesty::test
 		std::span<std::string_view> filterViews;
 
 		bool dryRun;
+
+		/// @brief Whether to run benchmark tests
+		bool runBenchmarks;
 	};
 }

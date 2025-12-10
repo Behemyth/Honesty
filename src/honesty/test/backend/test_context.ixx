@@ -28,11 +28,15 @@ namespace honesty::test
 			const std::span<Reporter*> reporters,
 			log::Logger& logger,
 			const std::span<std::string_view> filterViews,
-			const bool dryRun) :
+			const bool dryRun,
+			const bool runBenchmarks = true,
+			const bool silent = false) :
 			logger(logger),
 			reporters(reporters),
 			filterViews(filterViews),
-			dryRun(dryRun)
+			dryRun(dryRun),
+			runBenchmarks(runBenchmarks),
+			silent(silent)
 		{
 		}
 
@@ -42,6 +46,12 @@ namespace honesty::test
 		Requirements CreateRequirements(const std::string_view testName, const ExpectedTestOutcome outcome) const
 		{
 			const Requirements::Parameters parameters(testName, outcome);
+
+			// If silent, pass empty span to suppress reporter signals from assertions
+			if (silent)
+			{
+				return Requirements({}, parameters, logger);
+			}
 
 			return Requirements(reporters, parameters, logger);
 		}
@@ -60,5 +70,11 @@ namespace honesty::test
 		std::span<std::string_view> filterViews;
 
 		bool dryRun;
+
+		/// @brief Whether to run benchmark tests
+		bool runBenchmarks;
+
+		/// @brief Whether to suppress reporter output (for meta-tests)
+		bool silent;
 	};
 }

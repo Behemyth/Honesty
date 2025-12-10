@@ -847,10 +847,6 @@ namespace honesty::test
 			return parameters_.testName;
 		}
 
-		inline void Benchmark(std::string_view name, std::function_ref<void()> metric) const
-		{
-		}
-
 	private:
 		/**
 		 * @brief The parameters for a set of requirements. This is used to provide test state to the requirements

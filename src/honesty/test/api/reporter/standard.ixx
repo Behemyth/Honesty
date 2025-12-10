@@ -2,6 +2,7 @@ export module synodic.honesty.test.api:reporter.standard;
 
 import synodic.honesty.log;
 import synodic.honesty.test;
+import synodic.honesty.metric;
 import synodic.library;
 import std;
 
@@ -10,7 +11,10 @@ namespace
 	constexpr auto HIGHLIGHT_STYLE(honesty::log::TextStyle(honesty::log::Colour24(255, 255, 0)));
 	constexpr auto SUCCESS_STYLE(honesty::log::TextStyle(honesty::log::Colour24(0, 255, 0)));
 	constexpr auto FAILURE_STYLE(honesty::log::TextStyle(honesty::log::Colour24(255, 0, 0)));
+	constexpr auto WARNING_STYLE(honesty::log::TextStyle(honesty::log::Colour24(255, 200, 0)));
 	constexpr auto SKIP_STYLE(honesty::log::TextStyle(honesty::log::Colour24(128, 128, 128)));
+	constexpr auto BENCHMARK_STYLE(honesty::log::TextStyle(honesty::log::Colour24(0, 200, 200)));
+	constexpr auto BENCHMARK_NAME_STYLE(honesty::log::TextStyle(honesty::log::Colour24(200, 150, 255)));
 }
 
 namespace honesty::test
@@ -310,7 +314,8 @@ namespace honesty::test
 	{
 	public:
 		explicit StandardReporter(const log::Logger& logger) :
-			StreamingAdapter(logger)
+			StreamingAdapter(logger),
+			history_(metric::HistoryConfig {})
 		{
 		}
 
@@ -392,12 +397,14 @@ namespace honesty::test
 		{
 			const log::Logger& logger = Logger();
 
+			const auto totalSeconds = std::chrono::duration<double>(event.duration);
+
 			std::string passedStyled = format(SUCCESS_STYLE, "Passed");
 			std::string failedStyled = format(FAILURE_STYLE, "Failed");
 			std::string skipStyled   = format(SKIP_STYLE, "Skipped");
 			std::string todoStyled   = format(HIGHLIGHT_STYLE, "TODO");
 
-			logger.Info("{} Assertions {}", assertionsPassedCount_, passedStyled);
+			logger.Info("{} Assertions {} ({:.3f}s)", assertionsPassedCount_, passedStyled, totalSeconds.count());
 
 			if (assertionFailedCount_)
 			{
@@ -415,12 +422,219 @@ namespace honesty::test
 			}
 		}
 
+		void Signal(const event::BenchmarkComplete& event) override
+		{
+			const log::Logger& logger = Logger();
+			const std::string benchmarkName(event.name);
+
+			// Convert mean to nanoseconds to preserve precision for fast operations
+			const auto meanNs = std::chrono::duration_cast<std::chrono::nanoseconds>(event.results.mean);
+			const auto stddevNs = std::chrono::duration_cast<std::chrono::nanoseconds>(event.results.stddev);
+
+			std::string benchmarkStyled = format(BENCHMARK_STYLE, "Benchmark");
+			std::string nameStyled = format(BENCHMARK_NAME_STYLE, "{}", event.name);
+
+			logger.Info(
+				"{}: {}",
+				benchmarkStyled,
+				nameStyled);
+			logger.Info(
+				"  {} ns +/- {} ns ({} iterations, {:.2f} ops/s)",
+				meanNs.count(),
+				stddevNs.count(),
+				event.results.iterations,
+				event.results.iterations_per_second);
+
+			// Compare against history and display changes
+			if (auto comparison = history_.Compare(benchmarkName, event.results))
+			{
+				DisplayHistoryComparison(*comparison, logger);
+			}
+
+			// Record this result for future comparisons
+			history_.Record(benchmarkName, event.results);
+		}
+
+		void Signal(const event::BenchmarkGroupComplete& event) override
+		{
+			const log::Logger& logger = Logger();
+
+			if (event.entries.empty())
+			{
+				logger.Info("Benchmark Group: {} (empty)", event.groupName);
+				return;
+			}
+
+			// Find baseline (first one if multiple)
+			const event::BenchmarkEntry* baseline = nullptr;
+			bool multipleBaselines = false;
+
+			for (const auto& entry: event.entries)
+			{
+				if (entry.isBaseline)
+				{
+					if (baseline != nullptr)
+					{
+						multipleBaselines = true;
+					}
+					else
+					{
+						baseline = &entry;
+					}
+				}
+			}
+
+			// Calculate max name width for alignment
+			std::size_t maxNameWidth = 0;
+			for (const auto& entry: event.entries)
+			{
+				maxNameWidth = std::max(maxNameWidth, entry.name.size());
+			}
+
+			std::string benchmarkStyled = format(BENCHMARK_STYLE, "Benchmark");
+			std::string nameStyled = format(BENCHMARK_NAME_STYLE, "{}", event.groupName);
+			logger.Info("{}: {}", benchmarkStyled, nameStyled);
+
+			for (const auto& entry: event.entries)
+			{
+				const auto meanNs = std::chrono::duration_cast<std::chrono::nanoseconds>(entry.results.mean);
+				const auto stddevNs = std::chrono::duration_cast<std::chrono::nanoseconds>(entry.results.stddev);
+
+				// Build comparison string
+				std::string comparison;
+				if (entry.isBaseline)
+				{
+					if (&entry == baseline)
+					{
+						comparison = "baseline";
+					}
+					else
+					{
+						comparison = format(WARNING_STYLE, "(ignored baseline)");
+					}
+				}
+				else if (baseline != nullptr)
+				{
+					const auto baselineMean = baseline->results.mean.count();
+					const auto entryMean = entry.results.mean.count();
+
+					if (entryMean > 0)
+					{
+						// Calculate speedup ratio as recommended by Bruce Dawson:
+						// https://randomascii.wordpress.com/2018/02/04/what-we-talk-about-when-we-talk-about-performance/
+						// speedup ratio = OldTime / NewTime (for times) = baseline / entry
+						// Use "X times as fast" phrasing to avoid ambiguous percentages
+						const double speedupRatio = baselineMean / entryMean;
+						comparison = std::format("{:.2f}x", speedupRatio);
+					}
+				}
+
+				// Pad name to max width, then style it (so ANSI codes don't affect alignment)
+				std::string paddedName = std::format("{:<{}}", entry.name, maxNameWidth);
+				std::string nameStyled = format(BENCHMARK_NAME_STYLE, "{}", paddedName);
+
+				// Build history comparison string (inline)
+				const std::string fullName = event.groupName + "/" + entry.name;
+				std::string historyText;
+				if (auto histComparison = history_.Compare(fullName, entry.results))
+				{
+					historyText = FormatHistoryInline(*histComparison);
+				}
+
+				// Output with alignment: name, mean +/- stddev, comparison, history
+				if (historyText.empty())
+				{
+					logger.Info(
+						"  {}   {:>8} ns +/- {:>8} ns   {}",
+						nameStyled,
+						meanNs.count(),
+						stddevNs.count(),
+						comparison);
+				}
+				else
+				{
+					logger.Info(
+						"  {}   {:>8} ns +/- {:>8} ns   {}  {}",
+						nameStyled,
+						meanNs.count(),
+						stddevNs.count(),
+						comparison,
+						historyText);
+				}
+
+				// Record for future comparisons
+				history_.Record(fullName, entry.results);
+			}
+
+			if (multipleBaselines)
+			{
+				std::string warningStyled = format(WARNING_STYLE, "Warning");
+				logger.Warning("  {}: Multiple baselines detected, using first one", warningStyled);
+			}
+		}
+
 	private:
+		/**
+		 * @brief Format history comparison for inline display using speedup ratios
+		 *
+		 * Following Bruce Dawson's recommendation to use ratios instead of percentages:
+		 * https://randomascii.wordpress.com/2018/02/04/what-we-talk-about-when-we-talk-about-performance/
+		 * speedup ratio = OldTime / NewTime
+		 * > 1.0 means faster, < 1.0 means slower
+		 */
+		std::string FormatHistoryInline(const metric::ComparisonResult& comparison) const
+		{
+			// Calculate speedup ratio: previous / current
+			// > 1.0 means current is faster, < 1.0 means current is slower
+			const double speedupRatio = comparison.previous.meanNs / comparison.current.meanNs;
+
+			switch (comparison.status)
+			{
+				case metric::ComparisonResult::Status::Improved:
+					return format(SUCCESS_STYLE, "[{:.2f}x vs prev]", speedupRatio);
+				case metric::ComparisonResult::Status::Regressed:
+					return format(FAILURE_STYLE, "[{:.2f}x vs prev]", speedupRatio);
+				case metric::ComparisonResult::Status::Unchanged:
+				default:
+					return format(SKIP_STYLE, "[{:.2f}x vs prev]", speedupRatio);
+			}
+		}
+
+		/**
+		 * @brief Display history comparison for a single benchmark using speedup ratios
+		 */
+		void DisplayHistoryComparison(const metric::ComparisonResult& comparison, const log::Logger& logger) const
+		{
+			const auto& prev = comparison.previous;
+
+			// Calculate speedup ratio: previous / current
+			const double speedupRatio = prev.meanNs / comparison.current.meanNs;
+			std::string prevText = metric::FormatDuration(prev.meanNs);
+
+			std::string changeText;
+			switch (comparison.status)
+			{
+				case metric::ComparisonResult::Status::Improved:
+					changeText = format(SUCCESS_STYLE, "{:.2f}x as fast", speedupRatio);
+					break;
+				case metric::ComparisonResult::Status::Regressed:
+					changeText = format(FAILURE_STYLE, "{:.2f}x as fast", speedupRatio);
+					break;
+				case metric::ComparisonResult::Status::Unchanged:
+				default:
+					changeText = format(SKIP_STYLE, "{:.2f}x", speedupRatio);
+					break;
+			}
+
+			logger.Info("  vs previous: {} (was {})", changeText, prevText);
+		}
+
 		std::size_t assertionsPassedCount_ = 0;
 		std::size_t assertionFailedCount_  = 0;
 		std::size_t skippedTestsCount_     = 0;
 		std::size_t todoTestsCount_        = 0;
 
 		std::optional<SuiteState> currentSuiteState_;
+		metric::BenchmarkHistory history_;
 	};
 }

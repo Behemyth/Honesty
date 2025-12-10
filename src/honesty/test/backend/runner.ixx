@@ -6,6 +6,8 @@ import std;
 import inplace_vector;
 import function_ref;
 
+import synodic.honesty.metric;
+
 import :reporter;
 import :test;
 
@@ -40,6 +42,13 @@ namespace honesty::test
 		virtual Generator Run(std::function_ref<Generator()> function) = 0;
 
 		virtual Generator Run(Fixture& fixture, std::function_ref<Generator(Fixture&)> function) = 0;
+
+		/**
+		 * @brief Runs a benchmark function with an injected RegressionContext
+		 * @param function The benchmark function to execute
+		 * @return The benchmark results
+		 */
+		virtual metric::Results Run(std::function_ref<void(metric::RegressionContext&)> function) = 0;
 
 		const log::Logger& Logger() const
 		{

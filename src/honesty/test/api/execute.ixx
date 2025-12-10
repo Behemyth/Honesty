@@ -26,12 +26,14 @@ namespace honesty::test::api
 			const std::string_view applicationName,
 			const std::string_view filter,
 			const bool dryRun,
-			const std::string_view header
+			const std::string_view header,
+			const bool runBenchmarks = true
 			) :
 			applicationName(applicationName),
 			filter(filter),
 			dryRun(dryRun),
-			header(header)
+			header(header),
+			runBenchmarks(runBenchmarks)
 		{
 		}
 
@@ -40,6 +42,9 @@ namespace honesty::test::api
 
 		bool dryRun;
 		std::string_view header;
+
+		/// @brief Whether to run benchmark tests. Defaults to true.
+		bool runBenchmarks;
 	};
 
 	export struct ExecuteResult
@@ -53,7 +58,7 @@ namespace honesty::test::api
 	};
 
 	// Forward declaration for ProcessTest so it can be used in helpers below
-	bool ProcessTest(Runner& runner, const TestData& testData, const TestContext& testContext);
+	bool ProcessTest(Runner& runner, const TestData& testData, TestContext testContext);
 
 	bool HandleTags(
 		const TestData& testData,
@@ -62,13 +67,16 @@ namespace honesty::test::api
 		const bool todo = testData.Tag() == "todo";
 		if (testData.Tag() == "skip" || todo)
 		{
-			event::TestSkip testSkip;
-			testSkip.name = testData.Name();
-			testSkip.todo = todo;
-
-			for (Reporter* reporter: testContext.reporters)
+			if (not testContext.silent)
 			{
-				reporter->Signal(testSkip);
+				event::TestSkip testSkip;
+				testSkip.name = testData.Name();
+				testSkip.todo = todo;
+
+				for (Reporter* reporter: testContext.reporters)
+				{
+					reporter->Signal(testSkip);
+				}
 			}
 			return true;
 		}
@@ -116,7 +124,9 @@ namespace honesty::test::api
 					testContext.reporters,
 					testContext.logger,
 					testContext.filterViews,
-					testContext.dryRun);
+					testContext.dryRun,
+					testContext.runBenchmarks,
+					testContext.silent);
 
 				if (not ProcessTest(runner, static_cast<TestData>(test), newContext))
 				{
@@ -144,7 +154,9 @@ namespace honesty::test::api
 				testContext.reporters,
 				testContext.logger,
 				filter,
-				testContext.dryRun);
+				testContext.dryRun,
+				testContext.runBenchmarks,
+				testContext.silent);
 
 			if (not ProcessTest(runner, static_cast<TestData>(test), newContext))
 			{
@@ -154,7 +166,7 @@ namespace honesty::test::api
 		return true;
 	}
 
-	bool ProcessTest(Runner& runner, const TestData& testData, const TestContext& testContext)
+	bool ProcessTest(Runner& runner, const TestData& testData, TestContext testContext)
 	{
 		bool success = true;
 
@@ -162,6 +174,12 @@ namespace honesty::test::api
 		if (not testContext.filterViews.empty() and testData.Name() != testContext.filterViews.front())
 		{
 			return success;
+		}
+
+		// Check for SILENT tag - propagate to context and all children
+		if (testData.Tag() == "silent")
+		{
+			testContext.silent = true;
 		}
 
 		auto testOutcome   = ExpectedTestOutcome::PASS;
@@ -185,11 +203,15 @@ namespace honesty::test::api
 			}
 		}
 
-		const event::TestBegin testBegin(testData.Name(), assertOutcome);
-
-		for (Reporter* reporter: testContext.reporters)
+		// Only signal to reporters if not silent (but allow during dry runs for listing)
+		if (not testContext.silent or testContext.dryRun)
 		{
-			reporter->Signal(testBegin);
+			const event::TestBegin testBegin(testData.Name(), assertOutcome);
+
+			for (Reporter* reporter: testContext.reporters)
+			{
+				reporter->Signal(testBegin);
+			}
 		}
 
 		metric::Duration duration;
@@ -200,6 +222,22 @@ namespace honesty::test::api
 			const Requirements requirements = testContext.CreateRequirements(testData.Name(), testOutcome);
 
 			auto testExecutor = Overload{
+				[&](std::monostate)
+				{
+					// No test callback provided; treat as skipped
+					if (not testContext.silent)
+					{
+						event::TestSkip testSkip;
+						testSkip.name = testData.Name();
+						testSkip.todo = false;
+
+						for (Reporter* reporter: testContext.reporters)
+						{
+							reporter->Signal(testSkip);
+						}
+					}
+					success = true;
+				},
 				[&](const std::function_ref<void(const Requirements&)>& testCallback)
 				{
 					success = HandleCallback(runner, testData, testContext, requirements, testCallback);
@@ -217,17 +255,96 @@ namespace honesty::test::api
 				{
 					success = HandleCallback(runner, testData, testContext, testCallback);
 				},
-				[&](std::monostate)
+				[&](const std::function_ref<void(metric::RegressionContext&)>& benchmarkCallback)
 				{
-					// No test callback provided; treat as skipped
-					event::TestSkip testSkip;
-					testSkip.name = testData.Name();
-					testSkip.todo = false;
-
-					for (Reporter* reporter: testContext.reporters)
+					// Handle benchmark - skip if benchmarks are disabled or dry run
+					if (not testContext.runBenchmarks)
 					{
-						reporter->Signal(testSkip);
+						// Skip benchmark silently when benchmarks are disabled
+						success = true;
+						return;
 					}
+
+					if (not testContext.dryRun)
+					{
+						metric::Results results = runner.Run(benchmarkCallback);
+
+						if (not testContext.silent)
+						{
+							event::BenchmarkComplete benchmarkComplete(testData.Name(), results);
+							for (Reporter* reporter: testContext.reporters)
+							{
+								reporter->Signal(benchmarkComplete);
+							}
+						}
+					}
+					success = true;
+				},
+				[&](const std::function_ref<BenchmarkGenerator()>& benchmarkGroupFn)
+				{
+					// Handle benchmark group - skip if benchmarks are disabled
+					if (not testContext.runBenchmarks)
+					{
+						success = true;
+						return;
+					}
+
+					if (testContext.dryRun)
+					{
+						success = true;
+						return;
+					}
+
+					// Collect benchmark results from children
+					event::BenchmarkGroupComplete groupComplete;
+					groupComplete.groupName = std::string(testData.Name());
+
+					BenchmarkGenerator generator = benchmarkGroupFn();
+
+					// BenchmarkGenerator yields Benchmark objects which can be single benchmarks or nested groups
+					for (const Benchmark& benchmark: generator)
+					{
+						std::visit(Overload{
+							[&](const Benchmark::FunctionType& function)
+							{
+								metric::Results results = runner.Run(function);
+
+								event::BenchmarkEntry entry;
+								entry.name = std::string(benchmark.Name());
+								entry.results = results;
+								entry.isBaseline = benchmark.Tags() == "baseline";
+
+								groupComplete.entries.push_back(std::move(entry));
+							},
+							[&](const Benchmark::GroupType& nestedGroupFn)
+							{
+								// Nested groups are processed recursively - emit their own group event
+								// Create a temporary Test to reuse ProcessTest
+								Test nestedTest(benchmark.Name(), benchmark.Tags(), nestedGroupFn);
+								TestData nestedData(nestedTest);
+
+								TestContext newContext(
+									testContext.reporters,
+									testContext.logger,
+									testContext.filterViews,
+									testContext.dryRun,
+									testContext.runBenchmarks,
+									testContext.silent);
+
+								ProcessTest(runner, nestedData, newContext);
+							}
+						}, benchmark.Variant());
+					}
+
+					// Emit group complete event (only for non-nested benchmarks in this group)
+					if (not testContext.silent && not groupComplete.entries.empty())
+					{
+						for (Reporter* reporter: testContext.reporters)
+						{
+							reporter->Signal(groupComplete);
+						}
+					}
+
 					success = true;
 				}
 			};
@@ -248,9 +365,13 @@ namespace honesty::test::api
 		testEnd.name     = testData.Name();
 		testEnd.duration = duration;
 
-		for (Reporter* reporter: testContext.reporters)
+		// Allow signal during dry runs for listing
+		if (not testContext.silent or testContext.dryRun)
 		{
-			reporter->Signal(testEnd);
+			for (Reporter* reporter: testContext.reporters)
+			{
+				reporter->Signal(testEnd);
+			}
 		}
 
 		return success;
@@ -313,7 +434,8 @@ namespace honesty::test::api
 					suiteContext.reporters,
 					suiteContext.logger,
 					filter,
-					suiteContext.dryRun);
+					suiteContext.dryRun,
+					suiteContext.runBenchmarks);
 
 				testSuccess = ProcessTest(runner, view, testContext);
 
@@ -402,7 +524,8 @@ namespace honesty::test::api
 					parameters.applicationName,
 					suite.Name(),
 					filterViews,
-					parameters.dryRun);
+					parameters.dryRun,
+					parameters.runBenchmarks);
 
 				success |= ProcessSuite(runner, suite, suiteContext);
 			}

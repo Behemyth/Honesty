@@ -193,6 +193,37 @@ namespace honesty::test
 		{
 			metric::Duration duration;
 		};
+
+		struct BenchmarkComplete
+		{
+			explicit BenchmarkComplete(const std::string_view name, const metric::Results& results) :
+				name(name),
+				results(results)
+			{
+			}
+
+			std::string_view name;
+			metric::Results results;
+		};
+
+		/**
+		 * @brief Entry for a benchmark within a group, including baseline status
+		 */
+		struct BenchmarkEntry
+		{
+			std::string name;
+			metric::Results results;
+			bool isBaseline;
+		};
+
+		/**
+		 * @brief Event emitted when a benchmark group (parent benchmark with children) completes
+		 */
+		struct BenchmarkGroupComplete
+		{
+			std::string groupName;
+			std::vector<BenchmarkEntry> entries;
+		};
 	}
 
 	export class Reporter
@@ -227,6 +258,10 @@ namespace honesty::test
 		virtual void Signal(const event::AssertionSkip& event) = 0;
 
 		virtual void Signal(const event::Summary& event) = 0;
+
+		virtual void Signal(const event::BenchmarkComplete& event) = 0;
+
+		virtual void Signal(const event::BenchmarkGroupComplete& event) = 0;
 
 		const log::Logger& Logger() const
 		{

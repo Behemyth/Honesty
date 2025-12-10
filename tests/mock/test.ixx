@@ -305,6 +305,14 @@ public:
 	{
 		return function(fixture);
 	}
+
+	honesty::metric::Results Run(
+		const std::function_ref<void(honesty::metric::RegressionContext&)> function) override
+	{
+		honesty::metric::RegressionContext context;
+		function(context);
+		return context.GetResults();
+	}
 };
 
 namespace

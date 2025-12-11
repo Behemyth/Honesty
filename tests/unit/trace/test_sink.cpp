@@ -133,6 +133,93 @@ namespace
 				requirements.Expect(oss1.str().empty());
 				requirements.Expect(oss2.str().contains("after_remove"));
 			};
+
+			co_yield "otel_sink_basic"_test = [](const Requirements& requirements)
+			{
+				// Redirect cout and cerr to suppress OTel output
+				std::ostringstream nullCout, nullCerr;
+				auto* originalCout = std::cout.rdbuf(nullCout.rdbuf());
+				auto* originalCerr = std::cerr.rdbuf(nullCerr.rdbuf());
+
+				// Create OTel sink and initialize with ostream exporter
+				auto otelSink = std::make_unique<honesty::trace::OTelSink>();
+				otelSink->InitWithOStreamExporter();
+
+				// Create test span data
+				honesty::trace::SpanData data;
+				data.name = "otel_test_span";
+				data.startTime = std::chrono::steady_clock::now();
+				data.endTime = data.startTime + std::chrono::milliseconds(42);
+				data.status = honesty::trace::SpanStatus::OK;
+				data.kind = honesty::trace::SpanKind::INTERNAL;
+				data.AddAttribute("test.attribute", std::string_view{"test_value"});
+				data.AddAttribute("test.count", std::int64_t{123});
+
+				// Export should not throw
+				std::array spans{data};
+				otelSink->Export(spans);
+				otelSink->Flush();
+
+				// Restore streams
+				std::cout.rdbuf(originalCout);
+				std::cerr.rdbuf(originalCerr);
+
+				// Just verify no crash - OTel exporter output format is internal detail
+				requirements.Expect(true);
+			};
+
+			co_yield "otel_sink_multiple_spans"_test = [](const Requirements& requirements)
+			{
+				// Redirect cout and cerr to suppress OTel output
+				std::ostringstream nullCout, nullCerr;
+				auto* originalCout = std::cout.rdbuf(nullCout.rdbuf());
+				auto* originalCerr = std::cerr.rdbuf(nullCerr.rdbuf());
+
+				auto otelSink = std::make_unique<honesty::trace::OTelSink>();
+				otelSink->InitWithOStreamExporter();
+
+				// Create multiple spans
+				std::vector<honesty::trace::SpanData> spans;
+
+				for (int i = 0; i < 3; ++i)
+				{
+					honesty::trace::SpanData data;
+					data.name = "span_" + std::to_string(i);
+					data.startTime = std::chrono::steady_clock::now();
+					data.endTime = data.startTime + std::chrono::milliseconds(i * 10);
+					data.status = honesty::trace::SpanStatus::OK;
+					data.AddAttribute("index", std::int64_t{i});
+					spans.push_back(std::move(data));
+				}
+
+				otelSink->Export(spans);
+				otelSink->Flush();
+
+				// Restore streams
+				std::cout.rdbuf(originalCout);
+				std::cerr.rdbuf(originalCerr);
+
+				// Just verify no crash - OTel exporter output format is internal detail
+				requirements.Expect(true);
+			};
+
+			co_yield "otel_global_init"_test = [](const Requirements& requirements)
+			{
+				// Redirect cout and cerr to suppress OTel output
+				std::ostringstream nullCout, nullCerr;
+				auto* originalCout = std::cout.rdbuf(nullCout.rdbuf());
+				auto* originalCerr = std::cerr.rdbuf(nullCerr.rdbuf());
+
+				// Test global initialization/cleanup functions
+				honesty::trace::InitOTelTracing();
+				honesty::trace::CleanupOTelTracing();
+
+				// Restore streams
+				std::cout.rdbuf(originalCout);
+				std::cerr.rdbuf(originalCerr);
+
+				requirements.Expect(true);
+			};
 		});
 	SuiteRegistrar _(SUITE);
 }

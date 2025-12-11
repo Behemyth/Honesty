@@ -11,6 +11,7 @@ export import :context;
 export import :sink;
 export import :sink.log;
 export import :sink.scatter;
+export import :sink.otel;
 
 namespace honesty
 {

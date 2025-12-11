@@ -24,4 +24,83 @@ namespace honesty::trace
 
 		bool enabled;
 	};
+
+	/**
+	 * @brief Supported attribute value types for span attributes
+	 */
+	export using AttributeValue = std::variant<
+		bool,
+		std::int64_t,
+		std::uint64_t,
+		double,
+		std::string_view,
+		std::string
+	>;
+
+	/**
+	 * @brief A key-value pair for span attributes
+	 */
+	export struct Attribute
+	{
+		std::string_view key;
+		AttributeValue value;
+
+		constexpr Attribute(std::string_view k, AttributeValue v) :
+			key(k),
+			value(std::move(v))
+		{
+		}
+	};
+
+	/**
+	 * @brief Unique identifier for a trace (128-bit)
+	 */
+	export struct TraceID
+	{
+		std::array<std::uint8_t, 16> bytes{};
+
+		constexpr bool operator==(const TraceID&) const = default;
+
+		constexpr bool IsValid() const
+		{
+			return std::ranges::any_of(bytes, [](auto b) { return b != 0; });
+		}
+	};
+
+	/**
+	 * @brief Unique identifier for a span (64-bit)
+	 */
+	export struct SpanID
+	{
+		std::array<std::uint8_t, 8> bytes{};
+
+		constexpr bool operator==(const SpanID&) const = default;
+
+		constexpr bool IsValid() const
+		{
+			return std::ranges::any_of(bytes, [](auto b) { return b != 0; });
+		}
+	};
+
+	/**
+	 * @brief Status of a span
+	 */
+	export enum class SpanStatus : std::uint8_t
+	{
+		UNSET,
+		OK,
+		ERROR
+	};
+
+	/**
+	 * @brief Kind of span (client, server, internal, etc.)
+	 */
+	export enum class SpanKind : std::uint8_t
+	{
+		INTERNAL,
+		SERVER,
+		CLIENT,
+		PRODUCER,
+		CONSUMER
+	};
 }

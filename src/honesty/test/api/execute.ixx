@@ -5,6 +5,7 @@ import std;
 import synodic.honesty.log;
 import synodic.honesty.test.backend;
 import synodic.honesty.metric;
+import synodic.honesty.trace;
 
 import function_ref;
 
@@ -168,11 +169,27 @@ namespace honesty::test::api
 
 	bool ProcessTest(Runner& runner, const TestData& testData, TestContext testContext)
 	{
+		auto testSpan = TestTracer.CreateSpan("ProcessTest");
+		testSpan.SetAttribute("test_name", testData.Name());
+
+		// Convert tag to string for tracing
+		if (testData.Tag().Size() > 0)
+		{
+			std::string tagStr;
+			for (const auto& t : testData.Tag())
+			{
+				if (!tagStr.empty()) tagStr += ",";
+				tagStr += std::string_view(t);
+			}
+			testSpan.SetAttribute("test_tag", tagStr);
+		}
+
 		bool success = true;
 
 		// Filter the test by name
 		if (not testContext.filterViews.empty() and testData.Name() != testContext.filterViews.front())
 		{
+			testSpan.SetAttribute("filtered", true);
 			return success;
 		}
 
@@ -374,11 +391,15 @@ namespace honesty::test::api
 			}
 		}
 
+		testSpan.SetAttribute("success", success);
 		return success;
 	}
 
 	bool ProcessSuite(Runner& runner, const SuiteData& suite, SuiteContext& suiteContext)
 	{
+		auto suiteSpan = TestTracer.CreateSpan("ProcessSuite");
+		suiteSpan.SetAttribute("suite_name", suite.Name());
+
 		bool success = true;
 
 		std::span filter = suiteContext.filterViews;
@@ -455,6 +476,7 @@ namespace honesty::test::api
 			reporter->Signal(end);
 		}
 
+		suiteSpan.SetAttribute("success", success);
 		return success;
 	}
 
@@ -464,6 +486,11 @@ namespace honesty::test::api
 		std::span<Reporter*> reporters = {},
 		const log::Logger& logger      = log::RootLogger()) -> ExecuteResult
 	{
+		auto executeSpan = TestTracer.CreateSpan("Execute");
+		executeSpan.SetAttribute("filter", parameters.filter);
+		executeSpan.SetAttribute("dry_run", parameters.dryRun);
+		executeSpan.SetAttribute("run_benchmarks", parameters.runBenchmarks);
+
 		// Break down the filter into individual views
 		auto splitData = parameters.filter | std::ranges::views::split('.') |
 		                 std::ranges::views::transform(
@@ -543,6 +570,7 @@ namespace honesty::test::api
 		resolvedReporters.clear();
 		reporterStorage.clear();
 
+		executeSpan.SetAttribute("success", success);
 		return ExecuteResult(success);
 	}
 }

@@ -12,3 +12,4 @@ export import :suite_context;
 export import :test;
 export import :tag;
 export import :suite;
+export import :tracer;

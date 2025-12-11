@@ -1,39 +1,57 @@
-module;
-
-#include "opentelemetry/exporters/ostream/span_exporter_factory.h"
-#include "opentelemetry/sdk/trace/exporter.h"
-#include "opentelemetry/sdk/trace/processor.h"
-#include "opentelemetry/trace/provider.h"
-#include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/sdk/trace/simple_processor_factory.h"
-#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
-#include "opentelemetry/trace/tracer_provider.h"
-
-
 export module synodic.honesty.trace:sink.otel;
+
+import std;
+import :types;
+import :span;
 
 namespace honesty::trace
 {
-	void Init()
+	// Forward declaration of implementation class
+	class OTelSinkImpl;
+
+	/**
+	 * @brief OpenTelemetry trace sink
+	 *
+	 * Exports spans to OpenTelemetry-compatible backends.
+	 * Uses PIMPL pattern to keep OpenTelemetry headers out of module interface.
+	 */
+	export class OTelSink final
 	{
-		auto exporter = opentelemetry::exporter::trace::OStreamSpanExporterFactory::Create();
-		auto processor = opentelemetry::sdk::trace::SimpleSpanProcessorFactory::Create(std::move(exporter));
+	public:
+		explicit OTelSink(std::string_view serviceName = "honesty");
+		~OTelSink();
 
-		const std::shared_ptr sdkProvider =
-			opentelemetry::sdk::trace::TracerProviderFactory::Create(std::move(processor));
+		OTelSink(const OTelSink&) = delete;
+		OTelSink& operator=(const OTelSink&) = delete;
+		OTelSink(OTelSink&&) noexcept;
+		OTelSink& operator=(OTelSink&&) noexcept;
 
-		// Set the global trace provider
-		const std::shared_ptr<opentelemetry::trace::TracerProvider>& apiProvider = sdkProvider;
-		opentelemetry::trace::Provider::SetTracerProvider(apiProvider);
-	}
+		/**
+		 * @brief Initialize with ostream exporter (for testing/debugging)
+		 */
+		void InitWithOStreamExporter();
 
+		/**
+		 * @brief Export spans to OpenTelemetry
+		 */
+		void Export(std::span<const SpanData> spans);
 
-	void CleanupTracer()
-	{
-		const std::shared_ptr<opentelemetry::trace::TracerProvider> noop;
-		opentelemetry::trace::Provider::SetTracerProvider(noop);
-	}
+		/**
+		 * @brief Flush any buffered spans
+		 */
+		void Flush();
 
+	private:
+		std::unique_ptr<OTelSinkImpl> impl_;
+	};
 
+	/**
+	 * @brief Initialize global OpenTelemetry tracing with ostream exporter
+	 */
+	export void InitOTelTracing();
 
+	/**
+	 * @brief Cleanup global OpenTelemetry tracing
+	 */
+	export void CleanupOTelTracing();
 }

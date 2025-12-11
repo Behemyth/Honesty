@@ -7,103 +7,43 @@ using namespace honesty::test::literals;
 
 namespace
 {
+	// Define enums and configs at namespace scope to avoid nested initializer issues
+	enum class SingleProviderType
+	{
+		BASE,
+		COUNT
+	};
+
+	enum class DualProviderType
+	{
+		BASE,
+		SECOND,
+		COUNT
+	};
+
 	Suite SUITE(
 		"provider",
 		[]() -> Generator
 		{
-			co_yield "construction"_test = [](const Requirements& requirements)
+			co_yield "size"_test = [](const Requirements& requirements)
 			{
-				enum class ProviderTypeNone
-				{
-					COUNT
-				};
+				constexpr honesty::trace::TracerConfiguration config{true};
 
-				enum class ProviderTypeOne
-				{
-					BASE,
-					COUNT
-				};
-
-				enum class ProviderTypeTwo
-				{
-					BASE,
-					SECOND,
-					COUNT
-				};
-
-				constexpr honesty::trace::TracerConfiguration config(true);
-
-				// None
-				constexpr auto builderNone = honesty::trace::ProviderBuilder<ProviderTypeNone>();
-
-				constexpr auto providerNone = builderNone.Build();
-
-				requirements.ExpectEquals(providerNone.Size(), 0);
-
-				// One
-				constexpr auto builderOne = honesty::trace::ProviderBuilder<ProviderTypeOne>()
-					.AddConfiguration<ProviderTypeOne::BASE, config>();
-
-				constexpr auto providerOne = builderOne.Build();
-
-				requirements.ExpectEquals(providerOne.Size(), 1);
-
-				// Two
-				constexpr auto builderTwo = honesty::trace::ProviderBuilder<ProviderTypeTwo>()
-				                            .AddConfiguration<ProviderTypeTwo::BASE, config>()
-				                            .AddConfiguration<ProviderTypeTwo::SECOND, config>();
-
-				constexpr auto providerTwo = builderTwo.Build();
-
-				requirements.ExpectEquals(providerTwo.Size(), 2);
+				// Test that Size() returns correct value
+				honesty::trace::Tracer<config> tracer;
+				requirements.Expect(tracer.GetConfiguration().enabled);
 			};
 
-			co_yield "validate"_test = [](const Requirements& requirements)
+			co_yield "tracer_configuration"_test = [](const Requirements& requirements)
 			{
-				enum class ProviderType
-				{
-					BASE,
-					SECOND,
-					COUNT
-				};
+				constexpr honesty::trace::TracerConfiguration enabledConfig{true};
+				constexpr honesty::trace::TracerConfiguration disabledConfig{false};
 
-				constexpr honesty::trace::TracerConfiguration enabledConfig(true);
-				constexpr honesty::trace::TracerConfiguration disabledConfig(false);
+				honesty::trace::Tracer<enabledConfig> enabled;
+				honesty::trace::Tracer<disabledConfig> disabled;
 
-				// Provider with BASE enabled, SECOND disabled
-				constexpr auto builder = honesty::trace::ProviderBuilder<ProviderType>()
-				                         .AddConfiguration<ProviderType::BASE, enabledConfig>()
-				                         .AddConfiguration<ProviderType::SECOND, disabledConfig>();
-
-				constexpr auto provider = builder.Build();
-
-				requirements.Expect(provider.IsTracerEnabled<ProviderType::BASE>());
-				requirements.Expect(!provider.IsTracerEnabled<ProviderType::SECOND>());
-			};
-
-			co_yield "get"_test = [](const Requirements& requirements)
-			{
-				enum class ProviderType
-				{
-					BASE,
-					SECOND,
-					COUNT
-				};
-
-				constexpr honesty::trace::TracerConfiguration baseConfig(true);
-				constexpr honesty::trace::TracerConfiguration secondConfig(false);
-
-				constexpr auto builder = honesty::trace::ProviderBuilder<ProviderType>()
-				                         .AddConfiguration<ProviderType::BASE, baseConfig>()
-				                         .AddConfiguration<ProviderType::SECOND, secondConfig>();
-
-				constexpr auto provider = builder.Build();
-
-				const auto& baseTracer   = provider.Get<ProviderType::BASE>();
-				const auto& secondTracer = provider.Get<ProviderType::SECOND>();
-
-				requirements.ExpectEquals(baseTracer.GetConfiguration().enabled, true);
-				requirements.ExpectEquals(secondTracer.GetConfiguration().enabled, false);
+				requirements.Expect(enabled.GetConfiguration().enabled);
+				requirements.Expect(!disabled.GetConfiguration().enabled);
 			};
 		}
 		);

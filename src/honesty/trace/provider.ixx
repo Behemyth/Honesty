@@ -23,7 +23,7 @@ namespace honesty::trace
 		SpanRingBuffer() = default;
 
 		// Adds an element to the buffer. Overwrites the oldest element if the buffer is full.
-		void Push(const Span& span)
+		void Push(const SpanData& span)
 		{
 			buffer_[head_] = span;
 			head_          = head_ + 1 & Capacity - 1; // Wrap index
@@ -39,9 +39,9 @@ namespace honesty::trace
 		}
 
 		// Removes and returns the oldest element from the buffer. Assumes the buffer is not empty.
-		Span Pop()
+		SpanData Pop()
 		{
-			Span span = buffer_[tail_];
+			SpanData span = buffer_[tail_];
 			tail_     = tail_ + 1 & Capacity - 1; // Wrap index
 
 			--size_;
@@ -67,6 +67,19 @@ namespace honesty::trace
 			head_ = 0;
 			tail_ = 0;
 			size_ = 0;
+		}
+
+		// Get all spans as a contiguous view (for export)
+		std::span<const SpanData> View() const
+		{
+			// Note: This only works correctly when buffer hasn't wrapped
+			// For wrapped buffers, would need to return two spans or copy
+			if (head_ >= tail_)
+			{
+				return std::span{buffer_.data() + tail_, size_};
+			}
+			// Wrapped case - would need different handling
+			return std::span{buffer_.data() + tail_, Capacity - tail_};
 		}
 
 	private:
@@ -108,6 +121,9 @@ namespace honesty::trace
 			using Type = TracerConfiguration;
 		};
 
+		// Check if any tracer is enabled at compile time
+		static constexpr bool AnyEnabled = (Entries.config.enabled || ...);
+
 	public:
 		consteval Provider() : tracers_{Tracer<Entries.config>{}...}
 		{
@@ -131,14 +147,78 @@ namespace honesty::trace
 			return GetTracerAtIndex<index>();
 		}
 
+		template<EnumType Value = static_cast<EnumType>(0)>
+		auto& GetMutable()
+		{
+			constexpr auto index = IndexOf(Value);
+			return GetTracerAtIndexMutable<index>();
+		}
+
 		static constexpr std::uint8_t Size()
 		{
 			return sizeof...(Entries);
 		}
 
+		/**
+		 * @brief Record a completed span to the buffer
+		 */
+		void RecordSpan(const SpanData& data)
+		{
+			if constexpr (AnyEnabled)
+			{
+				storage_.Push(data);
+			}
+		}
+
+		/**
+		 * @brief Drain all buffered spans and pass to the provided callback
+		 * @param callback Function to receive the spans for export
+		 */
+		template<typename Callback>
+		void DrainSpans(Callback&& callback)
+		{
+			if constexpr (AnyEnabled)
+			{
+				std::vector<SpanData> spans;
+				spans.reserve(storage_.Size());
+
+				while (!storage_.Empty())
+				{
+					spans.push_back(storage_.Pop());
+				}
+
+				if (!spans.empty())
+				{
+					callback(std::span<const SpanData>{spans});
+				}
+			}
+		}
+
+		/**
+		 * @brief Get the number of buffered spans
+		 */
+		std::size_t BufferedSpanCount() const
+		{
+			if constexpr (AnyEnabled)
+			{
+				return storage_.Size();
+			}
+			else
+			{
+				return 0;
+			}
+		}
+
 	private:
 		template<std::size_t Index>
 		consteval const auto& GetTracerAtIndex() const
+		{
+			static_assert(Index < sizeof...(Entries), "Tracer index out of bounds");
+			return std::get<Index>(tracers_);
+		}
+
+		template<std::size_t Index>
+		auto& GetTracerAtIndexMutable()
 		{
 			static_assert(Index < sizeof...(Entries), "Tracer index out of bounds");
 			return std::get<Index>(tracers_);
@@ -159,7 +239,8 @@ namespace honesty::trace
 		using TracerTuple = decltype(std::tuple{Tracer<Entries.config>{}...});
 		TracerTuple tracers_;
 
-		static thread_local SpanRingBuffer<256> storage_;
+		// Only allocate storage when at least one tracer is enabled
+		[[no_unique_address]] std::conditional_t<AnyEnabled, SpanRingBuffer<256>, std::monostate> storage_{};
 	};
 
 

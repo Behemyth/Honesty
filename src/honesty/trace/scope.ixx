@@ -3,26 +3,33 @@ export module synodic.honesty.trace:scope;
 import std;
 import zstring_view;
 
+import :types;
+
 namespace honesty::trace
 {
 	/**
-	 * @brief Metadata for a trace span
+	 * @brief Compile-time metadata for a trace span. Used to define span properties at compile time.
 	 */
 	export class Scope final
-    {
-    public:
+	{
+	public:
+		explicit consteval Scope(std::zstring_view label, SpanKind kind = SpanKind::INTERNAL) noexcept :
+			label_(label),
+			kind_(kind)
+		{
+		}
 
-        explicit consteval Scope(std::zstring_view label) noexcept
-        {
-        }
+		Scope(const Scope&) = delete;
+		Scope& operator=(const Scope&) = delete;
 
-        Scope(const Scope&) = delete;
-        Scope& operator=(const Scope&) = delete;
+		Scope(Scope&&) noexcept = default;
+		Scope& operator=(Scope&&) noexcept = default;
 
-        Scope(Scope&&) noexcept = default;
-        Scope& operator=(Scope&&) noexcept = default;
+		consteval std::zstring_view Label() const noexcept { return label_; }
+		consteval SpanKind Kind() const noexcept { return kind_; }
 
-    private:
-
-    };
+	private:
+		std::zstring_view label_;
+		SpanKind kind_;
+	};
 }

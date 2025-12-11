@@ -4,21 +4,24 @@ import synodic.honesty.trace;
 
 namespace honesty::test
 {
-	consteval const auto& GetTracer()
+	/**
+	 * @brief Tracer categories for the test framework
+	 */
+	export enum class TracerCategory
 	{
-		enum class ProviderType
-		{
-			BASE,
-			COUNT
-		};
+		EXECUTE,     // Test execution (suites, tests)
+		RUNNER,      // Runner operations
+		REPORTER,    // Reporter events
+		COUNT
+	};
 
-		constexpr honesty::trace::TracerConfiguration baseConfig(true);
+	// Configuration: enabled in debug, disabled in release for zero overhead
+#ifdef NDEBUG
+	export inline constexpr honesty::trace::TracerConfiguration testTracerConfig{false};
+#else
+	export inline constexpr honesty::trace::TracerConfiguration testTracerConfig{true};
+#endif
 
-		constexpr auto builder = honesty::trace::ProviderBuilder<ProviderType>()
-			.AddConfiguration<ProviderType::BASE, baseConfig>();
-
-		constexpr auto provider = builder.Build();
-
-		return provider.Get();
-	}
+	// Global tracer instance for the test framework
+	export inline honesty::trace::Tracer<testTracerConfig> TestTracer;
 }

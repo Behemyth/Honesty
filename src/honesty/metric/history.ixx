@@ -11,20 +11,34 @@ export module synodic.honesty.metric:history;
 import :results;
 import :types;
 import synodic.honesty.utility;
+import synodic.honesty.log;
 
 import std;
 
 namespace honesty::metric
 {
+	namespace
+	{
+		auto& BenchmarkHistoryLogger()
+		{
+			static log::Logger logger = []() {
+				log::Logger l = log::RootLogger().CreateLogger("honesty.metric.history");
+				l.SetLevel(log::LevelType::WARNING);
+				return l;
+			}();
+			return logger;
+		}
+	}
+
 	/**
 	 * @brief Configuration for benchmark history storage and comparison
 	 */
 	export struct HistoryConfig
 	{
-		std::size_t maxHistorySize = 20;		   ///< Maximum number of historical runs to keep per benchmark
-		double regressionThreshold = 0.05;		   ///< Percentage threshold for flagging regressions (5%)
-		double improvementThreshold = 0.05;		   ///< Percentage threshold for flagging improvements (5%)
-		std::filesystem::path customPath {};	   ///< Custom path for history file (empty = use default)
+		std::size_t maxHistorySize = 20;		   // Maximum number of historical runs to keep per benchmark
+		double regressionThreshold = 0.05;		   // Percentage threshold for flagging regressions (5%)
+		double improvementThreshold = 0.05;		   // Percentage threshold for flagging improvements (5%)
+		std::filesystem::path customPath {};	   // Custom path for history file (empty = use default)
 	};
 
 	/**
@@ -32,16 +46,16 @@ namespace honesty::metric
 	 */
 	export struct HistoricalEntry
 	{
-		std::string timestamp;				///< ISO 8601 timestamp of when the benchmark was run
-		std::size_t iterations {};			///< Number of iterations
-		std::size_t samples {};				///< Number of samples
-		double totalDurationNs {};			///< Total duration in nanoseconds
-		double meanNs {};					///< Mean time per iteration in nanoseconds
-		double varianceNs {};				///< Variance in nanoseconds
-		double stddevNs {};					///< Standard deviation in nanoseconds
-		double minNs {};					///< Minimum time in nanoseconds
-		double maxNs {};					///< Maximum time in nanoseconds
-		double iterationsPerSecond {};		///< Throughput
+		std::string timestamp;				// ISO 8601 timestamp of when the benchmark was run
+		std::size_t iterations {};			// Number of iterations
+		std::size_t samples {};				// Number of samples
+		double totalDurationNs {};			// Total duration in nanoseconds
+		double meanNs {};					// Mean time per iteration in nanoseconds
+		double varianceNs {};				// Variance in nanoseconds
+		double stddevNs {};					// Standard deviation in nanoseconds
+		double minNs {};					// Minimum time in nanoseconds
+		double maxNs {};					// Maximum time in nanoseconds
+		double iterationsPerSecond {};		// Throughput
 	};
 
 	/**
@@ -52,15 +66,15 @@ namespace honesty::metric
 		std::string benchmarkName;
 		HistoricalEntry current;
 		HistoricalEntry previous;
-		double meanChangePercent {};		///< Positive = slower (regression), negative = faster (improvement)
+		double meanChangePercent {};		// Positive = slower (regression), negative = faster (improvement)
 		double stddevChangePercent {};
-		double throughputChangePercent {};	///< Positive = better, negative = worse
+		double throughputChangePercent {};	// Positive = better, negative = worse
 
 		enum class Status
 		{
-			Improved,	///< Significantly faster
-			Regressed,	///< Significantly slower
-			Unchanged	///< Within threshold
+			Improved,	// Significantly faster
+			Regressed,	// Significantly slower
+			Unchanged	// Within threshold
 		} status = Status::Unchanged;
 	};
 
@@ -83,6 +97,8 @@ namespace honesty::metric
 		 */
 		void Record(const std::string& benchmarkName, const Results& results)
 		{
+			BenchmarkHistoryLogger().Debug("Recording benchmark result for '{}'", benchmarkName);
+
 			LoadHistory();
 
 			HistoricalEntry entry;
@@ -104,10 +120,15 @@ namespace honesty::metric
 			// Trim to max size
 			if (benchmarkHistory.size() > config_.maxHistorySize)
 			{
+				BenchmarkHistoryLogger().Trace("Trimming history for '{}' to {} entries",
+					benchmarkName, config_.maxHistorySize);
 				benchmarkHistory.resize(config_.maxHistorySize);
 			}
 
 			SaveHistory();
+
+			BenchmarkHistoryLogger().Trace("Recorded benchmark '{}': mean={}ns, {} iterations",
+				benchmarkName, entry.meanNs, entry.iterations);
 		}
 
 		/**
@@ -136,11 +157,14 @@ namespace honesty::metric
 		 */
 		auto Compare(const std::string& benchmarkName, const Results& current) -> std::optional<ComparisonResult>
 		{
+			BenchmarkHistoryLogger().Debug("Comparing benchmark '{}' against previous run", benchmarkName);
+
 			LoadHistory();
 
 			auto it = history_.find(benchmarkName);
 			if (it == history_.end() || it->second.empty())
 			{
+				BenchmarkHistoryLogger().Trace("No previous run found for '{}'", benchmarkName);
 				return std::nullopt;
 			}
 
@@ -181,14 +205,20 @@ namespace honesty::metric
 			if (result.meanChangePercent > config_.regressionThreshold)
 			{
 				result.status = ComparisonResult::Status::Regressed;
+				BenchmarkHistoryLogger().Info("Benchmark '{}' REGRESSED: {:.2f}% slower",
+					benchmarkName, result.meanChangePercent * 100.0);
 			}
 			else if (result.meanChangePercent < -config_.improvementThreshold)
 			{
 				result.status = ComparisonResult::Status::Improved;
+				BenchmarkHistoryLogger().Info("Benchmark '{}' IMPROVED: {:.2f}% faster",
+					benchmarkName, -result.meanChangePercent * 100.0);
 			}
 			else
 			{
 				result.status = ComparisonResult::Status::Unchanged;
+				BenchmarkHistoryLogger().Trace("Benchmark '{}' unchanged: {:.2f}% change",
+					benchmarkName, result.meanChangePercent * 100.0);
 			}
 
 			return result;
@@ -215,6 +245,7 @@ namespace honesty::metric
 		 */
 		void Clear()
 		{
+			BenchmarkHistoryLogger().Info("Clearing all benchmark history");
 			history_.clear();
 			SaveHistory();
 		}
@@ -243,13 +274,17 @@ namespace honesty::metric
 
 			if (!std::filesystem::exists(path))
 			{
+				BenchmarkHistoryLogger().Trace("History file does not exist: {}", path.string());
 				loaded_ = true;
 				return;
 			}
 
+			BenchmarkHistoryLogger().Debug("Loading benchmark history from: {}", path.string());
+
 			std::ifstream file(path);
 			if (!file)
 			{
+				BenchmarkHistoryLogger().Warning("Failed to open history file: {}", path.string());
 				loaded_ = true;
 				return;
 			}
@@ -329,10 +364,14 @@ namespace honesty::metric
 
 					history_[benchmarkName] = std::move(entries);
 				}
+
+				BenchmarkHistoryLogger().Info("Loaded benchmark history: {} benchmarks from {}",
+					history_.size(), path.string());
 			}
-			catch (const std::exception&)
+			catch (const std::exception& e)
 			{
 				// If parsing fails, start fresh
+				BenchmarkHistoryLogger().Warning("Failed to parse history file, starting fresh: {}", e.what());
 				history_.clear();
 			}
 
@@ -342,6 +381,8 @@ namespace honesty::metric
 		void SaveHistory()
 		{
 			const auto path = HistoryFilePath();
+
+			BenchmarkHistoryLogger().Debug("Saving benchmark history to: {}", path.string());
 
 			// Ensure parent directory exists
 			utility::EnsureDirectory(path.parent_path());
@@ -353,6 +394,7 @@ namespace honesty::metric
 				std::ofstream file(tempPath);
 				if (!file)
 				{
+					BenchmarkHistoryLogger().Error("Failed to open temp file for writing: {}", tempPath.string());
 					throw std::runtime_error(std::format("Failed to open file for writing: {}", tempPath.string()));
 				}
 
@@ -391,9 +433,12 @@ namespace honesty::metric
 			if (ec)
 			{
 				// Fallback: try to copy and remove
+				BenchmarkHistoryLogger().Trace("Atomic rename failed, using copy fallback");
 				std::filesystem::copy_file(tempPath, path, std::filesystem::copy_options::overwrite_existing, ec);
 				std::filesystem::remove(tempPath, ec);
 			}
+
+			BenchmarkHistoryLogger().Trace("Saved {} benchmarks to history file", history_.size());
 		}
 
 		static auto CurrentTimestamp() -> std::string

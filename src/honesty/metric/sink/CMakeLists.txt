@@ -8,3 +8,8 @@ target_sources(honesty
 		FILE_SET metric_sink_private
 		TYPE CXX_MODULES
 )
+
+target_sources(honesty
+	PRIVATE
+		otel.cpp
+)

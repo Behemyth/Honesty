@@ -17,6 +17,17 @@ namespace
 	{
 		using Ts::operator()...;
 	};
+
+	// Internal framework logger for test execution diagnostics
+	auto& ExecuteLogger()
+	{
+		static honesty::log::Logger logger = []() {
+			honesty::log::Logger l = honesty::log::RootLogger().CreateLogger("honesty.test.execute");
+			l.SetLevel(honesty::log::LevelType::WARNING);
+			return l;
+		}();
+		return logger;
+	}
 }
 
 namespace honesty::test::api
@@ -68,6 +79,7 @@ namespace honesty::test::api
 		const bool todo = testData.Tag() == "todo";
 		if (testData.Tag() == "skip" || todo)
 		{
+			ExecuteLogger().Debug("Test '{}' {}", testData.Name(), todo ? "marked as TODO" : "skipped");
 			if (not testContext.silent)
 			{
 				event::TestSkip testSkip;
@@ -172,6 +184,8 @@ namespace honesty::test::api
 		auto testSpan = TestTracer.CreateSpan("ProcessTest");
 		testSpan.SetAttribute("test_name", testData.Name());
 
+		ExecuteLogger().Debug("Processing test: '{}'", testData.Name());
+
 		// Convert tag to string for tracing
 		if (testData.Tag().Size() > 0)
 		{
@@ -182,6 +196,7 @@ namespace honesty::test::api
 				tagStr += std::string_view(t);
 			}
 			testSpan.SetAttribute("test_tag", tagStr);
+			ExecuteLogger().Trace("Test '{}' has tags: {}", testData.Name(), tagStr);
 		}
 
 		bool success = true;
@@ -190,6 +205,7 @@ namespace honesty::test::api
 		if (not testContext.filterViews.empty() and testData.Name() != testContext.filterViews.front())
 		{
 			testSpan.SetAttribute("filtered", true);
+			ExecuteLogger().Trace("Test '{}' filtered out by filter '{}'", testData.Name(), testContext.filterViews.front());
 			return success;
 		}
 
@@ -277,6 +293,7 @@ namespace honesty::test::api
 					// Handle benchmark - skip if benchmarks are disabled or dry run
 					if (not testContext.runBenchmarks)
 					{
+						ExecuteLogger().Trace("Benchmark '{}' skipped (benchmarks disabled)", testData.Name());
 						// Skip benchmark silently when benchmarks are disabled
 						success = true;
 						return;
@@ -284,7 +301,10 @@ namespace honesty::test::api
 
 					if (not testContext.dryRun)
 					{
+						ExecuteLogger().Debug("Running benchmark: '{}'", testData.Name());
 						metric::Results results = runner.Run(benchmarkCallback);
+						ExecuteLogger().Debug("Benchmark '{}' complete: {} iterations, mean={}ns",
+							testData.Name(), results.iterations, results.mean.count());
 
 						if (not testContext.silent)
 						{
@@ -382,6 +402,9 @@ namespace honesty::test::api
 		testEnd.name     = testData.Name();
 		testEnd.duration = duration;
 
+		ExecuteLogger().Debug("Test '{}' completed: success={}, duration={}ns",
+			testData.Name(), success, duration.count());
+
 		// Allow signal during dry runs for listing
 		if (not testContext.silent or testContext.dryRun)
 		{
@@ -400,6 +423,8 @@ namespace honesty::test::api
 		auto suiteSpan = TestTracer.CreateSpan("ProcessSuite");
 		suiteSpan.SetAttribute("suite_name", suite.Name());
 
+		ExecuteLogger().Info("Starting suite: '{}'", suite.Name());
+
 		bool success = true;
 
 		std::span filter = suiteContext.filterViews;
@@ -410,6 +435,7 @@ namespace honesty::test::api
 			// Check if the suite name matches the filter
 			if (suite.Name() != suiteContext.filterViews.front())
 			{
+				ExecuteLogger().Trace("Suite '{}' filtered out by filter '{}'", suite.Name(), suiteContext.filterViews.front());
 				return true;
 			}
 
@@ -471,6 +497,9 @@ namespace honesty::test::api
 		end.name     = suite.Name();
 		end.duration = duration;
 
+		ExecuteLogger().Info("Suite '{}' completed: success={}, duration={}ns",
+			suite.Name(), success, duration.count());
+
 		for (Reporter* reporter: suiteContext.reporters)
 		{
 			reporter->Signal(end);
@@ -490,6 +519,9 @@ namespace honesty::test::api
 		executeSpan.SetAttribute("filter", parameters.filter);
 		executeSpan.SetAttribute("dry_run", parameters.dryRun);
 		executeSpan.SetAttribute("run_benchmarks", parameters.runBenchmarks);
+
+		ExecuteLogger().Info("Starting test execution: filter='{}', dryRun={}, benchmarks={}",
+			parameters.filter, parameters.dryRun, parameters.runBenchmarks);
 
 		// Break down the filter into individual views
 		auto splitData = parameters.filter | std::ranges::views::split('.') |

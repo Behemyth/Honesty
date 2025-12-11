@@ -15,6 +15,21 @@ import :types;
 
 namespace honesty::log
 {
+	/**
+	 * @brief Initialize global OpenTelemetry logging with ostream exporter
+	 *
+	 * Sets up an OStream exporter for debugging/testing.
+	 * Call this once at application startup before emitting any logs.
+	 */
+	export void InitOTelLogging();
+
+	/**
+	 * @brief Cleanup global OpenTelemetry logging
+	 *
+	 * Resets the global logger provider. Call at application shutdown.
+	 */
+	export void CleanupOTelLogging();
+
 	export template<mutex Mutex>
 	class OTelemetry final : public SynchronizedSink<Mutex>
 	{
@@ -26,8 +41,6 @@ namespace honesty::log
 
 			if (auto logRecord = logger->CreateLogRecord())
 			{
-				using namespace opentelemetry::trace::SemanticConventions;
-
 				logRecord->SetSeverity(OTelLevel(level));
 
 				std::string result = std::vformat(fmt, args);

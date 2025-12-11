@@ -6,9 +6,23 @@ import function_ref;
 import :types;
 import :timer;
 import :results;
+import synodic.honesty.log;
 
 namespace honesty::metric
 {
+	namespace
+	{
+		auto& MetricContextLogger()
+		{
+			static log::Logger logger = []() {
+				log::Logger l = log::RootLogger().CreateLogger("honesty.metric.context");
+				l.SetLevel(log::LevelType::WARNING);
+				return l;
+			}();
+			return logger;
+		}
+	}
+
 	/**
 	 *	@brief Context for timed state. i.e. Run a measurement for a certain amount of time.
 	 */
@@ -22,6 +36,9 @@ namespace honesty::metric
 
 		Results Measure(const std::function_ref<void()> metric)
 		{
+			MetricContextLogger().Debug("Starting timed measurement (target: {}ns)",
+				targetSampleDuration_.count());
+
 			// TODO: Minimize wrapping logic around the executed function
 			State state(targetSampleDuration_);
 			BenchmarkAccumulator accumulator;
@@ -58,6 +75,9 @@ namespace honesty::metric
 
 			Results results;
 			results.FromAccumulator(accumulator, state.totalIterations, state.totalDuration);
+
+			MetricContextLogger().Trace("Measurement complete: {} iterations, {} samples, mean={}ns",
+				results.iterations, results.samples, results.mean.count());
 
 			return results;
 		}
@@ -166,7 +186,9 @@ namespace honesty::metric
 		 */
 		Results Measure(const std::function_ref<void()> metric)
 		{
+			MetricContextLogger().Debug("Starting regression measurement");
 			lastResults_ = TimedContext::Measure(metric);
+			MetricContextLogger().Debug("Regression measurement complete");
 			return lastResults_;
 		}
 

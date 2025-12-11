@@ -47,10 +47,10 @@ namespace honesty::metric
 	 */
 	export struct DisplayConfig
 	{
-		bool useColor = true;		///< Use ANSI color codes
-		bool useUnicode = true;		///< Use Unicode symbols
-		std::size_t nameWidth = 40; ///< Column width for benchmark names
-		std::size_t valueWidth = 12; ///< Column width for numeric values
+		bool useColor = true;		// Use ANSI color codes
+		bool useUnicode = true;		// Use Unicode symbols
+		std::size_t nameWidth = 40; // Column width for benchmark names
+		std::size_t valueWidth = 12; // Column width for numeric values
 	};
 
 	/**

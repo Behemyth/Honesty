@@ -20,6 +20,9 @@ find_package(opentelemetry-cpp CONFIG REQUIRED)
 target_link_libraries(tests
 	PRIVATE
 	opentelemetry-cpp::opentelemetry-cpp
+	opentelemetry-cpp::logs
+	opentelemetry-cpp::common
+	opentelemetry-cpp::exporter_ostream_logs
 )
 
 target_link_libraries(tests

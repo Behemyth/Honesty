@@ -3,4 +3,5 @@ PRIVATE
 	test_colour.cpp
 	test_logger.cpp
 	test_sink.cpp
+	test_otel.cpp
 )

@@ -15,3 +15,8 @@ target_sources(honesty
 		FILE_SET log_private
 		TYPE CXX_MODULES
 )
+
+target_sources(honesty
+	PRIVATE
+		otel.cpp
+)

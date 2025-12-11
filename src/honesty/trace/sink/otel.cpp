@@ -30,10 +30,24 @@ module;
 
 module synodic.honesty.trace;
 import :sink.otel;
+import synodic.honesty.log;
 
 namespace honesty::trace
 {
 	namespace otel = opentelemetry;
+
+	namespace
+	{
+		auto& OTelTraceSinkLogger()
+		{
+			static log::Logger logger = []() {
+				log::Logger l = log::RootLogger().CreateLogger("honesty.trace.otel");
+				l.SetLevel(log::LevelType::WARNING);
+				return l;
+			}();
+			return logger;
+		}
+	}
 
 	// Convert honesty SpanKind to OpenTelemetry SpanKind
 	otel::trace::SpanKind ToOTelSpanKind(SpanKind kind)
@@ -72,6 +86,8 @@ namespace honesty::trace
 
 		void InitWithOStreamExporter()
 		{
+			OTelTraceSinkLogger().Debug("Initializing OTelSink with OStream exporter for service: {}", serviceName_);
+
 			auto exporter = otel::exporter::trace::OStreamSpanExporterFactory::Create();
 			auto processor = otel::sdk::trace::SimpleSpanProcessorFactory::Create(std::move(exporter));
 
@@ -81,6 +97,8 @@ namespace honesty::trace
 
 			tracer_ = otel::trace::Provider::GetTracerProvider()->GetTracer(
 				serviceName_, OPENTELEMETRY_SDK_VERSION);
+
+			OTelTraceSinkLogger().Info("OTelSink initialized for service '{}'", serviceName_);
 		}
 
 		void Export(std::span<const SpanData> spans)
@@ -88,12 +106,19 @@ namespace honesty::trace
 			std::lock_guard lock(mutex_);
 
 			if (!tracer_)
+			{
+				OTelTraceSinkLogger().Warning("Export called but tracer not initialized");
 				return;
+			}
+
+			OTelTraceSinkLogger().Debug("Exporting {} spans", spans.size());
 
 			for (const auto& data : spans)
 			{
 				ExportSpan(data);
 			}
+
+			OTelTraceSinkLogger().Trace("Export complete for {} spans", spans.size());
 		}
 
 		void Flush()
@@ -101,7 +126,9 @@ namespace honesty::trace
 			std::lock_guard lock(mutex_);
 			if (sdkProvider_)
 			{
+				OTelTraceSinkLogger().Debug("Flushing trace provider");
 				sdkProvider_->ForceFlush();
+				OTelTraceSinkLogger().Trace("Trace provider flush complete");
 			}
 		}
 
@@ -200,17 +227,25 @@ namespace honesty::trace
 	// Global functions implementation
 	void InitOTelTracing()
 	{
+		OTelTraceSinkLogger().Debug("Initializing global OpenTelemetry tracing pipeline");
+
 		auto exporter = otel::exporter::trace::OStreamSpanExporterFactory::Create();
 		auto processor = otel::sdk::trace::SimpleSpanProcessorFactory::Create(std::move(exporter));
 
 		auto sdkProvider = otel::sdk::trace::TracerProviderFactory::Create(std::move(processor));
 		otel::trace::Provider::SetTracerProvider(
 			std::shared_ptr<otel::trace::TracerProvider>(std::move(sdkProvider)));
+
+		OTelTraceSinkLogger().Info("Global OpenTelemetry tracing pipeline initialized with OStream exporter");
 	}
 
 	void CleanupOTelTracing()
 	{
+		OTelTraceSinkLogger().Debug("Cleaning up global OpenTelemetry tracing pipeline");
+
 		otel::trace::Provider::SetTracerProvider(
 			std::shared_ptr<otel::trace::TracerProvider>(nullptr));
+
+		OTelTraceSinkLogger().Info("Global OpenTelemetry tracing pipeline cleaned up");
 	}
 }

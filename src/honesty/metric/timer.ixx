@@ -5,17 +5,6 @@ import std;
 
 namespace honesty::metric
 {
-
-	/**
-	 *	@brief A collection of durations that may optionally exist.
-	 */
-	class Durations
-	{
-	public:
-
-	private:
-	};
-
 	export class Timer
 	{
 	public:

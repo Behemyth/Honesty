@@ -6,8 +6,8 @@
         "tool/cmake/platform/windows/CMakePresets.json"
     ],
     "cmakeMinimumRequired": {
-        "major": 3,
-        "minor": 30,
-        "patch": 5
+        "major": 4,
+        "minor": 0,
+        "patch": 0
     }
 }

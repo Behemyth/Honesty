@@ -19,12 +19,10 @@ repository = "https://github.com/synodic/Honesty"
 
 [dependency-groups]
 build = ["cppython[cmake,conan,git]>=0.9.15.dev3", "ninja>=1.13.0"]
-lint = ["ruff>=0.14.8", "pyrefly>=0.44.1", "isort>=7.0.0"]
+lint = ["ruff>=0.14.10", "pyrefly>=0.46.1", "isort>=7.0.0"]
 test = ["pytest-cov>=7.0.0", "pytest-mock>=3.15.1"]
-docs = ["zensical>=0.0.11"]
-config = [
-    "copier>=9.11.0",
-]
+docs = ["zensical>=0.0.15"]
+config = ["copier>=9.11.0"]
 
 [tool.cppython]
 dependencies = [

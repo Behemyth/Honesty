@@ -104,7 +104,7 @@ The `ResourceCollector` class provides point-in-time sampling of system resource
 | Platform | CPU Measurement | Memory Measurement |
 |----------|-----------------|-------------------|
 | Windows | `GetProcessTimes` | `GetProcessMemoryInfo` |
-| Linux | `/proc/self/stat` | `/proc/self/statm`, `/proc/self/status` |
+| Linux | Not yet implemented | Not yet implemented |
 
 ### Basic Usage
 
@@ -187,7 +187,7 @@ std::println("Memory used: {} bytes", after.memoryUsageBytes - before.memoryUsag
 
 ## OpenTelemetry Export
 
-The metric module integrates with OpenTelemetry for observability:
+The metric module integrates with OpenTelemetry for observability. Both benchmark timing results and resource metrics can be exported.
 
 ```cpp
 import synodic.honesty.metric;
@@ -208,7 +208,7 @@ ExportResults("my_benchmark", results);
 CleanupMetricExport();
 ```
 
-### Exported Metrics
+### Exported Benchmark Metrics
 
 | Metric | Type | Unit | Description |
 |--------|------|------|-------------|
@@ -217,6 +217,53 @@ CleanupMetricExport();
 | `benchmark.throughput` | Histogram | ops/s | Iterations per second |
 
 All metrics include a `benchmark.name` label for identification.
+
+### Exporting Resource Metrics
+
+Export standalone resource samples:
+
+```cpp
+ResourceCollector collector;
+collector.Initialize();
+
+ResourceSample sample = collector.Sample();
+ExportResourceSample("my_context", sample);
+```
+
+| Metric | Type | Unit | Description |
+|--------|------|------|-------------|
+| `process.cpu.usage` | Histogram | % | Process CPU usage |
+| `process.memory.usage` | Histogram | By | Process memory (working set) |
+| `process.memory.peak` | Histogram | By | Peak memory usage |
+
+### Combined Benchmark + Resource Export
+
+Export benchmark results with correlated resource data in a single call:
+
+```cpp
+ResourceCollector collector;
+collector.Initialize();
+
+ResourceSample before = collector.Sample();
+
+TimedContext context(std::chrono::seconds(1));
+Results results = context.Measure(myFunction);
+
+ResourceSample after = collector.Sample();
+
+// Export everything together with correlated labels
+ExportResultsWithResources("my_benchmark", results, before, after);
+```
+
+| Metric | Type | Unit | Description |
+|--------|------|------|-------------|
+| `benchmark.duration` | Histogram | ns | Mean iteration duration |
+| `benchmark.iterations` | Counter | - | Total iteration count |
+| `benchmark.throughput` | Histogram | ops/s | Iterations per second |
+| `benchmark.cpu.usage` | Histogram | % | CPU usage during benchmark |
+| `benchmark.memory.usage` | Histogram | By | Memory at benchmark end |
+| `benchmark.memory.delta` | Histogram | By | Memory change during benchmark |
+| `benchmark.memory.peak` | Histogram | By | Peak memory during benchmark |
 
 ---
 

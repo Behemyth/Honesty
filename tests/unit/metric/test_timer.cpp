@@ -31,11 +31,12 @@ namespace
 					Timer timer(duration);
 
 					// Do some work that takes measurable time
-					volatile int sum = 0;
+					int sum = 0;
 					for (int i = 0; i < 10000; ++i)
 					{
 						sum += i;
 					}
+					DoNotOptimize(sum);
 				}
 
 				// After doing work, duration should be positive (or at least non-negative due to clock resolution)
@@ -50,15 +51,17 @@ namespace
 				{
 					Timer timer1(duration1);
 					// Small delay
-					volatile int x = 0;
+					int x = 0;
 					for (int i = 0; i < 1000; ++i) { x += i; }
+					DoNotOptimize(x);
 				}
 
 				{
 					Timer timer2(duration2);
 					// Larger delay
-					volatile int x = 0;
+					int x = 0;
 					for (int i = 0; i < 10000; ++i) { x += i; }
+					DoNotOptimize(x);
 				}
 
 				// Both durations should be valid

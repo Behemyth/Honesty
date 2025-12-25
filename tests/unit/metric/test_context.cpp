@@ -32,11 +32,12 @@ namespace
 
 			Results results = context.Measure([]() {
 			// Simple work to measure
-			volatile int sum = 0;
+			int sum = 0;
 			for (int i = 0; i < 100; ++i)
 			{
 			sum += i;
 			}
+			DoNotOptimize(sum);
 			});
 
 			requirements.Expect(results.iterations > std::size_t{0}, "Should have at least one iteration");
@@ -63,8 +64,8 @@ namespace
 
 			// Measure something
 			context.Measure([]() {
-			volatile int x = 42;
-			(void)x;
+			int x = 42;
+			DoNotOptimize(x);
 			});
 
 			// GetResults should return the same results as the last Measure call
@@ -80,11 +81,12 @@ namespace
 
 			Results results = context.Measure([]() {
 			// Do some measurable work
-			volatile int sum = 0;
+			int sum = 0;
 			for (int i = 0; i < 1000; ++i)
 			{
 			sum += i;
 			}
+			DoNotOptimize(sum);
 			});
 
 			// Variance and stddev should be non-negative

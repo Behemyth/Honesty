@@ -6,6 +6,7 @@ import function_ref;
 import :types;
 import :timer;
 import :results;
+import :platform;
 import synodic.honesty.log;
 
 namespace honesty::metric
@@ -167,10 +168,26 @@ namespace honesty::metric
 	{
 	public:
 		/**
+		 * @brief Configuration for regression measurement
+		 */
+		struct Config
+		{
+			/// Number of warmup iterations before measurement (default: 0)
+			std::uint64_t warmupIterations = 0;
+
+			/// Platform tuning configuration
+			PlatformConfig platform = {};
+
+			/// Whether to apply platform tuning during measurement
+			bool enablePlatformTuning = true;
+		};
+
+		/**
 		 * @brief Initializes the context to an estimated minimal fit of iterations/samples
 		 */
-		RegressionContext() :
-			TimedContext(std::chrono::nanoseconds(1))
+		explicit RegressionContext(Config config = {}) :
+			TimedContext(std::chrono::nanoseconds(1)),
+			config_(std::move(config))
 		{
 			// TODO: Move the calculation to the initializer
 			const Duration resolution(20);	// TODO: Get the resolution of the current clock
@@ -187,7 +204,33 @@ namespace honesty::metric
 		Results Measure(const std::function_ref<void()> metric)
 		{
 			MetricContextLogger().Debug("Starting regression measurement");
+
+			// Apply platform tuning if enabled
+			std::optional<ScopedPlatformTuner> platformTuner;
+			if (config_.enablePlatformTuning)
+			{
+				platformTuner.emplace(config_.platform);
+
+				// Log any warnings from platform setup
+				for (const auto& warning : platformTuner->State().warnings)
+				{
+					MetricContextLogger().Warning("Platform: {}", warning);
+				}
+			}
+
+			// Run warmup iterations (not timed)
+			if (config_.warmupIterations > 0)
+			{
+				MetricContextLogger().Debug("Running {} warmup iterations", config_.warmupIterations);
+				for (std::uint64_t i = 0; i < config_.warmupIterations; ++i)
+				{
+					metric();
+				}
+			}
+
+			// Perform actual measurement
 			lastResults_ = TimedContext::Measure(metric);
+
 			MetricContextLogger().Debug("Regression measurement complete");
 			return lastResults_;
 		}
@@ -201,7 +244,38 @@ namespace honesty::metric
 			return lastResults_;
 		}
 
+		/**
+		 * @brief Get the current configuration
+		 */
+		const Config& GetConfig() const noexcept
+		{
+			return config_;
+		}
+
+		/**
+		 * @brief Set the number of warmup iterations
+		 * @param count Number of iterations to run before measurement
+		 * @return Reference to this context for chaining
+		 */
+		RegressionContext& Warmup(std::uint64_t count) noexcept
+		{
+			config_.warmupIterations = count;
+			return *this;
+		}
+
+		/**
+		 * @brief Enable or disable platform tuning
+		 * @param enable Whether to apply platform-specific optimizations
+		 * @return Reference to this context for chaining
+		 */
+		RegressionContext& EnablePlatformTuning(bool enable) noexcept
+		{
+			config_.enablePlatformTuning = enable;
+			return *this;
+		}
+
 	private:
+		Config config_;
 		Results lastResults_;
 	};
 

@@ -64,8 +64,8 @@ namespace
 				{
 					ctx.Measure([]()
 					{
-						volatile auto tag = BaselineTag("benchmark");
-						(void)tag;
+						auto tag = BaselineTag("benchmark");
+						DoNotOptimize(tag);
 					});
 				};
 
@@ -73,8 +73,8 @@ namespace
 				{
 					ctx.Measure([]()
 					{
-						volatile auto tag = Tag("benchmark");
-						(void)tag;
+						auto tag = Tag("benchmark");
+						DoNotOptimize(tag);
 					});
 				};
 			};
@@ -92,8 +92,8 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						volatile auto combined = tag1 / tag2;
-						(void)combined;
+						auto combined = tag1 / tag2;
+						DoNotOptimize(combined);
 					});
 				};
 
@@ -104,8 +104,8 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						volatile auto combined = tag1 / tag2;
-						(void)combined;
+						auto combined = tag1 / tag2;
+						DoNotOptimize(combined);
 					});
 				};
 			};
@@ -121,8 +121,8 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						volatile auto combined = tag1 / tag2 / tag3 / tag4;
-						(void)combined;
+						auto combined = tag1 / tag2 / tag3 / tag4;
+						DoNotOptimize(combined);
 					});
 				};
 
@@ -135,8 +135,8 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						volatile auto combined = tag1 / tag2 / tag3 / tag4;
-						(void)combined;
+						auto combined = tag1 / tag2 / tag3 / tag4;
+						DoNotOptimize(combined);
 					});
 				};
 			};
@@ -153,8 +153,8 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						volatile bool found = (tag == "test");
-						(void)found;
+						bool found = (tag == "test");
+						DoNotOptimize(found);
 					});
 				};
 
@@ -164,8 +164,8 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						volatile bool found = (tag == "test");
-						(void)found;
+						bool found = (tag == "test");
+						DoNotOptimize(found);
 					});
 				};
 			};
@@ -179,8 +179,8 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						volatile bool found = (tag1 == tag2);
-						(void)found;
+						bool found = (tag1 == tag2);
+						DoNotOptimize(found);
 					});
 				};
 
@@ -191,8 +191,8 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						volatile bool found = (tag1 == tag2);
-						(void)found;
+						bool found = (tag1 == tag2);
+						DoNotOptimize(found);
 					});
 				};
 			};
@@ -209,8 +209,8 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						volatile bool found = (tag == "nonexistent");
-						(void)found;
+						bool found = (tag == "nonexistent");
+						DoNotOptimize(found);
 					});
 				};
 
@@ -220,8 +220,8 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						volatile bool found = (tag == "nonexistent");
-						(void)found;
+						bool found = (tag == "nonexistent");
+						DoNotOptimize(found);
 					});
 				};
 			};

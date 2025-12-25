@@ -6,13 +6,16 @@ target_sources(honesty
 			metric.ixx
 			comparison.ixx
 			context.ixx
+			escape.ixx
 			history.ixx
 			types.ixx
 			timer.ixx
 			results.ixx
+			platform.ixx
 	PRIVATE
 		FILE_SET metric_private
 		TYPE CXX_MODULES
 )
 
+add_subdirectory(platform)
 add_subdirectory(sink)

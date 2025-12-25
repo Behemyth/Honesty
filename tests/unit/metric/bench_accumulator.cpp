@@ -238,8 +238,8 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						volatile double mean = accumulator.Mean();
-						(void)mean;
+						auto mean = accumulator.Mean();
+						DoNotOptimize(mean);
 					});
 				};
 
@@ -253,8 +253,8 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						volatile double mean = accumulator.Mean();
-						(void)mean;
+						auto mean = accumulator.Mean();
+						DoNotOptimize(mean);
 					});
 				};
 
@@ -268,8 +268,8 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						volatile double mean = accumulator.get<synodic::statistics::mean>().result();
-						(void)mean;
+						auto mean = accumulator.get<synodic::statistics::mean>().result();
+						DoNotOptimize(mean);
 					});
 				};
 			};
@@ -290,8 +290,8 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						volatile double variance = accumulator.Variance();
-						(void)variance;
+						auto variance = accumulator.Variance();
+						DoNotOptimize(variance);
 					});
 				};
 
@@ -305,8 +305,8 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						volatile double variance = accumulator.Variance();
-						(void)variance;
+						auto variance = accumulator.Variance();
+						DoNotOptimize(variance);
 					});
 				};
 
@@ -320,8 +320,8 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						volatile double variance = accumulator.get<synodic::statistics::variance>().result();
-						(void)variance;
+						auto variance = accumulator.get<synodic::statistics::variance>().result();
+						DoNotOptimize(variance);
 					});
 				};
 			};
@@ -342,12 +342,16 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						volatile auto count = accumulator.Count();
-						volatile auto mean = accumulator.Mean();
-						volatile auto variance = accumulator.Variance();
-						volatile auto min = accumulator.Min();
-						volatile auto max = accumulator.Max();
-						(void)count; (void)mean; (void)variance; (void)min; (void)max;
+						auto count = accumulator.Count();
+						auto mean = accumulator.Mean();
+						auto variance = accumulator.Variance();
+						auto min = accumulator.Min();
+						auto max = accumulator.Max();
+						DoNotOptimize(count);
+						DoNotOptimize(mean);
+						DoNotOptimize(variance);
+						DoNotOptimize(min);
+						DoNotOptimize(max);
 					});
 				};
 
@@ -361,12 +365,16 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						volatile auto count = accumulator.Count();
-						volatile auto mean = accumulator.Mean();
-						volatile auto variance = accumulator.Variance();
-						volatile auto min = accumulator.Min();
-						volatile auto max = accumulator.Max();
-						(void)count; (void)mean; (void)variance; (void)min; (void)max;
+						auto count = accumulator.Count();
+						auto mean = accumulator.Mean();
+						auto variance = accumulator.Variance();
+						auto min = accumulator.Min();
+						auto max = accumulator.Max();
+						DoNotOptimize(count);
+						DoNotOptimize(mean);
+						DoNotOptimize(variance);
+						DoNotOptimize(min);
+						DoNotOptimize(max);
 					});
 				};
 
@@ -380,12 +388,16 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						volatile auto count = accumulator.get<synodic::statistics::count>().result();
-						volatile auto mean = accumulator.get<synodic::statistics::mean>().result();
-						volatile auto variance = accumulator.get<synodic::statistics::variance>().result();
-						volatile auto min = accumulator.get<synodic::statistics::min>().result();
-						volatile auto max = accumulator.get<synodic::statistics::max>().result();
-						(void)count; (void)mean; (void)variance; (void)min; (void)max;
+						auto count = accumulator.get<synodic::statistics::count>().result();
+						auto mean = accumulator.get<synodic::statistics::mean>().result();
+						auto variance = accumulator.get<synodic::statistics::variance>().result();
+						auto min = accumulator.get<synodic::statistics::min>().result();
+						auto max = accumulator.get<synodic::statistics::max>().result();
+						DoNotOptimize(count);
+						DoNotOptimize(mean);
+						DoNotOptimize(variance);
+						DoNotOptimize(min);
+						DoNotOptimize(max);
 					});
 				};
 			};

@@ -38,8 +38,11 @@ target_compile_features(honesty_main PUBLIC cxx_std_23)
 
 find_package(opentelemetry-cpp REQUIRED)
 find_package(synodic-template-library REQUIRED)
+find_package(portability REQUIRED)
 
 target_link_libraries(honesty
+	PUBLIC
+	synodic::portability
 	PRIVATE
 	opentelemetry-cpp::opentelemetry-cpp
 	synodic::synodic-template-library
@@ -49,6 +52,7 @@ target_link_libraries(honesty
 target_link_libraries(honesty_main
 	PUBLIC
 	synodic::honesty
+	synodic::portability
 	synodic::synodic-template-library
 )
 

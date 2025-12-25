@@ -14,8 +14,8 @@ dependencies = []
 requires-python = ">=3.14"
 
 [project.urls]
-homepage = "https://github.com/synodic/Honesty"
-repository = "https://github.com/synodic/Honesty"
+homepage = "https://github.com/synodic/honesty"
+repository = "https://github.com/synodic/honesty"
 
 [dependency-groups]
 build = ["cppython[cmake,conan,git]>=0.9.15.dev3", "ninja>=1.13.0"]

@@ -22,11 +22,12 @@ namespace
 				{
 					ctx.Measure([]()
 					{
-						volatile int sum = 0;
+						int sum = 0;
 						for (int i = 0; i < 100; ++i)
 						{
 							sum += i;
 						}
+						DoNotOptimize(sum);
 					});
 				};
 
@@ -35,11 +36,12 @@ namespace
 					ctx.Measure([]()
 					{
 						// Simulated faster implementation
-						volatile int sum = 0;
+						int sum = 0;
 						for (int i = 0; i < 50; ++i)
 						{
 							sum += i * 2;
 						}
+						DoNotOptimize(sum);
 					});
 				};
 
@@ -48,11 +50,12 @@ namespace
 					ctx.Measure([]()
 					{
 						// Simulated slower implementation
-						volatile int sum = 0;
+						int sum = 0;
 						for (int i = 0; i < 200; ++i)
 						{
 							sum += i;
 						}
+						DoNotOptimize(sum);
 					});
 				};
 			};
@@ -67,8 +70,8 @@ namespace
 				{
 					ctx.Measure([]()
 					{
-						volatile int x = 42;
-						(void)x;
+						int x = 42;
+						DoNotOptimize(x);
 					});
 				};
 
@@ -76,9 +79,9 @@ namespace
 				{
 					ctx.Measure([]()
 					{
-						volatile int x = 42;
-						volatile int y = x * 2;
-						(void)y;
+						int x = 42;
+						int y = x * 2;
+						DoNotOptimize(y);
 					});
 				};
 			};
@@ -93,11 +96,12 @@ namespace
 				{
 					ctx.Measure([]()
 					{
-						volatile int sum = 0;
+						int sum = 0;
 						for (int i = 0; i < 100; ++i)
 						{
 							sum += i;
 						}
+						DoNotOptimize(sum);
 					});
 				};
 
@@ -105,11 +109,12 @@ namespace
 				{
 					ctx.Measure([]()
 					{
-						volatile int sum = 0;
+						int sum = 0;
 						for (int i = 0; i < 80; ++i)
 						{
 							sum += i;
 						}
+						DoNotOptimize(sum);
 					});
 				};
 
@@ -117,11 +122,12 @@ namespace
 				{
 					ctx.Measure([]()
 					{
-						volatile int sum = 0;
+						int sum = 0;
 						for (int i = 0; i < 120; ++i)
 						{
 							sum += i;
 						}
+						DoNotOptimize(sum);
 					});
 				};
 			};
@@ -136,8 +142,8 @@ namespace
 				{
 					ctx.Measure([]()
 					{
-						volatile int x = 1;
-						(void)x;
+						int x = 1;
+						DoNotOptimize(x);
 					});
 				};
 
@@ -145,8 +151,8 @@ namespace
 				{
 					ctx.Measure([]()
 					{
-						volatile int x = 2;
-						(void)x;
+						int x = 2;
+						DoNotOptimize(x);
 					});
 				};
 
@@ -157,11 +163,12 @@ namespace
 					{
 						ctx.Measure([]()
 						{
-							volatile int sum = 0;
+							int sum = 0;
 							for (int i = 0; i < 10; ++i)
 							{
 								sum += i;
 							}
+							DoNotOptimize(sum);
 						});
 					};
 
@@ -169,11 +176,12 @@ namespace
 					{
 						ctx.Measure([]()
 						{
-							volatile int sum = 0;
+							int sum = 0;
 							for (int i = 0; i < 20; ++i)
 							{
 								sum += i;
 							}
+							DoNotOptimize(sum);
 						});
 					};
 				};
@@ -196,11 +204,12 @@ namespace
 			co_yield SILENT / "ungrouped_standalone"_bench = [](RegressionContext& ctx)
 			{
 				ctx.Measure([]() {
-					volatile int sum = 0;
+					int sum = 0;
 					for (int i = 0; i < 50; ++i)
 					{
 						sum += i;
 					}
+					DoNotOptimize(sum);
 				});
 			};
 		});

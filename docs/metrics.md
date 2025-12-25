@@ -131,6 +131,27 @@ All metrics include a `benchmark.name` label for identification.
 
 ## Usage Examples
 
+### Preventing Optimization
+
+Use `DoNotOptimize` and `Clobber` to prevent the compiler from optimizing away benchmark code:
+
+```cpp
+import synodic.honesty.metric;
+
+using namespace honesty::metric;
+
+ctx.Measure([]() {
+    int sum = 0;
+    for (int i = 0; i < 1000; ++i) {
+        sum += i;
+    }
+    DoNotOptimize(sum);  // Ensures sum is computed
+});
+```
+
+- `DoNotOptimize(value)` - Prevents dead code elimination of computed results
+- `Clobber(value)` - Prevents constant propagation; forces the compiler to treat the value as potentially modified
+
 ### Basic Benchmark
 
 ```cpp
@@ -143,11 +164,11 @@ void benchmark_example()
     TimedContext context(std::chrono::milliseconds(100));
 
     Results results = context.Measure([]() {
-        // Your code here
-        volatile int sum = 0;
+        int sum = 0;
         for (int i = 0; i < 1000; ++i) {
             sum += i;
         }
+        DoNotOptimize(sum);
     });
 
     // Access results

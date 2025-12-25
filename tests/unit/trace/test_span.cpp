@@ -7,9 +7,8 @@ using namespace honesty::test::literals;
 
 namespace
 {
-	// Use simple Tracer directly to avoid MSVC compiler limits with nested initializers
-	constexpr honesty::trace::TracerConfiguration enabledConfig{true};
-	honesty::trace::Tracer<enabledConfig> tracer;
+	// Use non-viral Tracer (uses global TracingEnabled)
+	honesty::trace::Tracer tracer;
 
 	Suite SUITE(
 		"span",
@@ -17,36 +16,65 @@ namespace
 		{
 			co_yield "span_creation"_test = [](const Requirements& requirements)
 			{
-				honesty::Span span = tracer.CreateSpan("test_span");
-
-				requirements.Expect(!span.IsEnded());
+				if constexpr (honesty::trace::TracingEnabled)
+				{
+					honesty::Span span = tracer.CreateSpan("test_span");
+					requirements.Expect(!span.IsEnded());
+				}
+				else
+				{
+					// When disabled, we get NoopSpan
+					auto span = tracer.CreateSpan("test_span");
+					static_assert(std::is_same_v<decltype(span), honesty::NoopSpan>);
+					requirements.Expect(true);
+				}
 			};
 
 			co_yield "span_attributes"_test = [](const Requirements& requirements)
 			{
-				auto span = tracer.CreateSpan("attributed_span");
+				if constexpr (honesty::trace::TracingEnabled)
+				{
+					auto span = tracer.CreateSpan("attributed_span");
 
-				span.SetAttribute("key1", std::int64_t{42});
-				span.SetAttribute("key2", std::string_view{"value"});
-				span.SetAttribute("key3", true);
+					span.SetAttribute("key1", std::int64_t{42});
+					span.SetAttribute("key2", std::string_view{"value"});
+					span.SetAttribute("key3", true);
 
-				const auto& data = span.Data();
-				requirements.ExpectEquals(data.attributeCount, std::size_t{3});
+					const auto& data = span.Data();
+					requirements.ExpectEquals(data.attributeCount, std::size_t{3});
+				}
+				else
+				{
+					// When disabled, SetAttribute compiles to nothing
+					auto span = tracer.CreateSpan("attributed_span");
+					span.SetAttribute("key", std::int64_t{42});
+					requirements.Expect(true);
+				}
 			};
 
 			co_yield "span_status"_test = [](const Requirements& requirements)
 			{
-				auto span = tracer.CreateSpan("status_span");
+				if constexpr (honesty::trace::TracingEnabled)
+				{
+					auto span = tracer.CreateSpan("status_span");
 
-				span.SetStatus(honesty::trace::SpanStatus::OK);
-				requirements.ExpectEquals(
-					static_cast<int>(span.Data().status),
-					static_cast<int>(honesty::trace::SpanStatus::OK));
+					span.SetStatus(honesty::trace::SpanStatus::OK);
+					requirements.ExpectEquals(
+						static_cast<int>(span.Data().status),
+						static_cast<int>(honesty::trace::SpanStatus::OK));
 
-				span.SetStatus(honesty::trace::SpanStatus::ERROR, "something went wrong");
-				requirements.ExpectEquals(
-					static_cast<int>(span.Data().status),
-					static_cast<int>(honesty::trace::SpanStatus::ERROR));
+					span.SetStatus(honesty::trace::SpanStatus::ERROR, "something went wrong");
+					requirements.ExpectEquals(
+						static_cast<int>(span.Data().status),
+						static_cast<int>(honesty::trace::SpanStatus::ERROR));
+				}
+				else
+				{
+					// When disabled, SetStatus compiles to nothing
+					auto span = tracer.CreateSpan("status_span");
+					span.SetStatus(honesty::trace::SpanStatus::OK);
+					requirements.Expect(true);
+				}
 			};
 
 			co_yield "noop_span"_test = [](const Requirements& requirements)

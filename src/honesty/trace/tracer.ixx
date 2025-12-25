@@ -54,14 +54,19 @@ namespace honesty::trace
 	};
 
 	/**
-	 * @brief A tracer generates and manages spans.
-	 * @tparam Configuration Compile-time configuration determining if tracing is enabled
+	 * @brief A tracer that uses global compile-time configuration.
+	 *
+	 * This tracer uses the global TracingEnabled constexpr to determine behavior.
+	 * When tracing is disabled, all methods compile to nothing via `if constexpr`.
+	 *
+	 * Usage:
+	 *   Tracer tracer;
+	 *   auto span = tracer.CreateSpan("operation");  // NoopSpan when disabled
 	 */
-	export template<TracerConfiguration Configuration>
-	class Tracer
+	export class Tracer
 	{
 	public:
-		consteval Tracer() = default;
+		constexpr Tracer() = default;
 
 		Tracer(const Tracer& other) = delete;
 		constexpr Tracer(Tracer&& other) noexcept = default;
@@ -73,7 +78,7 @@ namespace honesty::trace
 		 */
 		auto CreateSpan(const std::string_view name) const
 		{
-			if constexpr (Configuration.enabled)
+			if constexpr (TracingEnabled)
 			{
 				auto& ctx = Context::Current();
 
@@ -94,7 +99,7 @@ namespace honesty::trace
 		 */
 		auto CreateScopedSpan(const std::string_view name) const
 		{
-			if constexpr (Configuration.enabled)
+			if constexpr (TracingEnabled)
 			{
 				auto span = CreateSpan(name);
 				auto guard = ContextGuard(span.Data().traceID, span.Data().spanID);
@@ -106,9 +111,12 @@ namespace honesty::trace
 			}
 		}
 
-		static consteval TracerConfiguration GetConfiguration()
+		/**
+		 * @brief Check if tracing is enabled at compile time
+		 */
+		static consteval bool IsEnabled()
 		{
-			return Configuration;
+			return TracingEnabled;
 		}
 
 	private:

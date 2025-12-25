@@ -1,3 +1,8 @@
+target_sources(tests
+PRIVATE
+	test_compile_time_config.cpp
+)
+
 add_subdirectory(
 	metric
 )

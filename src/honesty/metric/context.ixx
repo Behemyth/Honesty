@@ -26,6 +26,9 @@ namespace honesty::metric
 
 	/**
 	 *	@brief Context for timed state. i.e. Run a measurement for a certain amount of time.
+	 *
+	 *	When MetricsEnabled is false (via -DHONESTY_METRICS_DISABLED), the Measure method
+	 *	compiles to just executing the metric function once and returning empty results.
 	 */
 	export class TimedContext
 	{
@@ -37,50 +40,60 @@ namespace honesty::metric
 
 		Results Measure(const std::function_ref<void()> metric)
 		{
-			MetricContextLogger().Debug("Starting timed measurement (target: {}ns)",
-				targetSampleDuration_.count());
-
-			// TODO: Minimize wrapping logic around the executed function
-			State state(targetSampleDuration_);
-			BenchmarkAccumulator accumulator;
-
-			// Each measurement depends on the previous sample.
-			while (true)
+			if constexpr (!MetricsEnabled)
 			{
-				// All iterations are measured under a single sample. Avoids the overhead of measuring each iteration
-				Duration duration;
+				// When metrics are disabled, just run the function once (for side effects)
+				// and return empty results. The optimizer will inline this to nearly nothing.
+				metric();
+				return Results{};
+			}
+			else
+			{
+				MetricContextLogger().Debug("Starting timed measurement (target: {}ns)",
+					targetSampleDuration_.count());
 
-				// Scope the timer to just the executed operation
+				// TODO: Minimize wrapping logic around the executed function
+				State state(targetSampleDuration_);
+				BenchmarkAccumulator accumulator;
+
+				// Each measurement depends on the previous sample.
+				while (true)
 				{
-					Timer timer(duration);
+					// All iterations are measured under a single sample. Avoids the overhead of measuring each iteration
+					Duration duration;
 
-					while (state.Iterate())
+					// Scope the timer to just the executed operation
 					{
-						metric();
+						Timer timer(duration);
+
+						while (state.Iterate())
+						{
+							metric();
+						}
+					}
+
+					// Push normalized per-iteration time to accumulator
+					if (state.lastIterationCount > 0)
+					{
+						const double iterationTimeNs =
+							static_cast<double>(duration.count()) / static_cast<double>(state.lastIterationCount);
+						accumulator.Push(iterationTimeNs);
+					}
+
+					if (not state.Push(duration))
+					{
+						break;
 					}
 				}
 
-				// Push normalized per-iteration time to accumulator
-				if (state.lastIterationCount > 0)
-				{
-					const double iterationTimeNs =
-						static_cast<double>(duration.count()) / static_cast<double>(state.lastIterationCount);
-					accumulator.Push(iterationTimeNs);
-				}
+				Results results;
+				results.FromAccumulator(accumulator, state.totalIterations, state.totalDuration);
 
-				if (not state.Push(duration))
-				{
-					break;
-				}
+				MetricContextLogger().Trace("Measurement complete: {} iterations, {} samples, mean={}ns",
+					results.iterations, results.samples, results.mean.count());
+
+				return results;
 			}
-
-			Results results;
-			results.FromAccumulator(accumulator, state.totalIterations, state.totalDuration);
-
-			MetricContextLogger().Trace("Measurement complete: {} iterations, {} samples, mean={}ns",
-				results.iterations, results.samples, results.mean.count());
-
-			return results;
 		}
 
 	protected:
@@ -197,42 +210,56 @@ namespace honesty::metric
 		}
 
 		/**
-		 * @brief Measures a function and stores the results internally for later retrieval
+		 * @brief Measures a function and stores the results internally for later retrieval.
+		 *
+		 * When MetricsEnabled is false, this compiles to just executing the metric function
+		 * once and returning empty results.
+		 *
 		 * @param metric The function to measure
 		 * @return The measurement results
 		 */
 		Results Measure(const std::function_ref<void()> metric)
 		{
-			MetricContextLogger().Debug("Starting regression measurement");
-
-			// Apply platform tuning if enabled
-			std::optional<ScopedPlatformTuner> platformTuner;
-			if (config_.enablePlatformTuning)
+			if constexpr (!MetricsEnabled)
 			{
-				platformTuner.emplace(config_.platform);
-
-				// Log any warnings from platform setup
-				for (const auto& warning : platformTuner->State().warnings)
-				{
-					MetricContextLogger().Warning("Platform: {}", warning);
-				}
+				// When metrics are disabled, just run the function once and return empty results
+				metric();
+				lastResults_ = Results{};
+				return lastResults_;
 			}
-
-			// Run warmup iterations (not timed)
-			if (config_.warmupIterations > 0)
+			else
 			{
-				MetricContextLogger().Debug("Running {} warmup iterations", config_.warmupIterations);
-				for (std::uint64_t i = 0; i < config_.warmupIterations; ++i)
+				MetricContextLogger().Debug("Starting regression measurement");
+
+				// Apply platform tuning if enabled
+				std::optional<ScopedPlatformTuner> platformTuner;
+				if (config_.enablePlatformTuning)
 				{
-					metric();
+					platformTuner.emplace(config_.platform);
+
+					// Log any warnings from platform setup
+					for (const auto& warning : platformTuner->State().warnings)
+					{
+						MetricContextLogger().Warning("Platform: {}", warning);
+					}
 				}
+
+				// Run warmup iterations (not timed)
+				if (config_.warmupIterations > 0)
+				{
+					MetricContextLogger().Debug("Running {} warmup iterations", config_.warmupIterations);
+					for (std::uint64_t i = 0; i < config_.warmupIterations; ++i)
+					{
+						metric();
+					}
+				}
+
+				// Perform actual measurement
+				lastResults_ = TimedContext::Measure(metric);
+
+				MetricContextLogger().Debug("Regression measurement complete");
+				return lastResults_;
 			}
-
-			// Perform actual measurement
-			lastResults_ = TimedContext::Measure(metric);
-
-			MetricContextLogger().Debug("Regression measurement complete");
-			return lastResults_;
 		}
 
 		/**

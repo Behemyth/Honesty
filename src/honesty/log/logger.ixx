@@ -34,10 +34,38 @@ namespace honesty::log
 		Logger& operator=(const Logger& other)               = delete;
 		constexpr Logger& operator=(Logger&& other) noexcept = default;
 
+		/**
+		 * @brief Log a message at the specified level.
+		 *
+		 * Uses compile-time level filtering via `if constexpr`. When the level
+		 * is below CompileTimeLogLevel, the entire function body compiles to nothing.
+		 *
+		 * @tparam Level The log level (must be a compile-time constant for zero-cost elimination)
+		 * @param fmt The format string
+		 * @param args The format arguments
+		 */
+		template<LevelType Level, typename... Args>
+		inline void Log(std::format_string<Args...> fmt, Args&&... args) const
+		{
+			if constexpr (IsLevelEnabled(Level))
+			{
+				LogV(Level, fmt.get(), std::make_format_args(args...));
+			}
+		}
+
+		/**
+		 * @brief Log a message at runtime-determined level (no compile-time elimination).
+		 * @param level The log level
+		 * @param fmt The format string
+		 * @param args The format arguments
+		 */
 		template<typename... Args>
 		inline void Log(const LevelType level, std::format_string<Args...> fmt, Args&&... args) const
 		{
-			LogV(level, fmt.get(), std::make_format_args(args...));
+			if constexpr (CompileTimeLogLevel != LevelType::OFF)
+			{
+				LogV(level, fmt.get(), std::make_format_args(args...));
+			}
 		}
 
 		/**
@@ -68,37 +96,37 @@ namespace honesty::log
 		template<typename... Args>
 		inline void Trace(std::format_string<Args...> fmt, Args&&... args) const
 		{
-			Log(LevelType::TRACE, fmt, std::forward<Args>(args)...);
+			Log<LevelType::TRACE>(fmt, std::forward<Args>(args)...);
 		}
 
 		template<typename... Args>
 		inline void Debug(std::format_string<Args...> fmt, Args&&... args) const
 		{
-			Log(LevelType::DEBUG, fmt, std::forward<Args>(args)...);
+			Log<LevelType::DEBUG>(fmt, std::forward<Args>(args)...);
 		}
 
 		template<typename... Args>
 		inline void Info(std::format_string<Args...> fmt, Args&&... args) const
 		{
-			Log(LevelType::INFO, fmt, std::forward<Args>(args)...);
+			Log<LevelType::INFO>(fmt, std::forward<Args>(args)...);
 		}
 
 		template<typename... Args>
 		inline void Warning(std::format_string<Args...> fmt, Args&&... args) const
 		{
-			Log(LevelType::WARNING, fmt, std::forward<Args>(args)...);
+			Log<LevelType::WARNING>(fmt, std::forward<Args>(args)...);
 		}
 
 		template<typename... Args>
 		inline void Error(std::format_string<Args...> fmt, Args&&... args) const
 		{
-			Log(LevelType::ERROR, fmt, std::forward<Args>(args)...);
+			Log<LevelType::ERROR>(fmt, std::forward<Args>(args)...);
 		}
 
 		template<typename... Args>
 		inline void Critical(std::format_string<Args...> fmt, Args&&... args) const
 		{
-			Log(LevelType::CRITICAL, fmt, std::forward<Args>(args)...);
+			Log<LevelType::CRITICAL>(fmt, std::forward<Args>(args)...);
 		}
 
 		/**

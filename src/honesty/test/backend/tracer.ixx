@@ -15,13 +15,8 @@ namespace honesty::test
 		COUNT
 	};
 
-	// Configuration: enabled in debug, disabled in release for zero overhead
-#ifdef NDEBUG
-	export inline constexpr honesty::trace::TracerConfiguration testTracerConfig{false};
-#else
-	export inline constexpr honesty::trace::TracerConfiguration testTracerConfig{true};
-#endif
-
-	// Global tracer instance for the test framework
-	export inline honesty::trace::Tracer<testTracerConfig> TestTracer;
+	// Global tracer instance for the test framework.
+	// Uses the non-viral Tracer class which respects TracingEnabled.
+	// Configure via -DHONESTY_TRACING_DISABLED or -DHONESTY_TRACING_DEBUG_ONLY
+	export inline honesty::trace::Tracer TestTracer;
 }

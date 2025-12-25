@@ -90,73 +90,59 @@ namespace honesty::trace
 	};
 
 
-	template<typename EnumType>
-	struct TracerConfigEntry
-	{
-		EnumType key;
-		TracerConfiguration config;
-
-		consteval TracerConfigEntry(EnumType key, const TracerConfiguration config) :
-			key(key),
-			config(config)
-		{
-		}
-	};
-
 	/**
-	 * @brief Entrypoint for creating Tracers
+	 * @brief Provider for managing multiple named tracers with shared span storage.
+	 *
+	 * All tracers respect the global TracingEnabled configuration. When tracing
+	 * is disabled, the entire Provider compiles to minimal overhead.
+	 *
+	 * @tparam EnumType An enum with a COUNT member defining the tracer categories
 	 */
-	export
-	template<group_enum EnumType, TracerConfigEntry<EnumType>... Entries>
+	export template<group_enum EnumType>
 	class Provider
 	{
 		static constexpr auto COUNT = std::to_underlying(EnumType::COUNT);
 
-		template<typename Enum>
-		struct TracerConfigExtractor;
-
-		template<typename Enum>
-		struct TracerConfigExtractor<TracerConfigEntry<Enum>>
-		{
-			using Type = TracerConfiguration;
-		};
-
-		// Check if any tracer is enabled at compile time
-		static constexpr bool AnyEnabled = (Entries.config.enabled || ...);
-
 	public:
-		consteval Provider() : tracers_{Tracer<Entries.config>{}...}
-		{
-		}
+		constexpr Provider() = default;
 
 		Provider(const Provider& other)                = delete;
 		Provider(Provider&& other) noexcept            = delete;
 		Provider& operator=(const Provider& other)     = delete;
 		Provider& operator=(Provider&& other) noexcept = delete;
 
+		/**
+		 * @brief Check if tracing is enabled at compile time
+		 */
+		static consteval bool IsEnabled()
+		{
+			return TracingEnabled;
+		}
+
+		/**
+		 * @brief Get a tracer for the specified category
+		 */
 		template<EnumType Value>
-		consteval bool IsTracerEnabled() const
+		const Tracer& Get() const
 		{
-			return Get<Value>().GetConfiguration().enabled;
+			return tracers_[std::to_underlying(Value)];
 		}
 
-		template<EnumType Value = static_cast<EnumType>(0)>
-		consteval const auto& Get() const
+		/**
+		 * @brief Get a mutable tracer for the specified category
+		 */
+		template<EnumType Value>
+		Tracer& GetMutable()
 		{
-			constexpr auto index = IndexOf(Value);
-			return GetTracerAtIndex<index>();
+			return tracers_[std::to_underlying(Value)];
 		}
 
-		template<EnumType Value = static_cast<EnumType>(0)>
-		auto& GetMutable()
+		/**
+		 * @brief Get the number of tracer categories
+		 */
+		static constexpr std::size_t Size()
 		{
-			constexpr auto index = IndexOf(Value);
-			return GetTracerAtIndexMutable<index>();
-		}
-
-		static constexpr std::uint8_t Size()
-		{
-			return sizeof...(Entries);
+			return COUNT;
 		}
 
 		/**
@@ -164,7 +150,7 @@ namespace honesty::trace
 		 */
 		void RecordSpan(const SpanData& data)
 		{
-			if constexpr (AnyEnabled)
+			if constexpr (TracingEnabled)
 			{
 				storage_.Push(data);
 			}
@@ -177,7 +163,7 @@ namespace honesty::trace
 		template<typename Callback>
 		void DrainSpans(Callback&& callback)
 		{
-			if constexpr (AnyEnabled)
+			if constexpr (TracingEnabled)
 			{
 				std::vector<SpanData> spans;
 				spans.reserve(storage_.Size());
@@ -199,7 +185,7 @@ namespace honesty::trace
 		 */
 		std::size_t BufferedSpanCount() const
 		{
-			if constexpr (AnyEnabled)
+			if constexpr (TracingEnabled)
 			{
 				return storage_.Size();
 			}
@@ -210,72 +196,9 @@ namespace honesty::trace
 		}
 
 	private:
-		template<std::size_t Index>
-		consteval const auto& GetTracerAtIndex() const
-		{
-			static_assert(Index < sizeof...(Entries), "Tracer index out of bounds");
-			return std::get<Index>(tracers_);
-		}
+		std::array<Tracer, COUNT> tracers_{};
 
-		template<std::size_t Index>
-		auto& GetTracerAtIndexMutable()
-		{
-			static_assert(Index < sizeof...(Entries), "Tracer index out of bounds");
-			return std::get<Index>(tracers_);
-		}
-
-		static consteval std::size_t IndexOf(EnumType value)
-		{
-			constexpr auto keys = std::array{Entries.key...};
-			for (std::size_t i = 0; i < keys.size(); ++i)
-			{
-				if (keys[i] == value)
-					return i;
-			}
-			// This will cause a compile error if enum not found
-			return sizeof...(Entries); // Out of bounds - will trigger static_assert
-		}
-
-		using TracerTuple = decltype(std::tuple{Tracer<Entries.config>{}...});
-		TracerTuple tracers_;
-
-		// Only allocate storage when at least one tracer is enabled
-		[[no_unique_address]] std::conditional_t<AnyEnabled, SpanRingBuffer<256>, std::monostate> storage_{};
-	};
-
-
-	/**
-	 * @brief Builder for creating a Tracer Provider
-	 */
-	export
-	template<group_enum EnumType, TracerConfigEntry<EnumType>... Entries>
-	class ProviderBuilder
-	{
-		// TODO: Use reflection instead of a hard-coded count type
-		static constexpr auto COUNT = std::to_underlying(EnumType::COUNT);
-
-	public:
-		explicit consteval ProviderBuilder() = default;
-
-		template<EnumType Key, TracerConfiguration Config>
-		consteval auto AddConfiguration() const
-		{
-			return ProviderBuilder<EnumType, Entries..., TracerConfigEntry<EnumType>{Key, Config}>();
-		}
-
-		consteval auto Build() const
-		{
-			static_assert(
-				sizeof...(Entries) == std::to_underlying(EnumType::COUNT),
-				"All enum values must have a configuration.");
-			return BuildProvider(std::make_index_sequence<sizeof...(Entries)>{});
-		}
-
-	private:
-		template<std::size_t... Is>
-		consteval auto BuildProvider(std::index_sequence<Is...>) const
-		{
-			return Provider<EnumType, Entries...>();
-		}
+		// Only allocate storage when tracing is enabled
+		[[no_unique_address]] std::conditional_t<TracingEnabled, SpanRingBuffer<256>, std::monostate> storage_{};
 	};
 }

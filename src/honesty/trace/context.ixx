@@ -71,24 +71,37 @@ namespace honesty::trace
 	public:
 		explicit ContextGuard(TraceID newTraceID, SpanID newSpanID) :
 			previousTraceID_(Context::Current().GetTraceID()),
-			previousSpanID_(Context::Current().GetSpanID())
+			previousSpanID_(Context::Current().GetSpanID()),
+			active_(true)
 		{
 			Context::Current().SetCurrent(newTraceID, newSpanID);
 		}
 
 		~ContextGuard()
 		{
-			Context::Current().SetCurrent(previousTraceID_, previousSpanID_);
+			if (active_)
+			{
+				Context::Current().SetCurrent(previousTraceID_, previousSpanID_);
+			}
 		}
 
 		ContextGuard(const ContextGuard&) = delete;
 		ContextGuard& operator=(const ContextGuard&) = delete;
-		ContextGuard(ContextGuard&&) = delete;
+
+		ContextGuard(ContextGuard&& other) noexcept :
+			previousTraceID_(other.previousTraceID_),
+			previousSpanID_(other.previousSpanID_),
+			active_(other.active_)
+		{
+			other.active_ = false;  // Prevent other from restoring context
+		}
+
 		ContextGuard& operator=(ContextGuard&&) = delete;
 
 	private:
 		TraceID previousTraceID_;
 		SpanID previousSpanID_;
+		bool active_;
 	};
 
 	/**

@@ -13,17 +13,25 @@ namespace honesty::trace
 		};
 
 	/**
-	 * @brief Compile-time options for a tracer.
+	 * @brief Compile-time tracing configuration.
+	 *
+	 * When disabled, all tracing compiles to nothing via `if constexpr`.
+	 * This provides true zero-cost tracing when disabled in production builds.
+	 *
+	 * Configure via build system defines:
+	 *   -DHONESTY_TRACING_DISABLED -> All tracing disabled (zero cost)
+	 *   (default)                  -> Tracing enabled
+	 *
+	 * For debug/release automatic configuration:
+	 *   -DHONESTY_TRACING_DEBUG_ONLY -> Enabled in debug, disabled in release (NDEBUG)
 	 */
-	export struct TracerConfiguration
-	{
-		explicit consteval TracerConfiguration(const bool enabled) :
-			enabled(enabled)
-		{
-		}
-
-		bool enabled;
-	};
+#if defined(HONESTY_TRACING_DISABLED)
+	export inline constexpr bool TracingEnabled = false;
+#elif defined(HONESTY_TRACING_DEBUG_ONLY) && defined(NDEBUG)
+	export inline constexpr bool TracingEnabled = false;
+#else
+	export inline constexpr bool TracingEnabled = true;
+#endif
 
 	/**
 	 * @brief Supported attribute value types for span attributes

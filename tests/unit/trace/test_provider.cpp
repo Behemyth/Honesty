@@ -7,16 +7,10 @@ using namespace honesty::test::literals;
 
 namespace
 {
-	// Define enums and configs at namespace scope to avoid nested initializer issues
-	enum class SingleProviderType
+	// Define enum for provider test
+	enum class TestCategory
 	{
-		BASE,
-		COUNT
-	};
-
-	enum class DualProviderType
-	{
-		BASE,
+		FIRST,
 		SECOND,
 		COUNT
 	};
@@ -25,27 +19,61 @@ namespace
 		"provider",
 		[]() -> Generator
 		{
-			co_yield "size"_test = [](const Requirements& requirements)
+			co_yield "provider_size"_test = [](const Requirements& requirements)
 			{
-				constexpr honesty::trace::TracerConfiguration config{true};
+				honesty::trace::Provider<TestCategory> provider;
 
-				// Test that Size() returns correct value
-				honesty::trace::Tracer<config> tracer;
-				requirements.Expect(tracer.GetConfiguration().enabled);
+				requirements.ExpectEquals(provider.Size(), std::size_t{2});
 			};
 
-			co_yield "tracer_configuration"_test = [](const Requirements& requirements)
+			co_yield "provider_get_tracer"_test = [](const Requirements& requirements)
 			{
-				constexpr honesty::trace::TracerConfiguration enabledConfig{true};
-				constexpr honesty::trace::TracerConfiguration disabledConfig{false};
+				honesty::trace::Provider<TestCategory> provider;
 
-				honesty::trace::Tracer<enabledConfig> enabled;
-				honesty::trace::Tracer<disabledConfig> disabled;
+				// Can get tracers by category
+				const auto& first = provider.Get<TestCategory::FIRST>();
+				const auto& second = provider.Get<TestCategory::SECOND>();
 
-				requirements.Expect(enabled.GetConfiguration().enabled);
-				requirements.Expect(!disabled.GetConfiguration().enabled);
+				// Both should be Tracer instances
+				static_assert(std::is_same_v<std::decay_t<decltype(first)>, honesty::trace::Tracer>);
+				static_assert(std::is_same_v<std::decay_t<decltype(second)>, honesty::trace::Tracer>);
+
+				requirements.Expect(true);
 			};
-		}
-		);
+
+			co_yield "provider_is_enabled"_test = [](const Requirements& requirements)
+			{
+				// Provider::IsEnabled() should match global TracingEnabled
+				static_assert(
+					honesty::trace::Provider<TestCategory>::IsEnabled() == honesty::trace::TracingEnabled);
+				requirements.Expect(true);
+			};
+
+			co_yield "provider_create_span"_test = [](const Requirements& requirements)
+			{
+				honesty::trace::Provider<TestCategory> provider;
+
+				auto span = provider.Get<TestCategory::FIRST>().CreateSpan("provider_span");
+
+				if constexpr (honesty::trace::TracingEnabled)
+				{
+					requirements.ExpectEquals(span.Data().name, std::string_view{"provider_span"});
+					requirements.Expect(span.Data().traceID.IsValid());
+				}
+				else
+				{
+					static_assert(std::is_same_v<decltype(span), honesty::NoopSpan>);
+					requirements.Expect(true);
+				}
+			};
+
+			co_yield "provider_buffered_span_count"_test = [](const Requirements& requirements)
+			{
+				honesty::trace::Provider<TestCategory> provider;
+
+				// Initially empty
+				requirements.ExpectEquals(provider.BufferedSpanCount(), std::size_t{0});
+			};
+		});
 	SuiteRegistrar _(SUITE);
 }

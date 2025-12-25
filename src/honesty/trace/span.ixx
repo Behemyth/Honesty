@@ -69,7 +69,6 @@ namespace honesty::trace
 	 */
 	export class Span
 	{
-		template<TracerConfiguration Configuration>
 		friend class Tracer;
 
 	public:

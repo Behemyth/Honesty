@@ -7,55 +7,65 @@ using namespace honesty::test::literals;
 
 namespace
 {
-	// Use simple Tracer directly to avoid MSVC compiler limits with nested initializers
-	constexpr honesty::trace::TracerConfiguration enabledConfig{true};
-	constexpr honesty::trace::TracerConfiguration disabledConfig{false};
-	honesty::trace::Tracer<enabledConfig> enabledTracer;
-	honesty::trace::Tracer<disabledConfig> disabledTracer;
+	// Test the Tracer (uses global TracingEnabled)
+	honesty::trace::Tracer tracer;
 
 	Suite SUITE(
 		"tracer",
 		[]() -> Generator
 		{
+			co_yield "tracer_respects_global_config"_test = [](const Requirements& requirements)
+			{
+				// Test that Tracer respects the global TracingEnabled flag
+				auto span = tracer.CreateSpan("test_span");
+
+				if constexpr (honesty::trace::TracingEnabled)
+				{
+					// When enabled, we get a real Span
+					const auto& data = span.Data();
+					requirements.ExpectEquals(data.name, std::string_view{"test_span"});
+					requirements.Expect(data.traceID.IsValid());
+					requirements.Expect(data.spanID.IsValid());
+				}
+				else
+				{
+					// When disabled, we get NoopSpan
+					static_assert(std::is_same_v<decltype(span), honesty::NoopSpan>);
+				}
+			};
+
 			co_yield "is_trivially_constructible"_test = [](const Requirements& requirements)
 			{
-				constexpr auto configuration = honesty::trace::TracerConfiguration(true);
-
-				static_assert(
-					std::is_trivially_constructible_v<honesty::trace::Tracer<configuration>>);
+				// Tracer should be trivially constructible
+				static_assert(std::is_trivially_constructible_v<honesty::trace::Tracer>);
 			};
 
-			co_yield "enabled_tracer_creates_span"_test = [](const Requirements& requirements)
+			co_yield "is_enabled_is_consteval"_test = [](const Requirements& requirements)
 			{
-				auto span = enabledTracer.CreateSpan("test_span");
-
-				requirements.Expect(enabledTracer.GetConfiguration().enabled);
-
-				// Verify span has valid data
-				const auto& data = span.Data();
-				requirements.ExpectEquals(data.name, std::string_view{"test_span"});
-				requirements.Expect(data.traceID.IsValid());
-				requirements.Expect(data.spanID.IsValid());
+				// Tracer::IsEnabled() should be consteval and match TracingEnabled
+				static_assert(honesty::trace::Tracer::IsEnabled() == honesty::trace::TracingEnabled);
+				requirements.Expect(true);
 			};
 
-			co_yield "disabled_tracer_creates_noop"_test = [](const Requirements& requirements)
+			co_yield "zero_cost_size"_test = [](const Requirements& requirements)
 			{
-				auto span = disabledTracer.CreateSpan("should_be_noop");
-
-				requirements.Expect(!disabledTracer.GetConfiguration().enabled);
-
-				// NoopSpan has no data() method - it's completely elided
-				static_assert(std::is_same_v<decltype(span), honesty::NoopSpan>);
+				// The tracer should have minimal size
+				requirements.Expect(sizeof(honesty::trace::Tracer) <= sizeof(honesty::trace::TracerOptions) + 8);
 			};
 
-			co_yield "zero_cost_when_disabled"_test = [](const Requirements& requirements)
+			co_yield "scoped_span"_test = [](const Requirements& requirements)
 			{
-				// Verify that disabled tracer has minimal size (no sink pointer)
-				constexpr auto config = honesty::trace::TracerConfiguration(false);
-				using DisabledTracer = honesty::trace::Tracer<config>;
+				auto [span, guard] = tracer.CreateScopedSpan("scoped_test");
 
-				// The tracer should only contain TracerOptions when disabled
-				requirements.Expect(sizeof(DisabledTracer) <= sizeof(honesty::trace::TracerOptions) + 8);
+				if constexpr (honesty::trace::TracingEnabled)
+				{
+					requirements.ExpectEquals(span.Data().name, std::string_view{"scoped_test"});
+				}
+				else
+				{
+					static_assert(std::is_same_v<decltype(span), honesty::NoopSpan>);
+					static_assert(std::is_same_v<decltype(guard), honesty::trace::NoopContextGuard>);
+				}
 			};
 		});
 	SuiteRegistrar _(SUITE);

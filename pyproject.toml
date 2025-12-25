@@ -79,9 +79,8 @@ skip_empty = true
 build = "cppython build"
 test = "cppython test"
 serve = "zensical serve"
-config = "copier update --defaults"
-post_install.shell = "if exist .copier-answers.yml (copier update --defaults --skip-answered)"
-post_update.shell = "if exist .copier-answers.yml (copier update --defaults --skip-answered)"
+post_install = "copier recopy --force --skip-answered"
+post_update = "copier recopy --force --skip-answered"
 
 [build-system]
 build-backend = "pdm.backend"

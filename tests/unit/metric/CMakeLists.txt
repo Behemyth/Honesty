@@ -4,6 +4,7 @@ PRIVATE
 	test_comparison.cpp
 	test_context.cpp
 	test_history.cpp
+	test_resource.cpp
 	test_results.cpp
 	test_timer.cpp
 )

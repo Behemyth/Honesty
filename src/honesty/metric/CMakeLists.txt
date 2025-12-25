@@ -12,10 +12,12 @@ target_sources(honesty
 			timer.ixx
 			results.ixx
 			platform.ixx
+			resource.ixx
 	PRIVATE
 		FILE_SET metric_private
 		TYPE CXX_MODULES
 )
 
 add_subdirectory(platform)
+add_subdirectory(resource)
 add_subdirectory(sink)

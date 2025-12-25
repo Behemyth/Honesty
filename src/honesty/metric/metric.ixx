@@ -5,6 +5,7 @@ export import :context;
 export import :escape;
 export import :history;
 export import :platform;
+export import :resource;
 export import :results;
 export import :types;
 export import :timer;

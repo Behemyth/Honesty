@@ -7,6 +7,7 @@ The metric module provides benchmarking and performance measurement capabilities
 - [Overview](#overview)
 - [Measurement Contexts](#measurement-contexts)
 - [Results](#results)
+- [Resource Collection](#resource-collection)
 - [OpenTelemetry Export](#opentelemetry-export)
 - [Usage Examples](#usage-examples)
 
@@ -91,6 +92,96 @@ Features:
 - **Welford's algorithm** for numerically stable mean and variance
 - **Online computation** - no need to store all samples
 - **Compile-time composition** - only pay for features you use
+
+---
+
+## Resource Collection
+
+The `ResourceCollector` class provides point-in-time sampling of system resource usage (CPU, memory) for the current process. This is useful for monitoring resource consumption during benchmarks or any code execution.
+
+### Platform Implementation
+
+| Platform | CPU Measurement | Memory Measurement |
+|----------|-----------------|-------------------|
+| Windows | `GetProcessTimes` | `GetProcessMemoryInfo` |
+| Linux | `/proc/self/stat` | `/proc/self/statm`, `/proc/self/status` |
+
+### Basic Usage
+
+```cpp
+import synodic.honesty.metric;
+
+using namespace honesty::metric;
+
+ResourceCollector collector;
+collector.Initialize();
+
+// Take a point-in-time sample
+ResourceSample sample = collector.Sample();
+
+std::println("CPU: {:.2f}%", sample.cpuUsagePercent);
+std::println("Memory: {} bytes", sample.memoryUsageBytes);
+std::println("Peak Memory: {} bytes", sample.peakMemoryBytes);
+```
+
+### ResourceSample
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `timestamp` | `Clock::time_point` | When the sample was taken |
+| `cpuUsagePercent` | `double` | Process CPU usage (0-100+, may exceed 100% on multi-core) |
+| `memoryUsageBytes` | `std::size_t` | Current working set / RSS |
+| `peakMemoryBytes` | `std::size_t` | Peak memory usage |
+
+### Configuration
+
+```cpp
+ResourceConfig config;
+config.collectCpu = true;     // Enable CPU collection (default: true)
+config.collectMemory = true;  // Enable memory collection (default: true)
+
+ResourceCollector collector(config);
+```
+
+### Scoped Sampling
+
+Use `ScopedResourceSampler` to automatically capture resource usage across a scope:
+
+```cpp
+ResourceCollector collector;
+collector.Initialize();
+
+{
+    ScopedResourceSampler sampler(collector);
+
+    // ... code to measure ...
+
+    ResourceSample delta = sampler.End();
+    std::println("Memory delta: {} bytes", delta.memoryUsageBytes);
+}
+```
+
+### Integration with Benchmarks
+
+```cpp
+ResourceCollector collector;
+collector.Initialize();
+
+TimedContext context(std::chrono::seconds(1));
+
+// Sample before
+ResourceSample before = collector.Sample();
+
+Results results = context.Measure([]() {
+    // Code to benchmark
+});
+
+// Sample after
+ResourceSample after = collector.Sample();
+
+std::println("Benchmark mean: {} ns", results.mean.count());
+std::println("Memory used: {} bytes", after.memoryUsageBytes - before.memoryUsageBytes);
+```
 
 ---
 

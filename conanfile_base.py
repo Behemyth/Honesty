@@ -24,7 +24,7 @@ class CPPythonBase(ConanFile):
         """CPPython managed requirements."""
         self.requires("opentelemetry-cpp/[>=1.22.0]")
         self.requires("portability/[>=0.0.0.dev]")
-        self.requires("synodic-template-library/[>=0.0.0.dev]")
+        self.requires("periapsis/[>=0.0.0.dev]")
 
     def build_requirements(self):
         """CPPython managed build and test requirements."""

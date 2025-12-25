@@ -55,6 +55,18 @@ Results results = context.Measure([]() {
 });
 ```
 
+#### Clock Resolution
+
+`RegressionContext` automatically measures the actual clock resolution at startup (typically ~20-100ns on modern systems) and sets the target sample duration to `resolution × 1000`. This ensures each timing sample is long enough to be accurate relative to clock granularity.
+
+You can adjust this via configuration:
+
+```cpp
+// For very fast operations, increase the multiplier for more stable results
+RegressionContext context;
+context.ClockResolutionMultiple(2000);  // 2000× clock resolution per sample
+```
+
 ---
 
 ## Results

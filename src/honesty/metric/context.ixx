@@ -33,12 +33,32 @@ namespace honesty::metric
 	export class TimedContext
 	{
 	public:
-		explicit(false) TimedContext(const std::chrono::nanoseconds duration) :
-			targetSampleDuration_(duration)
+		/**
+		 * @param minSampleDuration Minimum duration for each sample (determines iteration scaling)
+		 * @param maxTotalDuration Maximum total time budget for measurement (default: 1 second)
+		 */
+		explicit TimedContext(
+			const std::chrono::nanoseconds minSampleDuration,
+			const std::chrono::nanoseconds maxTotalDuration = std::chrono::seconds(1)) :
+			targetSampleDuration_(minSampleDuration),
+			maxTotalDuration_(maxTotalDuration)
 		{
 		}
 
 		Results Measure(const std::function_ref<void()> metric)
+		{
+			return MeasureImpl(metric, 1);
+		}
+
+	protected:
+		/**
+		 * @brief Internal measurement implementation
+		 * @param metric The function to measure
+		 * @param minIterationsPerSample Minimum iterations per sample
+		 */
+		Results MeasureImpl(
+			const std::function_ref<void()> metric,
+			std::uint32_t minIterationsPerSample)
 		{
 			if constexpr (!MetricsEnabled)
 			{
@@ -49,12 +69,13 @@ namespace honesty::metric
 			}
 			else
 			{
-				MetricContextLogger().Debug("Starting timed measurement (target: {}ns)",
-					targetSampleDuration_.count());
+				MetricContextLogger().Debug("Starting timed measurement (min sample: {}ns, max total: {}ns)",
+					targetSampleDuration_.count(), maxTotalDuration_.count());
 
-				// TODO: Minimize wrapping logic around the executed function
-				State state(targetSampleDuration_);
+				State state(targetSampleDuration_, maxTotalDuration_, minIterationsPerSample);
 				BenchmarkAccumulator accumulator;
+				std::vector<double> rawSamples;
+				rawSamples.reserve(State::maxSamples);
 
 				// Each measurement depends on the previous sample.
 				while (true)
@@ -72,12 +93,13 @@ namespace honesty::metric
 						}
 					}
 
-					// Push normalized per-iteration time to accumulator
+					// Push normalized per-iteration time to accumulator and raw samples
 					if (state.lastIterationCount > 0)
 					{
 						const double iterationTimeNs =
 							static_cast<double>(duration.count()) / static_cast<double>(state.lastIterationCount);
 						accumulator.Push(iterationTimeNs);
+						rawSamples.push_back(iterationTimeNs);
 					}
 
 					if (not state.Push(duration))
@@ -87,10 +109,10 @@ namespace honesty::metric
 				}
 
 				Results results;
-				results.FromAccumulator(accumulator, state.totalIterations, state.totalDuration);
+				results.FromAccumulatorWithSamples(accumulator, std::move(rawSamples), state.totalIterations, state.totalDuration);
 
-				MetricContextLogger().Trace("Measurement complete: {} iterations, {} samples, mean={}ns",
-					results.iterations, results.samples, results.mean.count());
+				MetricContextLogger().Trace("Measurement complete: {} iterations, {} samples, median={}ns, MdAPE={:.2f}%",
+					results.iterations, results.samples, results.median.count(), results.mdape * 100.0);
 
 				return results;
 			}
@@ -102,13 +124,25 @@ namespace honesty::metric
 		 */
 		struct State
 		{
-			explicit State(const std::chrono::nanoseconds targetDuration) :
-				targetIterations(1),
+			/**
+			 * @param minSampleDuration Minimum duration for each sample (based on clock resolution)
+			 * @param maxTotalDuration Maximum total time budget for measurement
+			 * @param minIterations Minimum iterations per sample
+			 */
+			explicit State(
+				const std::chrono::nanoseconds minSampleDuration,
+				const std::chrono::nanoseconds maxTotalDuration,
+				const std::uint32_t minIterations = 1) :
+				targetIterations(std::max(1u, minIterations)),
 				lastIterationCount(0),
 				totalIterations(0),
 				sampleCount(0),
 				totalDuration(0),
-				targetDuration(targetDuration)
+				minSampleDuration(minSampleDuration),
+				maxTotalDuration(maxTotalDuration),
+				minIterationsPerSample(std::max(1u, minIterations)),
+				rng(std::random_device{}()),
+				noiseDist(0.0, 0.2)  // 0-20% noise
 			{
 			}
 
@@ -136,20 +170,32 @@ namespace honesty::metric
 				totalIterations += lastIterationCount;
 				++sampleCount;
 
-				// Check if we've collected enough samples or exceeded time budget
-				// Minimum 1 sample, stop after reasonable sample count or time
-				if (sampleCount >= maxSamples || totalDuration >= targetDuration)
+				// Stop conditions:
+				// 1. Collected maximum samples (for statistical robustness)
+				// 2. Exceeded time budget (to prevent runaway measurements)
+				if (sampleCount >= maxSamples || totalDuration >= maxTotalDuration)
 				{
 					return false;
 				}
 
-				// Set the next sample's iteration count based on timing
+				// Calculate iterations for next sample to meet minimum sample duration
+				// This is key for accuracy: each sample must be long enough relative to clock resolution
 				std::uint32_t nextIterations = 1;
 				if (elapsed > 0)
 				{
-					// Scale iterations to try to hit target duration per sample
-					const double scale = static_cast<double>(targetDuration.count()) / elapsed;
-					nextIterations = std::max(1u, static_cast<std::uint32_t>(scale * lastIterationCount));
+					// Scale iterations so next sample targets minSampleDuration
+					// If current sample took `elapsed` ns for `lastIterationCount` iterations,
+					// we need (minSampleDuration / elapsed) * lastIterationCount iterations
+					const double scale = static_cast<double>(minSampleDuration.count()) / elapsed;
+					double baseIterations = scale * lastIterationCount;
+
+					// Add 0-20% random noise to prevent aliasing effects
+					// This technique is from nanobench and improves accuracy
+					const double noise = 1.0 + noiseDist(rng);
+					baseIterations *= noise;
+
+					// Enforce minimum iterations per sample
+					nextIterations = std::max(minIterationsPerSample, static_cast<std::uint32_t>(baseIterations));
 				}
 
 				// Reset for next sample
@@ -163,13 +209,25 @@ namespace honesty::metric
 			std::uint32_t lastIterationCount;
 			std::size_t totalIterations;
 			std::size_t sampleCount;
-			static constexpr std::size_t maxSamples = 100;
+
+			/// Maximum number of samples to collect (nanobench default is 1001)
+			static constexpr std::size_t maxSamples = 1001;
 
 			std::chrono::nanoseconds totalDuration;
-			std::chrono::nanoseconds targetDuration;
+			/// Minimum duration for each sample (clock resolution × multiplier)
+			std::chrono::nanoseconds minSampleDuration;
+			/// Maximum total measurement time budget
+			std::chrono::nanoseconds maxTotalDuration;
+			/// Minimum iterations per sample
+			std::uint32_t minIterationsPerSample;
+
+			// Random noise generator for anti-aliasing
+			std::minstd_rand rng;
+			std::uniform_real_distribution<double> noiseDist;
 		};
 
 		std::chrono::nanoseconds targetSampleDuration_;
+		std::chrono::nanoseconds maxTotalDuration_;
 	};
 
 	/**
@@ -193,20 +251,29 @@ namespace honesty::metric
 
 			/// Whether to apply platform tuning during measurement
 			bool enablePlatformTuning = true;
+
+			/// Clock resolution multiplier (higher = longer samples, more stable)
+			/// nanobench uses 1000, which means each sample targets 1000x the clock resolution
+			std::size_t clockResolutionMultiple = 1000;
+
+			/// Maximum total measurement time (default: 1 second)
+			std::chrono::nanoseconds maxTotalDuration = std::chrono::seconds(1);
+
+			/// Minimum iterations per sample (prevents unreliable single-iteration samples)
+			std::uint32_t minIterationsPerSample = 1;
 		};
 
 		/**
 		 * @brief Initializes the context to an estimated minimal fit of iterations/samples
 		 */
 		explicit RegressionContext(Config config = {}) :
-			TimedContext(std::chrono::nanoseconds(1)),
+			TimedContext(GetClockResolution() * config.clockResolutionMultiple, config.maxTotalDuration),
 			config_(std::move(config))
 		{
-			// TODO: Move the calculation to the initializer
-			const Duration resolution(20);	// TODO: Get the resolution of the current clock
-
-			// TODO: Config the multiplier
-			targetSampleDuration_ = resolution * 1000;
+			MetricContextLogger().Debug("Clock resolution: {}ns, min sample duration: {}ns, max total: {}ns",
+				std::chrono::duration_cast<std::chrono::nanoseconds>(GetClockResolution()).count(),
+				targetSampleDuration_.count(),
+				maxTotalDuration_.count());
 		}
 
 		/**
@@ -255,7 +322,7 @@ namespace honesty::metric
 				}
 
 				// Perform actual measurement
-				lastResults_ = TimedContext::Measure(metric);
+				lastResults_ = TimedContext::MeasureImpl(metric, config_.minIterationsPerSample);
 
 				MetricContextLogger().Debug("Regression measurement complete");
 				return lastResults_;
@@ -298,6 +365,30 @@ namespace honesty::metric
 		RegressionContext& EnablePlatformTuning(bool enable) noexcept
 		{
 			config_.enablePlatformTuning = enable;
+			return *this;
+		}
+
+		/**
+		 * @brief Set the clock resolution multiplier
+		 * @param multiple Target duration = clock resolution × multiple (default: 1000)
+		 * @return Reference to this context for chaining
+		 */
+		RegressionContext& ClockResolutionMultiple(std::size_t multiple) noexcept
+		{
+			config_.clockResolutionMultiple = multiple;
+			// Recalculate target duration
+			targetSampleDuration_ = GetClockResolution() * multiple;
+			return *this;
+		}
+
+		/**
+		 * @brief Set minimum iterations per sample
+		 * @param count Minimum iterations to run per sample (default: 1)
+		 * @return Reference to this context for chaining
+		 */
+		RegressionContext& MinIterationsPerSample(std::uint32_t count) noexcept
+		{
+			config_.minIterationsPerSample = std::max(1u, count);
 			return *this;
 		}
 

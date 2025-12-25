@@ -3,7 +3,7 @@ export module synodic.honesty.test.backend:tag;
 import std;
 import fixed_string;
 import inplace_vector;
-import synodic.library;
+import synodic.periapsis;
 
 namespace honesty::test
 {
@@ -24,7 +24,7 @@ namespace honesty::test
 		static constexpr int MAX_NAME_SIZE = 13;
 
 	public:
-		using value_type			 = synodic::InplaceString<MAX_NAME_SIZE>;
+		using value_type			 = peri::InplaceString<MAX_NAME_SIZE>;
 		using pointer				 = value_type*;
 		using const_pointer			 = const value_type*;
 		using reference				 = value_type&;
@@ -125,7 +125,7 @@ namespace honesty::test
 		friend class BenchmarkTag;
 
 		std::array<value_type, MAX_TAGS> tags_;
-		synodic::MinimalIntegerType<MAX_TAGS> size_;
+		peri::MinimalIntegerType<MAX_TAGS> size_;
 	};
 
 	/**
@@ -139,7 +139,7 @@ namespace honesty::test
 		static constexpr int MAX_NAME_SIZE = 13;
 
 	public:
-		using value_type			 = synodic::InplaceString<MAX_NAME_SIZE>;
+		using value_type			 = peri::InplaceString<MAX_NAME_SIZE>;
 		using pointer				 = value_type*;
 		using const_pointer			 = const value_type*;
 		using reference				 = value_type&;
@@ -256,7 +256,7 @@ namespace honesty::test
 		friend class Tag;
 
 		std::array<value_type, MAX_TAGS> tags_;
-		synodic::MinimalIntegerType<MAX_TAGS> size_;
+		peri::MinimalIntegerType<MAX_TAGS> size_;
 	};
 
 	// Deferred definition after BenchmarkTag is complete

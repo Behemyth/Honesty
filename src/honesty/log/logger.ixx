@@ -5,7 +5,7 @@ import :colour;
 import :sink;
 import :types;
 
-import synodic.library;
+import synodic.periapsis;
 import synodic.honesty.utility;
 
 namespace honesty::log
@@ -318,7 +318,7 @@ namespace honesty::log
 	class LoggerRegistry
 	{
 		static constexpr std::string_view ROOT_LOGGER_NAME = "root";
-		static constexpr auto ROOT_LOGGER_HASH             = synodic::Hash(ROOT_LOGGER_NAME);
+		static constexpr auto ROOT_LOGGER_HASH             = peri::Hash(ROOT_LOGGER_NAME);
 
 	public:
 		consteval LoggerRegistry() :

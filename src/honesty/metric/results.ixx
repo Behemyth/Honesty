@@ -1,6 +1,6 @@
 export module synodic.honesty.metric:results;
 
-import synodic.library;
+import synodic.periapsis;
 
 import :types;
 import std;
@@ -9,18 +9,15 @@ namespace honesty::metric
 {
 	/**
 	 * @brief Accumulator type for collecting benchmark timing samples.
-	 *
-	 * Uses synodic-template-library's compile-time composable statistics to
-	 * efficiently compute running statistics with Welford's online algorithm.
 	 */
-	export using BenchmarkAccumulator = synodic::statistics::Accumulator<
+	export using BenchmarkAccumulator = peri::statistics::Accumulator<
 		double,
-		synodic::statistics::count,
-		synodic::statistics::sum,
-		synodic::statistics::mean,
-		synodic::statistics::variance,
-		synodic::statistics::min,
-		synodic::statistics::max>;
+		peri::statistics::count,
+		peri::statistics::sum,
+		peri::statistics::mean,
+		peri::statistics::variance,
+		peri::statistics::min,
+		peri::statistics::max>;
 
 	/**
 	 * @brief A duration type using double representation for statistical calculations.
@@ -114,20 +111,20 @@ namespace honesty::metric
 			std::size_t totalIterations,
 			Duration duration)
 		{
-			iterations	  = totalIterations;
-			samples		  = accumulator.template get<synodic::statistics::count>().result();
+			iterations    = totalIterations;
+			samples       = accumulator.get<peri::statistics::count>().result();
 			totalDuration = duration;
 
-			mean	 = StatsDuration(accumulator.template get<synodic::statistics::mean>().result());
-			variance = StatsDuration(accumulator.template get<synodic::statistics::variance>().result());
-			stddev	 = StatsDuration(accumulator.template get<synodic::statistics::variance>().stddev());
+			mean     = StatsDuration(accumulator.get<peri::statistics::mean>().result());
+			variance = StatsDuration(accumulator.get<peri::statistics::variance>().result());
+			stddev   = StatsDuration(accumulator.get<peri::statistics::variance>().stddev());
 
-			if (const auto minResult = accumulator.template get<synodic::statistics::min>().result())
+			if (const auto minResult = accumulator.get<peri::statistics::min>().result())
 			{
 				min = StatsDuration(*minResult);
 			}
 
-			if (const auto maxResult = accumulator.template get<synodic::statistics::max>().result())
+			if (const auto maxResult = accumulator.get<peri::statistics::max>().result())
 			{
 				max = StatsDuration(*maxResult);
 			}

@@ -3,7 +3,7 @@ export module synodic.honesty.test.api:reporter.standard;
 import synodic.honesty.log;
 import synodic.honesty.test;
 import synodic.honesty.metric;
-import synodic.library;
+import synodic.periapsis;
 import std;
 
 namespace
@@ -109,7 +109,7 @@ namespace honesty::test
 			// Check to see if the compacted summary can fit on a single line
 			if (a.contains("\n") or b.contains("\n") or totalSize >= maxLineLength)
 			{
-				throw synodic::NotImplementedException();
+				throw peri::NotImplementedException();
 			}
 
 			const std::string introduction = format("{}Expected:", indent);

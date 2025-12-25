@@ -268,7 +268,7 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						auto mean = accumulator.get<synodic::statistics::mean>().result();
+						auto mean = accumulator.get<peri::statistics::mean>().result();
 						DoNotOptimize(mean);
 					});
 				};
@@ -320,7 +320,7 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						auto variance = accumulator.get<synodic::statistics::variance>().result();
+						auto variance = accumulator.get<peri::statistics::variance>().result();
 						DoNotOptimize(variance);
 					});
 				};
@@ -388,11 +388,11 @@ namespace
 
 					ctx.Measure([&]()
 					{
-						auto count = accumulator.get<synodic::statistics::count>().result();
-						auto mean = accumulator.get<synodic::statistics::mean>().result();
-						auto variance = accumulator.get<synodic::statistics::variance>().result();
-						auto min = accumulator.get<synodic::statistics::min>().result();
-						auto max = accumulator.get<synodic::statistics::max>().result();
+						auto count = accumulator.get<peri::statistics::count>().result();
+						auto mean = accumulator.get<peri::statistics::mean>().result();
+						auto variance = accumulator.get<peri::statistics::variance>().result();
+						auto min = accumulator.get<peri::statistics::min>().result();
+						auto max = accumulator.get<peri::statistics::max>().result();
 						DoNotOptimize(count);
 						DoNotOptimize(mean);
 						DoNotOptimize(variance);

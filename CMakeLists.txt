@@ -37,7 +37,7 @@ target_compile_features(honesty PUBLIC cxx_std_23)
 target_compile_features(honesty_main PUBLIC cxx_std_23)
 
 find_package(opentelemetry-cpp REQUIRED)
-find_package(synodic-template-library REQUIRED)
+find_package(periapsis REQUIRED)
 find_package(portability REQUIRED)
 
 target_link_libraries(honesty
@@ -45,7 +45,7 @@ target_link_libraries(honesty
 	synodic::portability
 	PRIVATE
 	opentelemetry-cpp::opentelemetry-cpp
-	synodic::synodic-template-library
+	synodic::periapsis
 )
 
 # Link the main library to the convenience variant
@@ -53,7 +53,7 @@ target_link_libraries(honesty_main
 	PUBLIC
 	synodic::honesty
 	synodic::portability
-	synodic::synodic-template-library
+	synodic::periapsis
 )
 
 # Gather and define all the project and sub-project sources
